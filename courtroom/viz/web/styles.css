@@ -936,3 +936,6 @@ svg .muted { fill: var(--muted); }
   .tour-actions .btn { flex: 1; }
 }
 @media (max-width: 520px) { #tour-btn { width: 36px; height: 36px; } }
+.tour-skip { height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 0.8125rem; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tour-skip:hover { color: var(--ink); background: var(--wash); }
+@media (max-width: 640px) { .tour-skip { flex: none !important; } }

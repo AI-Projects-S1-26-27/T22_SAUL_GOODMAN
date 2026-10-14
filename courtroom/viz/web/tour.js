@@ -174,11 +174,13 @@ function tourRenderCard(step) {
     actions.push(el("button", { type: "button", class: "btn quiet small", "data-act": "back" }, "Back"));
     actions.push(el("button", { type: "button", class: "btn primary small", "data-act": "finish" }, "Start a trial", icon("i-arrow")));
   } else {
+    actions.push(el("button", { type: "button", class: "tour-skip", "data-act": "skip" }, "Skip tour"));
     actions.push(el("button", { type: "button", class: "btn quiet small", "data-act": "back", disabled: i === 0 }, "Back"));
     actions.push(el("button", { type: "button", class: "btn primary small", "data-act": "next" }, i === n - 2 ? "Finish" : "Next", icon("i-arrow")));
   }
   T.card.classList.toggle("is-welcome", Boolean(step.welcome || step.finale));
-  T.card.replaceChildren(
+  // replaceChildren (unlike el) turns null into the text "null", so optional parts are filtered out
+  T.card.replaceChildren(...[
     el("div", { class: "tour-top" },
       el("span", { class: "tour-kicker" }, step.kicker),
       step.welcome || step.finale ? null : el("span", { class: "tour-count" }, `${i} of ${n - 2}`),
@@ -190,7 +192,7 @@ function tourRenderCard(step) {
     step.keys ? el("p", { class: "tour-keys" }, "Keyboard: ", el("kbd", {}, "←"), " ", el("kbd", {}, "→"), " to step, ", el("kbd", {}, "Space"), " to play or pause.") : null,
     step.welcome ? el("p", { class: "tour-hint" }, "You can replay this tour any time with the ? button at the top.") : null,
     el("div", { class: "tour-foot" }, step.welcome || step.finale ? null : dots, el("div", { class: "tour-actions" }, actions)),
-  );
+  ].filter(Boolean));
   T.card.querySelector(".tour-x svg")?.append(svg("path", { d: "M6 6l12 12M18 6 6 18" }));
   T.card.querySelectorAll("[data-act]").forEach((b) => b.addEventListener("click", () => tourAct(b.dataset.act)));
   T.card.classList.remove("swap");
