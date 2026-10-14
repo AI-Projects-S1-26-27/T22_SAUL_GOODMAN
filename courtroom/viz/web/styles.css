@@ -873,3 +873,66 @@ svg .muted { fill: var(--muted); }
 .site-footer { padding-block: 8px 48px; font-size: 0.875rem; color: var(--muted); }
 .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 32px; padding-inline: 34px; }
 @media (max-width: 640px) { .footer-inner { padding-inline: 18px; } }
+
+/* ------------------------------------------------------------------ guided tour */
+
+.tour { position: fixed; inset: 0; z-index: 100; }
+.tour-shield { position: absolute; inset: 0; }
+/* the spotlight: a clear box whose giant shadow dims everything else */
+.tour-spot {
+  position: fixed; border-radius: 14px; pointer-events: none;
+  box-shadow: 0 0 0 2px var(--p), 0 0 0 9999px rgb(8 12 20 / 62%);
+  transition: top .35s var(--ease), left .35s var(--ease), width .35s var(--ease), height .35s var(--ease), border-radius .35s;
+  animation: tour-fade .25s var(--ease);
+}
+.tour.centered .tour-spot { border-radius: 50%; box-shadow: 0 0 0 9999px rgb(8 12 20 / 62%); }
+.tour-card {
+  position: fixed; width: min(380px, calc(100vw - 32px)); padding: 20px 22px 18px;
+  border: 1px solid var(--rule); border-radius: 18px; background: var(--paper); color: var(--ink);
+  box-shadow: 0 24px 60px -18px rgb(0 0 0 / 45%);
+  transition: top .35s var(--ease), left .35s var(--ease);
+}
+.tour-card:focus { outline: none; }
+.tour.centered .tour-card { top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100vw - 32px)); padding: 30px 30px 24px; transition: none; }
+.tour-card.swap > * { animation: tour-rise .3s var(--ease) both; }
+.tour-card.nudge { animation: tour-nudge .35s var(--ease); }
+.tour.centered .tour-card.nudge { animation: none; }
+.tour.leaving { animation: tour-fade .2s var(--ease) reverse both; }
+
+.tour-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.tour-kicker { font-size: 0.75rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; color: var(--p-ink); }
+.tour-count { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tour-x { margin-left: auto; display: grid; place-items: center; width: 32px; height: 32px; margin-right: -8px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+.tour-x:hover { background: var(--wash); color: var(--ink); }
+.tour-x svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.tour-card h2 { font-family: var(--serif); font-size: 1.375rem; font-weight: 600; margin-bottom: 8px; }
+.tour.centered .tour-card h2 { font-size: 1.75rem; }
+.tour-card p { color: var(--ink-2); font-size: 0.9375rem; }
+.tour-keys { margin-top: 10px; font-size: 0.8125rem !important; }
+.tour-hint { margin-top: 14px; font-size: 0.8125rem !important; color: var(--muted) !important; }
+.tour-mark { position: relative; width: 52px; height: 40px; margin: 6px 0 18px; }
+.tour-mark i { position: absolute; width: 34px; height: 24px; border-radius: 6px; }
+.tour-mark i:first-child { left: 0; top: 0; background: var(--p); }
+.tour-mark i:last-child { right: 0; bottom: 0; background: var(--d); box-shadow: 0 0 0 3px var(--paper); }
+
+.tour-foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+.tour-actions { display: flex; gap: 8px; margin-left: auto; }
+.tour-dots { display: flex; gap: 5px; padding: 0; margin: 0; list-style: none; }
+.tour-dots li { width: 6px; height: 6px; border-radius: 3px; background: var(--rule-strong); transition: width .25s var(--ease), background-color .25s; }
+.tour-dots li:first-child, .tour-dots li:last-child { display: none; }
+.tour-dots li.done { background: var(--ink-2); }
+.tour-dots li.on { width: 18px; background: var(--p); }
+
+@keyframes tour-fade { from { opacity: 0; } }
+@keyframes tour-rise { from { opacity: 0; transform: translateY(6px); } }
+@keyframes tour-nudge { 30% { transform: translateX(-6px); } 60% { transform: translateX(5px); } }
+
+@media (max-width: 640px) {
+  .tour-card { top: auto !important; left: 12px !important; right: 12px; bottom: 12px; width: auto; transition: none; }
+  .tour.centered .tour-card { top: 50% !important; left: 50% !important; right: auto; bottom: auto; }
+  .tour-dots { display: none; }
+  .tour-foot { flex-wrap: wrap; }
+  .tour-actions { width: 100%; }
+  .tour-actions .btn { flex: 1; }
+}
+@media (max-width: 520px) { #tour-btn { width: 36px; height: 36px; } }
