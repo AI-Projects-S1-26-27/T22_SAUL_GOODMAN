@@ -157,6 +157,41 @@ they are in; "same evidence, different bar" and "lawyers who know the bar" are t
 questions, and the page presents them separately. Second, the precomputed ladder in the bundle has
 seven rungs, so it is a coarse picture of how the equilibrium depends on the bar.
 
+## D10 — evidence can be added mid-trial (a new event kind and two new rules)
+
+Requested: "live evidence injection: logged in the hash-chained event stream, replay-identical".
+
+**Where it lives.** `EventKind.INJECTION` is new, and so is `status = "injected"`. The exhibit itself
+is **not** a field on the event, because `TrialEvent` is hashed field by field and any new field
+would have changed every digest ever produced. Instead the event carries the exhibit's SHA-256 in
+rule `INJ-1`, and the full exhibit rides on the result as `TrialResult.injections`.
+`verify_injections` checks that each recorded exhibit is the one the chain committed to: editing the
+event breaks `verify_chain`, and editing the exhibit afterwards breaks `verify_injections`.
+`tests/test_injection.py` includes a forgery that rewrites the event *and* re-chains it, to show the
+second check is not redundant.
+
+**When it lands.** The point is "after the trial has produced N events". The engine applies it at
+the next primary turn, never inside a response window, so an objection is always ruled on against
+the case as it stood when the exhibit was offered. If the trial leaves the evidence phases first,
+rule `INJ-2` records that, with the same hash, instead of silently dropping the exhibit.
+
+**A bug the test suite found in my first version.** I recorded only the injections that had been
+applied. Replaying such a result silently dropped an input whenever the trial ended before the
+injection point: the empty-docket and defense-only cases diverged. A result now carries every
+injection that was *requested*, because an unapplied one still shaped the trial by producing
+`INJ-2`. `test_a_late_injection_is_still_an_input_so_the_replay_must_include_it` pins it.
+
+**A rule I added.** A defense exhibit may not have positive support for any point. The
+directed-verdict review is sound only because defense evidence can never raise an element's
+log-odds (D5, D6); allowing an injected defense exhibit to do so would have let anyone reopen the
+hole D6 closed. The mirror case, a prosecution exhibit that hurts the prosecution, is allowed: it is
+foolish, not unsound.
+
+**Limits.** Three injections per trial. An injected exhibit joins its owner's hand and can be
+offered only while that owner is still presenting, so adding prosecution evidence after the
+prosecution has rested changes nothing, and the page says so. It needs the local simulator: the
+static demo has no engine to replay with.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

@@ -44,7 +44,7 @@ def cmd_run(a: argparse.Namespace) -> int:
     from courtroom.viz.terminal import print_summary, replay
 
     case = _case(a.case)
-    result = run_trial(case, a.prosecution, a.defense, a.seed)
+    result = run_trial(case, a.prosecution, a.defense, a.seed, _injections(a))
     if getattr(a, "narrate", False):
         from courtroom.llm import LLMClient, narrate
 
@@ -264,17 +264,41 @@ def cmd_stress(a: argparse.Namespace) -> int:
     return 0 if report.crashes == 0 and report.invariant_failures == 0 else 1
 
 
+def _injections(a: argparse.Namespace) -> list:
+    """The ``--inject`` file as validated Injection objects, or an empty list."""
+    from courtroom.contracts import Injection
+
+    if not getattr(a, "inject", None):
+        return []
+    raw = json.loads(Path(a.inject).read_text(encoding="utf-8"))
+    return [Injection.model_validate(x) for x in raw]
+
+
 def cmd_verify(a: argparse.Namespace) -> int:
+    from courtroom.engine import replay_trial, verify_injections
+
     case = _case(a.case)
-    first = run_trial(case, a.prosecution, a.defense, a.seed)
-    second = run_trial(case, a.prosecution, a.defense, a.seed)
+    injections = _injections(a)
+    first = run_trial(case, a.prosecution, a.defense, a.seed, injections)
+    second = run_trial(case, a.prosecution, a.defense, a.seed, injections)
     same = first.digest == second.digest and first.model_dump_json() == second.model_dump_json()
     chain_ok = verify_chain(first.events)
     console.print(f"digest run 1: {first.digest}\ndigest run 2: {second.digest}")
     console.print(
         f"bit-identical results: {'[green]YES' if same else '[red]NO'}[/]   hash chain valid: {'[green]YES' if chain_ok else '[red]NO'}[/]"
     )
-    return 0 if same and chain_ok else 1
+    ok = same and chain_ok
+    if injections:
+        # A result must reproduce from its own record, and the exhibits it names must be the ones
+        # the chain committed to.
+        from_record = replay_trial(first, case).digest == first.digest
+        committed = verify_injections(first)
+        console.print(
+            f"replays from its own record: {'[green]YES' if from_record else '[red]NO'}[/]   "
+            f"exhibits match the chain: {'[green]YES' if committed else '[red]NO'}[/]"
+        )
+        ok = ok and from_record and committed
+    return 0 if ok else 1
 
 
 def _load_analysis(results: Path) -> dict[str, object]:
@@ -478,6 +502,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("-p", "--prosecution", default="aggressive")
         p.add_argument("-d", "--defense", default="conservative")
         p.add_argument("--seed", type=int, default=0)
+        p.add_argument("--inject", help="JSON file: a list of {\"at_seq\": n, \"item\": {...exhibit...}} added mid-trial")
 
     p = sub.add_parser("run", help="run one trial")
     trial_args(p)

@@ -72,6 +72,7 @@ you can share exactly what you're looking at.
 | **Case file** | An **editor** where an examiner can load, edit or paste a case and run it, refused by the same validator with the failing field named. The accusation and charge, the points that must be proven, the standard of proof and the case budget. Witnesses come with credibility and possible bias. Every exhibit comes with its reliability, what it clashes with and its hidden flaws. |
 | **Verdict** | Why the loaded trial ended the way it did. Each point shows a bar per exhibit for how far it pushed the judge either way. An **evidence map** shows which exhibits back each other up and which clash. Also here: the judge's exact working, each side's ledger, and the fingerprinted event chain. |
 | **Strategy** | *Which style wins?* A win-rate matrix for every pairing of styles, the stable (Nash) choices explained in plain language, the smart mixes, and the win rate when both sides play smart. |
+| **Courtroom, add evidence** | In local mode, *Add evidence mid-trial* puts a new exhibit into one side's hand at the step you are viewing and replays the trial from there. The exhibit is committed to the hash chain, so the same inputs always give the same verdict. |
 | **The judge** | How rulings and verdicts are made, the three standards of proof, the six objection grounds, and the exact formula. A **slider** re-decides the loaded trial at any bar from 50 % to 99 %, and a table gives each flaw's chance of being caught. |
 
 The header has two switches:
@@ -231,6 +232,7 @@ python -m courtroom llm-exhibition                  # Gemini policy vs the four 
 python -m courtroom run --narrate                   # spoken argument text over a decided trial
 python -m courtroom export                          # rebuild the static web bundle (needs `analysis` first)
 python -m courtroom export-exhibition               # replay the committed LLM cache into data/exhibition.js
+python -m courtroom verify --inject file.json       # prove a trial with mid-trial evidence replays bit-identically
 python -m courtroom serve                           # web UI + API on http://127.0.0.1:8000
 ```
 

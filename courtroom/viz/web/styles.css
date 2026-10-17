@@ -1049,3 +1049,12 @@ body.exhibition-mode .panel::before {
 .thr-eq p { margin: .2rem 0; }
 .inline-field { display: inline-flex; align-items: center; gap: .4rem; font-size: .85rem; margin-right: .6rem; }
 .inline-field input { width: 4.5rem; }
+
+/* ---------------------------------------------------------------- evidence injection */
+.inject-panel { margin: 1rem 0; border: 1px solid var(--rule); border-radius: .5rem; padding: .6rem .9rem; }
+.inject-panel summary { cursor: pointer; font-weight: 600; }
+.inject-form { display: grid; gap: .7rem; margin-top: .7rem; max-width: 40rem; }
+.inject-form label:not(.inline-field) { display: grid; gap: .2rem; font-size: .88rem; }
+.inject-form fieldset { border: 1px solid var(--rule); border-radius: .4rem; padding: .5rem .7rem; }
+.inject-form legend { font-size: .85rem; font-weight: 600; padding: 0 .3rem; }
+.t-btn.t-inject { border-left: 3px solid var(--yes); font-style: italic; }

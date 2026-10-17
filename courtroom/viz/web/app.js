@@ -15,7 +15,7 @@ const S = {
   mode: null, bundle: null, cases: [], strategies: [], caseFiles: {}, caseFile: null,
   trial: null, trialKey: null, idx: 0, timer: null, loadToken: 0, caseToken: 0,
   tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null, rules: null,
-  spoken: null, spokenOn: false, spokenKey: null,
+  spoken: null, spokenOn: false, spokenKey: null, baseCaseFile: null, injections: [],
 };
 
 function el(tag, attrs = {}, ...kids) {
@@ -96,7 +96,7 @@ const FALLBACK_STANDARD = { beyond_reasonable_doubt: 0.9002, clear_and_convincin
 const standardProbability = (standard) => S.rules?.standards?.[standard]?.probability ?? FALLBACK_STANDARD[standard];
 const STATUS_TEXT = {
   unshown: "Not shown", offered: "Waiting for ruling", admitted: "Accepted", excluded: "Thrown out",
-  used: "Used against a witness", "used-failed": "Challenge failed",
+  used: "Used against a witness", "used-failed": "Challenge failed", injected: "Added mid-trial, not yet shown",
 };
 
 /* ------------------------------------------------------------------ case helpers */
@@ -286,6 +286,14 @@ function narrate(ev) {
       }
       return { speaker: "court", head: "The judge lets the trial continue.", sub: `${The("prosecution")} has shown enough to keep going.`, short: "The trial continues." };
     }
+    case "injection": {
+      const item = itemById(ev.subject);
+      return {
+        speaker: "court", head: `New evidence is added for ${item ? the(item.owner) : "one side"}.`, exhibit: item, tone: "yes",
+        sub: "It was not part of the original case. The trial carries on from here with it available.",
+        short: `New evidence added: ${item?.title ?? ev.subject}`,
+      };
+    }
     case "watchdog":
       return { speaker: "court", head: "The trial has run too long. The judge moves straight to a decision." };
     case "verdict": {
@@ -306,6 +314,7 @@ async function init() {
   initEditor();
   initSpokenToggle();
   initModeBar();
+  initInjection();
   try {
     if (!API) throw new Error("opened from disk");
     await fetchJSON(`${API}/health`, {}, 1500);
@@ -380,6 +389,8 @@ async function selectCase(id) {
   }
   if (token !== S.caseToken) return;
   S.caseFile = c;
+  S.baseCaseFile = c;
+  S.injections = [];
   S.trial = null;
   S.trialKey = null;
   document.querySelectorAll("[data-side-label]").forEach((n) => (n.textContent = sideLabel(n.dataset.sideLabel)));
@@ -412,6 +423,11 @@ async function loadTrial({ autoplay = false } = {}) {
   }
   const token = ++S.loadToken;
   stop();
+  if (S.injections.length && S.baseCaseFile) {
+    S.injections = [];
+    S.caseFile = S.baseCaseFile;
+    buildEvidenceBoard();
+  }
   $("#run").disabled = true;
   try {
     const trial = S.mode === "live"
@@ -424,6 +440,7 @@ async function loadTrial({ autoplay = false } = {}) {
     }
     S.trial = trial;
     S.trialKey = key;
+    buildInjectionForm();
     setupTrial();
     renderThreshold();
     renderCatchTable();
@@ -565,6 +582,7 @@ function setupTrial() {
 
 function renderFrame() {
   const t = S.trial, n = t.events.length, ev = t.events[S.idx];
+  updateInjectionWhen();
   renderNow(ev);
   updatePhases(ev);
   updateMeters(ev, t.events[S.idx - 1]);
@@ -676,7 +694,7 @@ function buildTranscript() {
   ol.replaceChildren();
   S.trial.events.forEach((ev, i) => {
     const n = narrate(ev);
-    const cls = ev.kind === "phase_change" ? "t-btn t-phase" : `t-btn ${n.speaker}`;
+    const cls = ev.kind === "phase_change" ? "t-btn t-phase" : ev.kind === "injection" ? "t-btn t-inject" : `t-btn ${n.speaker}`;
     const btn = el("button", { type: "button", class: cls }, el("span", { class: "tech t-seq" }, `#${ev.seq}`), n.short ?? n.head);
     btn.addEventListener("click", () => { stop(); seek(i); });
     const said = S.spokenOn && S.spoken ? S.spoken[String(ev.seq)] : null;
@@ -1623,6 +1641,91 @@ function initThresholdSlider() {
   renderThreshold();
 }
 
+/* ------------------------------------------------------------------ evidence injection (courtroom tab)
+ * New evidence enters one side's hand at the step being viewed and the engine replays the trial from
+ * there. The exhibit is committed to the hash chain by the engine, so the same inputs always replay
+ * to the same verdict. The page keeps its own copy of the case extended with the exhibit, because
+ * the board and transcript look exhibits up by id; the pristine case is restored for the next trial.
+ */
+
+const withInjected = (base, injections) => ({ ...base, evidence: [...base.evidence, ...injections.map((i) => i.item)] });
+
+function buildInjectionForm() {
+  const box = $("#inj-support");
+  if (!box || !S.caseFile) return;
+  box.replaceChildren(...S.caseFile.elements.map((e, i) =>
+    el("label", { class: "inline-field" }, `${e.name} `,
+      el("input", { type: "number", min: "-1", max: "1", step: "0.1", value: i === 0 ? "0.8" : "0", "data-element": e.id }))));
+}
+
+function updateInjectionWhen() {
+  const out = $("#inj-when");
+  if (!out || !S.trial) return;
+  const ev = S.trial.events[S.idx];
+  out.textContent = `It will be added after step ${S.idx + 1}: ${ev ? narrate(ev).short ?? narrate(ev).head : ""}`;
+}
+
+function readInjection() {
+  const element = (input) => [input.dataset.element, Number(input.value)];
+  const support = Object.fromEntries([...document.querySelectorAll("#inj-support input")].map(element).filter(([, v]) => v !== 0 && !Number.isNaN(v)));
+  const owner = $("#inj-owner").value;
+  if (!Object.keys(support).length) return { error: "Give it an effect on at least one point, or it changes nothing." };
+  if (owner === "defense" && Object.values(support).some((v) => v > 0)) return { error: "A defense exhibit may only help the defense, so its effect must be zero or negative." };
+  const id = `INJ-${S.injections.length + 1}`;
+  const title = $("#inj-title").value.trim() || "Newly found evidence";
+  return {
+    at_seq: S.idx + 1,
+    item: {
+      id, title, description: `${title} (added mid-trial)`, kind: $("#inj-kind").value, owner, fact_id: `fact-${id.toLowerCase()}`,
+      support, reliability: Math.round(100 * Math.min(1, Math.max(0, Number($("#inj-reliability").value) || 0.9))) / 100,
+      hearsay: $("#inj-hearsay").checked, authenticated: !$("#inj-unverified").checked,
+      lawfully_obtained: !$("#inj-illegal").checked, disclosed: !$("#inj-late").checked,
+    },
+  };
+}
+
+async function runInjection() {
+  const status = $("#inj-status"), btn = $("#inj-run");
+  if (!S.trial || !API || S.mode !== "live") { status.textContent = "Adding evidence needs the local simulator: python -m courtroom serve"; return; }
+  if (S.injections.length >= 3) { status.textContent = "Three additions is the limit for one trial. Start a new trial to try more."; return; }
+  const injection = readInjection();
+  if (injection.error) { status.textContent = injection.error; return; }
+  btn.disabled = true;
+  status.textContent = "Replaying the trial with the new evidence…";
+  try {
+    const request = { ...currentRequest(), injections: [...S.injections, injection] };
+    const trial = await fetchJSON(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }, 60000);
+    stop();
+    S.injections = trial.injections;
+    S.caseFile = withInjected(S.baseCaseFile, S.injections);
+    buildEvidenceBoard();
+    S.trial = trial;
+    S.trialKey = `${S.baseCaseFile.id}|${request.prosecution}|${request.defense}|${request.seed}|inj${S.injections.length}`;
+    buildInjectionForm();
+    setupTrial();
+    renderThreshold();
+    const at = trial.events.findIndex((e) => e.kind === "injection" && e.subject === injection.item.id);
+    if (at < 0) {
+      seek(0);
+      status.textContent = "The trial had already left the evidence phases before that step, so nothing was added. The trial is unchanged.";
+    } else {
+      seek(at);
+      const offered = trial.events.findIndex((e, i) => i > at && e.action?.evidence_id === injection.item.id && e.action?.type === "present_evidence");
+      status.textContent = offered < 0
+        ? `Added after step ${injection.at_seq}. Its owner never offered it before the case closed, so it did not affect the verdict.`
+        : `Added after step ${injection.at_seq}, and its owner offered it at step ${offered + 1}. The verdict is ${outcomeWord(trial.verdict.outcome)}.`;
+    }
+  } catch (err) {
+    status.textContent = `It was refused: ${explainApiError(err).map((e) => e.message).join("; ").slice(0, 300)}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function initInjection() {
+  $("#inj-run")?.addEventListener("click", runInjection);
+}
+
 /* ------------------------------------------------------------------ catch probability (judge tab) */
 
 const GROUND_WORDS = {
@@ -1745,6 +1848,10 @@ function initEditor() {
         body: JSON.stringify({ case: p.value, prosecution: selectedStyle("prosecution") ?? "aggressive", defense: selectedStyle("defense") ?? "conservative", seed: 0 }),
       });
       S.caseFile = p.value;
+      S.baseCaseFile = p.value;
+      S.injections = [];
+      buildEvidenceBoard();
+      buildInjectionForm();
       S.trial = trial;
       S.trialKey = `custom|${Date.now()}`;
       setupTrial();

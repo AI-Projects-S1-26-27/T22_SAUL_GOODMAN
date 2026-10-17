@@ -83,3 +83,92 @@ def test_the_net_catches_a_tab_that_cannot_render(tmp_path) -> None:
     code, report = _smoke(mutated)
     assert code == 1
     assert any("renderThreshold" in p for p in report["problems"])
+
+
+# ----------------------------------------------------------------- live mode: the code a local user runs
+
+
+@pytest.fixture(scope="module")
+def live_fixtures(tmp_path_factory) -> Path:
+    """Genuine engine output served by a fake API, so live-only code runs against real shapes."""
+    from courtroom.agents import describe_strategies
+    from courtroom.cases import CASES
+    from courtroom.contracts import EvidenceItem, EvidenceKind, Injection, Side
+    from courtroom.engine import run_trial
+    from courtroom.gametheory import estimate_payoffs
+    from courtroom.gametheory.bootstrap import equilibrium_label
+    from courtroom.judge.rules import THRESHOLD_LOG_ODDS, sigmoid
+
+    case = CASES["helix-espionage"]
+    item = EvidenceItem(
+        id="INJ-1", title="Newly recovered drive image", description="x", kind=EvidenceKind.DOCUMENT, owner=Side.PROSECUTION,
+        fact_id="fact-inj-1", support={case.elements[0].id: 0.8}, reliability=0.9,
+    )
+    strategies = ("aggressive", "conservative", "adaptive", "mixed:0.5")
+    table = estimate_payoffs(case, strategies, seeds=range(2))
+    game = json.loads(table.model_dump_json())
+    game["dynamics"] = []
+    game["label"] = equilibrium_label(table.analysis)
+    game["bar"] = {"standard": case.standard.value, "probability": 0.9002, "log_odds": "11/5", "overridden": False}
+    bundle_rules = json.loads((ROOT / "courtroom" / "viz" / "web" / "data" / "bundle.js").read_text("utf-8").split("= ", 1)[1].rsplit(";", 1)[0])["rules"]
+    fx = {
+        "cases": [json.loads(c.model_dump_json()) for c in CASES.values()],
+        "strategies": describe_strategies(),
+        "rules": bundle_rules,
+        "baseline": json.loads(run_trial(case, "aggressive", "conservative", 0).model_dump_json()),
+        "injected": json.loads(run_trial(case, "aggressive", "conservative", 0, [Injection(at_seq=4, item=item)]).model_dump_json()),
+        "game": game,
+    }
+    assert sigmoid(float(THRESHOLD_LOG_ODDS[case.standard])) == pytest.approx(0.9002, abs=1e-4)
+    path = tmp_path_factory.mktemp("live") / "fixtures.json"
+    path.write_text(json.dumps(fx), encoding="utf-8")
+    return path
+
+
+def _smoke_live(fixtures: Path, app: Path | None = None) -> tuple[int, dict]:
+    env = {**os.environ, "UI_SMOKE_LIVE": str(fixtures), **({"UI_SMOKE_APP": str(app)} if app else {})}
+    done = subprocess.run(["node", str(HARNESS)], capture_output=True, text=True, timeout=120, env=env, check=False)
+    try:
+        return done.returncode, json.loads(done.stdout)
+    except ValueError:
+        pytest.fail(f"the harness produced no JSON:\n{done.stdout}\n{done.stderr}")
+
+
+def test_the_live_ui_runs_clean_and_really_uses_the_live_controls(live_fixtures) -> None:
+    code, report = _smoke_live(live_fixtures)
+    assert report["problems"] == [], report["problems"]
+    assert code == 0
+    calls = report["calls"]
+    paths = {c["path"] for c in calls}
+    assert {"/health", "/cases", "/rules", "/trial", "/game"} <= paths
+    assert any(c["path"] == "/trial" and c["injections"] == 1 for c in calls), "the injection button never fired a request"
+    assert any(c["path"] == "/trial" and c["bar"] is not None for c in calls), "the replay-at-a-bar button never fired"
+    assert any(c["path"] == "/game" and c["bar"] is not None for c in calls), "the recompute-at-a-bar button never fired"
+    assert any(c["path"] == "/game" and c["inlineCase"] for c in calls), "the editor's Analyse button never fired"
+
+
+def test_an_injected_exhibit_reaches_the_evidence_board(live_fixtures) -> None:
+    """The trial used the exhibit, so the page has to list it. The board is built outside setupTrial,
+    and an earlier version of the injection UI forgot to rebuild it: no exception, just a wrong page."""
+    _, report = _smoke_live(live_fixtures)
+    assert "ev-item|INJ-1" in report["dataIds"], f"the board never listed the injected exhibit: {report['dataIds']}"
+
+
+def test_the_net_catches_an_injection_that_forgets_the_board(live_fixtures, tmp_path) -> None:
+    source = APP.read_text(encoding="utf-8")
+    needle = "    S.caseFile = withInjected(S.baseCaseFile, S.injections);\n    buildEvidenceBoard();\n"
+    assert needle in source, "the line this mutation removes has moved; update the test"
+    mutated = tmp_path / "app.js"
+    mutated.write_text(source.replace(needle, "    S.caseFile = withInjected(S.baseCaseFile, S.injections);\n", 1), encoding="utf-8")
+    _, report = _smoke_live(live_fixtures, mutated)
+    assert "ev-item|INJ-1" not in report["dataIds"], "this mutation should have left the board without the exhibit"
+
+
+def test_the_net_catches_a_broken_injection_path(live_fixtures, tmp_path) -> None:
+    """Break only code that runs after the injection response arrives, and demand a red."""
+    source = APP.read_text(encoding="utf-8")
+    mutated = tmp_path / "app.js"
+    mutated.write_text(source.replace("const withInjected = ", "const withInjectedGone = ", 1), encoding="utf-8")
+    code, report = _smoke_live(live_fixtures, mutated)
+    assert code == 1
+    assert any("withInjected is not defined" in p for p in report["problems"])

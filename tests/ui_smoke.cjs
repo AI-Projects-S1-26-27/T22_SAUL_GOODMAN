@@ -30,6 +30,7 @@ function scanForSelfReportedErrors(where, args) {
   for (const a of args) if (typeof a === "string" && SELF_REPORTED.test(a)) note(`the app displayed an error from ${where}`, a);
 }
 
+const dataIds = new Set(); // "<class>|<data-id>" for every element stamped with a data-id, e.g. "ev-item|P-LAPTOP"
 const listeners = [];
 function makeEl(label) {
   const store = {};
@@ -40,6 +41,7 @@ function makeEl(label) {
       if (k === "then") return undefined;
       if (k === "length") return 0;
       if (k === "addEventListener") return (type, fn) => listeners.push({ label, type, fn });
+      if (k === "setAttribute") return (name, value) => { if (name === "data-id") dataIds.add(`${store.className ?? ""}|${value}`); };
       if (k === "append" || k === "replaceChildren" || k === "prepend") return (...args) => { scanForSelfReportedErrors(label, args); return undefined; };
       if (k === "dataset") return store.dataset ?? (store.dataset = {});
       if (k in store) return store[k];
@@ -56,6 +58,29 @@ function makeEl(label) {
   return p;
 }
 
+/* Live scenario. With UI_SMOKE_LIVE=<fixtures.json> the page believes it is talking to the real
+ * server, so the live-only code (injection, replay at a bar, recompute, the editor's Analyse) runs.
+ * The fixtures are genuine engine output written by the Python test, not hand-made stand-ins. */
+const fx = process.env.UI_SMOKE_LIVE ? JSON.parse(fs.readFileSync(process.env.UI_SMOKE_LIVE, "utf8")) : null;
+const calls = [];
+function liveFetch(url, opts) {
+  const u = String(url);
+  const body = opts && opts.body ? JSON.parse(opts.body) : null;
+  calls.push({ path: u.replace(/^.*\/api/, ""), injections: body && body.injections ? body.injections.length : 0, bar: body && body.bar != null ? body.bar : null, inlineCase: !!(body && body.case) });
+  const ok = (data) => Promise.resolve({ ok: true, status: 200, json: async () => data, text: async () => JSON.stringify(data) });
+  if (u.endsWith("/health")) return ok({ status: "ok" });
+  if (u.endsWith("/cases")) return ok(fx.cases.map((c) => ({ id: c.id, title: c.title, synopsis: c.synopsis, case_type: c.case_type, standard: c.standard, tags: c.tags })));
+  if (u.endsWith("/strategies")) return ok(fx.strategies);
+  if (u.endsWith("/rules")) return ok(fx.rules);
+  const m = u.match(/\/cases\/([^/]+)$/);
+  if (m) return ok(fx.cases.find((c) => c.id === decodeURIComponent(m[1])));
+  if (u.endsWith("/trial")) return ok(body && body.injections && body.injections.length ? fx.injected : fx.baseline);
+  if (u.endsWith("/game")) return ok(fx.game);
+  if (u.endsWith("/narrate")) return ok({ digest: "", narration: {}, source: "template", usage: { calls: 0, cache_hits: 0, unavailable: 0, cost_estimate_usd: 0 } });
+  if (u.endsWith("/validate")) return ok({ ok: true, case_id: "x", title: "x", elements: 3, witnesses: 1, evidence: 2 });
+  return Promise.reject(new Error("no network in the smoke test"));
+}
+
 const memory = new Map();
 const ctx = {
   console: { log() {}, warn() {}, error() {}, info() {}, debug() {} },
@@ -64,13 +89,26 @@ const ctx = {
       // Give the controls the values a user would have, or init never selects a case and the
       // whole trial-rendering path goes unexercised.
       const e = makeEl(sel);
-      const values = { "#case": ctx.COURTROOM_BUNDLE?.cases?.[0]?.id, "#seed": "0", "#thr-slider": "90", "#gseeds": "20", "#gstrats": "aggressive,conservative", "#speed": "1200" };
+      const values = {
+        "#case": ctx.COURTROOM_BUNDLE?.cases?.[0]?.id, "#seed": "0", "#thr-slider": "85", "#gseeds": "20", "#gstrats": "aggressive,conservative",
+        "#speed": "1200", "#thr-seeds": "10", "#inj-owner": "prosecution", "#inj-kind": "document", "#inj-title": "Newly recovered drive image",
+        "#inj-reliability": "0.9", "#ed-text": fx ? JSON.stringify(fx.cases[0]) : "",
+      };
       if (sel in values) e.value = values[sel];
+      if (/^#inj-(hearsay|unverified|illegal|late)$/.test(sel)) e.checked = false;
       if (sel.includes('name="prosecution-style"')) e.value = "aggressive";
       if (sel.includes('name="defense-style"')) e.value = "conservative";
       return e;
     },
-    querySelectorAll: () => [],
+    querySelectorAll: (sel) => {
+      if (sel === "#inj-support input") {
+        const input = makeEl("#inj-support input");
+        input.dataset = { element: fx && fx.cases[0].elements[0].id };
+        input.value = "0.8";
+        return [input];
+      }
+      return [];
+    },
     getElementById: (id) => makeEl(`#${id}`),
     createElement: (t) => makeEl(`<${t}>`),
     createElementNS: (_ns, t) => makeEl(`<${t}>`),
@@ -83,7 +121,7 @@ const ctx = {
   localStorage: { getItem: (k) => (memory.has(k) ? memory.get(k) : null), setItem: (k, v) => memory.set(k, String(v)), removeItem: (k) => memory.delete(k) },
   location: { protocol: "http:", hash: "", search: "", href: "http://localhost/", pathname: "/", origin: "http://localhost" },
   history: { replaceState() {}, pushState() {} },
-  fetch: () => Promise.reject(new Error("no network in the smoke test")),
+  fetch: (url, opts) => (fx ? liveFetch(url, opts) : Promise.reject(new Error("no network in the smoke test"))),
   matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
   getComputedStyle: () => ({ getPropertyValue: () => "#888" }),
   requestAnimationFrame: () => 0,
@@ -134,6 +172,6 @@ function run(file) {
   for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
 
   const fatal = problems.filter((p) => !p.includes("no network in the smoke test"));
-  console.log(JSON.stringify({ listeners: listeners.length, initProblems, problems: fatal }, null, 2));
+  console.log(JSON.stringify({ listeners: listeners.length, initProblems, problems: fatal, calls: fx ? calls : undefined, dataIds: fx ? [...dataIds].sort() : undefined }, null, 2));
   process.exit(fatal.length ? 1 : 0);
 })().catch((e) => { console.log(JSON.stringify({ crashed: String(e && e.stack || e) })); process.exit(2); });

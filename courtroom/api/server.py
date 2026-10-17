@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 from courtroom import __version__
 from courtroom.agents import describe_strategies, make_agent
 from courtroom.cases import CASES, generate_case, get_case
-from courtroom.contracts import CaseFile, TrialResult
+from courtroom.contracts import CaseFile, Injection, TrialResult
 from courtroom.engine import run_trial
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
 from courtroom.gametheory.bootstrap import equilibrium_label
@@ -39,6 +39,8 @@ class TrialRequest(BaseModel):
     seed: int = Field(default=0, ge=0, le=2**31)
     # The proof standard's bar as a probability. Omit it to use the case's own.
     bar: float | None = Field(default=None, ge=0.5, le=0.999)
+    # Exhibits added to a party's hand once the trial has produced ``at_seq`` events.
+    injections: list[Injection] = Field(default_factory=list, max_length=3)
 
     @field_validator("prosecution", "defense")
     @classmethod
@@ -88,6 +90,14 @@ def _case_for(case_id: str | None, inline: CaseFile | None, bar: float | None) -
         if override is not None:
             case = case.model_copy(update={"bar_log_odds": override})
     return case
+
+
+def _run(case: CaseFile, req: TrialRequest) -> TrialResult:
+    """Run the requested trial, turning a rejected injection into a clear 422 instead of a 500."""
+    try:
+        return run_trial(case, req.prosecution, req.defense, req.seed, req.injections)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from None
 
 
 def create_app() -> FastAPI:
@@ -201,7 +211,7 @@ def create_app() -> FastAPI:
         from courtroom.llm import LLMClient, narrate
 
         case = _case_for(req.case_id, req.case, req.bar)
-        result = run_trial(case, req.prosecution, req.defense, req.seed)
+        result = _run(case, req)
         client = LLMClient()
         lines = narrate(result, case, client)
         client.save()
@@ -221,8 +231,7 @@ def create_app() -> FastAPI:
 
     @app.post("/api/trial", response_model=TrialResult)
     def trial(req: TrialRequest) -> TrialResult:
-        case = _case_for(req.case_id, req.case, req.bar)
-        return run_trial(case, req.prosecution, req.defense, req.seed)
+        return _run(_case_for(req.case_id, req.case, req.bar), req)
 
     @app.post("/api/game")
     def game(req: GameRequest) -> JSONResponse:

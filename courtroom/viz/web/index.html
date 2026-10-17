@@ -324,6 +324,39 @@
               <ul class="ev-list" id="defense-evidence"></ul>
             </section>
           </div>
+          <details class="inject-panel live-only" id="inject-panel">
+            <summary>Add evidence mid-trial</summary>
+            <p class="thr-qnote">New evidence goes into one side's hand once the trial reaches the step you are looking at, and the trial then plays out again from there. It is written into the tamper-evident record, so the same inputs always replay to the same verdict. It can be offered only while its owner is still presenting, and never in the middle of an objection.</p>
+            <form class="inject-form" id="inject-form" autocomplete="off">
+              <label>Whose evidence
+                <select id="inj-owner"><option value="prosecution">Prosecution</option><option value="defense">Defense</option></select>
+              </label>
+              <label>What it is <input id="inj-title" type="text" maxlength="90" value="Newly recovered drive image"></label>
+              <label>Kind
+                <select id="inj-kind">
+                  <option value="document">Document</option><option value="digital_log">Digital log</option>
+                  <option value="physical">Physical item</option><option value="financial_record">Financial record</option>
+                  <option value="expert">Expert report</option>
+                </select>
+              </label>
+              <label>How reliable <input id="inj-reliability" type="number" min="0" max="1" step="0.05" value="0.9"></label>
+              <fieldset>
+                <legend>What it does to each point</legend>
+                <p class="thr-qnote">Positive helps the prosecution, negative helps the defense. A defense exhibit may only help the defense.</p>
+                <div id="inj-support"></div>
+              </fieldset>
+              <fieldset>
+                <legend>Hidden flaws (the other side has to spot them)</legend>
+                <label class="inline-field"><input type="checkbox" id="inj-hearsay"> Second-hand</label>
+                <label class="inline-field"><input type="checkbox" id="inj-unverified"> Not verified</label>
+                <label class="inline-field"><input type="checkbox" id="inj-illegal"> Obtained illegally</label>
+                <label class="inline-field"><input type="checkbox" id="inj-late"> Shared too late</label>
+              </fieldset>
+              <p class="thr-qnote" id="inj-when"></p>
+              <button class="btn" type="button" id="inj-run">Add it and replay from here</button>
+              <span class="field-help" id="inj-status" role="status"></span>
+            </form>
+          </details>
           <p class="ev-footnote">Hidden flaws are visible to you but not to the other side. A lawyer has to spot them and object.</p>
           <div class="next-up">
             <p>When the verdict is in, see exactly why.</p>

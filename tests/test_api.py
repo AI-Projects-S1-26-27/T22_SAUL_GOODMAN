@@ -163,3 +163,49 @@ def test_an_oversized_pasted_case_is_refused(client: TestClient) -> None:
 def test_narration_and_trial_agree_on_which_game_was_played(client: TestClient) -> None:
     req = {"case_id": "helix-espionage", "seed": 1, "bar": 0.95}
     assert client.post("/api/narrate", json=req).json()["digest"] == client.post("/api/trial", json=req).json()["digest"]
+
+
+# ----------------------------------------------------------------- live evidence injection
+
+
+def _injection(at_seq: int = 6, **overrides) -> dict:
+    item = {
+        "id": "X-NEW", "title": "Newly recovered drive image", "description": "Found after the trial began.",
+        "kind": "document", "owner": "prosecution", "fact_id": "fact-x-new",
+        "support": {"access": 0.9}, "reliability": 0.95,
+    }
+    item.update(overrides)
+    return {"at_seq": at_seq, "item": item}
+
+
+def test_trial_accepts_an_injection_and_records_it(client: TestClient) -> None:
+    body = client.post("/api/trial", json={"case_id": "helix-espionage", "seed": 1, "injections": [_injection()]}).json()
+    assert [i["item"]["id"] for i in body["injections"]] == ["X-NEW"]
+    assert [e["kind"] for e in body["events"]].count("injection") == 1
+
+
+def test_an_injected_trial_over_http_matches_the_engine_digest(client: TestClient) -> None:
+    from courtroom.cases import CASES
+    from courtroom.contracts import Injection
+    from courtroom.engine import run_trial
+
+    http = client.post("/api/trial", json={"case_id": "helix-espionage", "seed": 1, "injections": [_injection()]}).json()
+    direct = run_trial(CASES["helix-espionage"], "aggressive", "conservative", 1, [Injection.model_validate(_injection())])
+    assert http["digest"] == direct.digest
+
+
+def test_an_exhibit_that_does_not_fit_is_a_422_with_the_reason(client: TestClient) -> None:
+    r = client.post("/api/trial", json={"case_id": "helix-espionage", "injections": [_injection(id="P-LAPTOP")]})
+    assert r.status_code == 422
+    assert "does not fit this case" in r.text
+
+
+def test_a_malformed_exhibit_and_too_many_exhibits_are_refused(client: TestClient) -> None:
+    assert client.post("/api/trial", json={"case_id": "helix-espionage", "injections": [_injection(reliability=2)]}).status_code == 422
+    four = [_injection(at_seq=3 + i, id=f"X-{i}") for i in range(4)]
+    assert client.post("/api/trial", json={"case_id": "helix-espionage", "injections": four}).status_code == 422
+
+
+def test_narration_describes_the_same_injected_trial(client: TestClient) -> None:
+    req = {"case_id": "helix-espionage", "seed": 1, "injections": [_injection()]}
+    assert client.post("/api/narrate", json=req).json()["digest"] == client.post("/api/trial", json=req).json()["digest"]

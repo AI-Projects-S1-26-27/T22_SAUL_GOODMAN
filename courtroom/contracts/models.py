@@ -30,6 +30,7 @@ __all__ = [
     "Frozen",
     "GraphEdge",
     "GraphNode",
+    "Injection",
     "Ledger",
     "LegalElement",
     "ObjectionGround",
@@ -126,6 +127,7 @@ class EventKind(StrEnum):
     DIRECTED_VERDICT = "directed_verdict"
     WATCHDOG = "watchdog"
     VERDICT = "verdict"
+    INJECTION = "injection"  # evidence added to a party's hand mid-trial; see Injection
 
 
 class VerdictOutcome(StrEnum):
@@ -300,6 +302,19 @@ class CaseFile(Frozen):
         return sorted((a, b) for a, b in edges)
 
 
+class Injection(Frozen):
+    """An exhibit added to its owner's hand once the trial has produced ``at_seq`` events.
+
+    It lives on the trial *result*, not on the event: ``TrialEvent`` is hashed field by field, so a
+    new event field would change every digest ever produced. The chain commits to the item instead
+    through the content hash carried in the injection event's rule firing (``INJ-1``), which
+    ``engine.verify_injections`` checks. Re-running with ``result.injections`` reproduces the trial.
+    """
+
+    at_seq: int = Field(ge=1, le=10_000)
+    item: EvidenceItem
+
+
 # --------------------------------------------------------------------------- actions
 
 
@@ -426,7 +441,7 @@ class TrialEvent(Frozen):
     action: Action | None = None
     summary: str
     subject: str | None = None  # evidence id this event is about, if any
-    status: Literal["offered", "admitted", "excluded", "impeached"] | None = None
+    status: Literal["offered", "admitted", "excluded", "impeached", "injected"] | None = None
     rules: tuple[RuleFiring, ...] = ()
     burden_index: float | None = None
     element_probabilities: dict[str, float] = Field(default_factory=dict)
@@ -466,3 +481,4 @@ class TrialResult(Frozen):
     utilities: dict[Side, float]
     digest: str
     graph: EvidenceGraph
+    injections: tuple[Injection, ...] = ()  # every injection requested, in order, applied or not
