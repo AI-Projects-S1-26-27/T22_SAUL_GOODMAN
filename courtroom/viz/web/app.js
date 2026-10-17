@@ -90,7 +90,10 @@ const STANDARD = {
   preponderance: "on the balance of probabilities",
 };
 // Display-only fallbacks; the judge itself compares exact fractions (see courtroom/judge/rules.py).
-const THRESHOLD = { beyond_reasonable_doubt: 1 / (1 + Math.exp(-2.2)), clear_and_convincing: 1 / (1 + Math.exp(-1.1)), preponderance: 0.5 };
+/* The three standards come from the engine (/api/rules, or the bundle's copy of it). These constants
+ * are a last resort for a page opened with neither, and are never preferred over what the engine says. */
+const FALLBACK_STANDARD = { beyond_reasonable_doubt: 0.9002, clear_and_convincing: 0.7503, preponderance: 0.5 };
+const standardProbability = (standard) => S.rules?.standards?.[standard]?.probability ?? FALLBACK_STANDARD[standard];
 const STATUS_TEXT = {
   unshown: "Not shown", offered: "Waiting for ruling", admitted: "Accepted", excluded: "Thrown out",
   used: "Used against a witness", "used-failed": "Challenge failed",
@@ -118,7 +121,7 @@ const elementName = (id) => S.caseFile.elements.find((e) => e.id === id)?.name ?
 const itemById = (id) => S.caseFile.evidence.find((e) => e.id === id);
 const witnessById = (id) => S.caseFile.witnesses.find((w) => w.id === id);
 
-const threshold = () => S.trial?.verdict.snapshot.elements[0]?.threshold_probability ?? THRESHOLD[S.caseFile.standard];
+const threshold = () => S.trial?.verdict.snapshot.elements[0]?.threshold_probability ?? standardProbability(S.caseFile.standard);
 const strictStandard = () => S.caseFile.standard === "preponderance";
 const proven = (p) => (strictStandard() ? p > threshold() + 1e-9 : p >= threshold() - 1e-9);
 const barPhrase = () => `${strictStandard() ? "more than" : "at least"} ${pct(threshold())}`;
@@ -501,7 +504,7 @@ function renderBrief() {
   const c = S.caseFile;
   const { parties, name } = splitTitle(c.title);
   const kind = isCivil() ? "civil" : "criminal";
-  const bar = strictStandard() ? `more than ${pct(THRESHOLD[c.standard])}` : `at least ${pct(THRESHOLD[c.standard])}`;
+  const bar = strictStandard() ? `more than ${pct(standardProbability(c.standard))}` : `at least ${pct(standardProbability(c.standard))}`;
   $("#brief").replaceChildren(
     el("div", {},
       parties && el("p", { class: "parties" }, parties),
@@ -852,6 +855,9 @@ function renderAnalysisCard() {
 function loadGame() {
   S.game = null;
   renderAnalysisCard();
+  $("#thr-slider").value = String(Math.round(100 * ownBar()));
+  $("#thr-eq").replaceChildren();
+  $("#thr-replay-out").replaceChildren();
   const { name } = splitTitle(S.caseFile.title);
   $("#styles-case").textContent = `Case: ${name}`;
   $("#gstatus").textContent = "";
@@ -1379,10 +1385,6 @@ function focusNode(id) {
   for (const n of box.querySelectorAll(".node")) n.classList.toggle("lit", lit.has(n.dataset.id));
 }
 
-const OUTCOME_WORD = { guilty: "Guilty", not_guilty: "Not guilty", liable: "Liable", not_liable: "Not liable" };
-
-
-
 /* ------------------------------------------------------------------ mode: certified vs exhibition
  * The deterministic simulation and the LLM exhibition must never be mistaken for one another, so
  * the choice is a visible, persistent banner rather than a buried checkbox. Deterministic is the
@@ -1463,55 +1465,161 @@ function initSpokenToggle() {
   box.addEventListener("change", () => setMode(box.checked ? "exhibition" : "deterministic"));
 }
 
-/* ------------------------------------------------------------------ threshold slider (judge tab)
- * The bar is a game parameter, not a measurement. Re-deciding the loaded trial at a different bar
- * is pure arithmetic over per-element probabilities the trial already carries, so it needs no
- * server and works offline. Display only: it never feeds back into a verdict.
+const OUTCOME_WORD = { guilty: "Guilty", not_guilty: "Not guilty", liable: "Liable", not_liable: "Not liable" };
+const outcomeWord = (o) => OUTCOME_WORD[o] ?? (o === "directed_acquittal" ? (isCivil() ? "Dismissed" : "Not guilty (directed)") : capFirst(title(o)));
+
+/* ------------------------------------------------------------------ the proof bar (judge tab)
+ * The bar is a game parameter. Three different questions hang off one slider, and the page keeps
+ * them visibly apart because they are easy to confuse:
+ *   1. same evidence, different bar  - pure arithmetic on the loaded record, instant and exact;
+ *   2. lawyers who know the bar      - the trial replayed by the engine (live only);
+ *   3. which style wins at this bar  - the equilibrium, recomputed live or read from a precomputed
+ *                                      ladder in the bundle, and labelled as whichever it is.
  */
+
+const ownBar = () => (S.caseFile ? standardProbability(S.caseFile.standard) : 0.9);
+/** The slider as a probability, or null when it sits on the standard's own whole percent. */
+function sliderOverride() {
+  const pctNow = Number($("#thr-slider").value);
+  return pctNow === Math.round(100 * ownBar()) ? null : pctNow / 100;
+}
+
+function thrRow(es, bar, met) {
+  return el("div", { class: `thr-row ${met ? "met" : "unmet"}` },
+    el("p", { class: "thr-name" }, elementName(es.element_id)),
+    el("div", { class: "meter-track", role: "img", "aria-label": `${elementName(es.element_id)}: ${pct1(es.probability)} certain, bar at ${pct(bar)}` },
+      el("div", { class: "meter-fill", style: `--fill: ${100 * es.probability}%` }),
+      el("div", { class: "meter-bar", style: `left: ${100 * bar}%` })),
+    el("p", { class: "thr-val" }, pct1(es.probability)),
+    el("p", { class: "thr-flag" }, met ? "clears the bar" : "falls short"));
+}
 
 function renderThreshold() {
   const box = $("#thr-result");
   if (!box) return;
   const slider = $("#thr-slider"), out = $("#thr-value");
+  out.textContent = `${slider.value}%`;
   if (!S.trial) {
-    out.textContent = `${slider.value}%`;
     box.replaceChildren(el("p", { class: "empty-note" }, "Load a trial in the courtroom first, then the points will appear here."));
+    renderBarGrid();
     return;
   }
   const bar = Number(slider.value) / 100;
-  out.textContent = `${slider.value}%`;
-  const own = threshold();
+  const played = threshold();
   const rows = S.trial.verdict.snapshot.elements.map((es) => {
     const met = strictStandard() ? es.probability > bar : es.probability >= bar;
-    return el("div", { class: `thr-row ${met ? "met" : "unmet"}` },
-      el("p", { class: "thr-name" }, elementName(es.element_id)),
-      el("div", { class: "meter-track", role: "img", "aria-label": `${elementName(es.element_id)}: ${pct1(es.probability)} certain, bar at ${pct(bar)}` },
-        el("div", { class: "meter-fill", style: `--fill: ${100 * es.probability}%` }),
-        el("div", { class: "meter-bar", style: `left: ${100 * bar}%` })),
-      el("p", { class: "thr-val" }, pct1(es.probability)),
-      el("p", { class: "thr-flag" }, met ? "clears the bar" : "falls short"));
+    return thrRow(es, bar, met);
   });
   const all = S.trial.verdict.snapshot.elements.every((es) => (strictStandard() ? es.probability > bar : es.probability >= bar));
-  const real = S.trial.verdict.outcome;
   const wouldWin = all ? (isCivil() ? "liable" : "guilty") : (isCivil() ? "not_liable" : "not_guilty");
-  const same = wouldWin === real;
+  const real = S.trial.verdict.outcome;
+  const same = wouldWin === real || (real === "directed_acquittal" && !all);
   box.replaceChildren(
     el("div", { class: "thr-rows" }, rows),
     el("p", { class: `thr-verdict ${same ? "same" : "flipped"}` },
       same
-        ? `At ${pct(bar)} the verdict is unchanged: ${OUTCOME_WORD[wouldWin]}.`
-        : `At ${pct(bar)} the verdict would flip to ${OUTCOME_WORD[wouldWin]}. This case's own bar is ${pct1(own)}.`),
-    el("p", { class: "meters-note" }, "Every point must clear the bar. Moving it re-decides the trial that is already loaded; it does not re-run it."));
+        ? `At ${pct(bar)} the verdict is unchanged: ${outcomeWord(real)}.`
+        : `At ${pct(bar)} the verdict would flip to ${outcomeWord(wouldWin)}. This trial was played at ${pct1(played)}.`),
+    el("p", { class: "meters-note" }, "The evidence and the lawyers' choices are held fixed. Only the judge's bar moves."));
+  renderBarGrid();
+}
+
+/* Question 3, precomputed half: the ladder shipped in the bundle. */
+function renderBarGrid() {
+  const table = $("#thr-grid"), note = $("#thr-eq-note");
+  if (!table) return;
+  const grid = window.COURTROOM_BUNDLE?.analysis?.threshold_grid?.[S.caseFile?.id];
+  if (!grid) {
+    table.replaceChildren();
+    note.textContent = "No precomputed ladder is available for this case.";
+    return;
+  }
+  const bar = Number($("#thr-slider").value) / 100;
+  const nearest = grid.bars.reduce((best, r) => (Math.abs(r.bar - bar) < Math.abs(best.bar - bar) ? r : best), grid.bars[0]);
+  note.textContent = `Precomputed: this case re-solved at each bar below, ${grid.seeds} seeds per cell over ${grid.strategies.length} styles, `
+    + "so it matches the certified analysis. It is read from the bundle, not recomputed in your browser.";
+  const mix = (m) => Object.entries(m ?? {}).map(([k, v]) => `${styleInfo(k).label} ${pct(v)}`).join(", ") || "—";
+  table.replaceChildren(
+    el("thead", {}, el("tr", {}, ["Bar", "Result", "Prosecution plays", "Defense plays", "Prosecution wins"].map((h) => el("th", {}, h)))),
+    el("tbody", {}, grid.bars.map((r) => el("tr", { class: r === nearest ? "current" : "" },
+      el("th", { scope: "row" }, `${pct(r.bar)}${r.overridden ? "" : " (own)"}`),
+      el("td", {}, LABEL_WORDS[r.label] ?? r.label),
+      el("td", {}, mix(r.row_mix)),
+      el("td", {}, mix(r.col_mix)),
+      el("td", { class: "num" }, r.prosecution_win_rate_at_equilibrium == null ? "—" : pct(r.prosecution_win_rate_at_equilibrium))))));
+}
+
+/* A solved game as plain sentences, used for both the live recomputation and the editor. */
+function renderGameSummary(box, game, caption) {
+  const a = game.analysis, eqs = a.equilibria;
+  const word = LABEL_WORDS[game.label] ?? game.label ?? "";
+  const kids = [el("p", { class: "headline" }, word)];
+  if (eqs.length) {
+    const e = eqs[0];
+    const mix = (m) => Object.entries(m).filter(([, v]) => v > 0.0005).map(([k, v]) => `${styleInfo(k).label} ${pct(v)}`).join(", ");
+    kids.push(el("p", {}, `${sideLabel("prosecution")} plays: ${mix(e.row_mix)}. Defense plays: ${mix(e.col_mix)}.`));
+    kids.push(el("p", {}, `${capFirst(the("prosecution"))} wins ${pct(equilibriumWinRate(game, e))} of trials when both sides play smart.`));
+    if (eqs.length > 1) kids.push(el("p", { class: "meters-note" }, `${eqs.length} equilibria were found; this is the first.`));
+  } else {
+    kids.push(el("p", {}, "No stable way to play was found."));
+  }
+  kids.push(el("p", { class: "meters-note" }, caption));
+  box.replaceChildren(...kids);
+}
+
+async function replayAtBar() {
+  const out = $("#thr-replay-out"), status = $("#thr-status");
+  if (!S.caseFile || !API) return;
+  const bar = sliderOverride();
+  out.replaceChildren(el("p", { class: "meters-note" }, "Replaying…"));
+  try {
+    const trial = await fetchJSON(`${API}/trial`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...currentRequest(), ...(bar == null ? {} : { bar }) }),
+    }, 60000);
+    const played = trial.verdict.snapshot.elements[0]?.threshold_probability ?? ownBar();
+    out.replaceChildren(
+      el("div", { class: "thr-rows" }, trial.verdict.snapshot.elements.map((es) => thrRow(es, es.threshold_probability, es.met))),
+      el("p", { class: "thr-verdict same" }, `With lawyers who know the ${pct1(played)} bar: ${outcomeWord(trial.verdict.outcome)}.`),
+      el("p", { class: "meters-note" }, `${styleInfo(trial.prosecution_strategy).label} versus ${styleInfo(trial.defense_strategy).label}, trial ${trial.seed}. Compare with question 1: there the lawyers could not react.`));
+  } catch (err) {
+    out.replaceChildren(el("p", { class: "ed-error" }, `The replay failed (${String(err.message).slice(0, 160)}).`));
+  }
+  status.textContent = "";
+}
+
+async function recomputeAtBar() {
+  const box = $("#thr-eq"), status = $("#thr-status"), btn = $("#thr-equilibrium");
+  if (!S.caseFile || !API) return;
+  const bar = sliderOverride(), seeds = Math.min(100, Math.max(5, Math.floor(+$("#thr-seeds").value || 20)));
+  btn.disabled = true;
+  status.textContent = `Replaying ${seeds} trials for each of 16 matchups…`;
+  try {
+    const game = await fetchJSON(`${API}/game`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ case_id: S.caseFile.id, strategies: ["aggressive", "conservative", "adaptive", "mixed:0.5"], seeds, ...(bar == null ? {} : { bar }) }),
+    }, 180000);
+    renderGameSummary(box, game,
+      `Recomputed live at ${pct1(game.bar.probability)}: ${seeds} seeds per cell. With few seeds this is a rough look and can differ a lot from the certified 200-seed ladder below; raise the seed count to narrow the gap.`);
+    status.textContent = "";
+  } catch (err) {
+    status.textContent = `Could not recompute (${String(err.message).slice(0, 120)}).`;
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function initThresholdSlider() {
   const slider = $("#thr-slider");
   if (!slider) return;
-  slider.addEventListener("input", renderThreshold);
+  slider.addEventListener("input", () => { $("#thr-replay-out").replaceChildren(); renderThreshold(); });
   $("#thr-reset")?.addEventListener("click", () => {
-    slider.value = String(Math.round(100 * (S.trial ? threshold() : 0.9)));
+    slider.value = String(Math.round(100 * ownBar()));
+    $("#thr-replay-out").replaceChildren();
     renderThreshold();
   });
+  $("#thr-replay")?.addEventListener("click", replayAtBar);
+  $("#thr-equilibrium")?.addEventListener("click", recomputeAtBar);
   renderThreshold();
 }
 
@@ -1547,6 +1655,19 @@ function renderCatchTable() {
 }
 
 /* ------------------------------------------------------------------ case editor (case file tab) */
+
+/** FastAPI's 422 body as [{field, message}], so the editor names the failing field instead of dumping JSON. */
+function explainApiError(err) {
+  const text = String(err.message ?? err);
+  try {
+    const detail = JSON.parse(text.slice(text.indexOf("{") >= 0 ? text.indexOf("{") : 0)).detail;
+    if (Array.isArray(detail)) {
+      return detail.map((d) => ({ field: (d.loc ?? []).filter((x) => x !== "body" && x !== "case").join("."), message: d.msg ?? "invalid" }));
+    }
+    if (typeof detail === "string") return [{ field: "", message: detail }];
+  } catch { /* not JSON: fall through to the raw text */ }
+  return [{ field: "", message: text.slice(0, 400) }];
+}
 
 function initEditor() {
   const text = $("#ed-text"), status = $("#ed-status"), errors = $("#ed-errors");
@@ -1591,6 +1712,27 @@ function initEditor() {
     }
   });
 
+  $("#ed-analyse").addEventListener("click", async () => {
+    const p = parse();
+    if (!p.ok) return;
+    errors.replaceChildren();
+    $("#ed-analysis").replaceChildren();
+    if (!API || S.mode !== "live") return say("Analysing your own case needs the local simulator: python -m courtroom serve", "bad");
+    say("Replaying 20 trials for each of 16 matchups\u2026");
+    try {
+      const game = await fetchJSON(`${API}/game`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ case: p.value, strategies: ["aggressive", "conservative", "adaptive", "mixed:0.5"], seeds: 20 }),
+      }, 180000);
+      renderGameSummary($("#ed-analysis"), game,
+        `Recomputed live on your case at ${pct1(game.bar.probability)}, 20 seeds per cell. Nothing here is precomputed or certified.`);
+      say("Analysed.", "ok");
+    } catch (err) {
+      showErrors(explainApiError(err));
+      say("It was refused. The validator said why.", "bad");
+    }
+  });
+
   $("#ed-run").addEventListener("click", async () => {
     const p = parse();
     if (!p.ok) return;
@@ -1613,7 +1755,7 @@ function initEditor() {
       say("It ran. Opening the courtroom.", "ok");
       location.hash = "#courtroom";
     } catch (err) {
-      showErrors([{ field: "", message: String(err.message).slice(0, 400) }]);
+      showErrors(explainApiError(err));
       say("It was refused. The validator said why.", "bad");
     }
   });

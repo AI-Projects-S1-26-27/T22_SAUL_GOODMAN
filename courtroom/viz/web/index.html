@@ -364,12 +364,15 @@
             <div class="editor-bar">
               <button class="btn quiet" type="button" id="ed-load">Load the current case</button>
               <button class="btn quiet" type="button" id="ed-validate">Check it</button>
+              <button class="btn quiet" type="button" id="ed-analyse">Analyse it</button>
               <button class="btn" type="button" id="ed-run">Try it in the courtroom</button>
               <span id="ed-status" class="ed-status" role="status" aria-live="polite"></span>
             </div>
             <label class="sr-only" for="ed-text">Case file JSON</label>
             <textarea id="ed-text" class="editor" spellcheck="false" rows="16" placeholder="Press “Load the current case” to start from the case above, then edit it."></textarea>
+            <p class="field-help">Optional <code>bar_log_odds</code> sets how sure the judge must be, as a log-odds string such as <code>"11/5"</code> (90%), <code>"1.1"</code> (75%) or <code>"0"</code> (50%). Leave it out to use the standard's own bar.</p>
             <div id="ed-errors" class="ed-errors"></div>
+            <div id="ed-analysis" class="thr-eq"></div>
           </section>
         </section>
 
@@ -540,7 +543,7 @@
           <section class="block" aria-labelledby="slider-title">
             <header class="block-head">
               <h3 id="slider-title">Move the bar yourself</h3>
-              <p>The bar is a setting, not a measurement. Drag it to see which points the loaded trial would still prove, and whether the verdict changes.</p>
+              <p>The bar is a setting, not a measurement. Drag it and three different questions get answered, each labelled for what it is.</p>
             </header>
             <div class="slider-row">
               <label for="thr-slider">How sure must the judge be?</label>
@@ -548,7 +551,27 @@
               <output id="thr-value">90%</output>
               <button class="btn quiet" type="button" id="thr-reset">Reset to the case's own bar</button>
             </div>
+
+            <h4 class="thr-q">1. Same evidence, different bar</h4>
+            <p class="thr-qnote">What a judge with this bar would decide on the trial that is already loaded. Instant and exact, but the lawyers do not get to react.</p>
             <div id="thr-result" class="thr-result"></div>
+
+            <div class="live-only thr-live">
+              <h4 class="thr-q">2. Lawyers who know the bar</h4>
+              <p class="thr-qnote">Replays the trial with both lawyers told the bar, so they choose differently. Needs the local simulator.</p>
+              <button class="btn quiet" type="button" id="thr-replay">Replay the trial at this bar</button>
+              <div id="thr-replay-out" class="thr-result"></div>
+            </div>
+
+            <h4 class="thr-q">3. Which style wins at this bar?</h4>
+            <p class="thr-qnote" id="thr-eq-note"></p>
+            <div class="live-only thr-live">
+              <label class="inline-field">Seeds per matchup <input id="thr-seeds" type="number" min="5" max="100" value="20" inputmode="numeric"></label>
+              <button class="btn quiet" type="button" id="thr-equilibrium">Recompute the equilibrium at this bar</button>
+              <span class="field-help" id="thr-status" role="status"></span>
+            </div>
+            <div id="thr-eq" class="thr-eq"></div>
+            <div class="table-scroll"><table class="matrix analysis-table" id="thr-grid"></table></div>
           </section>
 
           <section class="block" aria-labelledby="catch-title">

@@ -28,11 +28,11 @@ from courtroom.judge.rules import (
     MAX_CONTRADICTION_DISCOUNT,
     ONE,
     PRIOR_LOG_ODDS,
-    THRESHOLD_LOG_ODDS,
     ZERO,
     fmt,
     q,
     sigmoid,
+    threshold_for,
     threshold_met,
 )
 
@@ -85,7 +85,7 @@ def score_record(
         discount[i.id] = min(MAX_CONTRADICTION_DISCOUNT, pressure)
 
     prior = PRIOR_LOG_ODDS[case.case_type]
-    tau = THRESHOLD_LOG_ODDS[case.standard]
+    tau = threshold_for(case)
     exact: dict[str, Fraction] = {}
     element_scores: list[ElementScore] = []
 
@@ -136,7 +136,7 @@ def score_record(
                 probability=sigmoid(float(log_odds)),
                 threshold=fmt(tau),
                 threshold_probability=sigmoid(float(tau)),
-                met=threshold_met(log_odds, case.standard),
+                met=threshold_met(log_odds, case.standard, tau),
                 contributions=contributions,
             )
         )

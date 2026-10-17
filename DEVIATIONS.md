@@ -131,6 +131,32 @@ payoff matrices, the bootstrap or the sweep, and none of those were regenerated 
 call. Every run prints calls, cache hits, unavailable calls, tokens and an estimated cost. The USD
 rate is a configurable placeholder (`COURTROOM_LLM_RATES`), not a quoted price.
 
+## D9 — the proof standard's bar is a parameter (touches the judge's code path, not its arithmetic)
+
+Requested: "standards 11/5, 11/10, 0 as game parameters, not hard-coded". Before this, the bar was
+read in five places as `THRESHOLD_LOG_ODDS[case.standard]` (`judge/scoring.py`, `judge/judge.py`,
+`agents/base.py`, `engine/trial.py`) and was retyped as constants in `app.js`.
+
+What changed: `CaseFile` gained an optional `bar_log_odds` (an exact rational string, validated to
+lie between 0 and 7), and the five reads now go through `judge.rules.threshold_for(case)`. With no
+override it returns exactly `THRESHOLD_LOG_ODDS[case.standard]`. The standard still decides whether a
+tie passes (strict for preponderance, inclusive otherwise). The page now reads the standards from
+`/api/rules` (or the bundle's copy of it) instead of its own constants.
+
+What did **not** change: the formulas for `S_i`, `d_i`, `c_i` and `L_e`, and the three constants.
+The guarantee is empirical and enforced, not asserted: `tests/test_golden.py` pins 42 digests
+recorded **before** the change, and all 42 are identical after it.
+
+`override_for_bar` treats a requested bar within the same whole percent as the standard's own as
+"no override", so choosing 90% on a beyond-reasonable-doubt case keeps the exact 11/5 rather than a
+rounded 2.1972. Without that, the slider would have silently nudged borderline verdicts the moment
+anyone touched it.
+
+Two limits worth knowing. First, the agents' `Oracle` reads the same bar, so lawyers play the game
+they are in; "same evidence, different bar" and "lawyers who know the bar" are therefore different
+questions, and the page presents them separately. Second, the precomputed ladder in the bundle has
+seven rungs, so it is a coarse picture of how the equilibrium depends on the bar.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

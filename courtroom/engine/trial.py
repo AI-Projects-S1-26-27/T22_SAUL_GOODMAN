@@ -47,7 +47,7 @@ from courtroom.judge.rules import (
     SANCTION_BAD_FAITH_EVIDENCE,
     SANCTION_OVERRULED_OBJECTION,
     SANCTION_VIOLATION,
-    THRESHOLD_LOG_ODDS,
+    threshold_for,
 )
 from courtroom.procedure import ProcedureState, Violation, validate
 from courtroom.procedure.state import CASE_PHASES, STALL_LIMIT
@@ -506,4 +506,4 @@ def run_trial(case: CaseFile, prosecution: str, defense: str, seed: int = 0) -> 
 
 
 def threshold_probability(case: CaseFile) -> float:
-    return _sigmoid(float(THRESHOLD_LOG_ODDS[case.standard]))
+    return _sigmoid(float(threshold_for(case)))

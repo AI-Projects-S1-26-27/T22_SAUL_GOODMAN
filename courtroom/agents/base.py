@@ -19,7 +19,7 @@ from courtroom.contracts import (
     Side,
 )
 from courtroom.judge.admissibility import ground_is_valid
-from courtroom.judge.rules import THRESHOLD_LOG_ODDS
+from courtroom.judge.rules import threshold_for
 from courtroom.judge.scoring import score_record
 
 # Conversion of heuristic quantities into utility units (shared by all policies).
@@ -63,7 +63,7 @@ class Oracle:
         self._cache = cache
         self._admitted = frozenset(admitted)
         self._impeachments = dict(impeachments)
-        self._tau = float(THRESHOLD_LOG_ODDS[cache.case.standard])
+        self._tau = float(threshold_for(cache.case))
 
     def log_odds(self, add: Iterable[str] = (), impeach: str | None = None) -> dict[str, float]:
         imp = dict(self._impeachments)

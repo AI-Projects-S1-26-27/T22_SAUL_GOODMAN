@@ -185,3 +185,44 @@ def test_the_page_stays_functional_without_an_api() -> None:
     """The hosted demo has no /api. The page must fall back to the bundle rather than break."""
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assert 'S.mode = "offline"' in js and "COURTROOM_BUNDLE" in js
+
+
+# ----------------------------------------------------------------- the precomputed proof-bar ladder
+
+
+def test_every_case_ships_a_ladder_that_agrees_with_the_certified_analysis(bundle) -> None:
+    analysis = bundle["analysis"]
+    for cid in CASES:
+        grid = analysis["threshold_grid"][cid]
+        assert grid["seeds"] == 200 and len(grid["strategies"]) == 4
+        bars = [r["bar"] for r in grid["bars"]]
+        assert bars == sorted(bars) and len(bars) == 7
+        own = [r for r in grid["bars"] if not r["overridden"]]
+        assert len(own) == 1, f"{cid}: exactly one rung should be the case's own bar"
+        assert own[0]["label"] == analysis["bootstrap"][cid]["baseline_label"], (
+            f"{cid}: the ladder's own rung disagrees with the certified analysis"
+        )
+
+
+def test_a_ladder_rung_reproduces_from_the_engine(bundle) -> None:
+    """Re-solve one cheap case at one off-standard bar and compare it with what shipped."""
+    from courtroom.judge.rules import override_for_bar
+
+    cid, bar = "edge-empty-docket", 0.7
+    case = CASES[cid]
+    override = override_for_bar(case, bar)
+    assert override is not None
+    fresh = estimate_payoffs(case.model_copy(update={"bar_log_odds": override}), tuple(bundle["meta"]["strategies"]), seeds=range(200))
+    shipped = next(r for r in bundle["analysis"]["threshold_grid"][cid]["bars"] if r["bar"] == bar)
+    assert shipped["label"] == equilibrium_label(fresh.analysis)
+    assert shipped["equilibria"] == len(fresh.analysis.equilibria)
+    assert shipped["overridden"] is True
+
+
+def test_the_bundle_does_not_hard_code_a_different_standard_than_the_engine(bundle) -> None:
+    """The page reads its standards from rules; they must be the engine's, to the digit."""
+    from courtroom.judge.rules import THRESHOLD_LOG_ODDS, sigmoid
+
+    for name, shipped in bundle["rules"]["standards"].items():
+        standard = next(s for s in THRESHOLD_LOG_ODDS if s.value == name)
+        assert shipped["probability"] == round(sigmoid(float(THRESHOLD_LOG_ODDS[standard])), 4)

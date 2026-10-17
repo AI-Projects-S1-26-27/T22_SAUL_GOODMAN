@@ -12,6 +12,7 @@ Rules for this module:
 from __future__ import annotations
 
 from enum import StrEnum
+from fractions import Fraction
 from typing import Literal
 
 __all__ = [
@@ -239,6 +240,26 @@ class CaseFile(Frozen):
     rebuttal_turns: int = Field(default=2, ge=0, le=16)
     perception_accuracy: float = Field(default=0.8, ge=0.5, le=1.0)
     tags: tuple[str, ...] = ()
+    # The proof standard's bar is a game parameter, not a constant of nature. ``None`` (every
+    # library case, and the only path the certified analysis uses) means "the standard's own
+    # bar". Otherwise an exact rational in log-odds, written "11/5" or "2.1972"; the standard
+    # still decides whether a tie passes (strict for preponderance, inclusive otherwise).
+    bar_log_odds: str | None = Field(default=None, pattern=r"^(\d{1,2}(\.\d{1,6})?|\d{1,4}/\d{1,4})$")
+
+    @field_validator("bar_log_odds")
+    @classmethod
+    def _bar_is_a_sane_rational(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        try:
+            bar = Fraction(v)
+        except (ValueError, ZeroDivisionError):
+            raise ValueError(f"bar_log_odds {v!r} is not a rational number") from None
+        # 0 is "more likely than not"; 7 is about 99.9%. Below 0 would let a case be proven
+        # when it is less likely than not, and above 7 nothing could ever be proven.
+        if not Fraction(0) <= bar <= Fraction(7):
+            raise ValueError("bar_log_odds must lie between 0 (50%) and 7 (about 99.9%)")
+        return v
 
     @model_validator(mode="after")
     def _referential_integrity(self) -> CaseFile:

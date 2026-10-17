@@ -311,6 +311,56 @@ def _assert_results_match(table: object, stored: dict[str, object], case_id: str
         )
 
 
+GRID_BARS = (0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95)
+
+
+def _equilibrium_summary(table: object) -> dict[str, object]:
+    """A compact, JSON-friendly account of one solved game, for the precomputed bar grid."""
+    from courtroom.gametheory.bootstrap import equilibrium_label
+
+    analysis = table.analysis  # type: ignore[attr-defined]
+    wins = {(c.row, c.col): c.prosecution_win_rate for c in table.cells}  # type: ignore[attr-defined]
+    out: dict[str, object] = {
+        "label": equilibrium_label(analysis),
+        "equilibria": len(analysis.equilibria),
+        "mean_prosecution_win_rate": round(sum(wins.values()) / len(wins), 4),
+    }
+    if analysis.equilibria:
+        eq = analysis.equilibria[0]
+        out["row_mix"] = {k: round(v, 4) for k, v in eq.row_mix.items() if v > 0.0005}
+        out["col_mix"] = {k: round(v, 4) for k, v in eq.col_mix.items() if v > 0.0005}
+        out["prosecution_win_rate_at_equilibrium"] = round(
+            sum(eq.row_mix[r] * eq.col_mix[c] * w for (r, c), w in wins.items()), 4
+        )
+    return out
+
+
+def _threshold_grid(case: CaseFile, certified: object, strategies: tuple[str, ...], seeds: int, workers: int) -> dict[str, object]:
+    """The game re-solved at a ladder of proof bars, at the same seed count as the certified analysis.
+
+    The case's own bar reuses the certified table, so the grid agrees with it exactly rather than
+    approximately; every other rung applies the bar as a parameter and re-estimates the matrix.
+    """
+    from courtroom.gametheory import estimate_payoffs
+    from courtroom.judge.rules import THRESHOLD_LOG_ODDS, override_for_bar, sigmoid
+
+    rungs = []
+    for bar in GRID_BARS:
+        override = override_for_bar(case, bar)
+        table = certified
+        if override is not None:
+            table = estimate_payoffs(
+                case.model_copy(update={"bar_log_odds": override}), strategies, seeds=range(seeds), workers=workers
+            )
+        rungs.append({"bar": bar, "overridden": override is not None, **_equilibrium_summary(table)})
+    return {
+        "seeds": seeds,
+        "strategies": list(strategies),
+        "own_probability": round(sigmoid(float(THRESHOLD_LOG_ODDS[case.standard])), 4),
+        "bars": rungs,
+    }
+
+
 def cmd_export(a: argparse.Namespace) -> int:
     """Pre-compute a static bundle so the web UI works with no server (demo fallback).
 
@@ -352,6 +402,7 @@ def cmd_export(a: argparse.Namespace) -> int:
     ]
     k = len(strategies)
     uniform = [1.0 / k] * k
+    grids: dict[str, object] = {}
     for cid, case in CASES.items():
         for p, d in pairs:
             r = run_trial(case, p, d, seed=0)
@@ -364,6 +415,8 @@ def cmd_export(a: argparse.Namespace) -> int:
             {"x": x, "y": y} for x, y in replicator(table.analysis.A, table.analysis.B, uniform, uniform, steps=300)[::5]
         ]
         bundle["games"][cid] = body  # type: ignore[index]
+        if not a.skip_grid:
+            grids[cid] = _threshold_grid(case, table, strategies, a.seeds, a.workers)
         console.print(f"exported {cid}")
 
     if analysis is not None:
@@ -375,6 +428,7 @@ def cmd_export(a: argparse.Namespace) -> int:
             "order": list(CASES),
             "bootstrap": analysis["bootstrap"],
             "sensitivity": analysis["sensitivity"],
+            "threshold_grid": grids,
         }
     payload = json.dumps(bundle, separators=(",", ":"))
     (out / "bundle.js").write_text(f"window.COURTROOM_BUNDLE = {payload};\n", encoding="utf-8")
@@ -505,6 +559,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--results", default="results", help="where `analysis` wrote payoffs/bootstrap/sensitivity")
     p.add_argument("--skip-analysis", dest="skip_analysis", action="store_true",
                    help="export trials and games only, without the bootstrap and sweep")
+    p.add_argument("--skip-grid", dest="skip_grid", action="store_true",
+                   help="skip the precomputed proof-bar ladder (the slowest part of the export)")
     p.set_defaults(fn=cmd_export)
 
     p = sub.add_parser("export-exhibition", help="replay the committed LLM cache into data/exhibition.js (no key, no network)")

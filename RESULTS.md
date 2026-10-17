@@ -142,6 +142,37 @@ loaded trial be re-decided.
 
 ---
 
+### The whole ladder, not just four points
+
+The sweep above samples the criminal bar at 80, 85, 90 and 95%. The bundle also ships the full
+game re-solved at seven bars from 50% to 95%, at the same 200 seeds per cell as the certified
+analysis (the case's own bar reuses the certified matrix, so the two agree exactly). It is
+produced by `python -m courtroom export`, and the web page reads it rather than recomputing it.
+
+`helix-espionage`:
+
+| Bar | Result | Prosecution plays | Defense plays | Prosecution wins at equilibrium |
+|---|---|---|---|---|
+| 50% | dominance-solvable | adaptive 100% | aggressive 100% | 42.0% |
+| 60% | dominance-solvable | adaptive 100% | adaptive 100% | 51.0% |
+| 70% | dominance-solvable | adaptive 100% | aggressive 100% | 18.0% |
+| 80% | mixed | conservative 61%, adaptive 39% | aggressive 68%, adaptive 32% | 5.3% |
+| 85% | mixed | conservative 88%, adaptive 12% | conservative 5%, adaptive 95% | 2.8% |
+| 90% (own) | mixed | conservative 87%, adaptive 13% | conservative 7%, adaptive 93% | 3.1% |
+| 95% | dominance-solvable | conservative 100% | conservative 100% | 0.0% |
+
+Read it as a shape rather than a lookup. On this ladder the flagship's mixed equilibrium appears
+only at 80%, 85% and 90%. At 50%, 60% and 70% and again at 95% the game has one clear best style
+for each side, and at 95% the prosecution cannot win at all. The shipped 90% bar is inside the
+mixed band. The ladder has seven rungs, so it cannot say where the band starts between 70% and
+80% or where it ends between 90% and 95%; that would take a finer ladder. It also does not
+explain *why* the structure changes, only that it does.
+
+Cases whose label changes somewhere on the ladder: `helix-espionage`.
+Cases whose label never changes from 50% to 95%: `aurora-defi`, `kestrel-av`, `edge-empty-docket`, `edge-mutual-exclusion`, `edge-poisoned-tree`, `edge-defense-only`.
+
+---
+
 ## 5. Changes made before the parameters were frozen
 
 All logged with reasons in [`DEVIATIONS.md`](DEVIATIONS.md): alternating turns and the

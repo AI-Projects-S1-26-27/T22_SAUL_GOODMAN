@@ -1039,3 +1039,13 @@ body.exhibition-mode .panel::before {
 .analysis-table td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .analysis-table tr.current { background: var(--yes-soft); }
 .analysis-detail { font-size: .85rem; color: var(--muted); margin: .6rem 0 0; }
+
+/* ---------------------------------------------------------------- the bar: three questions */
+.thr-q { margin: 1.4rem 0 .15rem; font-size: 1rem; }
+.thr-qnote { margin: 0 0 .6rem; font-size: .85rem; color: var(--muted); }
+.thr-live { margin-top: .2rem; }
+.thr-eq { margin-top: .8rem; }
+.thr-eq .headline { font-weight: 700; margin: 0 0 .3rem; }
+.thr-eq p { margin: .2rem 0; }
+.inline-field { display: inline-flex; align-items: center; gap: .4rem; font-size: .85rem; margin-right: .6rem; }
+.inline-field input { width: 4.5rem; }
