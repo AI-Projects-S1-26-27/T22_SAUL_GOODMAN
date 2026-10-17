@@ -80,6 +80,25 @@ class Cell:
         }
 
 
+def build_court(
+    case,
+    llm_side: Side,
+    opponent: str,
+    seed: int,
+    client: LLMClient,
+) -> tuple[Court, LLMAgent]:
+    """The one place an exhibition trial is assembled.
+
+    Used by the live harness and by the offline replay, so a replay from the committed cache
+    cannot drift from the run that filled it: same agent seeds, same strategy names, same seed.
+    """
+    agent = LLMAgent(client=client, rng=random.Random(f"{seed}:llm"))
+    other = make_agent(opponent, random.Random(f"{seed}:agent:{opponent}"))
+    p, d = (agent, other) if llm_side is Side.PROSECUTION else (other, agent)
+    names = ("llm", opponent) if llm_side is Side.PROSECUTION else (opponent, "llm")
+    return Court(case, p, d, seed, *names), agent
+
+
 def _deterministic_baseline(case, seeds, opponents) -> list[dict[str, object]]:
     """The same match-ups with a fixed strategy in the LLM's seat.
 
@@ -145,13 +164,10 @@ def run_exhibition(
                 if max_calls is not None and client.usage.calls >= max_calls:
                     aborted = f"call ceiling of {max_calls} reached"
                     break
-                agent = LLMAgent(client=client, rng=random.Random(f"{seed}:llm"))
-                other = make_agent(opponent, random.Random(f"{seed}:agent:{opponent}"))
-                p, d = (agent, other) if llm_side is Side.PROSECUTION else (other, agent)
+                court, agent = build_court(case, llm_side, opponent, seed, client)
                 client.start_trial()
-                names = ("llm", opponent) if llm_side is Side.PROSECUTION else (opponent, "llm")
                 try:
-                    result = Court(case, p, d, seed, *names).run()
+                    result = court.run()
                 except QuotaExhausted as exc:
                     # Daily cap: stop cleanly. Everything already answered stays in the cache,
                     # so the next run replays it for free and carries on from here.

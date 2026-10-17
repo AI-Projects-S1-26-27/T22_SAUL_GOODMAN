@@ -791,10 +791,67 @@ function buildWorking() {
   $("#digest").textContent = t.digest;
 }
 
+
+/* ------------------------------------------------------------------ certified analysis card
+ * Bootstrap stability and the sensitivity sweep are far too slow to run in a browser (minutes of
+ * simulation), so they ship precomputed in the bundle and are labelled as such. The bundle is
+ * only ever written from results that match the engine it ships with (see `export`).
+ */
+
+const PARAM_WORDS = {
+  sanctions: "penalties", costs: "what actions cost", LLR_SCALE: "how hard evidence moves the judge",
+  PRIOR_DEFECT_RATE: "how often lawyers expect a flaw", standards_of_proof: "all three proof standards",
+  beyond_reasonable_doubt: "the criminal bar",
+};
+const LABEL_WORDS = {
+  mixed: "Mixed: smart lawyers randomise",
+  pure: "A stable best style exists",
+  "dominance-solvable": "One clear best style (trivial)",
+};
+
+function describeVariation(v) {
+  const word = PARAM_WORDS[v.parameter] ?? v.parameter;
+  if (v.parameter === "beyond_reasonable_doubt") {
+    const p = Number.parseFloat(v.setting.replace("p=", ""));
+    return `${word} set to ${Math.round(100 * p)}%`;
+  }
+  const dir = v.setting.startsWith("-") ? "cut by" : "raised by";
+  return `${word} ${dir} ${v.setting.replace(/^[+-]/, "")}`;
+}
+
+function renderAnalysisCard() {
+  const box = $("#analysis-card");
+  if (!box) return;
+  const A = window.COURTROOM_BUNDLE?.analysis;
+  if (!A) { box.hidden = true; return; }
+  box.hidden = false;
+  const sweep = A.sensitivity, current = S.caseFile?.id;
+  $("#analysis-note").textContent = A.note;
+  const rows = A.order.map((id) => {
+    const b = A.bootstrap[id];
+    const broke = sweep.variations.filter((v) => v.changed.includes(id));
+    const kase = S.cases.find((c) => c.id === id);
+    return el("tr", { class: id === current ? "current" : "" },
+      el("th", { scope: "row" }, kase ? splitTitle(kase.title).name : id),
+      el("td", {}, LABEL_WORDS[b.baseline_label] ?? b.baseline_label),
+      el("td", { class: "num" }, `${b.label_counts[b.baseline_label] ?? 0} of ${b.n_resamples}`),
+      el("td", {}, broke.length ? `Changes if: ${broke.map(describeVariation).join("; ")}` : `Held under all ${sweep.variations.length} changes`));
+  });
+  $("#analysis-table").replaceChildren(
+    el("caption", { class: "tech" }, `Bootstrap over ${A.bootstrap[A.order[0]].n_seeds} seeds, sweep at ${sweep.n_seeds} seeds per cell.`),
+    el("thead", {}, el("tr", {}, el("th", {}, "Case"), el("th", {}, "Result"), el("th", {}, "Same result in"), el("th", {}, "When the rules are perturbed"))),
+    el("tbody", {}, rows));
+  const mine = current ? A.bootstrap[current] : null;
+  $("#analysis-detail").textContent = mine
+    ? "Perturbed: penalties and action costs \u00b125%, how hard evidence moves the judge \u00b125%, how often lawyers expect a flaw \u00b125%, every proof standard \u00b125%, and the criminal bar from 80% to 95%."
+    : "";
+}
+
 /* ------------------------------------------------------------------ which style wins */
 
 function loadGame() {
   S.game = null;
+  renderAnalysisCard();
   const { name } = splitTitle(S.caseFile.title);
   $("#styles-case").textContent = `Case: ${name}`;
   $("#gstatus").textContent = "";

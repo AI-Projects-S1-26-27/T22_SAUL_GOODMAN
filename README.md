@@ -86,8 +86,14 @@ pre-exported bundle (`courtroom/viz/web/data/bundle.js`), so it also works offli
 straight from `file://`.
 
 **Hosted demo vs. local server.** The Vercel deployment is the static UI running on that bundle.
-It includes the seed-0 trial for six style pairings per case plus the 2×2 Aggressive/Careful
-games, and it greys out the rest. Run `python -m courtroom serve` locally to unlock everything.
+It includes the seed-0 trial for six style pairings per case, the full **4×4** payoff matrix for
+every case (200 seeds per cell), and the precomputed bootstrap and sensitivity results, which
+the Strategy tab labels as precomputed. It greys out everything else. Run `python -m courtroom
+serve` locally to unlock any pairing, any seed, your own cases and live recomputation.
+
+The optional LLM exhibition ships as a **separate** file, `data/exhibition.js`, replayed from the
+committed response cache with the network disabled, so `bundle.js` can be audited as containing
+no model output.
 
 ---
 
@@ -192,7 +198,7 @@ what each result depends on, are in [`RESULTS.md`](RESULTS.md).
 
 | Case | Type | What it demonstrates | Equilibrium (4×4, 200 seeds) |
 |---|---|---|---|
-| `helix-espionage` (flagship) | Criminal | No dominant strategy either side: optimal play has to randomise | **Mixed** NE: prosecution 35 % Careful / 65 % Adaptive, defense 5 % Aggressive / 95 % Adaptive. Label stable in 200/200 resamples |
+| `helix-espionage` (flagship) | Criminal | No dominant strategy either side: optimal play has to randomise | **Mixed** NE: prosecution 87 % Careful / 13 % Adaptive, defense 93 % Adaptive / 7 % Careful (exactly 711/821 and 7870/8447). Label stable in 200/200 resamples |
 | `kestrel-av` | Civil | **Trivial**: the plaintiff cannot win under any pairing, so there is no strategic content (see `RESULTS.md` §5) | Pure NE (Careful, Careful), dominance-solvable, strictly |
 | `aurora-defi` | Criminal | Strong white-hat defense: aggression only burns budget | Pure NE (Careful, Careful); Careful strictly dominant for the prosecution |
 | `edge-empty-docket` | Criminal | Zero evidence | Directed acquittal (rule DV-2) under every pairing, including Chaotic. Every profile ties |
@@ -223,7 +229,8 @@ python -m courtroom stress --cases 100              # 2,500-trial fuzz run, exit
 python -m courtroom llm-models                      # Gemini models available on your key
 python -m courtroom llm-exhibition                  # Gemini policy vs the four (NOT equilibrium analysis)
 python -m courtroom run --narrate                   # spoken argument text over a decided trial
-python -m courtroom export                          # rebuild the static web bundle
+python -m courtroom export                          # rebuild the static web bundle (needs `analysis` first)
+python -m courtroom export-exhibition               # replay the committed LLM cache into data/exhibition.js
 python -m courtroom serve                           # web UI + API on http://127.0.0.1:8000
 ```
 
@@ -333,11 +340,20 @@ The live demo at <https://ai-project-weld-omega.vercel.app> is a static deployme
 `courtroom/viz/web` (see [`vercel.json`](vercel.json): no build command, output directory
 `courtroom/viz/web`).
 
-After changing cases, agents or judge constants:
+After changing cases, agents or judge constants, regenerate in this order:
 
 ```bash
-python -m courtroom export      # regenerate courtroom/viz/web/data/bundle.js
+python -m courtroom analysis --out results --workers 4   # matrices, bootstrap, sweep (about ten minutes)
+python -m courtroom export --workers 4                   # courtroom/viz/web/data/bundle.js
+python -m courtroom export-exhibition                    # courtroom/viz/web/data/exhibition.js (no key needed)
 ```
+
+`export` **refuses to run** if `results/payoffs.json` does not match the current engine, so the
+bundle can never ship analysis that describes a game the code no longer plays. `tests/test_bundle.py`
+checks the same thing from the other side: every shipped trial must reproduce its digest.
+
+To check the static build locally, `vercel build` works in a scratch copy with no login or project
+link; its output is byte-identical to `courtroom/viz/web`.
 
 Then commit and redeploy (push to the connected branch, or run `vercel --prod`).
 

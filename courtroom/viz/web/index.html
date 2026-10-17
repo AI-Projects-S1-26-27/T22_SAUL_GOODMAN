@@ -432,6 +432,7 @@
               <select id="gstrats">
                 <option value="aggressive,conservative">Aggressive and careful</option>
                 <option value="aggressive,conservative,adaptive">Aggressive, careful and adaptive</option>
+                <option value="aggressive,conservative,adaptive,mixed:0.5">All four styles</option>
               </select>
             </label>
             <label>Trials per matchup <input id="gseeds" type="number" min="1" max="100" value="20" inputmode="numeric"></label>
@@ -447,6 +448,15 @@
             </div>
             <div class="insight" id="insight"></div>
           </div>
+
+          <section class="block analysis-card" id="analysis-card" aria-labelledby="analysis-title" hidden>
+            <header class="block-head">
+              <h3 id="analysis-title">How solid is this? <em class="cert-tag">certified, precomputed</em></h3>
+              <p id="analysis-note"></p>
+            </header>
+            <div class="table-scroll"><table class="matrix analysis-table" id="analysis-table"></table></div>
+            <p class="analysis-detail" id="analysis-detail"></p>
+          </section>
 
           <div class="tech game-tech" id="game-tech">
             <div class="game-tech-grid">

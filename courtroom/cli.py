@@ -277,8 +277,46 @@ def cmd_verify(a: argparse.Namespace) -> int:
     return 0 if same and chain_ok else 1
 
 
+def _load_analysis(results: Path) -> dict[str, object]:
+    """The three certified result files, or a clear instruction to produce them."""
+    names = ("payoffs", "bootstrap", "sensitivity")
+    missing = [n for n in names if not (results / f"{n}.json").exists()]
+    if missing:
+        raise SystemExit(
+            f"missing {', '.join(n + '.json' for n in missing)} in {results}/. "
+            "Run `python -m courtroom analysis --out results --workers 4` first, "
+            "or pass --skip-analysis to export trials and games only."
+        )
+    loaded = {n: json.loads((results / f"{n}.json").read_text(encoding="utf-8")) for n in names}
+    return {
+        "payoffs": {t["case_id"]: t for t in loaded["payoffs"]},
+        "bootstrap": {r["case_id"]: r for r in loaded["bootstrap"]},
+        "sensitivity": loaded["sensitivity"],
+    }
+
+
+def _assert_results_match(table: object, stored: dict[str, object], case_id: str) -> None:
+    """Refuse to ship analysis that was computed by a different engine than the one shipping.
+
+    The matrices are deterministic, so a freshly estimated game must reproduce the stored one
+    cell for cell. If it does not, ``results/`` predates a rule change and would put numbers in
+    front of an examiner that describe a game the code no longer plays.
+    """
+    fresh = {(c.row, c.col): (c.mean_row, c.mean_col) for c in table.cells}  # type: ignore[attr-defined]
+    old = {(c["row"], c["col"]): (c["mean_row"], c["mean_col"]) for c in stored["cells"]}  # type: ignore[index]
+    if fresh != old:
+        raise SystemExit(
+            f"results/payoffs.json is stale for {case_id}: it does not match this engine. "
+            "Rerun `python -m courtroom analysis --out results --workers 4` and export again."
+        )
+
+
 def cmd_export(a: argparse.Namespace) -> int:
-    """Pre-compute a static bundle so the web UI works with no server (demo fallback)."""
+    """Pre-compute a static bundle so the web UI works with no server (demo fallback).
+
+    Everything in it is deterministic and certified. The LLM exhibition is deliberately a
+    separate file (``export-exhibition``) so this one can be audited as LLM-free.
+    """
     from fastapi.testclient import TestClient
 
     from courtroom.agents import describe_strategies
@@ -287,11 +325,20 @@ def cmd_export(a: argparse.Namespace) -> int:
 
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
+    strategies = tuple(ANALYSIS_STRATEGIES.split(","))
+    analysis = None if a.skip_analysis else _load_analysis(Path(a.results))
+
     bundle: dict[str, object] = {
         "cases": [json.loads(c.model_dump_json()) for c in CASES.values()],
         "strategies": describe_strategies(),
         # Judge constants + per-ground catch probability, so the judge tab works offline too.
         "rules": TestClient(_api).get("/api/rules").json(),
+        "meta": {
+            "turn_order": "alternating",
+            "strategies": list(strategies),
+            "seeds_per_cell": a.seeds,
+            "note": "Deterministic and certified. Contains no language-model output.",
+        },
         "trials": {},
         "games": {},
     }
@@ -303,21 +350,59 @@ def cmd_export(a: argparse.Namespace) -> int:
         ("adaptive", "adaptive"),
         ("chaos", "aggressive"),
     ]
+    k = len(strategies)
+    uniform = [1.0 / k] * k
     for cid, case in CASES.items():
         for p, d in pairs:
             r = run_trial(case, p, d, seed=0)
             bundle["trials"][f"{cid}|{p}|{d}|0"] = json.loads(r.model_dump_json())  # type: ignore[index]
-        table = estimate_payoffs(case, ("aggressive", "conservative"), seeds=range(a.seeds), workers=a.workers)
+        table = estimate_payoffs(case, strategies, seeds=range(a.seeds), workers=a.workers)
+        if analysis is not None and a.seeds == 200:
+            _assert_results_match(table, analysis["payoffs"][cid], cid)  # type: ignore[index]
         body = json.loads(table.model_dump_json())
         body["dynamics"] = [
-            {"x": x, "y": y} for x, y in replicator(table.analysis.A, table.analysis.B, [0.5, 0.5], [0.5, 0.5], steps=300)[::5]
+            {"x": x, "y": y} for x, y in replicator(table.analysis.A, table.analysis.B, uniform, uniform, steps=300)[::5]
         ]
         bundle["games"][cid] = body  # type: ignore[index]
         console.print(f"exported {cid}")
+
+    if analysis is not None:
+        bundle["analysis"] = {
+            "note": (
+                "Precomputed by `python -m courtroom analysis`. Not recomputed in the browser. "
+                "Matrices: 200 common seeds per cell. Bootstrap: 200 resamples. Sweep: 60 seeds per cell."
+            ),
+            "order": list(CASES),
+            "bootstrap": analysis["bootstrap"],
+            "sensitivity": analysis["sensitivity"],
+        }
     payload = json.dumps(bundle, separators=(",", ":"))
     (out / "bundle.js").write_text(f"window.COURTROOM_BUNDLE = {payload};\n", encoding="utf-8")
     console.print(f"[green]wrote {out / 'bundle.js'} ({len(payload) // 1024} KiB)[/]")
     return 0
+
+
+def cmd_export_exhibition(a: argparse.Namespace) -> int:
+    """Replay the committed LLM cache into a static, separately labelled bundle (no key, no network)."""
+    from courtroom.llm.bundle import replay_exhibition
+
+    results = Path(a.results)
+    if not results.exists():
+        raise SystemExit(f"{results} not found. Run `python -m courtroom llm-exhibition` first.")
+    data = replay_exhibition(results)
+    meta = data["meta"]
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(data, separators=(",", ":"))
+    (out / "exhibition.js").write_text(f"window.COURTROOM_EXHIBITION = {payload};\n", encoding="utf-8")
+    console.print(
+        f"replayed {len(data['trials'])} trials from the cache, {meta['cache_misses']} cache misses, "
+        f"{len(meta['mismatches_vs_live_run'])} mismatches against the live run"
+    )
+    for line in meta["mismatches_vs_live_run"]:
+        console.print(f"  [red]{line}[/]")
+    console.print(f"[green]wrote {out / 'exhibition.js'} ({len(payload) // 1024} KiB)[/]")
+    return 1 if meta["mismatches_vs_live_run"] else 0
 
 
 def cmd_serve(a: argparse.Namespace) -> int:
@@ -417,7 +502,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", default=str(EXPORT_DIR))
     p.add_argument("--seeds", type=int, default=200)
     p.add_argument("--workers", type=int, default=1)
+    p.add_argument("--results", default="results", help="where `analysis` wrote payoffs/bootstrap/sensitivity")
+    p.add_argument("--skip-analysis", dest="skip_analysis", action="store_true",
+                   help="export trials and games only, without the bootstrap and sweep")
     p.set_defaults(fn=cmd_export)
+
+    p = sub.add_parser("export-exhibition", help="replay the committed LLM cache into data/exhibition.js (no key, no network)")
+    p.add_argument("--results", default="results/llm_exhibition.json")
+    p.add_argument("--out", default=str(EXPORT_DIR))
+    p.set_defaults(fn=cmd_export_exhibition)
 
     p = sub.add_parser("serve", help="start the web UI + API")
     p.add_argument("--host", default="127.0.0.1")
