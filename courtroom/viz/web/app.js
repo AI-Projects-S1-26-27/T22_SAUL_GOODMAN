@@ -16,6 +16,7 @@ const S = {
   trial: null, trialKey: null, idx: 0, timer: null, loadToken: 0, caseToken: 0,
   tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null, rules: null,
   spoken: null, spokenOn: false, spokenKey: null, baseCaseFile: null, injections: [],
+  exhibition: null, exhibitionOn: false, modeToken: 0, setupNote: null, stylesIntro: null,
 };
 
 function el(tag, attrs = {}, ...kids) {
@@ -61,6 +62,7 @@ const STYLE = {
   conservative: { label: "Careful", adverb: "carefully", blurb: "Offers only solid evidence and objects only when sure." },
   adaptive: { label: "Adaptive", adverb: "adaptively", blurb: "Watches how the other side plays and adjusts." },
   chaos: { label: "Chaotic", adverb: "chaotically", blurb: "Makes random, often illegal moves. A stress test for the rules." },
+  llm: { label: "LLM (Gemini)", adverb: "as a language model", blurb: "A language model picks each move from the list of legal ones. Replayed from a committed cache of its real moves." },
 };
 const STYLE_ORDER = ["aggressive", "conservative", "adaptive", "chaos"];
 function styleInfo(name) {
@@ -409,7 +411,7 @@ function currentRequest() {
     case_id: S.caseFile.id,
     prosecution: selectedStyle("prosecution"),
     defense: selectedStyle("defense"),
-    seed: S.mode === "live" ? Math.max(0, Math.floor(+$("#seed").value || 0)) : 0,
+    seed: S.mode === "live" || S.exhibitionOn ? Math.max(0, Math.floor(+$("#seed").value || 0)) : 0,
   };
 }
 
@@ -430,16 +432,23 @@ async function loadTrial({ autoplay = false } = {}) {
   }
   $("#run").disabled = true;
   try {
-    const trial = S.mode === "live"
-      ? await fetchJSON(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) })
-      : S.bundle.trials[key];
+    // In the exhibition a trial is read from the committed replay and the request is never sent: the
+    // server has no "llm" strategy to run, and nothing here is allowed to spend money.
+    const trial = S.exhibitionOn
+      ? S.exhibition.trials[key]
+      : S.mode === "live"
+        ? await fetchJSON(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) })
+        : S.bundle.trials[key];
     if (token !== S.loadToken) return;
     if (!trial) {
-      showStageMessage("This matchup isn't in the saved trials. Pick another style, or run the simulator on your computer to try any combination.");
+      showStageMessage(S.exhibitionOn
+        ? `That matchup isn't in the exhibition replay. The model played ${S.exhibition.meta.case_id} on both sides against each fixed style, trials ${S.exhibition.meta.seeds[0]} to ${S.exhibition.meta.seeds.at(-1)}.`
+        : "This matchup isn't in the saved trials. Pick another style, or run the simulator on your computer to try any combination.");
       return;
     }
     S.trial = trial;
     S.trialKey = key;
+    updateExhibitionTrialNote();
     buildInjectionForm();
     setupTrial();
     renderThreshold();
@@ -475,11 +484,12 @@ function buildStyleControls() {
   const names = STYLE_ORDER.filter((n) => S.strategies.some((s) => s.name === n));
   for (const s of S.strategies) if (!names.includes(s.name) && !s.name.includes("<")) names.push(s.name);
   if (S.mode === "live") names.push("mixed:0.4");
+  names.push("llm"); // only ever visible in the exhibition (CSS); the certified page never offers it
   for (const side of SIDES) {
     const group = $(`#${side}-style`);
     group.setAttribute("aria-label", `${sideLabel(side)} style`);
     group.replaceChildren(...names.map((n) =>
-      el("label", {}, el("input", { type: "radio", name: `${side}-style`, value: n }), el("span", {}, styleInfo(n).label))));
+      el("label", { class: n === "llm" ? "exhibition-only" : "" }, el("input", { type: "radio", name: `${side}-style`, value: n }), el("span", {}, styleInfo(n).label))));
     group.addEventListener("change", () => {
       updateAvailability();
       loadTrial();
@@ -495,13 +505,15 @@ function setStyle(side, value) {
 }
 
 function updateAvailability() {
-  if (S.mode === "offline" && S.caseFile) {
-    const pairs = new Set(Object.keys(S.bundle.trials).filter((k) => k.startsWith(`${S.caseFile.id}|`)).map((k) => k.split("|").slice(1, 3).join("|")));
+  if ((S.mode === "offline" || S.exhibitionOn) && S.caseFile) {
+    const source = S.exhibitionOn ? S.exhibition.trials : S.bundle.trials;
+    const why = S.exhibitionOn ? "Not in the LLM exhibition replay." : "Not in the saved trials. Run the simulator locally to try this matchup.";
+    const pairs = new Set(Object.keys(source).filter((k) => k.startsWith(`${S.caseFile.id}|`)).map((k) => k.split("|").slice(1, 3).join("|")));
     const inputs = (side) => [...document.querySelectorAll(`input[name="${side}-style"]`)];
     const choose = (side, ok) => {
       for (const input of inputs(side)) {
         input.disabled = !ok(input.value);
-        input.parentElement.title = input.disabled ? "Not in the saved trials. Run the simulator locally to try this matchup." : "";
+        input.parentElement.title = input.disabled ? why : "";
       }
       const current = inputs(side).find((i) => i.checked);
       if (!current || current.disabled) {
@@ -873,6 +885,7 @@ function renderAnalysisCard() {
 function loadGame() {
   S.game = null;
   renderAnalysisCard();
+  renderExhibitionCard();
   $("#thr-slider").value = String(Math.round(100 * ownBar()));
   $("#thr-eq").replaceChildren();
   $("#thr-replay-out").replaceChildren();
@@ -1411,32 +1424,137 @@ function focusNode(id) {
 
 const MODE_SAY = {
   deterministic: "Exact rulebook judge, fixed strategies. Same case and choices give the same verdict, every time.",
-  exhibition: "A language model writes the arguments. The judge still ignores every word of it and scores only the record \u2014 the verdict is identical either way. Not reproducible on another machine, so it is excluded from the equilibrium analysis.",
+  exhibition: "A Gemini policy plays one seat, replayed from a committed cache of its real moves: no network, no key. The judge is the same exact rulebook. It is not reproducible on another machine from a cold cache, so it is excluded from the equilibrium analysis.",
 };
 
-function setMode(mode) {
-  const exhibition = mode === "exhibition";
-  S.spokenOn = exhibition;
+/** The exhibition replay is 1.5 MB and the certified page never needs it, so it loads on demand. */
+function loadExhibitionData() {
+  if (window.COURTROOM_EXHIBITION) return Promise.resolve(window.COURTROOM_EXHIBITION);
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "data/exhibition.js";
+    script.onload = () => (window.COURTROOM_EXHIBITION ? resolve(window.COURTROOM_EXHIBITION) : reject(new Error("exhibition.js defined nothing")));
+    script.onerror = () => reject(new Error("exhibition.js did not load"));
+    document.head.append(script);
+  });
+}
+
+/** Flip the page into or out of the exhibition without loading anything. */
+function applyModeUi(exhibition) {
+  S.exhibitionOn = exhibition;
   document.body.classList.toggle("exhibition-mode", exhibition);
   $("#mode-det").classList.toggle("is-on", !exhibition);
   $("#mode-llm").classList.toggle("is-on", exhibition);
   $("#mode-det").setAttribute("aria-checked", String(!exhibition));
   $("#mode-llm").setAttribute("aria-checked", String(exhibition));
   $("#mode-say").textContent = MODE_SAY[exhibition ? "exhibition" : "deterministic"];
-  const box = $("#spoken");
-  if (box) box.checked = exhibition;
-  try { localStorage.setItem("courtroom-mode", mode); } catch { /* storage unavailable */ }
-  if (exhibition && S.spokenKey !== S.trialKey) S.spoken = null;
-  loadSpokenArgument();
+  const meta = S.exhibition?.meta;
+  for (const option of document.querySelectorAll("#case option")) option.disabled = exhibition && meta && option.value !== meta.case_id;
+  $("#seed").max = exhibition && meta ? String(Math.max(...meta.seeds)) : "";
+  const note = $("#setup-note");
+  if (note) {
+    S.setupNote ??= note.textContent;
+    note.textContent = exhibition
+      ? `The model's trials are replayed from a cache, for ${meta?.case_id ?? "one case"} only, seeds ${meta?.seeds[0] ?? 0} to ${meta?.seeds.at(-1) ?? 4}. Pick LLM for one side and a fixed style for the other.`
+      : S.setupNote;
+  }
+  const intro = $("#styles-intro");
+  if (intro) {
+    S.stylesIntro ??= intro.textContent;
+    intro.textContent = exhibition
+      ? "Here the model plays each fixed style, on both sides. These are head-to-head results from a replay: nothing on this page is an equilibrium, and the certified analysis is hidden while the exhibition is on."
+      : S.stylesIntro;
+  }
+  if (!exhibition) {
+    for (const side of SIDES) if (selectedStyle(side) === "llm") setStyle(side, side === "prosecution" ? "aggressive" : "conservative");
+    $("#mode-trial").hidden = true;
+  }
+  renderExhibitionCard();
+}
+
+async function setMode(mode) {
+  const exhibition = mode === "exhibition";
+  const token = ++S.modeToken;
+  if (exhibition) {
+    $("#mode-say").textContent = "Loading the exhibition replay (about 1.5 MB, once)…";
+    try {
+      S.exhibition = await loadExhibitionData();
+    } catch {
+      if (token === S.modeToken) $("#mode-say").textContent = "The exhibition replay isn't available in this build, so the page stays in the certified mode.";
+      return;
+    }
+    if (token !== S.modeToken) return;
+  }
+  applyModeUi(exhibition);
+  if (exhibition) {
+    setStyle("prosecution", "llm");
+    setStyle("defense", "conservative");
+    if (S.caseFile?.id !== S.exhibition.meta.case_id) {
+      $("#case").value = S.exhibition.meta.case_id;
+      await selectCase(S.exhibition.meta.case_id);
+      return;
+    }
+  }
+  updateAvailability();
+  if (!exhibition && S.caseFile) loadGame(); // bring the certified matrix back as the page had it
+  await loadTrial();
 }
 
 function initModeBar() {
   if (!$("#mode-det")) return;
   $("#mode-det").addEventListener("click", () => setMode("deterministic"));
   $("#mode-llm").addEventListener("click", () => setMode("exhibition"));
-  let saved = "deterministic";
-  try { saved = localStorage.getItem("courtroom-mode") === "exhibition" ? "exhibition" : "deterministic"; } catch { /* ignore */ }
-  setMode(saved);
+  $("#exh-back")?.addEventListener("click", () => setMode("deterministic"));
+  // Always start certified. The mode is deliberately not remembered, so a shared link or a
+  // screenshot of this page can never open in the exhibition by accident.
+  applyModeUi(false);
+}
+
+/** One line about the trial on screen: how much of it the model actually decided. */
+function updateExhibitionTrialNote() {
+  const box = $("#mode-trial");
+  if (!box) return;
+  const st = S.exhibitionOn && S.trialKey ? S.exhibition.stats[S.trialKey] : null;
+  box.hidden = !st;
+  if (!st) return;
+  const real = st.decisions - st.trivial;
+  const missed = st.cache_misses
+    ? ` ${st.cache_misses} request${st.cache_misses === 1 ? "" : "s"} missed the cache and ${st.fallbacks ? "fell back to a fixed style" : "were answered on a re-ask"}.`
+    : "";
+  box.textContent = `This trial: the model chose ${st.llm_chosen} of ${real} real decisions${st.trivial ? ` (${st.trivial} turns had only one legal move)` : ""}; ${st.fallbacks} fell back to Adaptive.${missed}`;
+}
+
+/** The exhibition's results, in the Strategy tab, in place of the certified matrix. */
+function renderExhibitionCard() {
+  const card = $("#exhibition-card");
+  if (!card) return;
+  card.hidden = !S.exhibitionOn || !S.exhibition;
+  if (card.hidden) return;
+  const { meta, summary, stats } = S.exhibition;
+  $("#exh-note").textContent = meta.not_equilibrium;
+  const all = Object.values(stats);
+  const sum = (k) => all.reduce((n, s) => n + s[k], 0);
+  const real = sum("decisions") - sum("trivial");
+  $("#exh-facts").replaceChildren(...[
+    `Model ${meta.model} at temperature ${meta.temperature}, ${meta.case_id}, ${all.length} trials (${meta.seeds.length} seeds on each seat against each fixed style).`,
+    `The model chose ${sum("llm_chosen")} of ${real} real decisions; ${sum("fallbacks")} fell back to a fixed style; ${sum("cache_misses")} requests missed the cache and were re-asked.`,
+    `${summary.cached_responses_total ?? "Many"} responses are in the committed cache. Each cost one real call when it was recorded; replaying them costs nothing.`,
+    meta.source.charAt(0).toUpperCase() + meta.source.slice(1) + ".",
+  ].map((t) => el("li", {}, t)));
+  const side = (s) => capFirst(sideName(s, { the: false, cap: false }));
+  $("#exh-table").replaceChildren(
+    el("thead", {}, el("tr", {}, ["The model plays", "Against", "Trials", "Model wins", "Mean payoff", "Budget spent", "Exhibits offered", "Objections raised", "Fell back"].map((h) => el("th", {}, h)))),
+    el("tbody", {}, summary.cells.map((c) => el("tr", {},
+      el("th", { scope: "row" }, side(c.llm_side)), el("td", {}, styleInfo(c.opponent).label), el("td", { class: "num" }, String(c.trials)),
+      el("td", { class: "num" }, pct(c.llm_win_rate)), el("td", { class: "num" }, c.mean_llm_payoff.toFixed(2)),
+      el("td", { class: "num" }, c.mean_llm_budget_spent.toFixed(2)), el("td", { class: "num" }, (c.mean_exhibits_offered ?? 0).toFixed(1)),
+      el("td", { class: "num" }, (c.mean_objections_raised ?? 0).toFixed(1)), el("td", { class: "num" }, pct(c.fallback_rate))))));
+  $("#exh-baseline").replaceChildren(
+    el("thead", {}, el("tr", {}, ["Seat", "Style", "Against", "Wins", "Budget spent", "Exhibits offered", "Objections raised"].map((h) => el("th", {}, h)))),
+    el("tbody", {}, (summary.deterministic_baseline ?? []).map((b) => el("tr", {},
+      el("th", { scope: "row" }, side(b.side)), el("td", {}, styleInfo(b.strategy).label), el("td", {}, styleInfo(b.opponent).label),
+      el("td", { class: "num" }, pct(b.win_rate)), el("td", { class: "num" }, b.mean_budget_spent.toFixed(2)),
+      el("td", { class: "num" }, b.mean_exhibits_offered.toFixed(1)), el("td", { class: "num" }, b.mean_objections_raised.toFixed(1))))));
 }
 
 /* ------------------------------------------------------------------ spoken argument (exhibition)
@@ -1480,7 +1598,11 @@ async function loadSpokenArgument() {
 function initSpokenToggle() {
   const box = $("#spoken");
   if (!box) return;
-  box.addEventListener("change", () => setMode(box.checked ? "exhibition" : "deterministic"));
+  box.addEventListener("change", () => {
+    S.spokenOn = box.checked;
+    if (box.checked && S.spokenKey !== S.trialKey) S.spoken = null;
+    loadSpokenArgument();
+  });
 }
 
 const OUTCOME_WORD = { guilty: "Guilty", not_guilty: "Not guilty", liable: "Liable", not_liable: "Not liable" };
@@ -1587,7 +1709,7 @@ function renderGameSummary(box, game, caption) {
 
 async function replayAtBar() {
   const out = $("#thr-replay-out"), status = $("#thr-status");
-  if (!S.caseFile || !API) return;
+  if (!S.caseFile || !API || S.exhibitionOn) return; // the exhibition is a fixed replay: nothing to re-run
   const bar = sliderOverride();
   out.replaceChildren(el("p", { class: "meters-note" }, "Replaying…"));
   try {
@@ -1608,7 +1730,7 @@ async function replayAtBar() {
 
 async function recomputeAtBar() {
   const box = $("#thr-eq"), status = $("#thr-status"), btn = $("#thr-equilibrium");
-  if (!S.caseFile || !API) return;
+  if (!S.caseFile || !API || S.exhibitionOn) return;
   const bar = sliderOverride(), seeds = Math.min(100, Math.max(5, Math.floor(+$("#thr-seeds").value || 20)));
   btn.disabled = true;
   status.textContent = `Replaying ${seeds} trials for each of 16 matchups…`;
@@ -1686,6 +1808,7 @@ function readInjection() {
 
 async function runInjection() {
   const status = $("#inj-status"), btn = $("#inj-run");
+  if (S.exhibitionOn) { status.textContent = "Evidence can't be added to a replayed exhibition trial. Switch to the certified mode."; return; }
   if (!S.trial || !API || S.mode !== "live") { status.textContent = "Adding evidence needs the local simulator: python -m courtroom serve"; return; }
   if (S.injections.length >= 3) { status.textContent = "Three additions is the limit for one trial. Start a new trial to try more."; return; }
   const injection = readInjection();
@@ -1845,8 +1968,9 @@ function initEditor() {
     try {
       const trial = await fetchJSON(`${API}/trial`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ case: p.value, prosecution: selectedStyle("prosecution") ?? "aggressive", defense: selectedStyle("defense") ?? "conservative", seed: 0 }),
+        body: JSON.stringify({ case: p.value, prosecution: S.exhibitionOn ? "aggressive" : (selectedStyle("prosecution") ?? "aggressive"), defense: S.exhibitionOn ? "conservative" : (selectedStyle("defense") ?? "conservative"), seed: 0 }),
       });
+      if (S.exhibitionOn) applyModeUi(false);
       S.caseFile = p.value;
       S.baseCaseFile = p.value;
       S.injections = [];

@@ -21,6 +21,11 @@ AI used **to build** the project, and AI used **inside** the project at run time
 | `cases/generator.py` | One-line correctness fix: defense evidence could be generated with positive support. |
 | `llm/` | Wrote the entire optional Gemini layer and its tests. |
 | UI | Case editor, threshold slider, catch-probability table, spoken-argument toggle. |
+| Proof bar | Made the standard's bar a parameter (`CaseFile.bar_log_odds`, `judge.rules.threshold_for`), with an API, a three-question slider and a precomputed ladder (D9). |
+| Evidence injection | Logged mid-trial evidence in the hash chain with replay and tamper checks, plus its API, CLI and UI (D10). |
+| LLM exhibition mode | Cache-only opponent mode, lazy-loaded replay, and labelling (D11). |
+| Static bundle | Export that refuses stale analysis; Vercel build check; bundle freshness tests. |
+| Test infrastructure | `tests/ui_smoke.cjs`: runs the real `app.js` in Node against the real bundle, with mutation tests that prove it fails on real bugs. |
 | Docs | `RESULTS.md`, `DEVIATIONS.md`, this file, and README updates. |
 
 **What was NOT written by the assistant:** the original simulator — contracts, case library,
@@ -30,7 +35,7 @@ and the first web UI — was written by the team (commits `e6d4f32`, `0518c85` a
 
 **How the output was checked.** Nothing was accepted because it looked right:
 
-- **The suite is the gate.** 544 tests pass. No failing test was deleted, skipped or weakened to
+- **The suite is the gate.** 693 tests pass. No failing test was deleted, skipped or weakened to
   make a run go green. Where a test failed, either the code was fixed or the test's reference
   data was updated for an intended design change, with the reason recorded.
 - **Four assistant bugs were caught and fixed, not papered over.** Each one would have produced
@@ -50,6 +55,26 @@ and the first web UI — was written by the team (commits `e6d4f32`, `0518c85` a
      reasons recorded**. The tell was `quota_stops: 63` sitting beside `aborted: null`. Two tests
      now pin it, one asserting the decision counters **partition** the total exactly, so any
      unrecorded outcome fails the suite.
+**Bugs from the latest round, each found by a test rather than by looking:**
+
+5. A replay of an injected trial diverged whenever the trial ended before the injection point,
+   because only *applied* injections were recorded. The empty-docket and defense-only cases exposed
+   it; a result now carries every injection requested.
+6. A string splice in `app.js` deleted three functions `init()` still called, and the page crashed
+   on load. No Python test could see it. The UI smoke harness exists because of this, and it was
+   itself found to miss errors the app catches and shows to the user, so it now reads what the app
+   displays.
+7. The injected exhibit never reached the on-screen evidence board, and the same stale-board bug was
+   already present in the editor's "Try it in the courtroom". No exception, just a wrong page.
+8. In the LLM exhibition, the judge tab's replay-at-a-bar handler would still have sent
+   `"prosecution": "llm"` to the server. The buttons were hidden by CSS, which is not a safeguard.
+   The handler is now guarded, and a test fails if any request names the LLM strategy.
+9. `/api/narrate` could call the provider if the server happened to hold a key. It is cache-only now.
+
+Two of my own claims were also corrected before they stood: a sentence in `RESULTS.md` asserting
+where the flagship's equilibrium band ends (the ladder cannot resolve that) and a causal explanation
+for it that I had not tested.
+
 - **A reported figure was withdrawn rather than published.** The first exhibition run's
   defense-side results were contaminated by bug 4 and were discarded, not reported.
 - **Claims were measured, not asserted.** Where the assistant was told something about the repo

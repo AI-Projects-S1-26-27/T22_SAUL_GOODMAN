@@ -30,6 +30,7 @@ function scanForSelfReportedErrors(where, args) {
   for (const a of args) if (typeof a === "string" && SELF_REPORTED.test(a)) note(`the app displayed an error from ${where}`, a);
 }
 
+const styles = { prosecution: "aggressive", defense: "conservative" }; // the checked style radio on each side
 const dataIds = new Set(); // "<class>|<data-id>" for every element stamped with a data-id, e.g. "ev-item|P-LAPTOP"
 const listeners = [];
 function makeEl(label) {
@@ -49,6 +50,9 @@ function makeEl(label) {
     },
     set(_t, k, v) {
       if (k === "textContent" || k === "innerHTML") scanForSelfReportedErrors(label, [v]);
+      // Radio buttons remember which one was checked, as a real form does.
+      const radio = k === "checked" && v === true && /name="(prosecution|defense)-style"\]\[value="([^"]+)"/.exec(String(label));
+      if (radio) styles[radio[1]] = radio[2];
       store[k] = v;
       return true;
     },
@@ -66,7 +70,7 @@ const calls = [];
 function liveFetch(url, opts) {
   const u = String(url);
   const body = opts && opts.body ? JSON.parse(opts.body) : null;
-  calls.push({ path: u.replace(/^.*\/api/, ""), injections: body && body.injections ? body.injections.length : 0, bar: body && body.bar != null ? body.bar : null, inlineCase: !!(body && body.case) });
+  calls.push({ path: u.replace(/^.*\/api/, ""), strategies: body ? [body.prosecution, body.defense] : [], injections: body && body.injections ? body.injections.length : 0, bar: body && body.bar != null ? body.bar : null, inlineCase: !!(body && body.case) });
   const ok = (data) => Promise.resolve({ ok: true, status: 200, json: async () => data, text: async () => JSON.stringify(data) });
   if (u.endsWith("/health")) return ok({ status: "ok" });
   if (u.endsWith("/cases")) return ok(fx.cases.map((c) => ({ id: c.id, title: c.title, synopsis: c.synopsis, case_type: c.case_type, standard: c.standard, tags: c.tags })));
@@ -96,8 +100,10 @@ const ctx = {
       };
       if (sel in values) e.value = values[sel];
       if (/^#inj-(hearsay|unverified|illegal|late)$/.test(sel)) e.checked = false;
-      if (sel.includes('name="prosecution-style"')) e.value = "aggressive";
-      if (sel.includes('name="defense-style"')) e.value = "conservative";
+      if (sel.includes(":checked")) {
+        if (sel.includes('name="prosecution-style"')) e.value = styles.prosecution;
+        if (sel.includes('name="defense-style"')) e.value = styles.defense;
+      }
       return e;
     },
     querySelectorAll: (sel) => {
@@ -113,6 +119,14 @@ const ctx = {
     createElement: (t) => makeEl(`<${t}>`),
     createElementNS: (_ns, t) => makeEl(`<${t}>`),
     createTextNode: () => makeEl("#text"),
+    head: {
+      append(node) {
+        const src = node && node.src;
+        if (typeof src !== "string" || !src.endsWith(".js")) return;
+        try { run(src); } catch (e) { note(`loading ${src}`, e); return; }
+        setImmediate(() => { if (typeof node.onload === "function") node.onload(); });
+      },
+    },
     body: makeEl("body"),
     documentElement: makeEl("html"),
     addEventListener: (type, fn) => listeners.push({ label: "document", type, fn }),
@@ -153,9 +167,22 @@ function run(file) {
   run("app.js");
   for (let i = 0; i < 40; i++) await new Promise((r) => setImmediate(r));
 
+  const probe = () => vm.runInContext("({ exhibitionOn: S.exhibitionOn, mode: S.mode, key: S.trialKey, caseId: S.caseFile && S.caseFile.id })", ctx);
+  const stateAfterInit = probe();
   const initProblems = problems.length;
+  // UI_SMOKE_START=exhibition: switch to the LLM exhibition first and stay there, so that mode's
+  // rendering is exercised, instead of clicking "Back" on the way past as the default run does.
+  const skip = new Set();
   const fake = () => ({ target: makeEl("target"), currentTarget: makeEl("current"), key: "", preventDefault() {}, stopPropagation() {}, clientX: 0, clientY: 0 });
+  if (process.env.UI_SMOKE_START === "exhibition") {
+    const enter = listeners.find((l) => l.label === "#mode-llm" && l.type === "click");
+    if (enter) { try { await enter.fn(fake()); } catch (e) { note("entering the exhibition", e); } }
+    for (let i = 0; i < 30; i++) await new Promise((r) => setImmediate(r));
+    skip.add("#mode-det"); skip.add("#exh-back"); skip.add("#mode-llm");
+  }
+  const afterEnter = probe();
   for (const l of listeners.slice()) {
+    if (skip.has(l.label)) continue;
     try {
       const out = l.fn(fake());
       if (out && typeof out.then === "function") await out.catch((e) => note(`handler ${l.type} on ${l.label}`, e));
@@ -172,6 +199,6 @@ function run(file) {
   for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
 
   const fatal = problems.filter((p) => !p.includes("no network in the smoke test"));
-  console.log(JSON.stringify({ listeners: listeners.length, initProblems, problems: fatal, calls: fx ? calls : undefined, dataIds: fx ? [...dataIds].sort() : undefined }, null, 2));
+  console.log(JSON.stringify({ listeners: listeners.length, initProblems, problems: fatal, stateAfterInit, stateAfterEnter: afterEnter, stateAtEnd: probe(), calls: fx ? calls : undefined, dataIds: [...dataIds].sort() }, null, 2));
   process.exit(fatal.length ? 1 : 0);
 })().catch((e) => { console.log(JSON.stringify({ crashed: String(e && e.stack || e) })); process.exit(2); });

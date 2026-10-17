@@ -209,3 +209,18 @@ def test_a_malformed_exhibit_and_too_many_exhibits_are_refused(client: TestClien
 def test_narration_describes_the_same_injected_trial(client: TestClient) -> None:
     req = {"case_id": "helix-espionage", "seed": 1, "injections": [_injection()]}
     assert client.post("/api/narrate", json=req).json()["digest"] == client.post("/api/trial", json=req).json()["digest"]
+
+
+def test_narration_never_reaches_the_network_even_when_a_key_is_set(client: TestClient, monkeypatch) -> None:
+    """A page view must not be able to spend money. The server's key, if it has one, is unreachable."""
+    from courtroom.llm.client import LLMClient
+
+    monkeypatch.setenv("GEMINI_API_KEY", "set-on-purpose-to-prove-it-is-not-used")
+
+    def boom(self):
+        raise AssertionError("the narrate endpoint tried to reach the network")
+
+    monkeypatch.setattr(LLMClient, "_sdk", boom)
+    body = client.post("/api/narrate", json={"case_id": "helix-espionage", "seed": 0}).json()
+    assert body["usage"]["calls"] == 0
+    assert body["source"] == "template"

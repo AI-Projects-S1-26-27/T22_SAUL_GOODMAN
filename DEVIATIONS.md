@@ -192,6 +192,38 @@ offered only while that owner is still presenting, so adding prosecution evidenc
 prosecution has rested changes nothing, and the page says so. It needs the local simulator: the
 static demo has no engine to replay with.
 
+## D11 — the LLM opponent mode is a cache-only replay, and the page never opens in it
+
+Requested: a deterministic-versus-LLM-exhibition toggle whose LLM mode "must use the cache only and
+show a clear 'exhibition, not equilibrium' label".
+
+**How it is cache-only.** The exhibition is data, not a service. `courtroom/viz/web/data/exhibition.js`
+holds 40 trials replayed from the committed response cache with `allow_network=False`, built by
+`python -m courtroom export-exhibition`, which needs no key. The page loads it on demand when the
+mode is switched on, and reads trials from it; it never sends an exhibition request to the engine,
+because the engine has no `llm` strategy and the page must not try. `tests/test_ui_smoke.py` runs the
+real page against a fake API and fails if any request names the LLM strategy, and a mutation test
+proves the check fails when the page is made to ask the server.
+
+**A behaviour I changed.** `/api/narrate` used to build its client with the network on, so a server
+that happened to hold a Gemini key could have spent money on a page view. It is now cache-only, and
+`test_narration_never_reaches_the_network_even_when_a_key_is_set` booby-traps the SDK to prove it.
+
+**What the mode does and does not offer.** One case (the one that was played), seeds 0 to 4, either
+seat, against each fixed style. Adding evidence, moving the bar, recomputing a matrix and the
+certified analysis are all hidden, and their handlers are guarded as well as their buttons: a hidden
+button is not a safeguard, and the smoke test found that the replay-at-a-bar handler would still have
+sent `llm` to the server. The Strategy tab shows the model's own results in place of the matrix,
+labelled "not equilibrium analysis", with the four fixed styles in the same seat for comparison.
+
+**The page always opens certified.** The mode is deliberately not remembered, so a shared link or a
+screenshot cannot open in the exhibition by accident.
+
+**Honest limits.** The replay is exact for the 40 trials in it and says nothing about any other
+case. Four requests in it missed the cache because they were rate-limited when recorded; they were
+re-asked, none fell back, and the page reports the count. The mode needs no key, but it also cannot
+produce a new trial: that takes the local `llm-exhibition` command and a key.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

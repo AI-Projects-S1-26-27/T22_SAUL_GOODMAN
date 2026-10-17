@@ -226,3 +226,18 @@ def test_the_bundle_does_not_hard_code_a_different_standard_than_the_engine(bund
     for name, shipped in bundle["rules"]["standards"].items():
         standard = next(s for s in THRESHOLD_LOG_ODDS if s.value == name)
         assert shipped["probability"] == round(sigmoid(float(THRESHOLD_LOG_ODDS[standard])), 4)
+
+
+def test_the_certified_page_does_not_download_the_exhibition() -> None:
+    """The replay is 1.5 MB and only the exhibition needs it, so it must load on demand."""
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    assert "exhibition.js" not in html, "index.html loads the exhibition for every visitor"
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    assert js.count("data/exhibition.js") == 1, "the only reference should be the lazy loader"
+    assert "function loadExhibitionData" in js
+
+
+def test_the_exhibition_is_the_only_place_the_llm_strategy_appears_in_the_page_data(bundle) -> None:
+    """The LLM seat exists in exhibition.js and nowhere in the certified bundle."""
+    assert not any("llm" in key.split("|")[1:3] for key in bundle["trials"])
+    assert "llm" not in {s["name"] for s in bundle["strategies"]}

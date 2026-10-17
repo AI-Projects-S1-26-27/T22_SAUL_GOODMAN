@@ -66,6 +66,7 @@
         </button>
       </div>
       <p class="mode-say" id="mode-say">Exact rulebook judge, fixed strategies. Same case and choices give the same verdict, every time.</p>
+      <p class="mode-trial" id="mode-trial" hidden></p>
     </div>
   </div>
 
@@ -463,6 +464,21 @@
             <p class="styles-case" id="styles-case"></p>
           </header>
 
+          <section class="block exhibition-card" id="exhibition-card" aria-labelledby="exh-title" hidden>
+            <header class="block-head">
+              <h3 id="exh-title">LLM exhibition <em class="cert-tag exhibition">not equilibrium analysis</em></h3>
+              <p id="exh-note"></p>
+            </header>
+            <ul class="exh-facts" id="exh-facts"></ul>
+            <div class="table-scroll"><table class="matrix analysis-table" id="exh-table"></table></div>
+            <details class="exh-baseline">
+              <summary>How the four fixed styles did in the same seat, for comparison</summary>
+              <div class="table-scroll"><table class="matrix analysis-table" id="exh-baseline"></table></div>
+            </details>
+            <p class="analysis-detail">Replayed from a committed cache. Reading this page makes no call to any model, and none is possible from it.</p>
+            <button class="btn quiet" type="button" id="exh-back">Back to the certified analysis</button>
+          </section>
+
           <div class="game-controls live-only">
             <label>Styles to compare
               <select id="gstrats">
@@ -596,6 +612,7 @@
               <div id="thr-replay-out" class="thr-result"></div>
             </div>
 
+            <div class="thr-q3">
             <h4 class="thr-q">3. Which style wins at this bar?</h4>
             <p class="thr-qnote" id="thr-eq-note"></p>
             <div class="live-only thr-live">
@@ -605,6 +622,7 @@
             </div>
             <div id="thr-eq" class="thr-eq"></div>
             <div class="table-scroll"><table class="matrix analysis-table" id="thr-grid"></table></div>
+            </div>
           </section>
 
           <section class="block" aria-labelledby="catch-title">

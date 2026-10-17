@@ -26,8 +26,8 @@ HARNESS = ROOT / "tests" / "ui_smoke.cjs"
 pytestmark = pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
 
 
-def _smoke(app: Path | None = None) -> tuple[int, dict]:
-    env = {**os.environ, **({"UI_SMOKE_APP": str(app)} if app else {})}
+def _smoke(app: Path | None = None, **extra: str) -> tuple[int, dict]:
+    env = {**os.environ, **({"UI_SMOKE_APP": str(app)} if app else {}), **extra}
     done = subprocess.run(["node", str(HARNESS)], capture_output=True, text=True, timeout=120, env=env, check=False)
     try:
         return done.returncode, json.loads(done.stdout)
@@ -57,15 +57,17 @@ def test_the_net_catches_a_deleted_function_that_init_calls(tmp_path) -> None:
     assert any("initModeBar is not defined" in p for p in report["problems"])
 
 
-def test_the_net_catches_the_null_trial_crash(tmp_path) -> None:
+def test_the_net_catches_a_render_that_assumes_a_trial_exists_before_one_has_loaded(tmp_path) -> None:
+    """The class of bug that crashed the mode bar: init renders before any trial is loaded."""
     source = APP.read_text(encoding="utf-8")
-    guard = "    if (S.trial) { buildTranscript(); updateTranscript(); }"
+    guard = '  if (!S.trial) {\n    box.replaceChildren(el("p", { class: "empty-note" }, "Load a trial in the courtroom first'
     assert guard in source, "the guard this mutation removes has moved; update the test"
     mutated = tmp_path / "app.js"
-    mutated.write_text(source.replace(guard, "    buildTranscript(); updateTranscript();"), encoding="utf-8")
+    mutated.write_text(source.replace(guard, '  if (false) {\n    box.replaceChildren(el("p", { class: "empty-note" }, "Load a trial in the courtroom first', 1), encoding="utf-8")
     code, report = _smoke(mutated)
     assert code == 1
-    assert any("reading 'events'" in p for p in report["problems"])
+    assert any("Cannot read properties of null" in p for p in report["problems"])
+    assert report["stateAfterInit"]["caseId"] is None, "init should have aborted before selecting a case"
 
 
 def test_the_net_catches_an_error_the_app_catches_and_shows_the_user(tmp_path) -> None:
@@ -125,8 +127,8 @@ def live_fixtures(tmp_path_factory) -> Path:
     return path
 
 
-def _smoke_live(fixtures: Path, app: Path | None = None) -> tuple[int, dict]:
-    env = {**os.environ, "UI_SMOKE_LIVE": str(fixtures), **({"UI_SMOKE_APP": str(app)} if app else {})}
+def _smoke_live(fixtures: Path, app: Path | None = None, **extra: str) -> tuple[int, dict]:
+    env = {**os.environ, "UI_SMOKE_LIVE": str(fixtures), **({"UI_SMOKE_APP": str(app)} if app else {}), **extra}
     done = subprocess.run(["node", str(HARNESS)], capture_output=True, text=True, timeout=120, env=env, check=False)
     try:
         return done.returncode, json.loads(done.stdout)
@@ -172,3 +174,45 @@ def test_the_net_catches_a_broken_injection_path(live_fixtures, tmp_path) -> Non
     code, report = _smoke_live(live_fixtures, mutated)
     assert code == 1
     assert any("withInjected is not defined" in p for p in report["problems"])
+
+
+# ----------------------------------------------------------------- the LLM exhibition mode
+
+
+def test_the_page_always_opens_in_the_certified_mode() -> None:
+    """Shared links and screenshots must never open in the exhibition by accident."""
+    _, report = _smoke()
+    assert report["stateAfterInit"]["exhibitionOn"] is False
+
+
+def test_the_exhibition_opens_the_models_trial_from_the_replay_offline() -> None:
+    code, report = _smoke(UI_SMOKE_START="exhibition")
+    assert report["problems"] == [], report["problems"]
+    assert code == 0
+    assert report["stateAfterEnter"]["exhibitionOn"] is True
+    assert report["stateAfterEnter"]["key"] == "helix-espionage|llm|conservative|0"
+    assert report["stateAtEnd"]["exhibitionOn"] is True
+    assert "ev-item|P-LAPTOP" in report["dataIds"], "the model's trial rendered no evidence board"
+
+
+def test_in_the_exhibition_no_request_ever_names_the_llm_strategy(live_fixtures) -> None:
+    """The server has no "llm" strategy to run, and the page must not try to send one.
+
+    Live mode is where a stray request could actually go out, so this runs the exhibition there.
+    """
+    _, report = _smoke_live(live_fixtures, UI_SMOKE_START="exhibition")
+    assert report["problems"] == [], report["problems"]
+    assert report["stateAfterEnter"]["key"] == "helix-espionage|llm|conservative|0"
+    # (the run goes on to fire the editor's "Try it in the courtroom", which leaves the exhibition by design)
+    for call in report["calls"]:
+        assert "llm" not in call["strategies"], f"the page sent the LLM strategy to the server: {call}"
+
+
+def test_the_net_catches_an_exhibition_that_asks_the_server_for_the_model(live_fixtures, tmp_path) -> None:
+    source = APP.read_text(encoding="utf-8")
+    needle = "    const trial = S.exhibitionOn\n      ? S.exhibition.trials[key]\n      : S.mode === \"live\""
+    assert needle in source, "the line this mutation changes has moved; update the test"
+    mutated = tmp_path / "app.js"
+    mutated.write_text(source.replace(needle, "    const trial = false\n      ? S.exhibition.trials[key]\n      : S.mode === \"live\"", 1), encoding="utf-8")
+    _, report = _smoke_live(live_fixtures, mutated, UI_SMOKE_START="exhibition")
+    assert any("llm" in c["strategies"] for c in report["calls"]), "the mutation should have sent the LLM strategy to the server"

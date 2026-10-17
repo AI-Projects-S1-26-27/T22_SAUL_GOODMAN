@@ -206,13 +206,16 @@ def create_app() -> FastAPI:
         """Spoken argument text for a trial, generated after it has already been decided.
 
         Exhibition only. The trial is run and scored first; this adds words to a finished
-        record and can never change a verdict. Falls back to templates with no API key.
+        record and can never change a verdict. Reads the committed response cache and otherwise
+        falls back to templates; it never calls a model.
         """
         from courtroom.llm import LLMClient, narrate
 
         case = _case_for(req.case_id, req.case, req.bar)
         result = _run(case, req)
-        client = LLMClient()
+        # Cache only, whatever the environment holds. A page view must never be able to spend money,
+        # so the server's key (if any) is deliberately unreachable from here.
+        client = LLMClient(allow_network=False)
         lines = narrate(result, case, client)
         client.save()
         return JSONResponse(
