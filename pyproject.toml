@@ -16,7 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5", "pyright>=1.1.380"]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5", "pyright>=1.1.380", "google-genai>=1.0"]
+# Optional exhibition layer. The package runs, tests and demos fine without it.
+llm = ["google-genai>=1.0"]
 
 [project.scripts]
 courtroom = "courtroom.cli:main"
@@ -26,6 +28,7 @@ include = ["courtroom*"]
 
 [tool.setuptools.package-data]
 "courtroom.viz" = ["web/*", "web/data/*"]
+"courtroom.llm" = ["cache/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

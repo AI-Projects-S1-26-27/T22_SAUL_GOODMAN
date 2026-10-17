@@ -75,7 +75,10 @@ def generate_case(
         targets = rng.sample([e.id for e in elements], k)
         support = {t: _dec(sign * rng.uniform(0.05, 1.0)) for t in targets}
         if rng.random() < 0.08:  # occasional irrelevant or self-defeating item
-            support = {targets[0]: _dec(rng.uniform(-0.04, 0.04))}
+            # Defense support is never positive: the directed-verdict guarantee relies on
+            # defense evidence being unable to raise L_e, so only the prosecution may
+            # offer something that argues against its own case.
+            support = {targets[0]: _dec(rng.uniform(-0.04, 0.04 if owner is Side.PROSECUTION else 0.0))}
         witness_id = None
         if kind is EvidenceKind.TESTIMONY:
             witness_id = f"W{idx}"

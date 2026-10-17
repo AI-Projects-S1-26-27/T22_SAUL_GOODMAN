@@ -7,8 +7,12 @@ from fractions import Fraction as F
 import pytest
 
 from courtroom.cases import CASES
+from courtroom.contracts import StandardOfProof
+from courtroom.engine import run_trial
 from courtroom.gametheory import analyze, estimate_payoffs, replicator, stress, support_enumeration, verify_equilibrium
+from courtroom.gametheory.bootstrap import DOMINANCE_SOLVABLE, MIXED, PURE, bootstrap_case, equilibrium_label
 from courtroom.gametheory.nash import as_fraction_matrix, dominant_strategy, iesds
+from courtroom.gametheory.sensitivity import log_odds_for, patched, sweep
 
 
 def test_matching_pennies_unique_mixed_equilibrium() -> None:
@@ -104,3 +108,88 @@ def test_stress_fuzz_no_crashes_no_invariant_failures() -> None:
     assert report.invariant_failures == 0, report.failures
     assert report.trials == 30 * 25
     assert report.deterministic_replays > 0
+
+
+# ----------------------------------------------------------------- bootstrap stability
+
+
+def test_equilibrium_label_classifies_known_games() -> None:
+    pd = analyze(["C", "D"], ["C", "D"], [[-1, -3], [0, -2]], [[-1, 0], [-3, -2]])
+    assert equilibrium_label(pd) == DOMINANCE_SOLVABLE  # IESDS leaves exactly (D, D)
+    pennies = analyze(["H", "T"], ["H", "T"], [[1, -1], [-1, 1]], [[-1, 1], [1, -1]])
+    assert equilibrium_label(pennies) == MIXED  # no pure equilibrium exists
+    bos = analyze(["O", "F"], ["O", "F"], [[2, 0], [0, 1]], [[1, 0], [0, 2]])
+    assert equilibrium_label(bos) == PURE  # pure equilibria exist, no dominance
+
+
+def test_bootstrap_is_deterministic_and_reports_a_fraction() -> None:
+    kw = dict(strategies=("aggressive", "conservative"), seeds=range(8), n_resamples=5, rng_seed=7)
+    r1 = bootstrap_case(CASES["edge-poisoned-tree"], **kw)
+    r2 = bootstrap_case(CASES["edge-poisoned-tree"], **kw)
+    assert r1 == r2
+    assert sum(r1.label_counts.values()) == 5
+    assert 0.0 <= r1.stability <= 1.0
+    assert r1.label_counts.get(r1.baseline_label, 0) / 5 == pytest.approx(r1.stability)
+
+
+# ----------------------------------------------------------------- sensitivity sweep
+
+
+def _live_scale() -> tuple[F, F]:
+    """The LLR_SCALE each module currently sees, as (scoring, rules)."""
+    import courtroom.judge.rules as rules
+    import courtroom.judge.scoring as scoring
+
+    return scoring.LLR_SCALE, rules.LLR_SCALE
+
+
+def test_patched_constants_apply_and_restore_exactly() -> None:
+    original, doubled = F(3), F(6)
+    case = CASES["helix-espionage"]
+    before = run_trial(case, "aggressive", "conservative", seed=0)
+    assert _live_scale() == (original, original)
+
+    with patched({"LLR_SCALE": doubled}):
+        # the by-name binding in scoring.py must move too, not just the one in rules.py
+        assert _live_scale() == (doubled, doubled)
+
+    assert _live_scale() == (original, original)
+    after = run_trial(case, "aggressive", "conservative", seed=0)
+    assert after.digest == before.digest  # restoration is exact: determinism survives
+
+
+def test_patched_threshold_reaches_the_judge() -> None:
+    import courtroom.judge.rules as rules
+
+    base = rules.THRESHOLD_LOG_ODDS[StandardOfProof.BEYOND_REASONABLE_DOUBT]
+    with patched(thresholds={StandardOfProof.BEYOND_REASONABLE_DOUBT: log_odds_for(0.80)}):
+        assert rules.THRESHOLD_LOG_ODDS[StandardOfProof.BEYOND_REASONABLE_DOUBT] == log_odds_for(0.80)
+    assert rules.THRESHOLD_LOG_ODDS[StandardOfProof.BEYOND_REASONABLE_DOUBT] == base
+
+
+def test_log_odds_for_is_exact_and_monotone() -> None:
+    assert log_odds_for(0.5) == F(0)
+    assert log_odds_for(0.80) < log_odds_for(0.90) < log_odds_for(0.95)
+    assert abs(float(log_odds_for(0.90)) - 2.1972) < 1e-4  # matches the 11/5 constant to 2 dp
+
+
+def test_sweep_reports_baseline_and_partitions_cases() -> None:
+    report = sweep(case_ids=["edge-empty-docket"], strategies=("aggressive", "conservative"), seeds=range(4))
+    assert report.baseline["edge-empty-docket"]
+    assert set(report.robust_cases) | set(report.fragile_cases) == {"edge-empty-docket"}
+    assert not (set(report.robust_cases) & set(report.fragile_cases))
+    assert report.variations and all(v.parameter for v in report.variations)
+
+
+def test_sweep_variations_actually_bite() -> None:
+    """A variation must change something.
+
+    Regression guard: when the sweep farmed trials out to a ProcessPoolExecutor the
+    children re-imported pristine modules, the patched constants never reached them,
+    and every variation silently returned the baseline. Zero movement everywhere is
+    indistinguishable from a broken sweep, so assert at least one variation moves.
+    """
+    report = sweep(case_ids=["helix-espionage"], strategies=("aggressive", "conservative"), seeds=range(12))
+    base = report.baseline_win_rate["helix-espionage"]
+    moved = [v for v in report.variations if v.prosecution_win_rate["helix-espionage"] != base]
+    assert moved, "no variation changed the win rate: the perturbations are not reaching the trials"

@@ -55,6 +55,20 @@
     </div>
   </header>
 
+  <div class="mode-bar" id="mode-bar">
+    <div class="wrap mode-inner">
+      <div class="mode-pick" role="radiogroup" aria-label="Which simulation is running">
+        <button class="mode-btn is-on" type="button" id="mode-det" role="radio" aria-checked="true">
+          Deterministic <em>certified</em>
+        </button>
+        <button class="mode-btn" type="button" id="mode-llm" role="radio" aria-checked="false">
+          LLM exhibition <em>not certified</em>
+        </button>
+      </div>
+      <p class="mode-say" id="mode-say">Exact rulebook judge, fixed strategies. Same case and choices give the same verdict, every time.</p>
+    </div>
+  </div>
+
   <div class="tabs-rail">
     <div class="wrap">
       <div class="tabs" role="tablist" aria-label="Sections">
@@ -285,6 +299,11 @@
 
             <aside class="transcript" aria-labelledby="transcript-title">
               <h3 id="transcript-title">What's happened so far</h3>
+              <label class="spoken-toggle" for="spoken">
+                <input type="checkbox" id="spoken">
+                <span>Spoken argument <em class="exhibition-tag">exhibition</em></span>
+              </label>
+              <p class="spoken-note" id="spoken-note" hidden></p>
               <ol id="transcript"></ol>
             </aside>
           </div>
@@ -335,6 +354,22 @@
               <p>Reliability is how much the judge trusts a piece of evidence on its own. Evidence that clashes with other evidence counts for less.</p>
             </header>
             <div class="exhibits" id="exhibits"></div>
+          </section>
+
+          <section class="block" aria-labelledby="editor-title">
+            <header class="block-head">
+              <h3 id="editor-title">Write your own case</h3>
+              <p>Edit the case below, or paste your own. It goes through exactly the same validator the built-in cases do, so a malformed file is refused with the failing field named instead of crashing the trial.</p>
+            </header>
+            <div class="editor-bar">
+              <button class="btn quiet" type="button" id="ed-load">Load the current case</button>
+              <button class="btn quiet" type="button" id="ed-validate">Check it</button>
+              <button class="btn" type="button" id="ed-run">Try it in the courtroom</button>
+              <span id="ed-status" class="ed-status" role="status" aria-live="polite"></span>
+            </div>
+            <label class="sr-only" for="ed-text">Case file JSON</label>
+            <textarea id="ed-text" class="editor" spellcheck="false" rows="16" placeholder="Press “Load the current case” to start from the case above, then edit it."></textarea>
+            <div id="ed-errors" class="ed-errors"></div>
           </section>
         </section>
 
@@ -490,6 +525,28 @@
               <div><dt>Guesswork <span class="rule-chip tech">OBJ-SPECULATION</span></dt><dd>A witness is testifying about something they didn't see first-hand.</dd></div>
               <div><dt>Off-topic <span class="rule-chip tech">OBJ-RELEVANCE</span></dt><dd>The evidence barely touches any point in the case.</dd></div>
             </dl>
+          </section>
+
+          <section class="block" aria-labelledby="slider-title">
+            <header class="block-head">
+              <h3 id="slider-title">Move the bar yourself</h3>
+              <p>The bar is a setting, not a measurement. Drag it to see which points the loaded trial would still prove, and whether the verdict changes.</p>
+            </header>
+            <div class="slider-row">
+              <label for="thr-slider">How sure must the judge be?</label>
+              <input type="range" id="thr-slider" min="50" max="99" step="1" value="90">
+              <output id="thr-value">90%</output>
+              <button class="btn quiet" type="button" id="thr-reset">Reset to the case's own bar</button>
+            </div>
+            <div id="thr-result" class="thr-result"></div>
+          </section>
+
+          <section class="block" aria-labelledby="catch-title">
+            <header class="block-head">
+              <h3 id="catch-title">How likely is a flaw to be caught?</h3>
+              <p>A lawyer cannot see most flaws for certain. Two are exceptions: whether evidence is off-topic is public once it is offered, and a party always knows whether it received an exhibit before trial.</p>
+            </header>
+            <div id="catch-table" class="catch-table"></div>
           </section>
 
           <p class="promise">Same case, same choices, same verdict, every time. Each step of the trial record is fingerprinted, so any change to it would show.</p>

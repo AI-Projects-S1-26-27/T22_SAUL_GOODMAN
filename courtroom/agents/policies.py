@@ -178,6 +178,11 @@ class CounselAgent:
             if view.phase is Phase.REBUTTAL and item.id not in view.rebuttal_targets:
                 continue
             defects = valid_grounds(item, view.case_type)
+            if ObjectionGround.RELEVANCE in defects:
+                # Irrelevant as a matter of law: |support| < RELEVANCE_FLOOR on every element, so the
+                # item is both certain to be excluded if challenged and worth almost nothing if not.
+                # No profile spends a turn on it; the EV profile already refuses it on cost grounds.
+                continue
             if len(defects) > self.profile.max_known_defects:
                 continue
             gain = oracle.gain(view.side, add=[item.id])

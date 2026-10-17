@@ -14,7 +14,8 @@ const SIDES = ["prosecution", "defense"];
 const S = {
   mode: null, bundle: null, cases: [], strategies: [], caseFiles: {}, caseFile: null,
   trial: null, trialKey: null, idx: 0, timer: null, loadToken: 0, caseToken: 0,
-  tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null,
+  tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null, rules: null,
+  spoken: null, spokenOn: false, spokenKey: null,
 };
 
 function el(tag, attrs = {}, ...kids) {
@@ -144,7 +145,8 @@ const itemMeta = (item) => `${[KIND[item.kind] ?? capFirst(title(item.kind)), su
 function phaseLabel(phase) {
   return {
     opening: "Opening",
-    prosecution_case: `${sideLabel("prosecution")}'s case`,
+    evidence: "Both sides present",
+    prosecution_case: `${sideLabel("prosecution")}'s case`,  // retired phase, kept for old bundles
     directed_verdict_review: "Judge's check",
     defense_case: "Defense's case",
     rebuttal: "Rebuttal",
@@ -163,12 +165,13 @@ function phaseNarration(ev) {
     };
   }
   return {
+    evidence: { head: "Both sides put their evidence to the court.", sub: `They take it in turns, ${p} first. Whoever is not offering can object to the piece on the table.` },
     prosecution_case: { head: `${P} presents its case.`, sub: "It offers evidence one piece at a time. The defense can object to each piece." },
     directed_verdict_review: {
-      head: `${P} has finished. The defense can now ask the judge to end the trial early.`,
+      head: `${P} can offer nothing further. The defense can now ask the judge to end the trial early.`,
       sub: `The judge will only do that if ${p} has no accepted evidence for one of the points it must prove.`,
     },
-    defense_case: { head: "The defense presents its case.", sub: `Now ${p} can object.` },
+    defense_case: { head: "The defense carries on alone.", sub: `${P} is finished, so nothing from here can help its case.` },
     rebuttal: { head: `${P} gets a final chance to respond.`, sub: "It can answer anything the defense brought up." },
     deliberation: { head: "The judge weighs the evidence.", sub: "Only accepted evidence counts toward the verdict." },
   }[ev.phase] ?? { head: ev.summary };
@@ -296,12 +299,17 @@ async function init() {
   initTechToggle();
   initTheme();
   initTabs();
+  initThresholdSlider();
+  initEditor();
+  initSpokenToggle();
+  initModeBar();
   try {
     if (!API) throw new Error("opened from disk");
     await fetchJSON(`${API}/health`, {}, 1500);
     S.mode = "live";
     S.cases = await fetchJSON(`${API}/cases`);
     S.strategies = await fetchJSON(`${API}/strategies`);
+    try { S.rules = await fetchJSON(`${API}/rules`); } catch { S.rules = null; }
   } catch {
     if (!window.COURTROOM_BUNDLE) {
       $("#source").textContent = "No trial data found.";
@@ -313,6 +321,7 @@ async function init() {
     S.cases = S.bundle.cases;
     S.strategies = S.bundle.strategies;
     S.bundle.cases.forEach((c) => (S.caseFiles[c.id] = c));
+    S.rules = S.bundle.rules ?? null;
   }
   document.body.classList.add(S.mode);
   $("#source").textContent = S.mode === "live" ? "Connected to the live simulator." : "Showing saved trials.";
@@ -413,6 +422,9 @@ async function loadTrial({ autoplay = false } = {}) {
     S.trial = trial;
     S.trialKey = key;
     setupTrial();
+    renderThreshold();
+    renderCatchTable();
+    if (S.spokenOn) { S.spoken = null; loadSpokenArgument(); }
     seek(0);
     if (autoplay) play();
   } catch (err) {
@@ -432,6 +444,8 @@ function showStageMessage(text) {
   for (const id of ["#first", "#prev", "#play", "#next", "#last", "#scrub"]) $(id).disabled = true;
   $("#step-label").textContent = "";
   renderVerdictTab();
+  renderThreshold();
+  renderCatchTable();
   replayReset();
 }
 
@@ -541,6 +555,8 @@ function setupTrial() {
   buildTranscript();
   buildWorking();
   renderVerdictTab();
+  renderThreshold();
+  renderCatchTable();
   replayReset();
 }
 
@@ -660,7 +676,8 @@ function buildTranscript() {
     const cls = ev.kind === "phase_change" ? "t-btn t-phase" : `t-btn ${n.speaker}`;
     const btn = el("button", { type: "button", class: cls }, el("span", { class: "tech t-seq" }, `#${ev.seq}`), n.short ?? n.head);
     btn.addEventListener("click", () => { stop(); seek(i); });
-    ol.append(el("li", { "data-i": i }, btn));
+    const said = S.spokenOn && S.spoken ? S.spoken[String(ev.seq)] : null;
+    ol.append(el("li", { "data-i": i }, btn, said ? el("p", { class: `spoken ${n.speaker}` }, said) : null));
   });
   ol.append(el("li", { class: "t-more", id: "t-more" }));
 }
@@ -1303,6 +1320,246 @@ function focusNode(id) {
     if (on) { lit.add(p.dataset.a); lit.add(p.dataset.b); }
   }
   for (const n of box.querySelectorAll(".node")) n.classList.toggle("lit", lit.has(n.dataset.id));
+}
+
+const OUTCOME_WORD = { guilty: "Guilty", not_guilty: "Not guilty", liable: "Liable", not_liable: "Not liable" };
+
+
+
+/* ------------------------------------------------------------------ mode: certified vs exhibition
+ * The deterministic simulation and the LLM exhibition must never be mistaken for one another, so
+ * the choice is a visible, persistent banner rather than a buried checkbox. Deterministic is the
+ * default and is what every number in RESULTS.md was measured on.
+ */
+
+const MODE_SAY = {
+  deterministic: "Exact rulebook judge, fixed strategies. Same case and choices give the same verdict, every time.",
+  exhibition: "A language model writes the arguments. The judge still ignores every word of it and scores only the record \u2014 the verdict is identical either way. Not reproducible on another machine, so it is excluded from the equilibrium analysis.",
+};
+
+function setMode(mode) {
+  const exhibition = mode === "exhibition";
+  S.spokenOn = exhibition;
+  document.body.classList.toggle("exhibition-mode", exhibition);
+  $("#mode-det").classList.toggle("is-on", !exhibition);
+  $("#mode-llm").classList.toggle("is-on", exhibition);
+  $("#mode-det").setAttribute("aria-checked", String(!exhibition));
+  $("#mode-llm").setAttribute("aria-checked", String(exhibition));
+  $("#mode-say").textContent = MODE_SAY[exhibition ? "exhibition" : "deterministic"];
+  const box = $("#spoken");
+  if (box) box.checked = exhibition;
+  try { localStorage.setItem("courtroom-mode", mode); } catch { /* storage unavailable */ }
+  if (exhibition && S.spokenKey !== S.trialKey) S.spoken = null;
+  loadSpokenArgument();
+}
+
+function initModeBar() {
+  if (!$("#mode-det")) return;
+  $("#mode-det").addEventListener("click", () => setMode("deterministic"));
+  $("#mode-llm").addEventListener("click", () => setMode("exhibition"));
+  let saved = "deterministic";
+  try { saved = localStorage.getItem("courtroom-mode") === "exhibition" ? "exhibition" : "deterministic"; } catch { /* ignore */ }
+  setMode(saved);
+}
+
+/* ------------------------------------------------------------------ spoken argument (exhibition)
+ * Generated AFTER the trial has been decided, from the finished record. It cannot change a
+ * verdict, and it is labelled on screen so it is never mistaken for the certified simulation.
+ */
+
+async function loadSpokenArgument() {
+  const note = $("#spoken-note");
+  if (!S.spokenOn || !S.trial) {
+    note.hidden = true;
+    // No trial yet (this runs during init), so there is nothing to rebuild.
+    if (S.trial) { buildTranscript(); updateTranscript(); }
+    return;
+  }
+  if (!API) {
+    note.hidden = false;
+    note.textContent = "Spoken argument needs the local simulator: python -m courtroom serve.";
+    return;
+  }
+  const key = S.trialKey;
+  note.hidden = false;
+  note.textContent = "Writing the arguments…";
+  try {
+    const body = await fetchJSON(`${API}/narrate`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(currentRequest()),
+    }, 120000);
+    if (key !== S.trialKey) return;
+    S.spoken = body.narration;
+    S.spokenKey = key;
+    note.textContent = body.source === "llm"
+      ? `Written by a language model (${body.usage.calls} calls, ${body.usage.cache_hits} cached). Exhibition only: the judge never reads it.`
+      : "No language model available, so these are the built-in templates. The judge never reads them either.";
+    buildTranscript();
+    updateTranscript();
+  } catch (err) {
+    note.textContent = `Could not write the arguments (${err.message}). The trial itself is unaffected.`;
+  }
+}
+
+function initSpokenToggle() {
+  const box = $("#spoken");
+  if (!box) return;
+  box.addEventListener("change", () => setMode(box.checked ? "exhibition" : "deterministic"));
+}
+
+/* ------------------------------------------------------------------ threshold slider (judge tab)
+ * The bar is a game parameter, not a measurement. Re-deciding the loaded trial at a different bar
+ * is pure arithmetic over per-element probabilities the trial already carries, so it needs no
+ * server and works offline. Display only: it never feeds back into a verdict.
+ */
+
+function renderThreshold() {
+  const box = $("#thr-result");
+  if (!box) return;
+  const slider = $("#thr-slider"), out = $("#thr-value");
+  if (!S.trial) {
+    out.textContent = `${slider.value}%`;
+    box.replaceChildren(el("p", { class: "empty-note" }, "Load a trial in the courtroom first, then the points will appear here."));
+    return;
+  }
+  const bar = Number(slider.value) / 100;
+  out.textContent = `${slider.value}%`;
+  const own = threshold();
+  const rows = S.trial.verdict.snapshot.elements.map((es) => {
+    const met = strictStandard() ? es.probability > bar : es.probability >= bar;
+    return el("div", { class: `thr-row ${met ? "met" : "unmet"}` },
+      el("p", { class: "thr-name" }, elementName(es.element_id)),
+      el("div", { class: "meter-track", role: "img", "aria-label": `${elementName(es.element_id)}: ${pct1(es.probability)} certain, bar at ${pct(bar)}` },
+        el("div", { class: "meter-fill", style: `--fill: ${100 * es.probability}%` }),
+        el("div", { class: "meter-bar", style: `left: ${100 * bar}%` })),
+      el("p", { class: "thr-val" }, pct1(es.probability)),
+      el("p", { class: "thr-flag" }, met ? "clears the bar" : "falls short"));
+  });
+  const all = S.trial.verdict.snapshot.elements.every((es) => (strictStandard() ? es.probability > bar : es.probability >= bar));
+  const real = S.trial.verdict.outcome;
+  const wouldWin = all ? (isCivil() ? "liable" : "guilty") : (isCivil() ? "not_liable" : "not_guilty");
+  const same = wouldWin === real;
+  box.replaceChildren(
+    el("div", { class: "thr-rows" }, rows),
+    el("p", { class: `thr-verdict ${same ? "same" : "flipped"}` },
+      same
+        ? `At ${pct(bar)} the verdict is unchanged: ${OUTCOME_WORD[wouldWin]}.`
+        : `At ${pct(bar)} the verdict would flip to ${OUTCOME_WORD[wouldWin]}. This case's own bar is ${pct1(own)}.`),
+    el("p", { class: "meters-note" }, "Every point must clear the bar. Moving it re-decides the trial that is already loaded; it does not re-run it."));
+}
+
+function initThresholdSlider() {
+  const slider = $("#thr-slider");
+  if (!slider) return;
+  slider.addEventListener("input", renderThreshold);
+  $("#thr-reset")?.addEventListener("click", () => {
+    slider.value = String(Math.round(100 * (S.trial ? threshold() : 0.9)));
+    renderThreshold();
+  });
+  renderThreshold();
+}
+
+/* ------------------------------------------------------------------ catch probability (judge tab) */
+
+const GROUND_WORDS = {
+  hearsay: "Hearsay", relevance: "Off-topic", authentication: "Not verified",
+  illegally_obtained: "Obtained illegally", late_disclosure: "Shared too late", speculation: "Guesswork",
+};
+
+function renderCatchTable() {
+  const box = $("#catch-table");
+  if (!box) return;
+  const rules = S.rules;
+  if (!rules) {
+    box.replaceChildren(el("p", { class: "empty-note" }, "Start the simulator with python -m courtroom serve, or rebuild the offline bundle with python -m courtroom export, to see these numbers."));
+    return;
+  }
+  const acc = S.caseFile ? String(Number(S.caseFile.perception_accuracy.toFixed(4))) : Object.keys(rules.catch_probability)[0];
+  const rows = rules.catch_probability[acc] ?? Object.values(rules.catch_probability)[0];
+  const head = el("div", { class: "catch-row catch-head" },
+    el("p", {}, "Flaw"), el("p", {}, "What the lawyer knows"), el("p", {}, "Aggressive"), el("p", {}, "Careful"), el("p", {}, "Adaptive"));
+  const body = rows.map((r) => el("div", { class: `catch-row${r.observable ? " observable" : ""}` },
+    el("p", {}, GROUND_WORDS[r.ground] ?? title(r.ground)),
+    el("p", {}, r.observable ? "Known for certain" : `A guess: ${pct(r.belief_if_flagged)} sure when flagged`),
+    el("p", { class: "num" }, pct(r.caught_by.aggressive)),
+    el("p", { class: "num" }, pct(r.caught_by.conservative)),
+    el("p", { class: "num" }, pct(r.caught_by.adaptive))));
+  box.replaceChildren(head, ...body,
+    el("p", { class: "meters-note" },
+      `Chance the flaw is both spotted and objected to, at this case's perception accuracy of ${pct(Number(acc))}. `
+      + "A careful lawyer only objects when it is at least 70% sure, so on a guessed flaw at this accuracy it stays silent."));
+}
+
+/* ------------------------------------------------------------------ case editor (case file tab) */
+
+function initEditor() {
+  const text = $("#ed-text"), status = $("#ed-status"), errors = $("#ed-errors");
+  if (!text) return;
+  const say = (msg, cls = "") => { status.textContent = msg; status.className = `ed-status ${cls}`; };
+  const showErrors = (list) => errors.replaceChildren(...list.map((e) =>
+    el("p", { class: "ed-error" }, el("code", {}, e.field || "(whole file)"), " ", e.message)));
+
+  const parse = () => {
+    try {
+      return { ok: true, value: JSON.parse(text.value) };
+    } catch (err) {
+      showErrors([{ field: "", message: `That isn't valid JSON: ${err.message}` }]);
+      say("Not valid JSON", "bad");
+      return { ok: false };
+    }
+  };
+
+  $("#ed-load").addEventListener("click", () => {
+    if (!S.caseFile) return say("No case is loaded yet.", "bad");
+    text.value = JSON.stringify(S.caseFile, null, 2);
+    errors.replaceChildren();
+    say(`Loaded ${S.caseFile.id}. Edit it, then check it.`, "ok");
+  });
+
+  $("#ed-validate").addEventListener("click", async () => {
+    const p = parse();
+    if (!p.ok) return;
+    errors.replaceChildren();
+    if (!API) return say("Checking needs the local simulator: python -m courtroom serve", "bad");
+    say("Checking…");
+    try {
+      const res = await fetch(`${API}/validate`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p.value),
+      });
+      const body = await res.json();
+      if (body.ok) return say(`Valid: ${body.elements} points, ${body.witnesses} witnesses, ${body.evidence} exhibits.`, "ok");
+      showErrors(body.errors ?? [{ field: "", message: "Rejected." }]);
+      say(`Rejected: ${body.errors?.length ?? 0} problem(s).`, "bad");
+    } catch (err) {
+      say(`Could not check it: ${err.message}`, "bad");
+    }
+  });
+
+  $("#ed-run").addEventListener("click", async () => {
+    const p = parse();
+    if (!p.ok) return;
+    errors.replaceChildren();
+    if (!API) return say("Running your own case needs the local simulator: python -m courtroom serve", "bad");
+    say("Running…");
+    try {
+      const trial = await fetchJSON(`${API}/trial`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ case: p.value, prosecution: selectedStyle("prosecution") ?? "aggressive", defense: selectedStyle("defense") ?? "conservative", seed: 0 }),
+      });
+      S.caseFile = p.value;
+      S.trial = trial;
+      S.trialKey = `custom|${Date.now()}`;
+      setupTrial();
+      seek(0);
+      renderBrief();
+      renderThreshold();
+      renderCatchTable();
+      say("It ran. Opening the courtroom.", "ok");
+      location.hash = "#courtroom";
+    } catch (err) {
+      showErrors([{ field: "", message: String(err.message).slice(0, 400) }]);
+      say("It was refused. The validator said why.", "bad");
+    }
+  });
 }
 
 /* ------------------------------------------------------------------ technical details switch */

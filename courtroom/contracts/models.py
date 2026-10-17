@@ -97,12 +97,15 @@ class ObjectionGround(StrEnum):
 
 class Phase(StrEnum):
     OPENING = "opening"
-    PROSECUTION_CASE = "prosecution_case"
+    # Both sides alternate here. The phase ends when the PROSECUTION can present no more,
+    # which is what makes the directed-verdict review sound (see judge.directed_verdict_review).
+    EVIDENCE = "evidence"
     DIRECTED_VERDICT_REVIEW = "directed_verdict_review"
-    DEFENSE_CASE = "defense_case"
+    DEFENSE_CASE = "defense_case"  # defense alone, if it had not already rested
     REBUTTAL = "rebuttal"
     DELIBERATION = "deliberation"
     CLOSED = "closed"
+    PROSECUTION_CASE = "prosecution_case"  # retired: kept so older exported bundles still parse
 
 
 class ActionType(StrEnum):

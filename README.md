@@ -51,7 +51,7 @@ python -m courtroom serve
 Open <http://127.0.0.1:8000>. The local server runs the **live simulator**, so you can use any
 trial number, any pairing of styles (including a mixed strategy) and larger strategy games.
 
-Run the test suite (483 tests):
+Run the test suite (544 tests):
 
 ```bash
 python -m pytest
@@ -69,10 +69,10 @@ you can share exactly what you're looking at.
 |---|---|
 | **Overview** | The idea on one page. A live replay of a real trial runs in the hero. Below it: who's in the room (the judge, the record and both lawyers), the five moves a lawyer can make, the four playing styles, and why every result can be checked. |
 | **Courtroom** | Pick a case and a style for each side, then play, pause or step through the trial. Every event is narrated in plain English. You also get stage progress, *How sure is the judge?* meters for each point with the bar it must clear, a clickable transcript, and live evidence boards showing what was shown, accepted or thrown out. |
-| **Case file** | The accusation and charge, the points that must be proven, the standard of proof and the case budget. Witnesses come with credibility and possible bias. Every exhibit comes with its reliability, what it clashes with and its hidden flaws. |
+| **Case file** | An **editor** where an examiner can load, edit or paste a case and run it, refused by the same validator with the failing field named. The accusation and charge, the points that must be proven, the standard of proof and the case budget. Witnesses come with credibility and possible bias. Every exhibit comes with its reliability, what it clashes with and its hidden flaws. |
 | **Verdict** | Why the loaded trial ended the way it did. Each point shows a bar per exhibit for how far it pushed the judge either way. An **evidence map** shows which exhibits back each other up and which clash. Also here: the judge's exact working, each side's ledger, and the fingerprinted event chain. |
 | **Strategy** | *Which style wins?* A win-rate matrix for every pairing of styles, the stable (Nash) choices explained in plain language, the smart mixes, and the win rate when both sides play smart. |
-| **The judge** | How rulings and verdicts are made, the three standards of proof, the six objection grounds, and the exact formula. |
+| **The judge** | How rulings and verdicts are made, the three standards of proof, the six objection grounds, and the exact formula. A **slider** re-decides the loaded trial at any bar from 50 % to 99 %, and a table gives each flaw's chance of being caught. |
 
 The header has two switches:
 
@@ -172,7 +172,12 @@ Payoffs are general-sum: `U = V·win − c·spent − μ·sanctions`. For each c
 4. Runs iterated elimination of strictly dominated strategies (IESDS) and flags dominance.
 5. Simulates replicator dynamics, showing how play would drift if both sides kept learning.
 
-The analyzer reports triviality honestly instead of hiding it. Calibration notes are in
+6. Resamples the seed set 200 times and reports how often each case's equilibrium label holds.
+7. Sweeps the constants by ±25%, and the criminal standard across 80-95%, reporting which
+   conclusions survive and which depend on a parameter.
+
+The analyzer reports triviality honestly instead of hiding it: `kestrel-av` is reported as trivial
+rather than dressed up. Measured results are in [`RESULTS.md`](RESULTS.md); calibration notes are in
 [`docs/DESIGN.md`](docs/DESIGN.md).
 
 ---
@@ -181,15 +186,23 @@ The analyzer reports triviality honestly instead of hiding it. Calibration notes
 
 All cases, people and organisations are **synthetic**.
 
-| Case | Type | What it demonstrates | Equilibrium (2×2, Aggressive/Careful) |
+Equilibria below are from the **4×4** game (Aggressive, Careful, Adaptive, Mixed) over 200 common
+seeds per cell, each verified by best response and resampled 200 times. Full numbers, including
+what each result depends on, are in [`RESULTS.md`](RESULTS.md).
+
+| Case | Type | What it demonstrates | Equilibrium (4×4, 200 seeds) |
 |---|---|---|---|
-| `helix-espionage` (flagship) | Criminal | Matching-pennies structure: aggressive prosecution beats a passive defense, and an aggressive defense punishes it | **Mixed** NE: prosecution ≈ 40 % aggressive, defense ≈ 91 % aggressive. No dominant strategy, and replicator dynamics orbit the NE |
-| `kestrel-av` | Civil | Arms race: aggression is strictly dominant for the plaintiff | Pure NE (Aggressive, Aggressive), dominance-solvable |
-| `aurora-defi` | Criminal | Strong white-hat defense: aggression only burns budget | Pure NE (Careful, Careful), dominance-solvable |
-| `edge-empty-docket` | Criminal | Zero evidence | Directed acquittal (rule DV-2) under every pairing, including Chaotic |
+| `helix-espionage` (flagship) | Criminal | No dominant strategy either side: optimal play has to randomise | **Mixed** NE: prosecution 35 % Careful / 65 % Adaptive, defense 5 % Aggressive / 95 % Adaptive. Label stable in 200/200 resamples |
+| `kestrel-av` | Civil | **Trivial**: the plaintiff cannot win under any pairing, so there is no strategic content (see `RESULTS.md` §5) | Pure NE (Careful, Careful), dominance-solvable, strictly |
+| `aurora-defi` | Criminal | Strong white-hat defense: aggression only burns budget | Pure NE (Careful, Careful); Careful strictly dominant for the prosecution |
+| `edge-empty-docket` | Criminal | Zero evidence | Directed acquittal (rule DV-2) under every pairing, including Chaotic. Every profile ties |
 | `edge-mutual-exclusion` | Civil | Two equally credible, contradictory witnesses | Exactly symmetric discount → log-odds exactly `0` → not liable |
 | `edge-poisoned-tree` | Criminal | Every exhibit is defective | An objecting defense wins, while a passive defense can still lose |
 | `edge-defense-only` | Criminal | Only exculpatory evidence | Directed acquittal ordered by the judge on its own motion (sua sponte) |
+
+The three `edge-*` structural fixtures are the only cases whose label survives **every** parameter
+perturbation. The four substantive cases each depend on at least one constant, and `RESULTS.md`
+says which.
 
 New cases can also be generated procedurally (`courtroom/cases/generator.py`).
 
@@ -202,8 +215,14 @@ python -m courtroom cases                           # list the case library
 python -m courtroom run --live                      # animated terminal replay of the flagship case
 python -m courtroom game --case helix-espionage     # payoff matrix + exact Nash equilibria
 python -m courtroom tournament                      # game analysis across the whole library
+python -m courtroom analysis --out results          # matrices + bootstrap + sweep, all to disk
+python -m courtroom bootstrap                       # how stable is each case's equilibrium label?
+python -m courtroom sensitivity                     # vary the constants; report what survives
 python -m courtroom verify -p chaos -d adaptive     # prove bit-for-bit determinism
 python -m courtroom stress --cases 100              # 2,500-trial fuzz run, exits 1 on any failure
+python -m courtroom llm-models                      # Gemini models available on your key
+python -m courtroom llm-exhibition                  # Gemini policy vs the four (NOT equilibrium analysis)
+python -m courtroom run --narrate                   # spoken argument text over a decided trial
 python -m courtroom export                          # rebuild the static web bundle
 python -m courtroom serve                           # web UI + API on http://127.0.0.1:8000
 ```
@@ -217,8 +236,39 @@ Run any command with `--help` for its options.
 | `GET /api/health` | Liveness check |
 | `GET /api/cases`, `GET /api/cases/{id}` | Case library and full case files |
 | `GET /api/strategies` | Available playing styles |
-| `POST /api/trial` | Run one trial `{case_id, prosecution, defense, seed}` |
+| `GET /api/rules` | Judge constants and each flaw's chance of being caught |
+| `POST /api/validate` | Check an examiner's own case file; names the failing field |
+| `POST /api/trial` | Run one trial `{case_id \| case, prosecution, defense, seed}` |
 | `POST /api/game` | Payoff matrix + equilibria `{case_id, strategies, seeds}` |
+
+---
+
+## The optional Gemini layer
+
+**Everything above is deterministic and certified. This part is not, and is kept separate on
+purpose.** See [`AI_USAGE.md`](AI_USAGE.md) and deviation D8 in [`DEVIATIONS.md`](DEVIATIONS.md).
+
+The proposal's stated contribution is a formal game with **no language model**. A Gemini layer now
+exists beside that core, never inside it, in two forms:
+
+| | What it does | Status |
+|---|---|---|
+| **Argument text** | Turns a decided move into a line of courtroom argument. Runs *after* the trial is scored and hashed, over the finished record. | Cosmetic. Cannot move a verdict. |
+| **Exhibition policy** | An agent that picks moves through the same `PartyView` / `Oracle` interface as every other agent. | **Exhibition only.** Never in a payoff matrix. |
+
+The separation is enforced by tests, not by intention: the verdict and digest are asserted
+byte-identical with and without generated text, no core package may import `courtroom.llm`, and
+prompts are checked to carry only the public record and the same noisy defect posteriors every
+other agent receives.
+
+Why the policy is excluded from the analysis: an LLM's payoffs are not reproducible from a cold
+cache on another machine, so no equilibrium computed over them could be certified by the
+best-response verifier. Results go to [`LLM_EXHIBITION.md`](LLM_EXHIBITION.md), labelled exhibition.
+
+Model `gemini-3.1-flash-lite` (cheapest tier, pinned rather than a `-latest` alias so a committed
+cache stays meaningful). Set `GEMINI_API_KEY` to use it; **with no key the layer falls back to
+templates silently and the demo still runs**. Responses are cached to disk and committed, so the
+demo works offline. A daily-quota stop saves progress and resumes from the cache for free.
 
 ---
 
@@ -272,7 +322,8 @@ judge only through the read-only `Oracle`, and the visualisation layer can't inf
 - **Agent crashes:** caught at the fault barrier (`V-AGENT-FAULT`), including in `opening_statement()`.
 - **Demo infrastructure:** bundle fallback, works from `file://`, and `no-cache` headers.
 - **Verified:** a 2,500-trial fuzz run, including the Chaotic agent, had 0 crashes and 0 invariant
-  violations, and 250/250 replays were bit-identical. All 483 tests pass.
+  violations, and 250/250 replays were bit-identical. All 544 tests pass (142 test functions,
+  parametrised). Measured figures and what they depend on are in [`RESULTS.md`](RESULTS.md).
 
 ---
 
@@ -307,7 +358,9 @@ courtroom/
   viz/         terminal dashboard + web/ (index.html, styles.css, app.js, data/bundle.js)
   cli.py       command-line entry point
 docs/DESIGN.md design dialectic and calibration notes
-tests/         483 tests
+RESULTS.md     measured equilibria, bootstrap stability, sensitivity sweep
+DEVIATIONS.md  every intentional divergence from the proposal, with reasons
+tests/         142 test functions -> 544 parametrised cases
 ```
 
 ---

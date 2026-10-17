@@ -939,3 +939,92 @@ svg .muted { fill: var(--muted); }
 .tour-skip { height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 0.8125rem; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .tour-skip:hover { color: var(--ink); background: var(--wash); }
 @media (max-width: 640px) { .tour-skip { flex: none !important; } }
+
+/* ---------------------------------------------------------------- threshold slider (judge tab) */
+.slider-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.slider-row label { font-weight: 600; }
+.slider-row input[type="range"] { flex: 1 1 14rem; min-width: 10rem; accent-color: var(--p); }
+.slider-row output { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 3.2rem; }
+.thr-rows { display: grid; gap: .5rem; }
+.thr-row { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(8rem, 2fr) 4rem 7rem; gap: .6rem; align-items: center; }
+.thr-row p { margin: 0; }
+.thr-name { font-weight: 600; }
+.thr-val { font-variant-numeric: tabular-nums; text-align: right; }
+.thr-flag { font-size: .85em; color: var(--muted); }
+.thr-row.met .thr-flag { color: var(--yes); }
+.thr-row.unmet .thr-flag { color: var(--no); }
+.thr-verdict { margin-top: .9rem; font-weight: 600; }
+.thr-verdict.flipped { color: var(--no); }
+@media (max-width: 34rem) {
+  .thr-row { grid-template-columns: 1fr 4rem; grid-template-areas: "name val" "meter meter" "flag flag"; }
+  .thr-name { grid-area: name; } .thr-val { grid-area: val; }
+  .thr-row .meter-track { grid-area: meter; } .thr-flag { grid-area: flag; }
+}
+
+/* ---------------------------------------------------------------- catch probability table */
+.catch-table { display: grid; gap: .35rem; }
+.catch-row { display: grid; grid-template-columns: minmax(6rem, 1.1fr) minmax(8rem, 1.6fr) repeat(3, 5rem); gap: .6rem; align-items: baseline; }
+.catch-row p { margin: 0; }
+.catch-row .num { font-variant-numeric: tabular-nums; text-align: right; }
+.catch-head { font-weight: 700; border-bottom: 1px solid var(--rule); padding-bottom: .35rem; }
+.catch-row.observable { color: var(--yes); }
+@media (max-width: 40rem) {
+  .catch-row { grid-template-columns: 1fr 1fr 1fr; }
+  .catch-row p:nth-child(2) { grid-column: 1 / -1; color: var(--muted); font-size: .9em; }
+}
+
+/* ---------------------------------------------------------------- case editor (case file tab) */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.editor-bar { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: .75rem; }
+.ed-status { font-size: .9em; color: var(--muted); }
+.ed-status.ok { color: var(--yes); }
+.ed-status.bad { color: var(--no); }
+.editor {
+  width: 100%; font-family: var(--mono); font-size: .85rem; line-height: 1.5; padding: .75rem;
+  border: 1px solid var(--rule); border-radius: .5rem; background: var(--wash);
+  color: var(--ink); resize: vertical; tab-size: 2;
+}
+.editor:focus-visible { outline: 2px solid var(--p); outline-offset: 1px; }
+.ed-errors { margin-top: .6rem; display: grid; gap: .3rem; }
+.ed-error { margin: 0; font-size: .9em; color: var(--no); }
+.ed-error code { font-family: var(--mono); font-weight: 700; }
+
+/* ---------------------------------------------------------------- spoken argument (exhibition) */
+.spoken-toggle { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem; font-size: .9em; cursor: pointer; }
+.spoken-toggle input { accent-color: var(--p); }
+.exhibition-tag {
+  font-style: normal; font-size: .72em; text-transform: uppercase; letter-spacing: .06em;
+  padding: .1rem .35rem; border: 1px solid var(--rule); border-radius: .25rem; color: var(--muted);
+}
+.spoken-note { margin: 0 0 .6rem; font-size: .82em; color: var(--muted); }
+.spoken {
+  margin: .25rem 0 .5rem 1.1rem; padding-left: .7rem; font-style: italic; font-size: .9em;
+  border-left: 2px solid var(--rule); color: var(--ink-2);
+}
+.spoken.prosecution { border-left-color: var(--p); }
+.spoken.defense { border-left-color: var(--d); }
+
+/* ---------------------------------------------------------------- certified vs exhibition mode */
+.mode-bar { border-bottom: 1px solid var(--rule); background: var(--wash); }
+.mode-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: .5rem 0; }
+.mode-pick { display: inline-flex; border: 1px solid var(--rule); border-radius: .4rem; overflow: hidden; }
+.mode-btn {
+  appearance: none; border: 0; background: transparent; color: var(--muted);
+  font: inherit; font-size: .85rem; padding: .35rem .7rem; cursor: pointer; display: flex; gap: .4rem; align-items: baseline;
+}
+.mode-btn em { font-style: normal; font-size: .72em; text-transform: uppercase; letter-spacing: .05em; opacity: .75; }
+.mode-btn + .mode-btn { border-left: 1px solid var(--rule); }
+.mode-btn.is-on { background: var(--yes-soft); color: var(--ink); font-weight: 600; }
+#mode-llm.is-on { background: var(--no-soft); }
+.mode-say { margin: 0; font-size: .82em; color: var(--muted); flex: 1 1 18rem; }
+/* An unmissable tint while the exhibition is on, so a screenshot can never be misread. */
+body.exhibition-mode .mode-bar { background: var(--no-soft); }
+body.exhibition-mode .panel::before {
+  content: "LLM exhibition \2014 not the certified simulation";
+  display: block; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--no); border: 1px dashed var(--no); border-radius: .3rem;
+  padding: .3rem .5rem; margin-bottom: .9rem;
+}

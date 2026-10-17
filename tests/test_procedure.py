@@ -25,7 +25,7 @@ def rules_fired(result) -> list[str]:
 def state():
     case = make_case((item("P1"), item("P2", cost=50.0), item("D1", D, support={"e1": -0.5})), budget=5.0)
     st = ProcedureState(case)
-    st.enter(Phase.PROSECUTION_CASE)
+    st.enter(Phase.EVIDENCE)
     return st
 
 
@@ -119,9 +119,11 @@ def test_budget_never_negative_even_when_fined() -> None:
 
 
 def test_every_phase_sequence_is_legal() -> None:
+    # Sides alternate inside EVIDENCE; the phase ends the moment the prosecution is
+    # finished, which is the premise the directed-verdict review rests on.
     legal = {
-        Phase.OPENING: {Phase.PROSECUTION_CASE},
-        Phase.PROSECUTION_CASE: {Phase.DIRECTED_VERDICT_REVIEW},
+        Phase.OPENING: {Phase.EVIDENCE},
+        Phase.EVIDENCE: {Phase.DIRECTED_VERDICT_REVIEW},
         Phase.DIRECTED_VERDICT_REVIEW: {Phase.DEFENSE_CASE, Phase.DELIBERATION},
         Phase.DEFENSE_CASE: {Phase.REBUTTAL, Phase.DELIBERATION},
         Phase.REBUTTAL: {Phase.DELIBERATION},

@@ -60,3 +60,45 @@ def test_ui_is_served(client: TestClient) -> None:
     html = client.get("/").text
     assert "Courtroom" in html and "app.js" in html
     assert client.get("/app.js").status_code == 200
+
+
+def test_validate_accepts_a_library_case(client: TestClient) -> None:
+    payload = client.get("/api/cases/helix-espionage").json()
+    r = client.post("/api/validate", json=payload)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["ok"] and body["case_id"] == "helix-espionage"
+    assert body["elements"] == 3 and body["evidence"] == 17
+
+
+def test_validate_names_the_failing_field(client: TestClient) -> None:
+    r = client.post("/api/validate", json={"id": "broken"})
+    assert r.status_code == 422
+    body = r.json()
+    assert body["ok"] is False
+    assert body["errors"] and all({"field", "message"} <= set(e) for e in body["errors"])
+    assert any(e["field"] == "title" for e in body["errors"])
+
+
+def test_trial_accepts_an_inline_case_file(client: TestClient) -> None:
+    payload = client.get("/api/cases/helix-espionage").json()
+    inline = client.post("/api/trial", json={"case": payload, "seed": 0}).json()
+    by_id = client.post("/api/trial", json={"case_id": "helix-espionage", "seed": 0}).json()
+    assert inline["digest"] == by_id["digest"]  # same case, same seed, same trial
+
+
+def test_trial_requires_a_case(client: TestClient) -> None:
+    assert client.post("/api/trial", json={"seed": 0}).status_code == 422
+
+
+def test_rules_endpoint_reports_thresholds_and_catch_probability(client: TestClient) -> None:
+    body = client.get("/api/rules").json()
+    assert body["standards"]["beyond_reasonable_doubt"]["log_odds"] == "11/5"
+    assert body["priors"]["criminal"]["probability"] == pytest.approx(0.2689, abs=1e-4)
+    assert body["prior_defect_rate"] == pytest.approx(0.15)
+    rows = next(iter(body["catch_probability"].values()))
+    observable = {r["ground"] for r in rows if r["observable"]}
+    assert observable == {"relevance", "late_disclosure"}
+    for r in rows:
+        if r["observable"]:
+            assert all(v == 1.0 for v in r["caught_by"].values())
