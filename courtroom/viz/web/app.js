@@ -1314,7 +1314,7 @@ function renderBreakdown() {
       const why = [];
       if (c.contradiction_discount > 0) why.push(`cut ${pct(c.contradiction_discount)} by clashing evidence`);
       if (c.corroboration_factor > 1) why.push(`boosted ${pct(c.corroboration_factor - 1)} by backing evidence`);
-      if (!c.counted) why.push("not counted: the same fact was already counted");
+      if (!c.counted) why.push("not counted: a larger item on the same fact was used, or this side already has its four strongest facts");
       return el("div", { class: `bd-row${c.counted ? "" : " uncounted"}`, title: why.length ? capFirst(why.join("; ")) : "" },
         el("p", { class: "bd-label" }, el("span", { class: `tag ${sideClass(item?.owner)}` }, c.evidence_id), el("span", {}, item?.title ?? "")),
         el("div", { class: "bd-bar", role: "img", "aria-label": `${pos ? "Toward" : "Against"} proving this point by ${size.toFixed(1)}${why.length ? `, ${why.join(", ")}` : ""}` },

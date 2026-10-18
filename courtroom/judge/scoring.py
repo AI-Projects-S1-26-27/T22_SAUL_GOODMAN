@@ -20,6 +20,7 @@ from courtroom.contracts import (
     EvidenceItem,
     ScoreSnapshot,
 )
+from courtroom.judge import rules as _rules
 from courtroom.judge.rules import (
     CONTRADICTION_BETA,
     CORROBORATION_ALPHA,
@@ -43,6 +44,23 @@ class ExactScores:
 
     log_odds: dict[str, Fraction]
     snapshot: ScoreSnapshot
+
+
+def _cap_facts_per_side(counted: set[str], weights: Mapping[str, Fraction], cap: int | None) -> set[str]:
+    """Keep the ``cap`` strongest counted facts on each side of an element (proposal Sec. 6).
+
+    A fact helps the prosecution when its weight is positive and the defense when it is negative,
+    and the two sides are capped separately, so a large defense case cannot push out the
+    prosecution's best facts or the other way round. Ranking is by ``|w|`` with the evidence id as
+    the tie-break, so the result is still a pure function of the admitted set.
+    """
+    if cap is None:
+        return counted
+    kept: set[str] = set()
+    for sign in (1, -1):
+        side = sorted((i for i in counted if _sign(weights[i]) == sign), key=lambda i: (-abs(weights[i]), i))
+        kept.update(side[:cap])
+    return kept
 
 
 def credibility(item: EvidenceItem, case: CaseFile, impeachments: Mapping[str, int]) -> Fraction:
@@ -111,6 +129,7 @@ def score_record(
             if incumbent is None or abs(weights[item_id]) > abs(weights[incumbent]):
                 best_per_fact[fact] = item_id
         counted = set(best_per_fact.values())
+        counted = _cap_facts_per_side(counted, weights, _rules.MAX_FACTS_PER_SIDE)
 
         log_odds = prior + LLR_SCALE * sum((weights[i] for i in sorted(counted)), ZERO)
         exact[e] = log_odds

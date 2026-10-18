@@ -224,6 +224,41 @@ case. Four requests in it missed the cache because they were rate-limited when r
 re-asked, none fell back, and the page reports the count. The mode needs no key, but it also cannot
 produce a new trial: that takes the local `llm-exhibition` command and a key.
 
+## D12 — the top-4-facts cap on Fe (a conformance fix, not a new rule)
+
+Proposal Sec. 6: "Fe is the four facts with the largest |v| per side, so splitting one fact into many
+cannot inflate the score." The judge never implemented the cap. The cumulative-evidence rule (one
+counted item per `fact_id`) covered *splitting one fact*, but distinct facts each added a flat
+`+3 * w` without limit, so a side could buy log-odds by exhibit count.
+
+**Change.** `rules.MAX_FACTS_PER_SIDE = 4`; `scoring._cap_facts_per_side` keeps, per sign, the four
+counted facts with the largest |w| (ties by id). Set the constant to `None` to reproduce the old
+judge exactly. No new tuned constant: 4 is the proposal's number.
+
+**Why this is a bug fix and not a scoring change.** The submitted spec states the rule; the code
+did not match it. On the seven library cases the cap changes nothing: 875 trials, 0 digest and 0
+verdict differences (`test_no_library_trial_changes_with_the_cap_on_or_off`). It does bite on
+generated cases (16 of 1,500 digests move, 0 verdicts), which is what a tail rule should do.
+RESULTS.md and the 42 pinned digests are unaffected.
+
+**Effect on the tail** (one criminal element, s=0.8, reliability 0.8, k counted facts, L_e):
+
+| Exhibits per side | before | after |
+|---|---|---|
+| 4 | 10.04 | 10.04 |
+| 6 | 16.10 | 10.40 |
+| 8 | 21.98 | 10.49 |
+
+Not zero growth: corroboration `k` still counts every same-sign fact (the proposal defines it so), so
+the four counted facts get a multiplier that saturates below 3/2.
+
+**Two other spec divergences, measured and NOT changed.** (a) The proposal nets per fact
+`max[v]+ - max[v]-`; the code keeps the single largest |w| per fact. No library fact has opposite-sign
+items on one element, so there is no effect today. (b) The proposal writes strict `Le > theta`; the
+code is strict only for preponderance. The 144 elements landing exactly on a bar are all civil
+preponderance, so there are 0 disagreements. Either would be a scoring change needing a team decision
+if a case ever exercised it.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

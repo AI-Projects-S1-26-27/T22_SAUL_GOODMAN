@@ -27,6 +27,11 @@ CONTRADICTION_BETA = Fraction(4, 5)  # beta: pairwise contradiction pressure
 MAX_CONTRADICTION_DISCOUNT = Fraction(9, 10)
 IMPEACHMENT_FACTOR = Fraction(1, 2)  # credibility halves per successful impeachment
 RELEVANCE_FLOOR = Fraction(1, 20)
+# Proposal Sec. 6: "Fe is the four facts with the largest |v| per side, so splitting one fact into
+# many cannot inflate the score." The cap applies per side of an element, i.e. separately to the
+# facts that help the prosecution and the facts that help the defense. ``None`` removes it, which is
+# how the earlier uncapped behaviour is reproduced (see tests/test_fact_cap.py).
+MAX_FACTS_PER_SIDE: int | None = 4
 DIRECTED_VERDICT_THRESHOLD = ZERO  # DV-1: any element with L_e < 0
 
 PRIOR_LOG_ODDS: dict[CaseType, Fraction] = {
