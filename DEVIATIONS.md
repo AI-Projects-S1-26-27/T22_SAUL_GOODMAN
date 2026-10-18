@@ -259,6 +259,79 @@ code is strict only for preponderance. The 144 elements landing exactly on a bar
 preponderance, so there are 0 disagreements. Either would be a scoring change needing a team decision
 if a case ever exercised it.
 
+## D13 — witness examination: direct and cross-examination, behind `RuleSet.witnesses`
+
+Requested: witnesses with hidden flaws, cross-examination whose success depends on them, and the
+language model only narrating the exchange. This **reverses** an earlier instruction ("don't add
+cross-examination; impeachment already covers it"), which is why it is logged.
+
+**The fence.** `CaseFile.rules` is `None` by default, which is the certified rulebook. Every library
+case has `rules=None`; the three examination variants live in `WITNESS_CASES`
+(`courtroom/cases/witness_cases.py`), not `CASES`, so the analysis, `RESULTS.md` and the bundle never see
+them. With the flag off, an `EXAMINE`/`CROSS_EXAMINE` action is refused as `V-WINDOW`. The 42 pinned
+digests and the bundle freshness test pass unchanged, and 768 tests pass.
+
+**What was added, and what it could have broken.**
+
+| Addition | Why it cannot move a certified digest |
+|---|---|
+| `ExamGround` (qualifications, bias, inconsistency) is a **separate enum** | `perceive()` and the chaos fuzzer iterate `ObjectionGround`; a new member there would change every RNG stream |
+| `ActionType.EXAMINE`, `CROSS_EXAMINE`; `EventKind.EXAMINATION` | never emitted when the flag is off |
+| `ChaosAgent` now samples a fixed six-action tuple | it used `list(ActionType)`, which the new members would have lengthened. Caught by a mutation check (`test_bundle` fails if reverted) |
+| witness perception uses `Random(f"{seed}:witness-perception")` | a separate stream, drawn only when the flag is on, for every witness in sorted order, so it is a pure function of (case, seed) |
+| `Action.ground: ObjectionGround \| ExamGround \| None` | serialises to the same string for every existing action |
+| `PartyView` and `Witness` gain defaulted fields | neither is hashed |
+
+**Rules.** Cross-examination costs 1.0, direct examination (redirect) 0.5, once per (witness, ground) and per
+witness; both need the witness to have testified, and both are refused in rebuttal (`V-EXAM-PHASE`).
+A cross succeeds **exactly when the named flaw is real** (`XEX-1`), multiplying the witness's credibility
+by 1/3 (qualifications), 1/2 (inconsistency) or 2/3 (bias); a cross on a flaw that is not there fails
+(`XEX-2`) and costs 0.25 sanction points. Redirect withdraws the most recent exposure (`XEX-4`) or does
+nothing (`XEX-5`). The factors are exact rationals and compose with each other and with impeachment.
+Exposures ride in the impeachment ledger under `"<witness>#<ground>"`, so `score_record`'s signature and
+the oracle cache are unchanged, and the score stays a pure function of the record.
+
+**Uncertainty is in the belief, not the outcome.** Agents see each flaw through the objector's channel
+(true-positive rate = accuracy, false-positive rate = (1 - accuracy)/4, prior 0.15). The ruling follows
+the truth. Cross-examination reuses each profile's objection thresholds (0.35, 0.70; the EV rule for
+Adaptive), so it adds no new risk parameter.
+
+**Soundness of the directed-verdict review (P1, P2) is preserved.** A cross can only lower the side that
+called the witness; because examination is refused in rebuttal, everything after the review is the
+defense's cross of a prosecution witness or the defense repairing its own, and both can only lower
+L_e. Tested exhaustively on every prosecution and defense witness and ground
+(`test_exposing_a_witness_only_ever_hurts_the_side_that_called_it`) and along every trial
+(`test_no_examination_can_raise_the_prosecution_after_...`).
+
+**Simplifications against `docs/DESIGN_WITNESS_POINTS.md`, stated plainly.** `INCONSISTENCY` halves
+credibility but does **not** also zero a contradicted statement (that needs a designated prior-statement
+item the case format does not have). `QUALIFICATIONS` is a credibility factor of 1/3, not an
+"opinions outside the field stop counting" rule (the format has no field-of-expertise). Either can be
+added later; neither is needed for the strategic content.
+
+**What the agents do with it** (3 strategies each side, 30 seeds, 270 trials per case):
+
+| Case | Verdict flips vs the same case without the rules | Notes |
+|---|---|---|
+| `helix-espionage-witnesses` | 0 | only Aggressive and Adaptive ever cross; **Conservative never does** (posterior after a red flag is 0.567, below its 0.70 bar, as predicted) |
+| `aurora-defi-witnesses` | 0 | 142 exposures, 39 repairs; the prosecution already loses every trial |
+| `kestrel-av-witnesses` | 11 | 3.9% of trials change outcome; Aggressive makes 213 examination moves, Conservative 40 |
+
+The conjecture that examination helps the profile that gambles on thin suspicion is visible here but
+**is not an equilibrium result**: no game has been solved with the rules on, and `RESULTS.md` is
+unchanged. That would be a second, opt-in analysis and is not done.
+
+**Language model.** `courtroom.llm.narrator` writes a Q-and-A line for each examination event from the
+public ruling only. The prompt names the line of questioning and the outcome the judge announced; it
+never carries a witness's flaw flags (`test_examination_prompts_carry_the_public_record_and_never_a_hidden_flaw`),
+and no core package imports `courtroom.llm` (`test_no_core_package_imports_the_language_model_layer`).
+Template fallback with no key or cold cache. **This is a second narrated move type, not a new kind of
+language-model use**; the instructor check on the proposal's "no language model" line is still open.
+
+**Not done.** The web case list does not offer the witness variants and the exhibition bundle contains no
+examination trials. The Gemini policy agent is not told about the new moves. The strategy space is
+still the certified 4x4; see `docs/DESIGN_WITNESS_POINTS.md` section 6 for what widening it costs.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

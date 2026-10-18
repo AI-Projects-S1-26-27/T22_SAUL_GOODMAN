@@ -1,7 +1,7 @@
 """Strategic counsel agents (Engineer 4)."""
 
 from courtroom.agents.adversarial import AgentCrash, ChaosAgent, ScriptedAgent
-from courtroom.agents.base import Agent, Oracle, ScoreCache, perceive
+from courtroom.agents.base import Agent, Oracle, ScoreCache, perceive, perceive_witnesses
 from courtroom.agents.policies import (
     ADAPTIVE,
     AGGRESSIVE,
@@ -31,4 +31,5 @@ __all__ = [
     "describe_strategies",
     "make_agent",
     "perceive",
+    "perceive_witnesses",
 ]

@@ -16,13 +16,14 @@ import math
 import random
 from collections.abc import Sequence
 
-from courtroom.agents import Agent, Oracle, ScoreCache, make_agent, perceive
+from courtroom.agents import Agent, Oracle, ScoreCache, make_agent, perceive, perceive_witnesses
 from courtroom.contracts import (
     Action,
     ActionType,
     CaseFile,
     EventKind,
     EvidenceGraph,
+    ExamGround,
     GraphEdge,
     GraphNode,
     Injection,
@@ -42,13 +43,17 @@ from courtroom.judge import Judge
 from courtroom.judge.admissibility import BAD_FAITH_GROUNDS
 from courtroom.judge.rules import (
     CONTEMPT_VIOLATIONS,
+    CROSS_COST,
+    EXAMINE_COST,
     FINE_VIOLATION,
     IMPEACHMENT_COST,
     MOTION_COST,
     OBJECTION_COST,
     SANCTION_BAD_FAITH_EVIDENCE,
+    SANCTION_FAILED_CROSS,
     SANCTION_OVERRULED_OBJECTION,
     SANCTION_VIOLATION,
+    exposure_key,
 )
 from courtroom.procedure import ProcedureState, Violation, validate
 from courtroom.procedure.state import CASE_PHASES, STALL_LIMIT
@@ -85,6 +90,11 @@ class Court:
         self.cache = ScoreCache(case)
         self._perception_rng = random.Random(f"{seed}:perception")
         self._perceived: PerceivedItem | None = None
+        # A separate stream, seeded apart from objection perception, and only drawn when the case enables
+        # witness examination, so a case without the flag consumes exactly the randomness it always did.
+        self._witness_beliefs: dict[str, dict[str, float]] = (
+            perceive_witnesses(case, random.Random(f"{seed}:witness-perception")) if case.witness_examination else {}
+        )
         self._events: list[TrialEvent] = []
         self._last_hash = GENESIS
         self._injections, self._cases_after = _plan_injections(case, injections)
@@ -157,6 +167,16 @@ class Court:
             opponent_budget=st.ledgers[opp].budget,
             turns_left=st.turns_left(side),
             impeachment_options=options,
+            examine_options=st.examine_options(side),
+            exam_options=tuple((w, g.value) for w, g in st.exam_options(side)),
+            own_exposures=tuple(
+                (w, st.exposed_grounds(w)[-1].value) for w in st.testified_witnesses(side) if st.exposed_grounds(w)
+            )
+            if st.case.witness_examination
+            else (),
+            witness_beliefs={w: dict(self._witness_beliefs[w]) for w in st.testified_witnesses(opp) if w in self._witness_beliefs}
+            if st.exam_options(side)
+            else {},
             rebuttal_targets=st.rebuttal_targets() if side is Side.PROSECUTION else (),
             opponent_objections=st.ledgers[opp].objections,
             opponent_response_windows=st.ledgers[opp].response_windows,
@@ -223,6 +243,8 @@ class Court:
         st = self.state
         budget = st.ledgers[side].budget
         if budget >= IMPEACHMENT_COST and st.testified_witnesses(side.opponent):
+            return True
+        if (budget >= CROSS_COST and st.exam_options(side)) or (budget >= EXAMINE_COST and st.examine_options(side)):
             return True
         allowed = set(st.rebuttal_targets()) if st.phase is Phase.REBUTTAL else None
         return any(
@@ -388,6 +410,12 @@ class Court:
                     status="impeached" if ok else None,
                 )
 
+            case ActionType.CROSS_EXAMINE:
+                self._cross_examine(side, action)
+
+            case ActionType.EXAMINE:
+                self._examine(side, action)
+
             case ActionType.MOTION_DIRECTED_VERDICT:
                 ledger.charge(MOTION_COST)
                 st.motion_made = True
@@ -410,6 +438,56 @@ class Court:
             case ActionType.REST:
                 self._emit(EventKind.ACTION, f"{side.value} rests.", side, action)
                 self._rest(side, None)
+
+    def _cross_examine(self, side: Side, action: Action) -> None:
+        st = self.state
+        ledger = st.ledgers[side]
+        witness = action.witness_id
+        ground = action.ground
+        assert witness is not None and isinstance(ground, ExamGround)
+        ledger.charge(CROSS_COST)
+        st.used_crosses.add((witness, ground))
+        st.consume_primary_turn(side)
+        st.passes[side] = 0
+        ok, rule = self.judge.rule_on_cross(witness, ground)
+        if ok:
+            st.exposures.append((witness, ground))
+            st.impeachments[exposure_key(witness, ground)] = 1
+        else:
+            ledger.sanctions += SANCTION_FAILED_CROSS
+        self._emit(
+            EventKind.EXAMINATION,
+            f"{side.value} cross-examines {witness} on {ground.value}: {'a real flaw is exposed' if ok else 'nothing found'}.",
+            side,
+            action,
+            [rule],
+            subject=witness,
+            status="exposed" if ok else "unfounded",
+        )
+
+    def _examine(self, side: Side, action: Action) -> None:
+        st = self.state
+        ledger = st.ledgers[side]
+        witness = action.witness_id
+        assert witness is not None
+        ledger.charge(EXAMINE_COST)
+        st.used_examines.add(witness)
+        st.consume_primary_turn(side)
+        st.passes[side] = 0
+        ok, rule = self.judge.rule_on_examine(witness, st.exposed_grounds(witness))
+        if ok:
+            _, ground = next((w, g) for w, g in reversed(st.exposures) if w == witness)
+            st.exposures.remove((witness, ground))
+            st.impeachments.pop(exposure_key(witness, ground), None)
+        self._emit(
+            EventKind.EXAMINATION,
+            f"{side.value} examines its own witness {witness}: {'rehabilitated' if ok else 'nothing to repair'}.",
+            side,
+            action,
+            [rule],
+            subject=witness,
+            status="rehabilitated" if ok else None,
+        )
 
     def _rule_on_objection(self, side: Side, action: Action) -> None:
         st = self.state

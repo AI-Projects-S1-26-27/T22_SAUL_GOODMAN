@@ -590,7 +590,11 @@ CASES: dict[str, CaseFile] = {c.id: c for c in (HELIX, AURORA, KESTREL, EMPTY, S
 
 
 def get_case(case_id: str) -> CaseFile:
-    try:
+    if case_id in CASES:
         return CASES[case_id]
-    except KeyError:
-        raise KeyError(f"unknown case {case_id!r}; available: {sorted(CASES)}") from None
+    # Witness-examination variants live in their own registry so nothing that iterates CASES sees them.
+    from courtroom.cases.witness_cases import WITNESS_CASES
+
+    if case_id in WITNESS_CASES:
+        return WITNESS_CASES[case_id]
+    raise KeyError(f"unknown case {case_id!r}; available: {sorted(CASES)} and {sorted(WITNESS_CASES)}") from None

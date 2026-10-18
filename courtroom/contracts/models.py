@@ -27,6 +27,7 @@ __all__ = [
     "EvidenceGraph",
     "EvidenceItem",
     "EvidenceKind",
+    "ExamGround",
     "Frozen",
     "GraphEdge",
     "GraphNode",
@@ -38,6 +39,7 @@ __all__ = [
     "PerceivedItem",
     "Phase",
     "RuleFiring",
+    "RuleSet",
     "ScoreSnapshot",
     "Side",
     "StandardOfProof",
@@ -97,6 +99,15 @@ class ObjectionGround(StrEnum):
     SPECULATION = "speculation"
 
 
+class ExamGround(StrEnum):
+    """What a cross-examiner attacks. Deliberately NOT part of ``ObjectionGround``: the perception
+    channel and the chaos fuzzer iterate that enum, so a new member there would change every digest."""
+
+    QUALIFICATIONS = "qualifications"
+    BIAS = "bias"
+    INCONSISTENCY = "inconsistency"
+
+
 class Phase(StrEnum):
     OPENING = "opening"
     # Both sides alternate here. The phase ends when the PROSECUTION can present no more,
@@ -117,6 +128,9 @@ class ActionType(StrEnum):
     MOTION_DIRECTED_VERDICT = "motion_directed_verdict"
     PASS = "pass"
     REST = "rest"
+    # Only legal under ``RuleSet.witnesses``; with the flag off the validator refuses them (V-WINDOW).
+    EXAMINE = "examine"
+    CROSS_EXAMINE = "cross_examine"
 
 
 class EventKind(StrEnum):
@@ -128,6 +142,7 @@ class EventKind(StrEnum):
     WATCHDOG = "watchdog"
     VERDICT = "verdict"
     INJECTION = "injection"  # evidence added to a party's hand mid-trial; see Injection
+    EXAMINATION = "examination"  # a witness examined or cross-examined; only under RuleSet.witnesses
 
 
 class VerdictOutcome(StrEnum):
@@ -176,6 +191,11 @@ class Witness(Frozen):
     role: str
     credibility: float = Field(ge=0.0, le=1.0)
     bias_note: str | None = None
+    # Hidden flaws, the witness analogue of an exhibit's defect flags. They matter only under
+    # ``RuleSet.witnesses``; the defaults make every existing witness flawless, so no existing case moves.
+    qualified: bool = True  # False: the witness is not qualified to give the opinion offered
+    impartial: bool = True  # False: undisclosed interest in the outcome
+    consistent: bool = True  # False: a prior statement contradicts the testimony
 
     @field_validator("credibility")
     @classmethod
@@ -227,6 +247,12 @@ class EvidenceItem(Frozen):
         return self.cost if self.cost is not None else DEFAULT_COST[self.kind]
 
 
+class RuleSet(Frozen):
+    """Optional rule extensions. ``CaseFile.rules is None`` means the certified rulebook, bit for bit."""
+
+    witnesses: bool = False  # direct and cross-examination of witnesses (DEVIATIONS D13)
+
+
 class CaseFile(Frozen):
     id: str = Field(pattern=r"^[a-z0-9_\-]+$")
     title: str
@@ -247,6 +273,11 @@ class CaseFile(Frozen):
     # bar". Otherwise an exact rational in log-odds, written "11/5" or "2.1972"; the standard
     # still decides whether a tie passes (strict for preponderance, inclusive otherwise).
     bar_log_odds: str | None = Field(default=None, pattern=r"^(\d{1,2}(\.\d{1,6})?|\d{1,4}/\d{1,4})$")
+    rules: RuleSet | None = None
+
+    @property
+    def witness_examination(self) -> bool:
+        return self.rules is not None and self.rules.witnesses
 
     @field_validator("bar_log_odds")
     @classmethod
@@ -327,7 +358,7 @@ class Action(Frozen):
     type: ActionType
     evidence_id: str | None = None
     witness_id: str | None = None
-    ground: ObjectionGround | None = None
+    ground: ObjectionGround | ExamGround | None = None
     rationale: str = ""
 
 
@@ -412,6 +443,12 @@ class PartyView(Frozen):
     rebuttal_targets: tuple[str, ...]
     opponent_objections: int
     opponent_response_windows: int
+    # Witness examination (empty unless the case enables it). ``exam_options`` are (opposing witness,
+    # ground) pairs still open; ``witness_beliefs`` is the noisy posterior that each flaw is real.
+    examine_options: tuple[str, ...] = ()
+    exam_options: tuple[tuple[str, str], ...] = ()
+    witness_beliefs: dict[str, dict[str, float]] = Field(default_factory=dict)
+    own_exposures: tuple[tuple[str, str], ...] = ()  # (own witness, ground of its latest exposure), public record
 
 
 # --------------------------------------------------------------------------- trial record
@@ -441,7 +478,7 @@ class TrialEvent(Frozen):
     action: Action | None = None
     summary: str
     subject: str | None = None  # evidence id this event is about, if any
-    status: Literal["offered", "admitted", "excluded", "impeached", "injected"] | None = None
+    status: Literal["offered", "admitted", "excluded", "impeached", "injected", "exposed", "unfounded", "rehabilitated"] | None = None
     rules: tuple[RuleFiring, ...] = ()
     burden_index: float | None = None
     element_probabilities: dict[str, float] = Field(default_factory=dict)

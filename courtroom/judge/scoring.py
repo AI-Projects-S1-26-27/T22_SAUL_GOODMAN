@@ -18,18 +18,21 @@ from courtroom.contracts import (
     Contribution,
     ElementScore,
     EvidenceItem,
+    ExamGround,
     ScoreSnapshot,
 )
 from courtroom.judge import rules as _rules
 from courtroom.judge.rules import (
     CONTRADICTION_BETA,
     CORROBORATION_ALPHA,
+    EXAM_FACTORS,
     IMPEACHMENT_FACTOR,
     LLR_SCALE,
     MAX_CONTRADICTION_DISCOUNT,
     ONE,
     PRIOR_LOG_ODDS,
     ZERO,
+    exposure_key,
     fmt,
     q,
     sigmoid,
@@ -68,7 +71,13 @@ def credibility(item: EvidenceItem, case: CaseFile, impeachments: Mapping[str, i
         return ONE
     witness = case.witness(item.witness_id)
     base = q(witness.credibility) if witness is not None else ONE
-    return base * IMPEACHMENT_FACTOR ** impeachments.get(item.witness_id, 0)
+    value = base * IMPEACHMENT_FACTOR ** impeachments.get(item.witness_id, 0)
+    # Exposed flaws ride in the same ledger under ``exposure_key``; an absent key is a factor of one,
+    # so a record with no cross-examination scores exactly as before.
+    for ground in ExamGround:
+        if impeachments.get(exposure_key(item.witness_id, ground), 0):
+            value *= EXAM_FACTORS[ground]
+    return value
 
 
 def _sign(x: Fraction) -> int:

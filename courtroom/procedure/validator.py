@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from courtroom.contracts import Action, ActionType, Phase, Side
-from courtroom.judge.rules import IMPEACHMENT_COST, MOTION_COST, OBJECTION_COST
-from courtroom.procedure.state import ALLOWED, ProcedureState
+from courtroom.contracts import Action, ActionType, ExamGround, Phase, Side
+from courtroom.judge.rules import CROSS_COST, EXAMINE_COST, IMPEACHMENT_COST, MOTION_COST, OBJECTION_COST
+from courtroom.procedure.state import ALLOWED, EXAM_ACTIONS, EXAM_PHASES, ProcedureState
 
 VIOLATION_RULES: dict[str, str] = {
     "V-TURN": "Actor is not the party entitled to act.",
@@ -26,6 +26,8 @@ VIOLATION_RULES: dict[str, str] = {
     "V-REBUTTAL-SCOPE": "Rebuttal evidence must contradict admitted defense evidence.",
     "V-OBJ-TARGET": "Objection must target the pending item (contemporaneous-objection rule).",
     "V-IMPEACH-TARGET": "Only an opposing witness who has testified may be impeached.",
+    "V-EXAM-PHASE": "Witnesses are examined only while evidence is being presented, never in rebuttal.",
+    "V-EXAM-TARGET": "Examine your own witness, or cross-examine an opposing one, who has testified.",
     "V-AGENT-FAULT": "The agent failed to produce a well-formed action.",
 }
 
@@ -49,7 +51,33 @@ def validate(action: Action, state: ProcedureState, expected_side: Side, window:
     if action.type.value not in ALLOWED[window]:  # type: ignore[index]
         return _v("V-WINDOW", f"{action.type.value} in {window} window")
 
+    if action.type.value in EXAM_ACTIONS:
+        if not case.witness_examination:
+            return _v("V-WINDOW", f"{action.type.value} is not in force in this case")
+        if state.phase not in EXAM_PHASES:
+            return _v("V-EXAM-PHASE", state.phase.value)
+
     match action.type:
+        case ActionType.EXAMINE:
+            if not action.witness_id:
+                return _v("V-MISSING-FIELD", "witness_id")
+            if action.witness_id not in state.testified_witnesses(action.actor):
+                return _v("V-EXAM-TARGET", action.witness_id)
+            if action.witness_id in state.used_examines:
+                return _v("V-DUPLICATE", f"examine {action.witness_id}")
+            if ledger.budget < EXAMINE_COST:
+                return _v("V-BUDGET", "examination")
+
+        case ActionType.CROSS_EXAMINE:
+            if not action.witness_id or not isinstance(action.ground, ExamGround):
+                return _v("V-MISSING-FIELD", "witness_id and an examination ground")
+            if action.witness_id not in state.testified_witnesses(action.actor.opponent):
+                return _v("V-EXAM-TARGET", action.witness_id)
+            if (action.witness_id, action.ground) in state.used_crosses:
+                return _v("V-DUPLICATE", f"cross {action.witness_id} on {action.ground.value}")
+            if ledger.budget < CROSS_COST:
+                return _v("V-BUDGET", "cross-examination")
+
         case ActionType.PRESENT_EVIDENCE:
             if not action.evidence_id:
                 return _v("V-MISSING-FIELD", "evidence_id")

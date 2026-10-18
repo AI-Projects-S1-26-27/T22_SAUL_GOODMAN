@@ -1,6 +1,8 @@
 # Design: per-point burden, expert witnesses, and narrated examination
 
-**Status: proposal. Nothing here is implemented.** Every number in the audit sections was measured
+**Status (updated): Part B and Part C are implemented behind the flag (DEVIATIONS D13); the top-4-facts cap
+was implemented instead of Part A (D12); Part A as briefed was skipped.** Where the code differs from the
+design below, D13 says so. Every number in the audit sections was measured
 against the current code on 18 Oct 2026; the commands are given so they can be re-run. Everything in
 the proposal sections is a design to be accepted, changed or rejected.
 
@@ -292,14 +294,35 @@ regenerated. This is the smaller change and the one I would do first.
 It answers a question Option 1 cannot ("is specialising in cross-examination viable?") at the cost of a
 bigger matrix and the API/UI changes above.
 
-### 6.3 Regeneration cost, from measured rates
+### 6.3 Regeneration cost, measured (this replaces an earlier estimate that was wrong)
 
-Trials cost about 1.9 ms each (`stress` reports `mean_ms`). A full `analysis` run is matrices
-(`n²×200×7`) plus bootstrap (200 resamples × `analyze()` × 7) plus the sweep (14 variations ×
-`n²×60×7`):
+The first version of this section estimated "~4 min single-core, ~10 min with `--workers 4`" from the
+1.9 ms trial rate. **That was wrong by a factor of about three.** Measured on this machine (11 cores,
+nothing else running except light editing), `python -m courtroom analysis --workers 4`:
 
-| | 4×4 (today) | 5×5 |
-|---|---|---|
+| Strategy space | Scope | Wall clock | CPU (user) |
+|---|---|---|---|
+| 4x4 (today) | all 7 cases | **13 min 56 s** | 18 min |
+| 4x4 | `helix-espionage` only | 6 min 30 s | 8.6 min |
+| 5x5 (+ `mixed:0.25`) | `helix-espionage` only | 9 min 44 s (**1.50x**) | 12.7 min |
+| 6x6 (+ `mixed:0.75`) | `helix-espionage` only | 14 min 39 s (**2.25x**) | 19.0 min |
+
+Stage times at 4x4, all cases: payoff matrices about 45 s, bootstrap about 55 s, **the sensitivity sweep
+about 12 min**. The sweep is single-process (D4: constants are patched in the parent, so it cannot use
+workers) and re-estimates every matrix at every perturbation, so it is 85% of the bill and it scales
+with the number of cells.
+
+Cost grows with cells (n^2), not with Nash enumeration, which stays under 0.15 s at 6x6. Scaling the
+full library by the measured ratios gives about **21 min at 5x5 and about 31 min at 6x6**.
+
+Is that too slow to redo late? No: a full regeneration is a half-hour job, not a blocker, and
+`--workers` only helps the first two stages. What *would* hurt is regenerating several times in the last
+days, because each also forces `RESULTS.md`, the proof-bar ladder in the bundle, the Strategy tab and
+the exhibition baseline to be rewritten. Freeze the strategy space early and regenerate once. The
+one cheap speed-up available is running the sweep per case in parallel processes, which D4 allows
+because each process patches its own constants.
+
+---|---|---|
 | Matrix trials | 22,400 | 35,000 |
 | Sweep trials | 94,080 | 147,000 |
 | Bootstrap `analyze()` | 1,400 × 5.1 ms ≈ 7 s | 1,400 × 25.1 ms ≈ 35 s |
@@ -319,7 +342,7 @@ the Strategy tab, and the exhibition's deterministic baseline. All of it has to 
 
 A1 changes `L_e`. The project has treated the judge's arithmetic as off-limits throughout — it is the
 basis of "the judge is not an AI" — and three separate instructions in this project have said not to
-touch it. Proceeding needs an explicit decision, recorded as **D12**, covering: which formula changed,
+touch it. Proceeding needs an explicit decision, recorded as a numbered deviation (D12 is now the top-4 cap; a rank-discount would be the next number), covering: which formula changed,
 that the three standards and exact arithmetic are preserved, that `rules=None` reproduces the old
 behaviour digest for digest, and why the unbounded tail justified the change.
 

@@ -13,13 +13,14 @@ from courtroom.contracts import (
     Action,
     CaseFile,
     EvidenceItem,
+    ExamGround,
     ObjectionGround,
     PartyView,
     PerceivedItem,
     Side,
 )
-from courtroom.judge.admissibility import ground_is_valid
-from courtroom.judge.rules import threshold_for
+from courtroom.judge.admissibility import ground_is_valid, witness_flaw_is_real
+from courtroom.judge.rules import exposure_key, threshold_for
 from courtroom.judge.scoring import score_record
 
 # Conversion of heuristic quantities into utility units (shared by all policies).
@@ -65,10 +66,20 @@ class Oracle:
         self._impeachments = dict(impeachments)
         self._tau = float(threshold_for(cache.case))
 
-    def log_odds(self, add: Iterable[str] = (), impeach: str | None = None) -> dict[str, float]:
+    def log_odds(
+        self,
+        add: Iterable[str] = (),
+        impeach: str | None = None,
+        expose: tuple[str, ExamGround] | None = None,
+        unexpose: tuple[str, ExamGround] | None = None,
+    ) -> dict[str, float]:
         imp = dict(self._impeachments)
         if impeach is not None:
             imp[impeach] = imp.get(impeach, 0) + 1
+        if expose is not None:
+            imp[exposure_key(*expose)] = 1
+        if unexpose is not None:
+            imp.pop(exposure_key(*unexpose), None)
         return self._cache.log_odds(self._admitted | frozenset(add), imp)
 
     def potential(self, log_odds: Mapping[str, float]) -> float:
@@ -76,9 +87,16 @@ class Oracle:
         cap = self._tau + POTENTIAL_HEADROOM
         return sum(min(v, cap) for v in log_odds.values())
 
-    def gain(self, side: Side, add: Iterable[str] = (), impeach: str | None = None) -> float:
+    def gain(
+        self,
+        side: Side,
+        add: Iterable[str] = (),
+        impeach: str | None = None,
+        expose: tuple[str, ExamGround] | None = None,
+        unexpose: tuple[str, ExamGround] | None = None,
+    ) -> float:
         """Change in the side's favour (log-odds potential) if the hypothetical happened."""
-        delta = self.potential(self.log_odds(add, impeach)) - self.potential(self.log_odds())
+        delta = self.potential(self.log_odds(add, impeach, expose, unexpose)) - self.potential(self.log_odds())
         return delta if side is Side.PROSECUTION else -delta
 
 
@@ -101,6 +119,28 @@ def defect_posteriors(accuracy: float) -> tuple[float, float]:
     positive = tpr * pi / (tpr * pi + fpr * (1 - pi))
     negative = (1 - tpr) * pi / ((1 - tpr) * pi + (1 - fpr) * (1 - pi))
     return positive, negative
+
+
+def perceive_witnesses(case: CaseFile, rng: random.Random) -> dict[str, dict[str, float]]:
+    """Noisy observation of every witness's hidden flaws, drawn once up front.
+
+    It uses the same channel as ``perceive`` (true-positive rate = accuracy, false-positive rate =
+    (1 - accuracy) / 4, Bayes posterior), so a cross-examiner faces exactly the objector's trade-off.
+    The draws are made for every witness in sorted-id order whether or not anyone ever testifies, so
+    the result is a pure function of (case, seed) and cannot depend on how the trial unfolds.
+    """
+    acc = case.perception_accuracy
+    fpr = (1.0 - acc) / 4.0
+    positive, negative = defect_posteriors(acc)
+    out: dict[str, dict[str, float]] = {}
+    for witness in sorted(case.witnesses, key=lambda w: w.id):
+        beliefs: dict[str, float] = {}
+        for ground in ExamGround:
+            truth = witness_flaw_is_real(case, witness.id, ground)
+            flagged = rng.random() < (acc if truth else fpr)
+            beliefs[ground.value] = round(positive if flagged else negative, 6)
+        out[witness.id] = beliefs
+    return out
 
 
 def perceive(item: EvidenceItem, case: CaseFile, rng: random.Random) -> PerceivedItem:
