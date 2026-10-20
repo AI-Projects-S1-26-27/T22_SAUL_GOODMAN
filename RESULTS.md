@@ -30,13 +30,12 @@ Measured against the current engine, in which **the two sides alternate turns** 
 
 | Check | Command | Result |
 |---|---|---|
-| Test suite | `python -m pytest` | **544 passed, 0 failed** |
+| Test suite | `python -m pytest` | **768 passed, 0 failed** |
 | Fuzz | `python -m courtroom stress --cases 100` | 2,500 trials, **0 crashes, 0 invariant failures** |
 | Replay determinism | `python -m courtroom verify` | 250/250 replays bit-identical; every case × pairing combination gives identical digests and valid hash chains |
 
-The suite is **142 test functions** across 9 files, which `@pytest.mark.parametrize` expands into
-the **544 test cases** pytest reports. Both numbers describe the same suite; 544 is what the tool
-prints.
+The suite is 269 test functions across 14 files, which `@pytest.mark.parametrize` expands into the **768 test
+cases** pytest reports. 768 is what the tool prints.
 
 Fuzz verdict mix over 2,500 generated cases: 1,548 directed acquittal · 559 liable · 273 not
 guilty · 78 guilty · 42 not liable. The generator produces weak cases — **61.9% end at the
@@ -50,8 +49,8 @@ fuzzing but not payoff analysis. All analysis below uses the seven hand-written 
 | Case | Type | Label | Equilibria | Dominance | Verified |
 |---|---|---|---|---|---|
 | `helix-espionage` | Criminal | **mixed** | 1 | none | ✓ |
-| `aurora-defi` | Criminal | pure | 2 | Conservative dominant (prosecution) | ✓ |
-| `kestrel-av` | Civil | **dominance-solvable** | 1 | Conservative dominant, both sides | ✓ |
+| `aurora-defi` | Criminal | pure | 2 | none | ✓ |
+| `kestrel-av` | Civil | **mixed** | 1 | none | ✓ |
 | `edge-empty-docket` | Criminal | pure | 16 | none (all profiles tie) | ✓ |
 | `edge-mutual-exclusion` | Civil | pure | 4 | none | ✓ |
 | `edge-poisoned-tree` | Criminal | pure | 4 | Conservative dominant (prosecution) | ✓ |
@@ -67,10 +66,13 @@ unique mixed equilibrium, in exact rationals:
 Alternating turns changed *which* mixture is optimal but not the structure: the case still
 requires randomisation, and the label held in 200/200 resamples.
 
-**Reported plainly, not hidden:** `kestrel-av` is **trivial** — iterated elimination of strictly
-dominated strategies leaves exactly one profile, so there is no strategic content. Its cause is
-documented as D3 in `DEVIATIONS.md` and was not retuned to make it look better. The two
-16-equilibrium edge cases are those where every profile ties, exactly as designed.
+**`aurora-defi` and `kestrel-av` were rebalanced (D14).** Before, both ended in a directed acquittal in all
+960 trials (prosecution win rate 0.000 in every cell) and `kestrel-av` was trivial. Now the prosecution wins
+0 to 16.5% of trials in `aurora-defi` and 0 to 42% in `kestrel-av`, and neither is trivial. `kestrel-av` has a
+unique mixed equilibrium (prosecution Conservative 1441/1743, Aggressive 302/1743; defense Conservative 1451/1800,
+Adaptive 349/1800). `aurora-defi` has two pure equilibria and no dominant strategy; its label is the least stable
+(80.5% of resamples, see section 3). The two 16-equilibrium edge cases are those where every profile ties, exactly
+as designed.
 
 ---
 
@@ -81,8 +83,8 @@ Resampling the 200 seeds with replacement, 200 times, and re-solving each resamp
 | Case | Label | Stability |
 |---|---|---|
 | `helix-espionage` | mixed | **100.0%** (200/200) |
-| `aurora-defi` | pure | **100.0%** |
-| `kestrel-av` | dominance-solvable | **100.0%** |
+| `aurora-defi` | pure | **80.5%** |
+| `kestrel-av` | mixed | **98.0%** |
 | `edge-empty-docket` | pure | **100.0%** |
 | `edge-mutual-exclusion` | pure | **100.0%** |
 | `edge-poisoned-tree` | pure | **100.0%** |
@@ -102,20 +104,19 @@ Each parameter group perturbed by ±25%, plus the criminal standard swept across
 
 | Case | Label survives | Breaks under |
 |---|---|---|
-| `kestrel-av` | **every variation** | — |
+| `kestrel-av` | 12 of 14 | `costs +25%`, `LLR_SCALE +25%` |
 | `edge-empty-docket` | **every variation** | — |
 | `edge-poisoned-tree` | **every variation** | — |
 | `edge-defense-only` | **every variation** | — |
-| `aurora-defi` | 13 of 14 | `PRIOR_DEFECT_RATE −25%` |
+| `aurora-defi` | 12 of 14 | `sanctions −25%`, `PRIOR_DEFECT_RATE −25%` |
 | `edge-mutual-exclusion` | 13 of 14 | `PRIOR_DEFECT_RATE −25%` |
 | `helix-espionage` | 11 of 14 | `LLR_SCALE −25%`, `standards +25%`, **BRD at 95%** |
 
-**Four of seven cases are now completely parameter-independent**, up from three before the turn
-order changed. The three structural edge fixtures were always robust — their outcomes follow from
-the rules (DV-2, waiver, exact cancellation) rather than from any tuned constant — and
-`kestrel-av` joined them.
+**Three of seven cases are completely parameter-independent** (the structural edge fixtures: their outcomes follow from
+the rules, not from any tuned constant). `kestrel-av` left that group when it was rebalanced, which is the price of having
+real strategic content.
 
-Three cases remain parameter-dependent, and the table says exactly which constant each depends on.
+Four cases are parameter-dependent, and the table says exactly which constant each depends on.
 No claim about them should be stated without that constant.
 
 ### The standard of proof, specifically
@@ -168,8 +169,8 @@ mixed band. The ladder has seven rungs, so it cannot say where the band starts b
 80% or where it ends between 90% and 95%; that would take a finer ladder. It also does not
 explain *why* the structure changes, only that it does.
 
-Cases whose label changes somewhere on the ladder: `helix-espionage`.
-Cases whose label never changes from 50% to 95%: `aurora-defi`, `kestrel-av`, `edge-empty-docket`, `edge-mutual-exclusion`, `edge-poisoned-tree`, `edge-defense-only`.
+Cases whose label changes somewhere on the ladder: `helix-espionage`, `kestrel-av` (mixed at 50%, dominance-solvable from 60% up).
+Cases whose label never changes from 50% to 95%: `aurora-defi`, `edge-empty-docket`, `edge-mutual-exclusion`, `edge-poisoned-tree`, `edge-defense-only`.
 
 ---
 
@@ -213,8 +214,9 @@ measurement*, and should be treated as a red flag rather than a result.
 
 ## 7. What is still open
 
-- **`kestrel-av` needs a team decision** — publish as trivial, or retune within documented bounds
-  (D3). It was deliberately not retuned after the fact.
+- **`kestrel-av` and `aurora-defi` were rebalanced** (D14). The change is case data only; no formula moved. Both sit near a
+  cliff: one clean `defect` exhibit of strength 0.35 or more turns `kestrel-av` into a 100% prosecution win, so the
+  published value (0.25) is a deliberately narrow band.
 - **Rebuttal can still add support (D7).** Both available fixes are out of bounds: zeroing a
   rebuttal item's support changes judge arithmetic, and banning `PRESENT` in rebuttal changes the
   game again. `test_any_post_dv_rise_is_confined_to_rebuttal` pins the gap so it cannot spread.

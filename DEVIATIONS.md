@@ -26,6 +26,8 @@ a case file to restore a result after measuring it is result-driven case design.
 retuning "within documented bounds" as a team decision; `RESULTS.md` section 5 records the one-line
 change that would restore a contestable case.
 
+**Superseded by D14**, which made that retune on the user's instruction.
+
 ## D4 — sensitivity sweep runs single-process
 
 `sweep()` does not accept a `workers` argument. A `ProcessPoolExecutor` child re-imports
@@ -331,6 +333,39 @@ language-model use**; the instructor check on the proposal's "no language model"
 **Not done.** The web case list does not offer the witness variants and the exhibition bundle contains no
 examination trials. The Gemini policy agent is not told about the new moves. The strategy space is
 still the certified 4x4; see `docs/DESIGN_WITNESS_POINTS.md` section 6 for what widening it costs.
+
+## D14 — `aurora-defi` and `kestrel-av` rebalanced (case data only; this IS result-driven case design)
+
+Requested after `docs/LEGAL_AND_BALANCE_AUDIT.md` showed both cases ended in a directed acquittal in all 960
+trials. D3 had refused to retune `kestrel-av` precisely because editing a case after measuring it is
+result-driven. That objection stands and is not answered: the values below were **chosen by measuring**, by trying
+about 20 configurations and keeping one that lands in a contested band. No formula, constant or rule changed.
+
+**aurora-defi** (two independent causes, audit section 1):
+* `execution` could never clear the bar: both on-chain items share one fact, and one fact gives at most 1.82 against
+  2.2. Added an independent fact, `P-CALLTRACE` (0.85 / 0.9). `P-TXS-DUP` is unchanged, so the cumulative-evidence
+  test still holds.
+* `control`'s strong items were all defective (`P-SEED` illegal, `P-KYC` late), so added the clean `P-IP` (0.7 / 0.85).
+* `fraud_intent` was -3.14 with everything admitted. Added the clean `P-LAUNDER` (0.9 / 0.92) and `P-LOGS`
+  (0.75 / 0.9, contradicts `D-ZHAO`); softened the defense by `D-BOUNTY` -0.60 to -0.42 ("if reported first"),
+  `D-RETURN` -0.75 to -0.45 (22M of 31M returned), `D-ZHAO` -0.50 to -0.45.
+* `budget` 11 to 12 and `max_primary_turns` 7 to 8: with seven turns the extra exhibits could not all be offered
+  and the win rate stayed at 0 to 3%.
+
+**kestrel-av**: added one clean `defect` exhibit, `P-RECALL` (0.25 / 0.70). `P-BUGS` stays undisclosed, so the late-disclosure
+gamble remains and is now an upside, not the only route.
+
+**Measured result** (200 seeds per cell, certified analysis): `aurora-defi` prosecution wins 0 to 16.5%, two pure equilibria,
+no dominant strategy, label stability 80.5%. `kestrel-av` wins 0 to 42%, one mixed equilibrium, not trivial, stability 98.0%.
+Helix and the five edge fixtures are untouched; their results are identical.
+
+**Fragility, stated plainly.** Both cases sit near a cliff. In `kestrel-av`, a clean defect exhibit of 0.30 or more gives
+the prosecution 99 to 100% in every cell, 0.25 gives 11%. In `aurora-defi`, a small further strengthening of the intent
+evidence also flips it to 100%. The published values are a narrow band, not a robust design.
+
+**What moved.** 11 of the 42 pinned digests (all aurora and kestrel entries; helix and the edge cases are unchanged) and
+the bundle, regenerated deliberately. `results/*.json`, `RESULTS.md` sections 2 to 4 and 7 and the web bundle were regenerated.
+`README.md` still quotes older test counts.
 
 ## Corrections to claims made about the repo (no code or doc changed)
 

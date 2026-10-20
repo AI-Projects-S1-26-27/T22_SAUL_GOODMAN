@@ -1,31 +1,31 @@
 {
  "aurora-defi|adaptive|mixed:0.5|0": {
-  "digest": "86f4aa51f30f085dd57dd8119bd34903cc596d1b67b906b960be019858840b32",
-  "events": 27,
-  "verdict": "directed_acquittal"
+  "digest": "435871e437a96391734a1232860dfd538723b6d35c2f84004bd882542701d11f",
+  "events": 41,
+  "verdict": "not_guilty"
  },
  "aurora-defi|adaptive|mixed:0.5|1": {
-  "digest": "410cce0ea972eb2a8638a21e2b72dbed5f037d78b676fae6fb38592d2544bb72",
-  "events": 40,
-  "verdict": "directed_acquittal"
+  "digest": "b5124c5602063c6cba59ae199e0111fe5b5c498afdb8375b05d45e861f9e2677",
+  "events": 47,
+  "verdict": "not_guilty"
  },
  "aurora-defi|aggressive|conservative|0": {
-  "digest": "46165f047eb63823e435588903e940ed213ae66f9427ded2bbc0520f7d8dd902",
-  "events": 39,
-  "verdict": "directed_acquittal"
+  "digest": "9a16e4e1f565a47edc49f55e3d2c0a3339f12d904a2fd1e99e3b8c5edb38008e",
+  "events": 47,
+  "verdict": "not_guilty"
  },
  "aurora-defi|aggressive|conservative|1": {
-  "digest": "376c178c49a3137e2bd891633cb94eb98145415ee88fd36c34e90dfa38f07fe0",
-  "events": 36,
-  "verdict": "directed_acquittal"
+  "digest": "ffe371e9fb32b26eed6aa6945c9e649f24bac5306e37419795a61b6965a1014c",
+  "events": 44,
+  "verdict": "not_guilty"
  },
  "aurora-defi|chaos|adaptive|0": {
-  "digest": "96262c3dc330a8d9bae0f377ed2806f84c5278a6a93481721238c873018bed92",
+  "digest": "8fdae776c66ffe714c2639a5027975c50089e3139be0069a624f4d13488ce575",
   "events": 13,
   "verdict": "directed_acquittal"
  },
  "aurora-defi|chaos|adaptive|1": {
-  "digest": "132fd862ee2a66c992415e0b55fccf6fc11d3386b6a92196be7cd83526ab52d4",
+  "digest": "d43032af50650f98910578e986ec4a706ffaf266b3ce06a80a0952a91072a9d8",
   "events": 12,
   "verdict": "directed_acquittal"
  },
@@ -180,22 +180,22 @@
   "verdict": "directed_acquittal"
  },
  "kestrel-av|adaptive|mixed:0.5|0": {
-  "digest": "4d33b505989e4797abe217794422b5a7a91b25afe25e164b85ff73c079b5e9a8",
-  "events": 26,
+  "digest": "1b1ab68270d2b9afabe3dd0ed997bb7f4c5ed69de3b1f933ad010587a113d106",
+  "events": 31,
   "verdict": "directed_acquittal"
  },
  "kestrel-av|adaptive|mixed:0.5|1": {
-  "digest": "f691c6eb59e5da93b8b8505053c292a333070987a2ebe8d23dc427cfbed90625",
+  "digest": "fec8bb2047d2d3ce35697e018a4285c3420f053f91845faf8ac9f41959d869a5",
   "events": 38,
   "verdict": "directed_acquittal"
  },
  "kestrel-av|aggressive|conservative|0": {
-  "digest": "6155c33bdcb1427aecfc6a7842c7839606837622750924b1aae5ac29ccc6f183",
-  "events": 38,
-  "verdict": "directed_acquittal"
+  "digest": "bf122391ac8da7dad3e0169d74740d6dfd6206757d2de6f17e8eb5aacdd19216",
+  "events": 44,
+  "verdict": "liable"
  },
  "kestrel-av|aggressive|conservative|1": {
-  "digest": "182303e558611b25554d8a05c99ff29eb5cc2f4533a886d28c83a5f84cf6dd4e",
+  "digest": "d15995650de737a82dc39a976bb275c015436563bc1e9df7bc8d1b75ca08b558",
   "events": 36,
   "verdict": "directed_acquittal"
  },
@@ -205,7 +205,7 @@
   "verdict": "directed_acquittal"
  },
  "kestrel-av|chaos|adaptive|1": {
-  "digest": "976edeb933e77b4b8b2a3941bd8eb735efd6efa909a263af9df939cf9a653735",
+  "digest": "60ba7cce6ec892a39e6b755a03b84b2fe8177dc95d21c373dee2353cc0736809",
   "events": 12,
   "verdict": "directed_acquittal"
  }
