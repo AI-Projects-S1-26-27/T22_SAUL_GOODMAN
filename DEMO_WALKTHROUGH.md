@@ -11,9 +11,9 @@ Pick **helix-espionage** unless a step says otherwise. Aurora and kestrel are no
 | 3 | The judge + slider | Open **The judge**, drag the bar slider (`thr-slider`) from 90% to 95%, press **Replay the trial at this bar** | The verdict flips; at 95% the prosecution cannot win. 80 to 90% is the stable mixed band. Press **Recompute the equilibrium** to show the label change |
 | 4 | Case editor | In the **Case file** area find "Write your own case"; add a short case and run it | Judge's per-point breakdown; "not counted" rows now explain the top-4 cap |
 | 5 | Evidence injection | Find the injection panel ("Add it and replay from here"); add a defense exhibit mid-trial | Timeline gets an injection event; the hash chain commits to the exhibit; a defense exhibit that helps the prosecution is refused |
-| 6 | Witness / cross-exam | **Terminal only** (variants are not in the web case list): `python -m courtroom run --case kestrel-av-witnesses -p aggressive -d aggressive --seed 0` | Events 17, 23, 25, 26: "cross-examines W-ENG on qualifications: a real flaw" and "rehabilitated". Add `--narrate` for the Q and A lines. Try `helix-espionage-witnesses`: Conservative never cross-examines |
+| 6 | Witness / cross-exam | **Terminal only** (variants are not in the web case list): `python -m courtroom run --case kestrel-av-witnesses -p aggressive -d aggressive --seed 0` | Events 17, 27, 28: "cross-examines W-ENG on qualifications: a real flaw", then "cross-examines W-EYE2 ... a real flaw" and "rehabilitated". Add `--narrate` for the Q and A lines. Try `helix-espionage-witnesses`: Conservative never cross-examines |
 | 7 | Gemini exhibition | Click **LLM exhibition** in the mode bar | Banner says "not certified / not equilibrium"; 40 replayed trials, no key and no network used; the matrix is replaced by the model's own results |
-| 8 | Close | Switch back to **Deterministic** | The page always opens certified; nothing above changed `the certified results beyond the D14 rebalancing of aurora and kestrel |
+| 8 | Close | Switch back to **Deterministic** | The page always opens certified; nothing above changed the certified results; the only certified change on this branch is the D14 rebalancing of aurora and kestrel |
 
 ## Key numbers
 
