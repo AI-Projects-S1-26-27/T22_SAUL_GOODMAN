@@ -288,3 +288,79 @@ cases are contested, so **audit 1 fixes should come first**.
 * kestrel-av: resolve D3 by making `P-BUGS` disclosed, or publish as trivial.
 * Remove the exclusionary rule (changes two cases and one fixture) or keep it as a stated US-law assumption.
 * Whether to build the hostile-witness move before any further regeneration.
+
+---
+
+## Appendix: how the rebalanced values sit against a measured transition
+
+This replaces the earlier description of the values as "chosen from about 20 configurations". The values were first
+found by trial; this appendix measures the curve around them so the choice can be judged against it. Each row is the
+full certified procedure (4 strategies, 16 cells, 200 common seeds, 200 bootstrap resamples) on one parameter value.
+"Mean win" is the prosecution win rate averaged over the 16 cells. "Label" is the proposal's pure / mixed /
+dominance-solvable classification; "label stability" is the share of resamples that keep it; "support stability" is
+the share that keep the exact set of equilibrium supports, which is stricter. Scripts: not in the repo.
+
+### kestrel-av: strength of the one clean `defect` exhibit `P-RECALL` (reliability 0.70)
+
+| Support | Mean win | Cell range | Label | Label stability | Support stability |
+|---|---|---|---|---|---|
+| 0.00 (absent) | 0.0% | 0 to 0% | dominance-solvable | 100% | 100% |
+| 0.025, 0.05 | 0.0% | 0 to 0% | dominance-solvable | 100% | 100% |
+| **0.075** | 10.0% | 0 to 42% | mixed | 98.0% | 76.5% |
+| 0.10, 0.15 | 9.9 to 10.0% | 0 to 42% | mixed | 98.0% | 76.5% |
+| 0.20 | 10.1% | 0 to 42% | mixed | 98.0% | 66.5% |
+| 0.225 | 10.4% | 0 to 42% | mixed | 98.0% | 53.5% |
+| **0.25 (shipped)** | 10.4% | 0 to 42% | mixed | 98.0% | **53.5%** |
+| 0.26, 0.27, 0.275 | 99.0% | 91 to 100% | dominance-solvable | 100% | 100% |
+| 0.30 to 0.50 | 99 to 100% | 91 to 100% | dominance-solvable | 100% | 100% |
+
+Reading: the transition is two steps, not a slope. Below about 0.06 the prosecution never wins; from about 0.075 to
+0.25 it wins about 10% (the contested band); above about 0.255 it wins about 99%. **The shipped 0.25 is inside the band but
+at its upper edge, within 0.01 of the cliff.** Inside the band the win rate is flat, so moving down costs nothing
+and the support of the mixed equilibrium becomes steadier (76.5% at 0.10 to 0.15 against 53.5% at 0.25).
+
+### aurora-defi: scale on the three defense intent items (`D-BOUNTY`, `D-RETURN`, `D-ZHAO`; 1.0 is shipped)
+
+| Scale | Mean win | Cell range | Label | Label stability | Support stability |
+|---|---|---|---|---|---|
+| 0.6, 0.8, 0.9, 0.95 | 98.2% | 95 to 100% | pure | 100% | 100% |
+| 0.7 | 98.5% | 95 to 100% | dominance-solvable | 100% | 74.0% |
+| 0.96, 0.97, 0.98, 0.99 | 5.6% | 0 to 17% | pure | 80.5% | 80.5% |
+| **1.0 (shipped)** | 5.6% | 0 to 17% | pure | **80.5%** | 80.5% |
+| 1.05 to 1.4 | 5.6 to 6.3% | 0 to 17% | pure | 80.5% | 80 to 80.5% |
+
+Reading: one step, between 0.95 and 0.96. The contested band runs from 0.96 to at least 1.4, so **the shipped value
+sits inside it and about 4% above the edge; 1.1 to 1.2 would sit mid-band**. But the instability does not come from the
+edge: label stability is 80.5% on the whole band (about 16% of resamples read as dominance-solvable and 3.5% as
+mixed). The game is intrinsically fragile because the prosecution wins at most 17% of any cell, so payoff gaps
+between strategies are close to sampling noise.
+
+A second parameter, the prosecution's intent strength (`P-LAUNDER`, `P-LOGS`), is also a cliff: x1.1 flips the case to
+98% prosecution wins unless the defense scale is also raised to 1.2.
+
+### aurora-defi: litigation budget (defense scale 1.1)
+
+| Budget | Mean win | Cell range | Label | Label stability | Support stability |
+|---|---|---|---|---|---|
+| 8 | 0.0% | 0 to 0% | dominance-solvable | 100% | 100% |
+| 9 | 0.4% | 0 to 3% | dominance-solvable | 100% | 100% |
+| **9.5** | 4.5% | 0 to 20% | dominance-solvable | **100%** | **100%** |
+| 10 | 4.9% | 0 to 10% | dominance-solvable | 93.0% | 87.0% |
+| 10.5 | 5.1% | 0 to 10% | dominance-solvable | 93.0% | 87.0% |
+| 11 | 5.8% | 0 to 14% | dominance-solvable | 61.0% | 53.0% |
+| 12 | 6.2% | 0 to 17% | pure | 80.5% | 80.5% |
+| 13, 14 | 6.2% | 0 to 17% | pure | 80.5% | 80.5% |
+
+### Findings and recommendation
+
+1. **Both shipped values are inside a measured contested band, and both are near an edge.** kestrel-av at its upper
+   edge (0.25, cliff at about 0.255). aurora-defi near its lower edge (1.0, cliff at about 0.955).
+2. **Stability.** Certified result for the shipped values: kestrel-av label 98.0% / support 53.5%; aurora-defi label
+   80.5% / support 80.5%. The kestrel mixed label holds but the exact mixture does not; aurora's label itself is fragile.
+3. **kestrel-av: move `P-RECALL` to 0.15.** Same win rate, same label stability (98%), support stability 76.5% instead
+   of 53.5%, and 0.10 of margin below the cliff instead of 0.005.
+4. **aurora-defi: a stable neighbour exists but it is thinner.** Budget 9.5 with defense scale 1.1 gives 4.5% mean wins,
+   100% label and support stability, but the game becomes dominance-solvable (one clear best style per side), which is
+   the "trivial" shape D3 objected to. Budget 9.5 also sits next to a second cliff (0.4% at budget 9). No setting found
+   is contested, stable and non-trivial at once. Options: accept 80.5% and say so; or accept a dominance-solvable aurora
+   and let helix and kestrel carry the mixed-strategy content.
