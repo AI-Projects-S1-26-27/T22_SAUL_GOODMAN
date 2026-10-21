@@ -396,6 +396,7 @@ def cmd_export(a: argparse.Namespace) -> int:
     from courtroom.agents import describe_strategies
     from courtroom.api.server import app as _api
     from courtroom.gametheory import estimate_payoffs, replicator
+    from courtroom.judge.brief import build_brief
 
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -405,6 +406,8 @@ def cmd_export(a: argparse.Namespace) -> int:
     bundle: dict[str, object] = {
         "cases": [json.loads(c.model_dump_json()) for c in CASES.values()],
         "strategies": describe_strategies(),
+        # The opening screen's brief, generated from each case file so the static page can show it offline.
+        "briefs": {cid: json.loads(build_brief(c).model_dump_json()) for cid, c in CASES.items()},
         # Judge constants + per-ground catch probability, so the judge tab works offline too.
         "rules": TestClient(_api).get("/api/rules").json(),
         "meta": {

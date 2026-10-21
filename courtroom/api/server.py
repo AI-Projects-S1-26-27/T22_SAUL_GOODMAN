@@ -22,6 +22,7 @@ from courtroom.contracts import AdversePush, CaseFile, Injection, TrialResult
 from courtroom.engine import push_reaction, run_trial
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
 from courtroom.gametheory.bootstrap import equilibrium_label
+from courtroom.judge.brief import build_brief
 from courtroom.judge.rules import THRESHOLD_LOG_ODDS, fmt, override_for_bar, sigmoid, threshold_for
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "viz" / "web"
@@ -238,6 +239,16 @@ def create_app() -> FastAPI:
     @app.post("/api/trial", response_model=TrialResult)
     def trial(req: TrialRequest) -> TrialResult:
         return _run(_case_for(req.case_id, req.case, req.bar), req)
+
+    @app.get("/api/brief/{case_id}")
+    def brief_for(case_id: str) -> JSONResponse:
+        """The plain-language brief of a library case: story, charge, issues, who must prove what."""
+        return JSONResponse(json.loads(build_brief(_case_for(case_id, None, None)).model_dump_json()))
+
+    @app.post("/api/brief")
+    def brief_for_case(req: TrialRequest) -> JSONResponse:
+        """The same brief for an examiner's own case file, so a custom case gets its opening screen too."""
+        return JSONResponse(json.loads(build_brief(_case_for(req.case_id, req.case, req.bar)).model_dump_json()))
 
     @app.post("/api/adverse")
     def adverse(req: TrialRequest) -> JSONResponse:

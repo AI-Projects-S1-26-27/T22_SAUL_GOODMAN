@@ -480,6 +480,25 @@ Measured on `helix-espionage`, Adaptive v Adaptive, seed 0: a missing-certificat
 prosecution offer `P-EXPERT` instead (the verdict goes from guilty to a directed acquittal); Aggressive still offers `P-VPN`
 and loses it to exclusion.
 
+## D16 — a generated case brief at the start of every trial (no rule changed)
+
+Answers the audit's point that the burden was computed at the end and never stated at the start
+(`docs/LEGAL_AND_BALANCE_AUDIT.md`, 2b). `courtroom/judge/brief.py` builds, from a case file and the judge's own constants:
+the story and charge, the issues as the court frames them (the case's own elements, in order), who carries the burden, the
+standard in plain words with its bar and tie rule, the starting presumption, what each side must or may do, the docket
+(exhibit and witness counts, budget, turns), how the judge weighs, and any published risks (witness examination, adverse
+events). It is shown as the opening screen of the Courtroom tab and folds away once the trial moves on.
+
+* **It cannot drift.** Every number is read from `threshold_for`, `PRIOR_LOG_ODDS` and `judge.rules` at build time
+  (`test_the_brief_follows_the_judges_constants_when_they_change` patches them and watches the text change), and the issues are
+  the case's elements (`test_the_issues_are_the_cases_own_elements_in_order`). The shipped bundle's briefs are checked
+  against the engine (`test_the_shipped_bundle_holds_the_brief_the_engine_builds_now`).
+* **It carries nothing hidden:** no exhibit ids, titles or flags, no witness flaws.
+* **No digest, verdict or result changed.** It is a read-only view; the bundle gained a `briefs` key and nothing else.
+* Served by `GET /api/brief/{case_id}` and `POST /api/brief` (a custom case at a chosen bar); the static page reads the bundle.
+* **Wording choice to check with a lawyer:** civil cases still say "prosecution side" for the plaintiff, because the engine uses
+  one pair of side names for both case types.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`
