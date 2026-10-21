@@ -23,6 +23,8 @@ from courtroom.contracts import (
     CaseFile,
     EventKind,
     EvidenceGraph,
+    EvidenceItem,
+    EvidenceKind,
     ExamGround,
     GraphEdge,
     GraphNode,
@@ -54,6 +56,7 @@ from courtroom.judge.rules import (
     SANCTION_OVERRULED_OBJECTION,
     SANCTION_VIOLATION,
     exposure_key,
+    hostile_key,
 )
 from courtroom.procedure import ProcedureState, Violation, validate
 from courtroom.procedure.state import CASE_PHASES, STALL_LIMIT
@@ -92,6 +95,10 @@ class Court:
         self._perceived: PerceivedItem | None = None
         # A separate stream, seeded apart from objection perception, and only drawn when the case enables
         # witness examination, so a case without the flag consumes exactly the randomness it always did.
+        # Adverse events draw from their own seeded stream, created only when the case enables them. A case
+        # without the flag never touches it, and one with every rate at zero consumes it without effect, so
+        # neither can disturb the objection or witness-perception streams.
+        self._adverse_rng = random.Random(f"{seed}:adverse")
         self._witness_beliefs: dict[str, dict[str, float]] = (
             perceive_witnesses(case, random.Random(f"{seed}:witness-perception")) if case.witness_examination else {}
         )
@@ -169,6 +176,15 @@ class Court:
             impeachment_options=options,
             examine_options=st.examine_options(side),
             exam_options=tuple((w, g.value) for w, g in st.exam_options(side)),
+            adverse=(
+                {
+                    "no_show": self.case.rules.no_show,  # type: ignore[union-attr]
+                    "missing_certificate": self.case.rules.missing_certificate,  # type: ignore[union-attr]
+                    "hostile": self.case.rules.hostile,  # type: ignore[union-attr]
+                }
+                if self.case.adverse_events
+                else {}
+            ),
             own_exposures=tuple(
                 (w, st.exposed_grounds(w)[-1].value) for w in st.testified_witnesses(side) if st.exposed_grounds(w)
             )
@@ -370,6 +386,14 @@ class Court:
                 ledger.charge(item.presentation_cost)
                 ledger.presented += 1
                 st.presented.append(item.id)
+                failure = self._roll_offer(item)
+                if failure is not None:
+                    st.consume_primary_turn(side)
+                    st.passes[side] = 0
+                    st.excluded.append(item.id)
+                    ledger.excluded += 1
+                    self._emit_offer_failure(side, action, item, failure)
+                    return
                 st.pending = item.id
                 st.consume_primary_turn(side)
                 st.passes[side] = 0
@@ -438,6 +462,52 @@ class Court:
             case ActionType.REST:
                 self._emit(EventKind.ACTION, f"{side.value} rests.", side, action)
                 self._rest(side, None)
+
+    # ------------------------------------------------------------------ adverse events
+
+    def _roll_offer(self, item: EvidenceItem) -> str | None:
+        """Whether offering ``item`` fails outright. Draws only for the events the item is exposed to."""
+        if not self.case.adverse_events:
+            return None
+        rules = self.case.rules
+        assert rules is not None
+        if item.witness_id is not None and self._adverse_rng.random() < rules.no_show:
+            return "no_show"
+        if item.kind is EvidenceKind.DIGITAL_LOG and self._adverse_rng.random() < rules.missing_certificate:
+            return "no_certificate"
+        return None
+
+    def _emit_offer_failure(self, side: Side, action: Action, item: EvidenceItem, failure: str) -> None:
+        if failure == "no_show":
+            witness = self.case.witness(item.witness_id) if item.witness_id else None
+            who = witness.name if witness else str(item.witness_id)
+            summary = f"{side.value} offers {item.id}, but the witness, {who}, does not appear. The testimony is lost."
+            rule = RuleFiring(rule_id="ADV-1", detail=f"Witness no-show for {item.id}; the exhibit is excluded and its cost is not refunded.")
+        else:
+            summary = f"{side.value} offers {item.id}, but it has no section 65B certificate. The court excludes it."
+            rule = RuleFiring(rule_id="ADV-2", detail=f"Electronic record {item.id} lacks a certificate of authenticity; excluded without objection, no bad-faith sanction.")
+        self._emit(EventKind.ADVERSE, summary, side, action, [rule], subject=item.id, status=failure)  # type: ignore[arg-type]
+
+    def _after_admission(self, item: EvidenceItem) -> None:
+        """A witness whose testimony has just been admitted may turn hostile (once per witness)."""
+        st = self.state
+        if not self.case.adverse_events or item.witness_id is None or item.witness_id in st.hostile:
+            return
+        rules = self.case.rules
+        assert rules is not None
+        if self._adverse_rng.random() >= rules.hostile:
+            return
+        st.hostile.add(item.witness_id)
+        st.impeachments[hostile_key(item.witness_id)] = 1
+        witness = self.case.witness(item.witness_id)
+        who = witness.name if witness else item.witness_id
+        self._emit(
+            EventKind.ADVERSE,
+            f"{who} turns hostile on the stand; the testimony of {item.witness_id} now carries a quarter of its weight.",
+            subject=item.witness_id,
+            status="hostile",
+            rules=[RuleFiring(rule_id="ADV-3", detail=f"Witness {item.witness_id} turned hostile after {item.id}; credibility x1/4.")],
+        )
 
     def _cross_examine(self, side: Side, action: Action) -> None:
         st = self.state
@@ -532,6 +602,8 @@ class Court:
             subject=item.id,
             status="excluded" if sustained else "admitted",
         )
+        if not sustained:
+            self._after_admission(item)
 
     def _admit_pending(self, waived: bool) -> None:
         st = self.state
@@ -550,6 +622,7 @@ class Court:
             subject=item.id,
             status="admitted",
         )
+        self._after_admission(item)
 
     def _rest(self, side: Side, forced: RuleFiring | None) -> None:
         st = self.state

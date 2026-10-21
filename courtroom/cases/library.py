@@ -452,7 +452,7 @@ KESTREL = CaseFile(
             P,
             K.DOCUMENT,
             "Kestrel service bulletin acknowledging a lane-keeping fault",
-            {"defect": 0.25},
+            {"defect": 0.15},
             0.7,
             fact="bulletin",
         ),
@@ -639,8 +639,12 @@ def get_case(case_id: str) -> CaseFile:
     if case_id in CASES:
         return CASES[case_id]
     # Witness-examination variants live in their own registry so nothing that iterates CASES sees them.
+    from courtroom.cases.adverse_cases import ADVERSE_CASES
     from courtroom.cases.witness_cases import WITNESS_CASES
 
-    if case_id in WITNESS_CASES:
-        return WITNESS_CASES[case_id]
-    raise KeyError(f"unknown case {case_id!r}; available: {sorted(CASES)} and {sorted(WITNESS_CASES)}") from None
+    for registry in (WITNESS_CASES, ADVERSE_CASES):
+        if case_id in registry:
+            return registry[case_id]
+    raise KeyError(
+        f"unknown case {case_id!r}; available: {sorted(CASES)}, {sorted(WITNESS_CASES)} and {sorted(ADVERSE_CASES)}"
+    ) from None

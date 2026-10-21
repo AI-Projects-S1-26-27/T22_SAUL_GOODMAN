@@ -30,7 +30,7 @@ _ROLE = {Side.PROSECUTION: "counsel for the prosecution", Side.DEFENSE: "counsel
 
 # Event kinds that represent a party speaking. RULING covers objections and impeachments,
 # which are ruled on in the same event that records the move.
-SPOKEN_KINDS = frozenset({EventKind.ACTION, EventKind.RULING, EventKind.EXAMINATION})
+SPOKEN_KINDS = frozenset({EventKind.ACTION, EventKind.RULING, EventKind.EXAMINATION, EventKind.ADVERSE})
 
 # What the witness says back, chosen from the judge's public ruling and nothing else. The ruling is on
 # the record; the hidden flaw that produced it is not, and never reaches this module.

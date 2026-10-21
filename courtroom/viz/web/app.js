@@ -296,6 +296,21 @@ function narrate(ev) {
         short: `New evidence added: ${item?.title ?? ev.subject}`,
       };
     }
+    case "adverse": {
+      const W = actor ? The(actor) : "";
+      const item = itemById(ev.subject);
+      if (ev.status === "no_show") {
+        return { speaker: "court", head: `${W}'s witness doesn't show up.`, exhibit: item, tone: "no",
+          sub: "The testimony is lost and the cost of offering it is not refunded.", short: `${W}'s witness fails to appear.` };
+      }
+      if (ev.status === "no_certificate") {
+        return { speaker: "court", head: `The judge excludes ${W}'s digital record.`, exhibit: item, tone: "no",
+          sub: "It has no certificate of authenticity (section 65B), so it cannot be used.", short: `${item?.title ?? "A record"} is excluded: no certificate.` };
+      }
+      const w = witnessById(ev.subject);
+      return { speaker: "court", head: `${w ? w.name : ev.subject} turns hostile.`, tone: "no",
+        sub: "This witness now counts for a quarter as much as before.", short: `${w?.name ?? ev.subject} turns hostile.` };
+    }
     case "examination": {
       const W = The(actor);
       const w = witnessById(ev.subject ?? a?.witness_id);

@@ -6,7 +6,7 @@ Pick **helix-espionage** unless a step says otherwise. Aurora and kestrel are no
 
 | # | Show | Do this | Point at |
 |---|---|---|---|
-| 1 | Verification | Terminal: `python -m pytest -q` then `python -m courtroom verify` | **773 passed**. Verify prints two identical digests, "bit-identical: YES, hash chain valid: YES" |
+| 1 | Verification | Terminal: `python -m pytest -q` then `python -m courtroom verify` | **827 passed**. Verify prints two identical digests, "bit-identical: YES, hash chain valid: YES" |
 | 2 | Strategy tab | Open **Strategy** | Payoff matrix and exact fractions. helix has **no dominant strategy**; prosecution plays Conservative 711/821, defense Adaptive 7870/8447. Bootstrap stability 100% |
 | 3 | The judge + slider | Open **The judge**, drag the bar slider (`thr-slider`) from 90% to 95%, press **Replay the trial at this bar** | The verdict flips; at 95% the prosecution cannot win. 80 to 90% is the stable mixed band. Press **Recompute the equilibrium** to show the label change |
 | 4 | Case editor | In the **Case file** area find "Write your own case"; add a short case and run it | Judge's per-point breakdown; "not counted" rows now explain the top-4 cap |

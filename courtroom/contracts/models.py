@@ -143,6 +143,7 @@ class EventKind(StrEnum):
     VERDICT = "verdict"
     INJECTION = "injection"  # evidence added to a party's hand mid-trial; see Injection
     EXAMINATION = "examination"  # a witness examined or cross-examined; only under RuleSet.witnesses
+    ADVERSE = "adverse"  # a seeded adverse event; only under RuleSet.adverse_events
 
 
 class VerdictOutcome(StrEnum):
@@ -251,6 +252,12 @@ class RuleSet(Frozen):
     """Optional rule extensions. ``CaseFile.rules is None`` means the certified rulebook, bit for bit."""
 
     witnesses: bool = False  # direct and cross-examination of witnesses (DEVIATIONS D13)
+    # Seeded adverse events (DEVIATIONS D15): a witness fails to appear, a digital record is excluded for a
+    # missing section 65B certificate, a witness turns hostile. Each rate is a probability per opportunity.
+    adverse_events: bool = False
+    no_show: float = Field(default=0.10, ge=0.0, le=1.0)
+    missing_certificate: float = Field(default=0.15, ge=0.0, le=1.0)
+    hostile: float = Field(default=0.10, ge=0.0, le=1.0)
 
 
 class CaseFile(Frozen):
@@ -278,6 +285,10 @@ class CaseFile(Frozen):
     @property
     def witness_examination(self) -> bool:
         return self.rules is not None and self.rules.witnesses
+
+    @property
+    def adverse_events(self) -> bool:
+        return self.rules is not None and self.rules.adverse_events
 
     @field_validator("bar_log_odds")
     @classmethod
@@ -449,6 +460,7 @@ class PartyView(Frozen):
     exam_options: tuple[tuple[str, str], ...] = ()
     witness_beliefs: dict[str, dict[str, float]] = Field(default_factory=dict)
     own_exposures: tuple[tuple[str, str], ...] = ()  # (own witness, ground of its latest exposure), public record
+    adverse: dict[str, float] = Field(default_factory=dict)  # the case's published adverse-event rates; empty if off
 
 
 # --------------------------------------------------------------------------- trial record
@@ -478,7 +490,7 @@ class TrialEvent(Frozen):
     action: Action | None = None
     summary: str
     subject: str | None = None  # evidence id this event is about, if any
-    status: Literal["offered", "admitted", "excluded", "impeached", "injected", "exposed", "unfounded", "rehabilitated"] | None = None
+    status: Literal["offered", "admitted", "excluded", "impeached", "injected", "exposed", "unfounded", "rehabilitated", "no_show", "no_certificate", "hostile"] | None = None
     rules: tuple[RuleFiring, ...] = ()
     burden_index: float | None = None
     element_probabilities: dict[str, float] = Field(default_factory=dict)

@@ -30,12 +30,12 @@ Measured against the current engine, in which **the two sides alternate turns** 
 
 | Check | Command | Result |
 |---|---|---|
-| Test suite | `python -m pytest` | **768 passed, 0 failed** |
+| Test suite | `python -m pytest` | **827 passed, 0 failed** |
 | Fuzz | `python -m courtroom stress --cases 100` | 2,500 trials, **0 crashes, 0 invariant failures** |
 | Replay determinism | `python -m courtroom verify` | 250/250 replays bit-identical; every case × pairing combination gives identical digests and valid hash chains |
 
-The suite is 269 test functions across 14 files, which `@pytest.mark.parametrize` expands into the **768 test
-cases** pytest reports. 768 is what the tool prints.
+The suite is 290 test functions across 18 files, which `@pytest.mark.parametrize` expands into the **827 test
+cases** pytest reports. 827 is what the tool prints.
 
 Fuzz verdict mix over 2,500 generated cases: 1,548 directed acquittal · 559 liable · 273 not
 guilty · 78 guilty · 42 not liable. The generator produces weak cases — **61.9% end at the
@@ -69,8 +69,8 @@ requires randomisation, and the label held in 200/200 resamples.
 **`aurora-defi` and `kestrel-av` were rebalanced (D14).** Before, both ended in a directed acquittal in all
 960 trials (prosecution win rate 0.000 in every cell) and `kestrel-av` was trivial. Now the prosecution wins
 0 to 16.5% of trials in `aurora-defi` and 0 to 42% in `kestrel-av`, and neither is trivial. `kestrel-av` has a
-unique mixed equilibrium (prosecution Conservative 1441/1743, Aggressive 302/1743; defense Conservative 1451/1800,
-Adaptive 349/1800). `aurora-defi` has two pure equilibria and no dominant strategy; its label is the least stable
+unique mixed equilibrium (prosecution Conservative 1337/1639, Aggressive 302/1639; defense Conservative 1351/1700,
+Adaptive 349/1700). `aurora-defi` has two pure equilibria and no dominant strategy; its label is the least stable
 (80.5% of resamples, see section 3). The two 16-equilibrium edge cases are those where every profile ties, exactly
 as designed.
 
@@ -215,8 +215,9 @@ measurement*, and should be treated as a red flag rather than a result.
 ## 7. What is still open
 
 - **`kestrel-av` and `aurora-defi` were rebalanced** (D14). The change is case data only; no formula moved. Both sit near a
-  cliff: one clean `defect` exhibit of strength 0.35 or more turns `kestrel-av` into a 100% prosecution win, so the
-  published value (0.25) is a deliberately narrow band.
+  cliff. `kestrel-av` is published at `P-RECALL` 0.15, mid-way in a measured band (about 0.075 to 0.25); at 0.275 or more the
+  prosecution wins about 99% of trials. `aurora-defi` has label stability of only **80.5%**: its equilibrium label is
+  fragile because the prosecution wins at most 16.5% of any cell. See `docs/LEGAL_AND_BALANCE_AUDIT.md`, appendix.
 - **Rebuttal can still add support (D7).** Both available fixes are out of bounds: zeroing a
   rebuttal item's support changes judge arithmetic, and banning `PRESENT` in rebuttal changes the
   game again. `test_any_post_dv_rise_is_confined_to_rebuttal` pins the gap so it cannot spread.
