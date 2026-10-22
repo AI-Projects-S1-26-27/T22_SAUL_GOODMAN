@@ -11,14 +11,16 @@ from courtroom.contracts import (
     CaseFile,
     CaseType,
     EvidenceItem,
+    ExamGround,
     ObjectionGround,
     RuleFiring,
     Verdict,
     VerdictOutcome,
 )
-from courtroom.judge.admissibility import rule_on_objection
+from courtroom.judge.admissibility import rule_on_objection, witness_flaw_is_real
 from courtroom.judge.rules import (
     DIRECTED_VERDICT_THRESHOLD,
+    EXAM_FACTORS,
     ZERO,
     fmt,
     q,
@@ -46,6 +48,30 @@ class Judge:
                 f"{impeaching.id} {'impeaches' if ok else 'does not bear on the credibility of'} "
                 f"witness {witness_id}; credibility {'halved' if ok else 'unchanged'}."
             ),
+        )
+
+    def rule_on_cross(self, witness_id: str, ground: ExamGround) -> tuple[bool, RuleFiring]:
+        """A cross-examination succeeds exactly when the hidden flaw it names is real."""
+        if witness_flaw_is_real(self.case, witness_id, ground):
+            return True, RuleFiring(
+                rule_id="XEX-1",
+                detail=f"Cross-examination on {ground.value} exposed a real flaw in {witness_id}; credibility x{fmt(EXAM_FACTORS[ground])}.",
+            )
+        return False, RuleFiring(
+            rule_id="XEX-2",
+            detail=f"Cross-examination of {witness_id} on {ground.value} found nothing; credibility unchanged.",
+        )
+
+    def rule_on_examine(self, witness_id: str, exposed: tuple[ExamGround, ...]) -> tuple[bool, RuleFiring]:
+        """Direct examination can undo the most recent exposure of one's own witness."""
+        if exposed:
+            return True, RuleFiring(
+                rule_id="XEX-4",
+                detail=f"Redirect of {witness_id} rehabilitated the witness; the {exposed[-1].value} finding is withdrawn.",
+            )
+        return False, RuleFiring(
+            rule_id="XEX-5",
+            detail=f"Direct examination of {witness_id}: nothing to rehabilitate.",
         )
 
     def score(self, admitted: Iterable[str], impeachments: Mapping[str, int]) -> ExactScores:

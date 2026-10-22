@@ -12,6 +12,7 @@ from courtroom.contracts import (
     CaseType,
     EvidenceItem,
     EvidenceKind,
+    ExamGround,
     ObjectionGround,
     RuleFiring,
     Side,
@@ -46,6 +47,19 @@ def ground_is_valid(item: EvidenceItem, ground: ObjectionGround, case_type: Case
             return not item.disclosed
         case ObjectionGround.SPECULATION:
             return item.kind is EvidenceKind.TESTIMONY and not item.personal_knowledge
+
+
+def witness_flaw_is_real(case: CaseFile, witness_id: str, ground: ExamGround) -> bool:
+    """Whether the hidden flaw ``ground`` names is real for this witness. The single source of truth for
+    both the cross-examination ruling and the agents' noisy perception of it."""
+    witness = case.witness(witness_id)
+    if witness is None:
+        return False
+    return not {
+        ExamGround.QUALIFICATIONS: witness.qualified,
+        ExamGround.BIAS: witness.impartial,
+        ExamGround.INCONSISTENCY: witness.consistent,
+    }[ground]
 
 
 def valid_grounds(item: EvidenceItem, case_type: CaseType) -> tuple[ObjectionGround, ...]:

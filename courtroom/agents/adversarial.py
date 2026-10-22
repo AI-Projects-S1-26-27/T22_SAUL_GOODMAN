@@ -11,6 +11,17 @@ from collections.abc import Sequence
 from courtroom.agents.base import Oracle
 from courtroom.contracts import Action, ActionType, ObjectionGround, PartyView, Side
 
+# The fuzzer draws from this fixed tuple, not ``list(ActionType)``: adding enum members must not change
+# the length of the list it samples, or every chaos trial's digest would move.
+_LEGACY_ACTIONS = (
+    ActionType.PRESENT_EVIDENCE,
+    ActionType.OBJECT,
+    ActionType.IMPEACH,
+    ActionType.MOTION_DIRECTED_VERDICT,
+    ActionType.PASS,
+    ActionType.REST,
+)
+
 
 class AgentCrash(RuntimeError):
     """Raised deliberately by the Chaos agent to test fault isolation."""
@@ -40,7 +51,7 @@ class ChaosAgent:
         junk_ids = ["NOPE-404", *view.admitted, *own_ids]
         return Action(
             actor=r.choice([view.side, view.side, view.side, view.side.opponent]),
-            type=r.choice(list(ActionType)),
+            type=r.choice(_LEGACY_ACTIONS),
             evidence_id=r.choice([None, *junk_ids]) if junk_ids else None,
             witness_id=r.choice([None, "W-GHOST", *[w for _, w in view.impeachment_options]]),
             ground=r.choice([None, *ObjectionGround]),

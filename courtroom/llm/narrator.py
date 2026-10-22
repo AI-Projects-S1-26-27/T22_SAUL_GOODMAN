@@ -30,7 +30,27 @@ _ROLE = {Side.PROSECUTION: "counsel for the prosecution", Side.DEFENSE: "counsel
 
 # Event kinds that represent a party speaking. RULING covers objections and impeachments,
 # which are ruled on in the same event that records the move.
-SPOKEN_KINDS = frozenset({EventKind.ACTION, EventKind.RULING})
+SPOKEN_KINDS = frozenset({EventKind.ACTION, EventKind.RULING, EventKind.EXAMINATION})
+
+# What the witness says back, chosen from the judge's public ruling and nothing else. The ruling is on
+# the record; the hidden flaw that produced it is not, and never reaches this module.
+_ANSWER = {
+    "exposed": "I... yes, I have to concede that.",
+    "unfounded": "No. There is nothing to that.",
+    "rehabilitated": "Yes, and I stand by what I said.",
+    None: "I have nothing to add.",
+}
+_RULING_TEXT = {
+    "exposed": "the judge found the line of questioning exposed a real weakness in the witness",
+    "unfounded": "the judge found the line of questioning turned up nothing",
+    "rehabilitated": "the judge found the witness's credibility restored",
+    None: "the judge found there was nothing to repair",
+}
+
+
+def _witness_label(case: CaseFile, witness_id: str | None) -> str:
+    witness = case.witness(witness_id) if witness_id else None
+    return f"{witness.name}, {witness.role}" if witness else str(witness_id)
 
 
 def _public_item(case: CaseFile, evidence_id: str | None) -> str:
@@ -55,6 +75,17 @@ def _template(case: CaseFile, event: TrialEvent, awaiting_response: bool = False
         case ActionType.OBJECT:
             ground = str(action.ground.value).replace("_", " ") if action.ground else "objection"
             return f"Objection, your Honour — {ground}."
+        case ActionType.CROSS_EXAMINE:
+            ground = str(action.ground.value) if action.ground else "credibility"
+            return (
+                f"Q: ({who}) {_witness_label(case, action.witness_id)}, is your {ground} not open to question? "
+                f"A: {_ANSWER[event.status]}"
+            )
+        case ActionType.EXAMINE:
+            return (
+                f"Q: ({who}) {_witness_label(case, action.witness_id)}, do you stand by your testimony? "
+                f"A: {_ANSWER[event.status]}"
+            )
         case ActionType.IMPEACH:
             return f"{who} challenges the credibility of {action.witness_id}."
         case ActionType.MOTION_DIRECTED_VERDICT:
@@ -82,10 +113,15 @@ def _prompt(case: CaseFile, event: TrialEvent, history: list[str]) -> str:
     if action.evidence_id:
         lines.append(f"Exhibit: {_public_item(case, action.evidence_id)}")
     if action.ground is not None:
-        lines.append(f"Ground of objection: {str(action.ground.value).replace('_', ' ')}")
+        label = "Line of cross-examination" if event.kind is EventKind.EXAMINATION else "Ground of objection"
+        lines.append(f"{label}: {str(action.ground.value).replace('_', ' ')}")
     if action.witness_id:
-        lines.append(f"Witness: {action.witness_id}")
-    lines.append("Say the one line you would say in court to carry out that move.")
+        lines.append(f"Witness: {_witness_label(case, action.witness_id)}")
+    if event.kind is EventKind.EXAMINATION:
+        lines.append(f"Outcome on the record: {_RULING_TEXT[event.status]}.")
+        lines.append("Write one question you ask the witness and the witness's answer, as: Q: ... A: ...")
+    else:
+        lines.append("Say the one line you would say in court to carry out that move.")
     return "\n".join(lines)
 
 

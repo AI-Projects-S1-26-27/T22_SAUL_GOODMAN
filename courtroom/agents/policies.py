@@ -18,6 +18,7 @@ from courtroom.contracts import (
     Action,
     ActionType,
     EvidenceItem,
+    ExamGround,
     Frozen,
     ObjectionGround,
     PartyView,
@@ -26,10 +27,13 @@ from courtroom.contracts import (
 )
 from courtroom.judge.admissibility import BAD_FAITH_GROUNDS, valid_grounds
 from courtroom.judge.rules import (
+    CROSS_COST,
+    EXAMINE_COST,
     IMPEACHMENT_COST,
     MOTION_COST,
     OBJECTION_COST,
     SANCTION_BAD_FAITH_EVIDENCE,
+    SANCTION_FAILED_CROSS,
     SANCTION_OVERRULED_OBJECTION,
 )
 
@@ -153,7 +157,11 @@ class CounselAgent:
         return Action(actor=view.side, type=ActionType.PASS, rationale=f"Let it in: {why}.")
 
     def _primary(self, view: PartyView, oracle: Oracle) -> Action:
-        options = self._presentation_options(view, oracle) + self._impeachment_options(view, oracle)
+        options = (
+            self._presentation_options(view, oracle)
+            + self._impeachment_options(view, oracle)
+            + self._examination_options(view, oracle)  # empty unless the case enables witness examination
+        )
         viable = [o for o in options if o.value > self.profile.min_gain]
         if not viable:
             return Action(actor=view.side, type=ActionType.REST, rationale="Nothing left worth the cost. Rest.")
@@ -219,6 +227,69 @@ class CounselAgent:
             - item.presentation_cost * COST_WEIGHT
             - (p_obj * SANCTION_BAD_FAITH_EVIDENCE * SANCTION_WEIGHT if bad_faith else 0.0)
         )
+
+    def _examination_options(self, view: PartyView, oracle: Oracle) -> list[_Option]:
+        """Cross-examination and redirect, offered only when the case has the witness rules on.
+
+        Cross-examination reuses the objection decision rule on purpose: a profile that objects only
+        when confident also cross-examines only when confident, so the two moves differ by their
+        payoffs and not by any new risk parameter. The posterior comes from the same noisy channel.
+        """
+        out: list[_Option] = []
+        spendable = self._spendable(view)
+        if spendable >= CROSS_COST:
+            for witness_id, ground_name in view.exam_options:
+                ground = ExamGround(ground_name)
+                belief = view.witness_beliefs.get(witness_id, {}).get(ground_name, 0.0)
+                gain = oracle.gain(view.side, expose=(witness_id, ground))
+                if gain <= 0:
+                    continue
+                if self.profile.adaptive:
+                    value = (
+                        belief * gain * LOGODDS_VALUE
+                        - (1 - belief) * SANCTION_FAILED_CROSS * SANCTION_WEIGHT
+                        - CROSS_COST * COST_WEIGHT
+                    )
+                    if value <= 0:
+                        continue
+                else:
+                    if belief < self.profile.objection_belief or gain < self.profile.objection_min_impact:
+                        continue
+                    value = gain
+                out.append(
+                    _Option(
+                        value=value,
+                        key=f"~x{witness_id}:{ground_name}",
+                        action=Action(
+                            actor=view.side,
+                            type=ActionType.CROSS_EXAMINE,
+                            witness_id=witness_id,
+                            ground=ground,
+                            rationale=f"Cross {witness_id} on {ground_name}: belief {belief:.2f}, +{gain:.2f} if real.",
+                        ),
+                    )
+                )
+        if spendable >= EXAMINE_COST:
+            for witness_id, ground_name in view.own_exposures:
+                if witness_id not in view.examine_options:
+                    continue
+                gain = oracle.gain(view.side, unexpose=(witness_id, ExamGround(ground_name)))
+                if gain <= 0:
+                    continue
+                value = gain * LOGODDS_VALUE - EXAMINE_COST * COST_WEIGHT if self.profile.adaptive else gain
+                out.append(
+                    _Option(
+                        value=value,
+                        key=f"~r{witness_id}",
+                        action=Action(
+                            actor=view.side,
+                            type=ActionType.EXAMINE,
+                            witness_id=witness_id,
+                            rationale=f"Redirect {witness_id} to repair the {ground_name} finding: +{gain:.2f}.",
+                        ),
+                    )
+                )
+        return out
 
     def _impeachment_options(self, view: PartyView, oracle: Oracle) -> list[_Option]:
         if self._spendable(view) < IMPEACHMENT_COST:

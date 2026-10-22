@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from courtroom.contracts import CaseFile, EvidenceKind, Ledger, Phase, Side, Window
+from courtroom.contracts import CaseFile, EvidenceKind, ExamGround, Ledger, Phase, Side, Window
 
 # Phases in which a party puts on evidence. EVIDENCE alternates between both sides;
 # the other two are single-party continuations, so they name their one actor.
@@ -20,7 +20,9 @@ CASE_PHASES: dict[Phase, Side | None] = {
     Phase.DEFENSE_CASE: Side.DEFENSE,
     Phase.REBUTTAL: Side.PROSECUTION,
 }
-PRIMARY_ACTIONS = frozenset({"present_evidence", "impeach", "pass", "rest"})
+EXAM_ACTIONS = frozenset({"examine", "cross_examine"})  # legal only under CaseFile.rules.witnesses
+EXAM_PHASES = frozenset({Phase.EVIDENCE, Phase.DEFENSE_CASE})  # never rebuttal: it is scope-limited
+PRIMARY_ACTIONS = frozenset({"present_evidence", "impeach", "pass", "rest"}) | EXAM_ACTIONS
 RESPONSE_ACTIONS = frozenset({"object", "pass"})
 MOTION_ACTIONS = frozenset({"motion_directed_verdict", "pass"})
 ALLOWED: dict[Window, frozenset[str]] = {
@@ -83,6 +85,9 @@ class ProcedureState:
     excluded: list[str] = field(default_factory=list)
     impeachments: dict[str, int] = field(default_factory=dict)
     used_impeachments: set[tuple[str, str]] = field(default_factory=set)
+    exposures: list[tuple[str, ExamGround]] = field(default_factory=list)  # successful cross-examinations, in order
+    used_crosses: set[tuple[str, ExamGround]] = field(default_factory=set)
+    used_examines: set[str] = field(default_factory=set)
     turns_used: dict[tuple[Phase, Side], int] = field(default_factory=dict)
     passes: dict[Side, int] = field(default_factory=dict)  # consecutive primary passes, per side
     rested: set[Side] = field(default_factory=set)
@@ -197,6 +202,23 @@ class ProcedureState:
             if item and item.owner is side and item.kind is EvidenceKind.TESTIMONY and item.witness_id:
                 out.add(item.witness_id)
         return tuple(sorted(out))
+
+    def exam_options(self, side: Side) -> tuple[tuple[str, ExamGround], ...]:
+        """(opposing witness, ground) pairs ``side`` may still cross-examine on."""
+        if not self.case.witness_examination or self.phase not in EXAM_PHASES:
+            return ()
+        return tuple(
+            (w, g) for w in self.testified_witnesses(side.opponent) for g in ExamGround if (w, g) not in self.used_crosses
+        )
+
+    def examine_options(self, side: Side) -> tuple[str, ...]:
+        """Own witnesses that may still be examined directly."""
+        if not self.case.witness_examination or self.phase not in EXAM_PHASES:
+            return ()
+        return tuple(w for w in self.testified_witnesses(side) if w not in self.used_examines)
+
+    def exposed_grounds(self, witness_id: str) -> tuple[ExamGround, ...]:
+        return tuple(g for w, g in self.exposures if w == witness_id)
 
     def rebuttal_targets(self) -> tuple[str, ...]:
         """Prosecution items that may be offered in rebuttal: those contradicting admitted defense evidence."""

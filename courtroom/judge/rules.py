@@ -13,7 +13,7 @@ import math
 from fractions import Fraction
 from typing import TYPE_CHECKING
 
-from courtroom.contracts import CaseType, StandardOfProof
+from courtroom.contracts import CaseType, ExamGround, StandardOfProof
 
 if TYPE_CHECKING:
     from courtroom.contracts import CaseFile
@@ -27,7 +27,24 @@ CONTRADICTION_BETA = Fraction(4, 5)  # beta: pairwise contradiction pressure
 MAX_CONTRADICTION_DISCOUNT = Fraction(9, 10)
 IMPEACHMENT_FACTOR = Fraction(1, 2)  # credibility halves per successful impeachment
 RELEVANCE_FLOOR = Fraction(1, 20)
+# Proposal Sec. 6: "Fe is the four facts with the largest |v| per side, so splitting one fact into
+# many cannot inflate the score." The cap applies per side of an element, i.e. separately to the
+# facts that help the prosecution and the facts that help the defense. ``None`` removes it, which is
+# how the earlier uncapped behaviour is reproduced (see tests/test_fact_cap.py).
+MAX_FACTS_PER_SIDE: int | None = 4
 DIRECTED_VERDICT_THRESHOLD = ZERO  # DV-1: any element with L_e < 0
+
+# Witness examination (DEVIATIONS D13). Only reachable when ``CaseFile.rules.witnesses`` is on, so none of
+# this touches a certified result. A real flaw exposed on cross multiplies the witness's credibility by
+# the ground's factor; the factors compose with each other and with IMPEACHMENT_FACTOR.
+EXAM_FACTORS: dict[ExamGround, Fraction] = {
+    ExamGround.QUALIFICATIONS: Fraction(1, 3),  # the strongest attack: the opinion should not have been heard
+    ExamGround.BIAS: Fraction(2, 3),  # the weakest: an interested witness can still be right
+    ExamGround.INCONSISTENCY: Fraction(1, 2),  # as damaging as a successful impeachment
+}
+EXAMINE_COST = 0.5
+CROSS_COST = 1.0
+SANCTION_FAILED_CROSS = 0.25  # attacking a flaw that is not there, like an overruled objection
 
 PRIOR_LOG_ODDS: dict[CaseType, Fraction] = {
     CaseType.CRIMINAL: Fraction(-1),  # presumption of innocence (p ~= 0.27)
@@ -51,6 +68,14 @@ OBJECTION_COST = 0.5
 IMPEACHMENT_COST = 1.0
 MOTION_COST = 0.5
 CONTEMPT_VIOLATIONS = 3
+
+
+def exposure_key(witness_id: str, ground: ExamGround) -> str:
+    """Key under which an exposed flaw rides in the impeachment ledger.
+
+    Witness ids match ``[A-Za-z0-9_-]+`` so ``#`` can never occur inside one.
+    """
+    return f"{witness_id}#{ground.value}"
 
 
 def q(x: float | int | str | Fraction) -> Fraction:

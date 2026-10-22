@@ -296,6 +296,26 @@ function narrate(ev) {
         short: `New evidence added: ${item?.title ?? ev.subject}`,
       };
     }
+    case "examination": {
+      const W = The(actor);
+      const w = witnessById(ev.subject ?? a?.witness_id);
+      const who = w ? `${w.name} (${lowerFirst(w.role)})` : ev.subject;
+      if (a?.type === "examine") {
+        const repaired = ev.status === "rehabilitated";
+        return {
+          speaker: actor, head: `${W} questions its own witness, ${who}.`,
+          judge: repaired ? "The earlier damage to this witness is undone." : "There was nothing to repair.",
+          tone: repaired ? "yes" : "no", short: `${W} questions ${w?.name ?? ev.subject}. ${repaired ? "Credibility restored." : "No effect."}`,
+        };
+      }
+      const ok = ev.status === "exposed";
+      const ground = title(a?.ground ?? "credibility");
+      return {
+        speaker: actor, head: `${W} cross-examines ${who} on ${lowerFirst(ground)}.`,
+        judge: ok ? "A real weakness comes out. This witness now counts for less." : `Nothing comes of it. ${W} is penalised.`,
+        tone: ok ? "yes" : "no", short: `${W} cross-examines ${w?.name ?? ev.subject}. ${ok ? "It lands." : "Nothing found."}`,
+      };
+    }
     case "watchdog":
       return { speaker: "court", head: "The trial has run too long. The judge moves straight to a decision." };
     case "verdict": {
@@ -1314,7 +1334,7 @@ function renderBreakdown() {
       const why = [];
       if (c.contradiction_discount > 0) why.push(`cut ${pct(c.contradiction_discount)} by clashing evidence`);
       if (c.corroboration_factor > 1) why.push(`boosted ${pct(c.corroboration_factor - 1)} by backing evidence`);
-      if (!c.counted) why.push("not counted: the same fact was already counted");
+      if (!c.counted) why.push("not counted: a larger item on the same fact was used, or this side already has its four strongest facts");
       return el("div", { class: `bd-row${c.counted ? "" : " uncounted"}`, title: why.length ? capFirst(why.join("; ")) : "" },
         el("p", { class: "bd-label" }, el("span", { class: `tag ${sideClass(item?.owner)}` }, c.evidence_id), el("span", {}, item?.title ?? "")),
         el("div", { class: "bd-bar", role: "img", "aria-label": `${pos ? "Toward" : "Against"} proving this point by ${size.toFixed(1)}${why.length ? `, ${why.join(", ")}` : ""}` },
