@@ -417,6 +417,7 @@ def cmd_export(a: argparse.Namespace) -> int:
     from courtroom.api.server import app as _api
     from courtroom.gametheory import estimate_payoffs, replicator
     from courtroom.judge.brief import build_brief
+    from courtroom.llm.explainer import explain
 
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -438,6 +439,7 @@ def cmd_export(a: argparse.Namespace) -> int:
         },
         "trials": {},
         "games": {},
+        "explanations": {},
     }
     pairs = [
         ("aggressive", "conservative"),
@@ -454,6 +456,8 @@ def cmd_export(a: argparse.Namespace) -> int:
         for p, d in pairs:
             r = run_trial(case, p, d, seed=0)
             bundle["trials"][f"{cid}|{p}|{d}|0"] = json.loads(r.model_dump_json())  # type: ignore[index]
+            # The template account, so the static page can explain a verdict with no server and no model.
+            bundle["explanations"][f"{cid}|{p}|{d}|0"] = json.loads(explain(r, case).model_dump_json())  # type: ignore[index]
         table = estimate_payoffs(case, strategies, seeds=range(a.seeds), workers=a.workers)
         if analysis is not None and a.seeds == 200:
             _assert_results_match(table, analysis["payoffs"][cid], cid)  # type: ignore[index]

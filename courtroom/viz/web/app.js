@@ -1382,8 +1382,62 @@ function exhibitRow(item) {
 
 /* ------------------------------------------------------------------ verdict tab */
 
+/* ------------------------------------------------------------------ plain-words verdict explanation
+ * The text is written from the trial record and the judge's own figures (llm/explainer.py). The table beside it is
+ * those same figures copied out, so a reader can check every number in the prose against the judge's. When a local
+ * model is running it phrases the account; if it uses a figure the judge did not compute, the server discards its text
+ * and sends the template instead. Offline, the page shows the template stored in the bundle.
+ */
+
+function renderExplanation(x) {
+  const out = $("#explain-out");
+  if (!out) return;
+  const f = x.facts;
+  const source = x.source === "model"
+    ? `Phrased by ${x.model}${x.provider ? ` (${x.provider}, on this computer)` : ""} from the record. Every figure in it was checked against the judge's.`
+    : `Template written from the record, no language model.${x.note ? ` (${x.note})` : ""}`;
+  const rows = f.elements.map((e) => el("tr", {},
+    el("td", {}, e.name),
+    el("td", {}, `${e.probability_pct}% (log-odds ${e.log_odds_float})`),
+    el("td", {}, `${e.bar_pct}%`),
+    el("td", { class: e.met ? "ok" : "bad" }, e.met ? "met" : "not met")));
+  const movers = f.elements.flatMap((e) => [...e.for_prosecution.slice(0, 1), ...e.for_defense.slice(0, 1)].map((c) => `${e.name}: ${c.title} (${c.id}) ${c.weight > 0 ? "+" : ""}${c.weight}`));
+  out.replaceChildren(
+    el("p", { class: "explain-text" }, x.text),
+    el("p", { class: "explain-source" }, source),
+    el("table", { class: "explain-table" },
+      el("thead", {}, el("tr", {}, ...["Point", "Judge's score", "Bar", "Result"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, ...rows)),
+    movers.length ? el("details", {}, el("summary", {}, "Strongest accepted exhibits behind those scores"), el("ul", {}, ...movers.map((m) => el("li", {}, m)))) : null);
+}
+
+async function runExplain() {
+  const status = $("#explain-status"), btn = $("#explain-run");
+  if (!S.trial) { status.textContent = "Run a trial first."; return; }
+  btn.disabled = true;
+  status.textContent = "Reading the record…";
+  try {
+    let data = null;
+    if (!S.exhibitionOn && API && S.mode === "live") {
+      const request = { ...currentRequest(), injections: S.injections, adverse_pushes: S.pushes };
+      data = await fetchJSON(`${API}/explain`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }, 150000);
+    } else if (!S.exhibitionOn) {
+      data = S.bundle?.explanations?.[S.trialKey] ?? null;
+    }
+    if (!data) { status.textContent = "There is no stored account for this trial. Run the local simulator (python -m courtroom serve) to get one."; return; }
+    renderExplanation(data);
+    status.textContent = "";
+  } catch (err) {
+    status.textContent = `It could not be written: ${explainApiError(err).map((e) => e.message).join("; ").slice(0, 200)}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 function renderVerdictTab() {
   const t = S.trial, ruling = $("#ruling");
+  const explainOut = $("#explain-out");
+  if (explainOut) explainOut.replaceChildren();
   if (!t) {
     ruling.className = "ruling empty";
     ruling.replaceChildren(el("p", { class: "empty-note" }, "No trial is loaded yet. Pick a case and a style for each side in the courtroom, then come back here."));
@@ -1962,6 +2016,7 @@ async function runInjection() {
 function initInjection() {
   $("#inj-run")?.addEventListener("click", runInjection);
   initPush();
+  initExplain();
 }
 
 /* ------------------------------------------------------------------ pushed adverse events (courtroom tab)
@@ -2036,6 +2091,10 @@ async function runPush() {
   } finally {
     btn.disabled = false;
   }
+}
+
+function initExplain() {
+  $("#explain-run")?.addEventListener("click", runExplain);
 }
 
 function initPush() {
