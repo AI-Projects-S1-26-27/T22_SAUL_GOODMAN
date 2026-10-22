@@ -378,7 +378,9 @@ courtroom/
   cli.py       command-line entry point
 docs/DESIGN.md design dialectic and calibration notes
 PROVENANCE.md  how to verify every claim yourself: commands, expected results, hashes, bugs found
-RESULTS.md     measured equilibria, bootstrap stability, sensitivity sweep
+RESULTS.md     measured equilibria, bootstrap stability, sensitivity sweep (current engine)
+docs/archive/  the earlier analysis write-up, kept on record and marked superseded
+docs/LLM_COST.md  what the Gemini exhibition cost, from Google's published rates
 DEVIATIONS.md  every intentional divergence from the proposal, with reasons
 tests/         356 test functions -> 935 parametrised cases
 ```

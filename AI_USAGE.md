@@ -130,6 +130,8 @@ ceiling, and a daily-quota stop that saves the cache and resumes for free rather
 key was held in a file outside the repository with mode 600, and the repository was grepped to
 confirm no key material reached any tracked file.
 
+**What it cost.** About $0.05 on the paid-tier rate for the recorded tokens, and nothing charged on the free tier the key was on; the arithmetic, the source and what it leaves out are in [`docs/LLM_COST.md`](docs/LLM_COST.md).
+
 **Reading the call counts.** `LLM_EXHIBITION.md` reports calls made *in that run*. A replay from
 the committed cache honestly reports **0**, because it makes none. The cumulative cost of
 producing the results is the number of distinct responses in the cache, each paid for by one real

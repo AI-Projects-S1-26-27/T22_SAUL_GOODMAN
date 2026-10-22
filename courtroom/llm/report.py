@@ -62,7 +62,10 @@ def render(results_path: Path, out_path: Path) -> str:
     out.append(f"| Input tokens | {usage['input_tokens']:,} |")
     out.append(f"| Output tokens | {usage['output_tokens']:,} |")
     cost = usage["estimated_cost"]
-    priced = f"${cost:.4f}" if cost else "not priced — the Gemini API exposes no pricing; set COURTROOM_LLM_RATES"
+    priced = (
+        f"${cost:.4f}" if cost
+        else "not priced by the tool (the API exposes no pricing); see [`docs/LLM_COST.md`](docs/LLM_COST.md) for the cost from Google's published rates"
+    )
     out.append(f"| Estimated cost | {priced} |")
     out.append(f"| Overall fallback rate | **{data['overall_fallback_rate']:.1%}** |")
     out.append(f"| — rate-limited (per-minute 429) | {usage['rate_limited']} |")
