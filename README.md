@@ -377,6 +377,7 @@ courtroom/
   viz/         terminal dashboard + web/ (index.html, styles.css, app.js, data/bundle.js)
   cli.py       command-line entry point
 docs/DESIGN.md design dialectic and calibration notes
+HANDOFF.md     start here if you are picking this up: what works, invariants, known issues
 PROVENANCE.md  how to verify every claim yourself: commands, expected results, hashes, bugs found
 RESULTS.md     measured equilibria, bootstrap stability, sensitivity sweep (current engine)
 docs/archive/  the earlier analysis write-up, kept on record and marked superseded
