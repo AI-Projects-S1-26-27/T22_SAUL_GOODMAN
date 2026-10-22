@@ -26,8 +26,9 @@ from pathlib import Path
 
 from courtroom.cases import get_case
 from courtroom.contracts import Side
-from courtroom.llm.client import CACHE_PATH, LLMClient
+from courtroom.llm.client import CACHE_PATH
 from courtroom.llm.exhibition import build_court
+from courtroom.llm.factory import make_client
 
 LABEL = "Exhibition — not equilibrium analysis"
 NOT_EQUILIBRIUM = (
@@ -38,11 +39,20 @@ NOT_EQUILIBRIUM = (
 )
 
 
-def replay_exhibition(results_path: Path, cache_path: Path = CACHE_PATH) -> dict[str, object]:
+def replay_exhibition(results_path: Path, cache_path: Path | None = None) -> dict[str, object]:
     results = json.loads(results_path.read_text(encoding="utf-8"))
     case_id = results["case_id"]
     case = get_case(case_id)
-    client = LLMClient(cache_path=cache_path, allow_network=False)
+    provider = results.get("provider", "gemini")
+    # The cache holds responses for the provider and model the run used; replay reads the same file, offline.
+    kwargs: dict[str, object] = {"allow_network": False}
+    if provider == "ollama":
+        kwargs["model"] = results["model"]
+        if cache_path is not None:
+            kwargs["cache_path"] = cache_path
+    else:
+        kwargs["cache_path"] = cache_path or CACHE_PATH
+    client = make_client(provider, **kwargs)
 
     trials: dict[str, object] = {}
     stats: dict[str, object] = {}
@@ -80,6 +90,7 @@ def replay_exhibition(results_path: Path, cache_path: Path = CACHE_PATH) -> dict
             "not_equilibrium": NOT_EQUILIBRIUM,
             "kind": "exhibition",
             "model": results["model"],
+            **({"provider": provider} if provider != "gemini" else {}),  # Gemini output stays byte-identical
             "temperature": results["temperature"],
             "case_id": case_id,
             "seeds": results["seeds"],

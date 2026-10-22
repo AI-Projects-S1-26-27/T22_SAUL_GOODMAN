@@ -90,6 +90,8 @@ class Usage:
     malformed: int = 0  # structured output that would not parse
     errors: int = 0  # anything else from the transport
     quota_stops: int = 0  # daily cap hit; an outage, NOT a fallback and NOT a model failure
+    provider: str = "Gemini"  # label for the printed summary only
+    free: bool = False  # a local model has no per-token price
     input_tokens: int = 0
     output_tokens: int = 0
 
@@ -110,14 +112,19 @@ class Usage:
         return round(self.fallbacks / self.attempts, 4) if self.attempts else 0.0
 
     def cost_estimate(self) -> float:
+        if self.free:
+            return 0.0
         rin, rout = _rates()
         return round(self.input_tokens / 1e6 * rin + self.output_tokens / 1e6 * rout, 6)
 
     def summary(self) -> str:
         rates_set = _rates() != (0.0, 0.0)
-        cost = f"${self.cost_estimate():.4f}" if rates_set else "not priced (set COURTROOM_LLM_RATES)"
+        if self.free:
+            cost = "free (runs locally)"
+        else:
+            cost = f"${self.cost_estimate():.4f}" if rates_set else "not priced (set COURTROOM_LLM_RATES)"
         return (
-            f"Gemini calls: {self.calls} · cache hits: {self.cache_hits} · "
+            f"{self.provider} calls: {self.calls} · cache hits: {self.cache_hits} · "
             f"fallbacks: {self.fallbacks} (unavailable {self.refusals}, rate-limited {self.rate_limited}, "
             f"blocked {self.blocked}, malformed {self.malformed}, errors {self.errors}) · "
             f"fallback rate {self.fallback_rate():.1%} · "
@@ -207,9 +214,22 @@ class LLMClient:
 
     # ------------------------------------------------------------------ availability
 
+    #: Short name used in logged rationales and reports: "gemini", "ollama".
+    provider_tag = "gemini"
+
     @property
     def has_key(self) -> bool:
         return bool(os.environ.get("GEMINI_API_KEY"))
+
+    @property
+    def available(self) -> bool:
+        """Whether a live call could be attempted. Gemini needs a key; a local provider overrides this."""
+        return self.has_key
+
+    @property
+    def cache_model(self) -> str:
+        """The model string baked into cache keys, so two providers can never share an entry."""
+        return self.model
 
     def start_trial(self) -> None:
         self._calls_this_trial = 0
@@ -235,14 +255,14 @@ class LLMClient:
         With ``schema``, structured JSON output is requested so the answer can be parsed
         mechanically rather than scraped out of prose.
         """
-        key = cache_key(prompt, system, self.model, self.temperature, self.max_tokens)
+        key = cache_key(prompt, system, self.cache_model, self.temperature, self.max_tokens)
         with self._lock:
             hit = self._cache.get(key)
         if hit is not None:
             self.usage.cache_hits += 1
             return hit
 
-        if not self.allow_network or not self.has_key:
+        if not self.allow_network or not self.available:
             self.usage.refusals += 1
             return None
         if self._calls_this_trial >= MAX_CALLS_PER_TRIAL or self.usage.calls >= self.max_calls_per_run:

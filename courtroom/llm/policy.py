@@ -190,7 +190,7 @@ class LLMAgent:
             if index is not None:
                 self.llm_decisions += 1
                 chosen = options[index]
-                return chosen.model_copy(update={"rationale": f"[gemini] chose option {index}: {_describe(chosen, view, oracle)}"})
+                return chosen.model_copy(update={"rationale": f"[{self.client.provider_tag}] chose option {index}: {_describe(chosen, view, oracle)}"})
             if attempt < MAX_REPROMPTS:
                 self.reprompts += 1
                 note = (

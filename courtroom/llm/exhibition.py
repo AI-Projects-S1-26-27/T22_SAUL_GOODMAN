@@ -27,6 +27,7 @@ from courtroom.cases import get_case
 from courtroom.contracts import Side
 from courtroom.engine.trial import Court
 from courtroom.llm.client import LLMClient, QuotaExhausted, SpendCeilingReached
+from courtroom.llm.factory import make_client
 from courtroom.llm.policy import LLMAgent
 
 DETERMINISTIC = ("aggressive", "conservative", "adaptive", "mixed:0.5")
@@ -150,7 +151,7 @@ def run_exhibition(
     completed rather than throwing the run away.
     """
     case = get_case(case_id)
-    client = client or LLMClient()
+    client = client or make_client()
     cells: list[Cell] = []
     aborted: str | None = None
     resumable = False
@@ -231,6 +232,7 @@ def run_exhibition(
         ),
         "case_id": case_id,
         "model": client.model,
+        "provider": client.provider_tag,
         "temperature": client.temperature,
         "seeds": list(seeds),
         "opponents": list(opponents),
