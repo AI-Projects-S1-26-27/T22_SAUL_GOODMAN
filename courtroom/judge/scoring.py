@@ -26,6 +26,7 @@ from courtroom.judge.rules import (
     CONTRADICTION_BETA,
     CORROBORATION_ALPHA,
     EXAM_FACTORS,
+    HOSTILE_FACTOR,
     IMPEACHMENT_FACTOR,
     LLR_SCALE,
     MAX_CONTRADICTION_DISCOUNT,
@@ -34,6 +35,7 @@ from courtroom.judge.rules import (
     ZERO,
     exposure_key,
     fmt,
+    hostile_key,
     q,
     sigmoid,
     threshold_for,
@@ -77,6 +79,8 @@ def credibility(item: EvidenceItem, case: CaseFile, impeachments: Mapping[str, i
     for ground in ExamGround:
         if impeachments.get(exposure_key(item.witness_id, ground), 0):
             value *= EXAM_FACTORS[ground]
+    if impeachments.get(hostile_key(item.witness_id), 0):
+        value *= HOSTILE_FACTOR
     return value
 
 

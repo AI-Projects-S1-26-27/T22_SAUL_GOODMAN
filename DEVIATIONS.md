@@ -352,20 +352,110 @@ about 20 configurations and keeping one that lands in a contested band. No formu
 * `budget` 11 to 12 and `max_primary_turns` 7 to 8: with seven turns the extra exhibits could not all be offered
   and the win rate stayed at 0 to 3%.
 
-**kestrel-av**: added one clean `defect` exhibit, `P-RECALL` (0.25 / 0.70). `P-BUGS` stays undisclosed, so the late-disclosure
+**kestrel-av**: added one clean `defect` exhibit, `P-RECALL` (0.15 / 0.70). `P-BUGS` stays undisclosed, so the late-disclosure
 gamble remains and is now an upside, not the only route.
 
 **Measured result** (200 seeds per cell, certified analysis): `aurora-defi` prosecution wins 0 to 16.5%, two pure equilibria,
 no dominant strategy, label stability 80.5%. `kestrel-av` wins 0 to 42%, one mixed equilibrium, not trivial, stability 98.0%.
 Helix and the five edge fixtures are untouched; their results are identical.
 
-**Fragility, stated plainly.** Both cases sit near a cliff. In `kestrel-av`, a clean defect exhibit of 0.30 or more gives
-the prosecution 99 to 100% in every cell, 0.25 gives 11%. In `aurora-defi`, a small further strengthening of the intent
+**Fragility, stated plainly.** Both cases sit near a cliff. In `kestrel-av`, a clean defect exhibit of 0.275 or more gives
+the prosecution 99 to 100% in every cell; 0.075 to 0.25 gives about 10%, so `P-RECALL` was moved from 0.25 to **0.15**, the
+middle of the measured band (the audit appendix has the sweep). In `aurora-defi`, a small further strengthening of the intent
 evidence also flips it to 100%. The published values are a narrow band, not a robust design.
 
 **What moved.** 11 of the 42 pinned digests (all aurora and kestrel entries; helix and the edge cases are unchanged) and
 the bundle, regenerated deliberately. `results/*.json`, `RESULTS.md` sections 2 to 4 and 7 and the web bundle were regenerated.
 `README.md` still quotes older test counts.
+
+## D15 — seeded adverse events behind `RuleSet.adverse_events`
+
+Requested to give the strategies real risk: moves that can fail through no fault of the player. Three events, each
+drawn from a stream seeded `"<seed>:adverse"` and logged as an `ADVERSE` event in the hash chain:
+
+| Event | Fires when | Effect | Rule |
+|---|---|---|---|
+| Witness no-show | a testimony exhibit is offered (default 10%) | exhibit excluded, cost not refunded, turn spent | `ADV-1` |
+| Missing 65B certificate | a `digital_log` exhibit is offered (default 15%) | excluded by the court without objection, no bad-faith sanction | `ADV-2` |
+| Hostile witness | a witness's testimony is admitted, once per witness (default 10%) | credibility x1/4 (exact), testimony **not** flipped | `ADV-3` |
+
+**The fence.** Off by default; the certified library never has it. The events live in `courtroom/cases/adverse_cases.py`
+(`ADVERSE_CASES`: helix, aurora, kestrel and poisoned-tree variants), reachable through `get_case`. The stream is created
+per trial but a certified case never draws from it. With the flag on and every rate at zero a trial's digest equals the plain
+trial's (`test_every_rate_at_zero_reproduces_the_plain_trial_exactly`), and a mutation that shared the perception stream
+fails that test.
+
+**Why a new stream and not the existing one.** The instruction was to draw from the trial's RNG so replays hold. Replays do
+hold, the draws being a pure function of (seed, trace). Using the *objection-perception* stream would have shifted every
+perception draw as soon as an adverse draw was inserted between them, which changes behaviour of the existing channel;
+a separate stream seeded from the same trial seed avoids that.
+
+**Soundness.** The directed-verdict review needs "nothing afterwards raises the prosecution". Events only remove or
+down-weight evidence at the instant of offer or admission, so a defense exhibit lost after the review leaves L_e at or below its
+review value. Tested along every trial (`test_no_adverse_event_can_raise_the_prosecution_after_...`).
+
+**Not modelled.** The side that called a witness cannot respond to hostility (declare it, cross its own witness) and cannot
+re-summon a no-show. `ADVERSE` events with a single party are narrated as the offer that failed; hostility has no actor and is
+not narrated.
+
+**Agents.** Only Adaptive reads the published rates (`PartyView.adverse`, empty on every certified case) and discounts an
+exhibit's gain by its survival probability. Aggressive and Conservative ignore the risk, so the difference between them is part
+of what is measured.
+
+**Measured: payoff standard deviation per strategy** (utility, over 4 opponents x 60 seeds; same seeds, adverse variant against the
+plain case; kestrel at `P-RECALL` 0.15):
+
+| Case | Side | Strategy | sd before | sd after | mean before | mean after |
+|---|---|---|---|---|---|---|
+| helix-espionage | prosecution | aggressive | 5.73 | 5.34 | -2.84 | -3.92 |
+| helix-espionage | prosecution | conservative | 0.00 | 0.08 | -2.25 | -2.23 |
+| helix-espionage | prosecution | adaptive | 4.32 | 4.39 | -0.46 | -1.02 |
+| helix-espionage | prosecution | mixed:0.5 | 3.85 | 3.63 | -2.64 | -3.17 |
+| helix-espionage | defense | aggressive | 1.74 | 0.98 | 4.64 | 4.98 |
+| helix-espionage | defense | conservative | 4.76 | 4.91 | 1.78 | 2.89 |
+| helix-espionage | defense | adaptive | 2.83 | 2.57 | 5.69 | 5.92 |
+| helix-espionage | defense | mixed:0.5 | 3.87 | 3.60 | 3.23 | 3.99 |
+| aurora-defi | prosecution | aggressive | 3.70 | 3.64 | -4.40 | -4.34 |
+| aurora-defi | prosecution | conservative | 0.33 | 2.65 | -2.76 | -2.04 |
+| aurora-defi | prosecution | adaptive | 3.29 | 3.54 | -2.31 | -2.23 |
+| aurora-defi | prosecution | mixed:0.5 | 2.71 | 3.25 | -3.47 | -3.22 |
+| aurora-defi | defense | aggressive | 1.97 | 2.98 | 4.67 | 4.55 |
+| aurora-defi | defense | conservative | 2.82 | 2.97 | 6.59 | 6.47 |
+| aurora-defi | defense | adaptive | 2.82 | 3.10 | 6.59 | 6.38 |
+| aurora-defi | defense | mixed:0.5 | 2.60 | 3.06 | 5.64 | 5.42 |
+| kestrel-av | prosecution | aggressive | 3.93 | 4.82 | -3.78 | -2.48 |
+| kestrel-av | prosecution | conservative | 0.00 | 3.77 | -2.10 | -0.41 |
+| kestrel-av | prosecution | adaptive | 3.05 | 4.80 | -2.83 | -1.00 |
+| kestrel-av | prosecution | mixed:0.5 | 2.78 | 4.45 | -2.85 | -1.46 |
+| kestrel-av | defense | aggressive | 0.93 | 3.54 | 6.33 | 4.86 |
+| kestrel-av | defense | conservative | 4.12 | 4.59 | 5.93 | 4.95 |
+| kestrel-av | defense | adaptive | 1.57 | 3.72 | 7.24 | 5.78 |
+| kestrel-av | defense | mixed:0.5 | 2.98 | 3.95 | 6.07 | 4.90 |
+| edge-poisoned-tree | prosecution | aggressive | 5.16 | 5.11 | -4.78 | -4.54 |
+| edge-poisoned-tree | prosecution | conservative | 0.00 | 0.00 | 0.00 | 0.00 |
+| edge-poisoned-tree | prosecution | adaptive | 1.86 | 1.78 | -0.87 | -0.96 |
+| edge-poisoned-tree | prosecution | mixed:0.5 | 4.18 | 4.09 | -1.98 | -1.88 |
+| edge-poisoned-tree | defense | aggressive | 2.14 | 2.14 | 9.04 | 9.05 |
+| edge-poisoned-tree | defense | conservative | 2.56 | 2.50 | 8.86 | 8.91 |
+| edge-poisoned-tree | defense | adaptive | 2.56 | 2.50 | 8.86 | 8.91 |
+| edge-poisoned-tree | defense | mixed:0.5 | 2.40 | 2.40 | 8.95 | 8.96 |
+
+Reading: the events create risk where it was missing and add little where it already existed. Kestrel's sd rises for every
+strategy (Conservative 0.00 to 3.77); aurora's Conservative prosecution goes 0.33 to 2.65; helix, which was already volatile, barely
+moves (Aggressive prosecution 5.73 to 5.34); poisoned-tree has one witness and one digital record and is unchanged.
+
+**Measured: equilibria with the events on** (certified procedure, 200 seeds, `results/adverse/`):
+
+| Case | Certified | With adverse events |
+|---|---|---|
+| helix-espionage | mixed, Conservative and Adaptive both sides, stability 100% | **same supports**; prosecution wins 0 to 68.5% (was 0 to 100%) |
+| aurora-defi | pure, 2 equilibria, stability 80.5% | **dominance-solvable**, Conservative both sides, stability 100%; wins 11 to 23% |
+| kestrel-av | mixed, stability 98.0% | **dominance-solvable**, Conservative both sides, stability 99.5%; wins 17.5 to 42% |
+| edge-poisoned-tree | pure, 4 equilibria | unchanged |
+
+Adding risk made two cases *more* stable and *less* strategic: when a play can fail at random the cautious profile
+dominates, so the matrix collapses toward Conservative. That is a result worth stating, and it is the opposite of the hoped
+for "more strategic variety". Helix keeps its mixed equilibrium.
 
 ## Corrections to claims made about the repo (no code or doc changed)
 

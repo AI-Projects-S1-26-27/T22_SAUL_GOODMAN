@@ -88,6 +88,7 @@ class ProcedureState:
     exposures: list[tuple[str, ExamGround]] = field(default_factory=list)  # successful cross-examinations, in order
     used_crosses: set[tuple[str, ExamGround]] = field(default_factory=set)
     used_examines: set[str] = field(default_factory=set)
+    hostile: set[str] = field(default_factory=set)  # witnesses who turned hostile (adverse events only)
     turns_used: dict[tuple[Phase, Side], int] = field(default_factory=dict)
     passes: dict[Side, int] = field(default_factory=dict)  # consecutive primary passes, per side
     rested: set[Side] = field(default_factory=set)

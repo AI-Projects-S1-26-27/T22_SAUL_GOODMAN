@@ -42,6 +42,10 @@ EXAM_FACTORS: dict[ExamGround, Fraction] = {
     ExamGround.BIAS: Fraction(2, 3),  # the weakest: an interested witness can still be right
     ExamGround.INCONSISTENCY: Fraction(1, 2),  # as damaging as a successful impeachment
 }
+# Adverse events (DEVIATIONS D15). A witness who turns hostile keeps testifying but is worth a quarter as much;
+# the testimony is not flipped, so a hostile defense witness can never help the prosecution beyond what an
+# absent witness would.
+HOSTILE_FACTOR = Fraction(1, 4)
 EXAMINE_COST = 0.5
 CROSS_COST = 1.0
 SANCTION_FAILED_CROSS = 0.25  # attacking a flaw that is not there, like an overruled objection
@@ -68,6 +72,11 @@ OBJECTION_COST = 0.5
 IMPEACHMENT_COST = 1.0
 MOTION_COST = 0.5
 CONTEMPT_VIOLATIONS = 3
+
+
+def hostile_key(witness_id: str) -> str:
+    """Key under which a witness's hostility rides in the impeachment ledger (``#`` cannot occur in an id)."""
+    return f"{witness_id}#hostile"
 
 
 def exposure_key(witness_id: str, ground: ExamGround) -> str:

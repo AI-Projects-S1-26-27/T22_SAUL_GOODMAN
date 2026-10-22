@@ -1,0 +1,99 @@
+[
+  {
+    "case_id": "helix-espionage-adverse",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "mixed",
+    "baseline_equilibria": 1,
+    "label_counts": {
+      "mixed": 200
+    },
+    "stability": 1.0,
+    "rng_seed": 0
+  },
+  {
+    "case_id": "aurora-defi-adverse",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "dominance-solvable",
+    "baseline_equilibria": 1,
+    "label_counts": {
+      "dominance-solvable": 200
+    },
+    "stability": 1.0,
+    "rng_seed": 0
+  },
+  {
+    "case_id": "kestrel-av-adverse",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "dominance-solvable",
+    "baseline_equilibria": 1,
+    "label_counts": {
+      "dominance-solvable": 199,
+      "pure": 1
+    },
+    "stability": 0.995,
+    "rng_seed": 0
+  },
+  {
+    "case_id": "edge-poisoned-tree-adverse",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "pure",
+    "baseline_equilibria": 4,
+    "label_counts": {
+      "pure": 200
+    },
+    "stability": 1.0,
+    "rng_seed": 0
+  }
+]

@@ -18,6 +18,7 @@ from courtroom.contracts import (
     Action,
     ActionType,
     EvidenceItem,
+    EvidenceKind,
     ExamGround,
     Frozen,
     ObjectionGround,
@@ -222,6 +223,7 @@ class CounselAgent:
             return gain
         p_obj = self._opponent_objection_rate(view) if defects else 0.0
         bad_faith = any(d in BAD_FAITH_GROUNDS for d in defects)
+        gain *= self._survival(view, item)
         return (
             (1 - p_obj) * gain * LOGODDS_VALUE
             - item.presentation_cost * COST_WEIGHT
@@ -290,6 +292,22 @@ class CounselAgent:
                     )
                 )
         return out
+
+    def _survival(self, view: PartyView, item: EvidenceItem) -> float:
+        """Expected fraction of an exhibit's value that survives the case's published adverse events.
+
+        Empty ``view.adverse`` (every certified case) gives exactly 1.0, so nothing changes there. Only the
+        expected-value profile uses it: the others keep ignoring the risk, which is the difference the
+        adverse-event measurement is meant to expose.
+        """
+        if not view.adverse:
+            return 1.0
+        keep = 1.0
+        if item.witness_id is not None:
+            keep *= (1.0 - view.adverse["no_show"]) * (1.0 - 0.75 * view.adverse["hostile"])
+        if item.kind is EvidenceKind.DIGITAL_LOG:
+            keep *= 1.0 - view.adverse["missing_certificate"]
+        return keep
 
     def _impeachment_options(self, view: PartyView, oracle: Oracle) -> list[_Option]:
         if self._spendable(view) < IMPEACHMENT_COST:
