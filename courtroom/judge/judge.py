@@ -19,10 +19,10 @@ from courtroom.contracts import (
 from courtroom.judge.admissibility import rule_on_objection
 from courtroom.judge.rules import (
     DIRECTED_VERDICT_THRESHOLD,
-    THRESHOLD_LOG_ODDS,
     ZERO,
     fmt,
     q,
+    threshold_for,
 )
 from courtroom.judge.scoring import ExactScores, score_record
 
@@ -102,7 +102,7 @@ class Judge:
     ) -> Verdict:
         scores = self.score(admitted, impeachments)
         snap = scores.snapshot
-        tau = THRESHOLD_LOG_ODDS[self.case.standard]
+        tau = threshold_for(self.case)
         rules = [
             RuleFiring(
                 rule_id="STD-1",

@@ -19,7 +19,7 @@ from courtroom.contracts import (
     Side,
 )
 from courtroom.judge.admissibility import ground_is_valid
-from courtroom.judge.rules import THRESHOLD_LOG_ODDS
+from courtroom.judge.rules import threshold_for
 from courtroom.judge.scoring import score_record
 
 # Conversion of heuristic quantities into utility units (shared by all policies).
@@ -63,7 +63,7 @@ class Oracle:
         self._cache = cache
         self._admitted = frozenset(admitted)
         self._impeachments = dict(impeachments)
-        self._tau = float(THRESHOLD_LOG_ODDS[cache.case.standard])
+        self._tau = float(threshold_for(cache.case))
 
     def log_odds(self, add: Iterable[str] = (), impeach: str | None = None) -> dict[str, float]:
         imp = dict(self._impeachments)
@@ -84,6 +84,12 @@ class Oracle:
 
 PRIOR_DEFECT_RATE = 0.15  # lawyers' prior that any given ground applies to an exhibit
 
+# Grounds the opponent observes exactly rather than through the noisy channel.
+# Relevance: the support is public once the item is offered.
+# Late disclosure: a fact about the record, not an inference — the opponent knows
+# whether it received the exhibit before trial.
+OBSERVABLE_GROUNDS = frozenset({ObjectionGround.RELEVANCE, ObjectionGround.LATE_DISCLOSURE})
+
 
 def defect_posteriors(accuracy: float) -> tuple[float, float]:
     """Bayesian posterior P(defect | signal) for a positive and a negative signal.
@@ -102,7 +108,9 @@ def perceive(item: EvidenceItem, case: CaseFile, rng: random.Random) -> Perceive
 
     For each ground the observer receives a binary red-flag signal through the
     channel described in ``defect_posteriors`` and holds the Bayesian posterior.
-    Relevance is public (support is visible once offered), so it is known exactly.
+    The grounds in ``OBSERVABLE_GROUNDS`` are known exactly instead: relevance
+    because the support is public once offered, late disclosure because the
+    opponent knows whether the exhibit reached it before trial.
     """
     acc = case.perception_accuracy
     fpr = (1.0 - acc) / 4.0
@@ -110,7 +118,7 @@ def perceive(item: EvidenceItem, case: CaseFile, rng: random.Random) -> Perceive
     beliefs: dict[ObjectionGround, float] = {}
     for ground in ObjectionGround:
         truth = ground_is_valid(item, ground, case.case_type)
-        if ground is ObjectionGround.RELEVANCE:
+        if ground in OBSERVABLE_GROUNDS:
             beliefs[ground] = 1.0 if truth else 0.0
             continue
         flagged = rng.random() < (acc if truth else fpr)

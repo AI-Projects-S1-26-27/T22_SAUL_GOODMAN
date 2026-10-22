@@ -55,6 +55,21 @@
     </div>
   </header>
 
+  <div class="mode-bar" id="mode-bar">
+    <div class="wrap mode-inner">
+      <div class="mode-pick" role="radiogroup" aria-label="Which simulation is running">
+        <button class="mode-btn is-on" type="button" id="mode-det" role="radio" aria-checked="true">
+          Deterministic <em>certified</em>
+        </button>
+        <button class="mode-btn" type="button" id="mode-llm" role="radio" aria-checked="false">
+          LLM exhibition <em>not certified</em>
+        </button>
+      </div>
+      <p class="mode-say" id="mode-say">Exact rulebook judge, fixed strategies. Same case and choices give the same verdict, every time.</p>
+      <p class="mode-trial" id="mode-trial" hidden></p>
+    </div>
+  </div>
+
   <div class="tabs-rail">
     <div class="wrap">
       <div class="tabs" role="tablist" aria-label="Sections">
@@ -285,6 +300,11 @@
 
             <aside class="transcript" aria-labelledby="transcript-title">
               <h3 id="transcript-title">What's happened so far</h3>
+              <label class="spoken-toggle" for="spoken">
+                <input type="checkbox" id="spoken">
+                <span>Spoken argument <em class="exhibition-tag">exhibition</em></span>
+              </label>
+              <p class="spoken-note" id="spoken-note" hidden></p>
               <ol id="transcript"></ol>
             </aside>
           </div>
@@ -305,6 +325,39 @@
               <ul class="ev-list" id="defense-evidence"></ul>
             </section>
           </div>
+          <details class="inject-panel live-only" id="inject-panel">
+            <summary>Add evidence mid-trial</summary>
+            <p class="thr-qnote">New evidence goes into one side's hand once the trial reaches the step you are looking at, and the trial then plays out again from there. It is written into the tamper-evident record, so the same inputs always replay to the same verdict. It can be offered only while its owner is still presenting, and never in the middle of an objection.</p>
+            <form class="inject-form" id="inject-form" autocomplete="off">
+              <label>Whose evidence
+                <select id="inj-owner"><option value="prosecution">Prosecution</option><option value="defense">Defense</option></select>
+              </label>
+              <label>What it is <input id="inj-title" type="text" maxlength="90" value="Newly recovered drive image"></label>
+              <label>Kind
+                <select id="inj-kind">
+                  <option value="document">Document</option><option value="digital_log">Digital log</option>
+                  <option value="physical">Physical item</option><option value="financial_record">Financial record</option>
+                  <option value="expert">Expert report</option>
+                </select>
+              </label>
+              <label>How reliable <input id="inj-reliability" type="number" min="0" max="1" step="0.05" value="0.9"></label>
+              <fieldset>
+                <legend>What it does to each point</legend>
+                <p class="thr-qnote">Positive helps the prosecution, negative helps the defense. A defense exhibit may only help the defense.</p>
+                <div id="inj-support"></div>
+              </fieldset>
+              <fieldset>
+                <legend>Hidden flaws (the other side has to spot them)</legend>
+                <label class="inline-field"><input type="checkbox" id="inj-hearsay"> Second-hand</label>
+                <label class="inline-field"><input type="checkbox" id="inj-unverified"> Not verified</label>
+                <label class="inline-field"><input type="checkbox" id="inj-illegal"> Obtained illegally</label>
+                <label class="inline-field"><input type="checkbox" id="inj-late"> Shared too late</label>
+              </fieldset>
+              <p class="thr-qnote" id="inj-when"></p>
+              <button class="btn" type="button" id="inj-run">Add it and replay from here</button>
+              <span class="field-help" id="inj-status" role="status"></span>
+            </form>
+          </details>
           <p class="ev-footnote">Hidden flaws are visible to you but not to the other side. A lawyer has to spot them and object.</p>
           <div class="next-up">
             <p>When the verdict is in, see exactly why.</p>
@@ -335,6 +388,25 @@
               <p>Reliability is how much the judge trusts a piece of evidence on its own. Evidence that clashes with other evidence counts for less.</p>
             </header>
             <div class="exhibits" id="exhibits"></div>
+          </section>
+
+          <section class="block" aria-labelledby="editor-title">
+            <header class="block-head">
+              <h3 id="editor-title">Write your own case</h3>
+              <p>Edit the case below, or paste your own. It goes through exactly the same validator the built-in cases do, so a malformed file is refused with the failing field named instead of crashing the trial.</p>
+            </header>
+            <div class="editor-bar">
+              <button class="btn quiet" type="button" id="ed-load">Load the current case</button>
+              <button class="btn quiet" type="button" id="ed-validate">Check it</button>
+              <button class="btn quiet" type="button" id="ed-analyse">Analyse it</button>
+              <button class="btn" type="button" id="ed-run">Try it in the courtroom</button>
+              <span id="ed-status" class="ed-status" role="status" aria-live="polite"></span>
+            </div>
+            <label class="sr-only" for="ed-text">Case file JSON</label>
+            <textarea id="ed-text" class="editor" spellcheck="false" rows="16" placeholder="Press “Load the current case” to start from the case above, then edit it."></textarea>
+            <p class="field-help">Optional <code>bar_log_odds</code> sets how sure the judge must be, as a log-odds string such as <code>"11/5"</code> (90%), <code>"1.1"</code> (75%) or <code>"0"</code> (50%). Leave it out to use the standard's own bar.</p>
+            <div id="ed-errors" class="ed-errors"></div>
+            <div id="ed-analysis" class="thr-eq"></div>
           </section>
         </section>
 
@@ -392,11 +464,27 @@
             <p class="styles-case" id="styles-case"></p>
           </header>
 
+          <section class="block exhibition-card" id="exhibition-card" aria-labelledby="exh-title" hidden>
+            <header class="block-head">
+              <h3 id="exh-title">LLM exhibition <em class="cert-tag exhibition">not equilibrium analysis</em></h3>
+              <p id="exh-note"></p>
+            </header>
+            <ul class="exh-facts" id="exh-facts"></ul>
+            <div class="table-scroll"><table class="matrix analysis-table" id="exh-table"></table></div>
+            <details class="exh-baseline">
+              <summary>How the four fixed styles did in the same seat, for comparison</summary>
+              <div class="table-scroll"><table class="matrix analysis-table" id="exh-baseline"></table></div>
+            </details>
+            <p class="analysis-detail">Replayed from a committed cache. Reading this page makes no call to any model, and none is possible from it.</p>
+            <button class="btn quiet" type="button" id="exh-back">Back to the certified analysis</button>
+          </section>
+
           <div class="game-controls live-only">
             <label>Styles to compare
               <select id="gstrats">
                 <option value="aggressive,conservative">Aggressive and careful</option>
                 <option value="aggressive,conservative,adaptive">Aggressive, careful and adaptive</option>
+                <option value="aggressive,conservative,adaptive,mixed:0.5">All four styles</option>
               </select>
             </label>
             <label>Trials per matchup <input id="gseeds" type="number" min="1" max="100" value="20" inputmode="numeric"></label>
@@ -412,6 +500,15 @@
             </div>
             <div class="insight" id="insight"></div>
           </div>
+
+          <section class="block analysis-card" id="analysis-card" aria-labelledby="analysis-title" hidden>
+            <header class="block-head">
+              <h3 id="analysis-title">How solid is this? <em class="cert-tag">certified, precomputed</em></h3>
+              <p id="analysis-note"></p>
+            </header>
+            <div class="table-scroll"><table class="matrix analysis-table" id="analysis-table"></table></div>
+            <p class="analysis-detail" id="analysis-detail"></p>
+          </section>
 
           <div class="tech game-tech" id="game-tech">
             <div class="game-tech-grid">
@@ -490,6 +587,50 @@
               <div><dt>Guesswork <span class="rule-chip tech">OBJ-SPECULATION</span></dt><dd>A witness is testifying about something they didn't see first-hand.</dd></div>
               <div><dt>Off-topic <span class="rule-chip tech">OBJ-RELEVANCE</span></dt><dd>The evidence barely touches any point in the case.</dd></div>
             </dl>
+          </section>
+
+          <section class="block" aria-labelledby="slider-title">
+            <header class="block-head">
+              <h3 id="slider-title">Move the bar yourself</h3>
+              <p>The bar is a setting, not a measurement. Drag it and three different questions get answered, each labelled for what it is.</p>
+            </header>
+            <div class="slider-row">
+              <label for="thr-slider">How sure must the judge be?</label>
+              <input type="range" id="thr-slider" min="50" max="99" step="1" value="90">
+              <output id="thr-value">90%</output>
+              <button class="btn quiet" type="button" id="thr-reset">Reset to the case's own bar</button>
+            </div>
+
+            <h4 class="thr-q">1. Same evidence, different bar</h4>
+            <p class="thr-qnote">What a judge with this bar would decide on the trial that is already loaded. Instant and exact, but the lawyers do not get to react.</p>
+            <div id="thr-result" class="thr-result"></div>
+
+            <div class="live-only thr-live">
+              <h4 class="thr-q">2. Lawyers who know the bar</h4>
+              <p class="thr-qnote">Replays the trial with both lawyers told the bar, so they choose differently. Needs the local simulator.</p>
+              <button class="btn quiet" type="button" id="thr-replay">Replay the trial at this bar</button>
+              <div id="thr-replay-out" class="thr-result"></div>
+            </div>
+
+            <div class="thr-q3">
+            <h4 class="thr-q">3. Which style wins at this bar?</h4>
+            <p class="thr-qnote" id="thr-eq-note"></p>
+            <div class="live-only thr-live">
+              <label class="inline-field">Seeds per matchup <input id="thr-seeds" type="number" min="5" max="100" value="20" inputmode="numeric"></label>
+              <button class="btn quiet" type="button" id="thr-equilibrium">Recompute the equilibrium at this bar</button>
+              <span class="field-help" id="thr-status" role="status"></span>
+            </div>
+            <div id="thr-eq" class="thr-eq"></div>
+            <div class="table-scroll"><table class="matrix analysis-table" id="thr-grid"></table></div>
+            </div>
+          </section>
+
+          <section class="block" aria-labelledby="catch-title">
+            <header class="block-head">
+              <h3 id="catch-title">How likely is a flaw to be caught?</h3>
+              <p>A lawyer cannot see most flaws for certain. Two are exceptions: whether evidence is off-topic is public once it is offered, and a party always knows whether it received an exhibit before trial.</p>
+            </header>
+            <div id="catch-table" class="catch-table"></div>
           </section>
 
           <p class="promise">Same case, same choices, same verdict, every time. Each step of the trial record is fingerprinted, so any change to it would show.</p>

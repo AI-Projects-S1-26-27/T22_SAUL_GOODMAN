@@ -9,7 +9,7 @@ import hashlib
 import json
 from collections.abc import Iterable
 
-from courtroom.contracts import TrialEvent
+from courtroom.contracts import EvidenceItem, TrialEvent
 
 GENESIS = "0" * 64
 
@@ -31,3 +31,9 @@ def verify_chain(events: Iterable[TrialEvent]) -> bool:
             return False
         prev = ev.hash
     return True
+
+
+def digest_item(item: EvidenceItem) -> str:
+    """SHA-256 of an exhibit's canonical JSON, so a chain event can commit to its exact content."""
+    blob = json.dumps(item.model_dump(mode="json"), sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(blob.encode("ascii")).hexdigest()

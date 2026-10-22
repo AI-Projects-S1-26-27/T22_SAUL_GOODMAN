@@ -82,9 +82,12 @@ def test_crashing_agent_is_contained() -> None:
 def test_non_action_return_is_a_violation() -> None:
     court = Court(CASES["helix-espionage"], WrongType(), CounselAgent(CONSERVATIVE), seed=0)  # type: ignore[arg-type]
     result = court.run()
-    # Each malformed return is a violation treated as PASS; two in a row trip the stall rule.
-    assert result.ledgers[Side.PROSECUTION].violations == 2
-    assert "STALL-1" in [ru.rule_id for ev in result.events for ru in ev.rules]
+    # Each malformed return is a violation treated as PASS. Under alternating turns the
+    # prosecution also faults in the response window the defense's offer opens, so it
+    # reaches three violations (two primary, one response) and is held in contempt
+    # before the two-consecutive-passes stall rule can fire.
+    assert result.ledgers[Side.PROSECUTION].violations == 3
+    assert "CONTEMPT-1" in [ru.rule_id for ev in result.events for ru in ev.rules]
     assert result.verdict.outcome is VerdictOutcome.DIRECTED_ACQUITTAL
 
 

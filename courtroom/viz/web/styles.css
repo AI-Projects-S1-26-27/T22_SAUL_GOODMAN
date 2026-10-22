@@ -939,3 +939,147 @@ svg .muted { fill: var(--muted); }
 .tour-skip { height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 0.8125rem; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .tour-skip:hover { color: var(--ink); background: var(--wash); }
 @media (max-width: 640px) { .tour-skip { flex: none !important; } }
+
+/* ---------------------------------------------------------------- threshold slider (judge tab) */
+.slider-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.slider-row label { font-weight: 600; }
+.slider-row input[type="range"] { flex: 1 1 14rem; min-width: 10rem; accent-color: var(--p); }
+.slider-row output { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 3.2rem; }
+.thr-rows { display: grid; gap: .5rem; }
+.thr-row { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(8rem, 2fr) 4rem 7rem; gap: .6rem; align-items: center; }
+.thr-row p { margin: 0; }
+.thr-name { font-weight: 600; }
+.thr-val { font-variant-numeric: tabular-nums; text-align: right; }
+.thr-flag { font-size: .85em; color: var(--muted); }
+.thr-row.met .thr-flag { color: var(--yes); }
+.thr-row.unmet .thr-flag { color: var(--no); }
+.thr-verdict { margin-top: .9rem; font-weight: 600; }
+.thr-verdict.flipped { color: var(--no); }
+@media (max-width: 34rem) {
+  .thr-row { grid-template-columns: 1fr 4rem; grid-template-areas: "name val" "meter meter" "flag flag"; }
+  .thr-name { grid-area: name; } .thr-val { grid-area: val; }
+  .thr-row .meter-track { grid-area: meter; } .thr-flag { grid-area: flag; }
+}
+
+/* ---------------------------------------------------------------- catch probability table */
+.catch-table { display: grid; gap: .35rem; }
+.catch-row { display: grid; grid-template-columns: minmax(6rem, 1.1fr) minmax(8rem, 1.6fr) repeat(3, 5rem); gap: .6rem; align-items: baseline; }
+.catch-row p { margin: 0; }
+.catch-row .num { font-variant-numeric: tabular-nums; text-align: right; }
+.catch-head { font-weight: 700; border-bottom: 1px solid var(--rule); padding-bottom: .35rem; }
+.catch-row.observable { color: var(--yes); }
+@media (max-width: 40rem) {
+  .catch-row { grid-template-columns: 1fr 1fr 1fr; }
+  .catch-row p:nth-child(2) { grid-column: 1 / -1; color: var(--muted); font-size: .9em; }
+}
+
+/* ---------------------------------------------------------------- case editor (case file tab) */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.editor-bar { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: .75rem; }
+.ed-status { font-size: .9em; color: var(--muted); }
+.ed-status.ok { color: var(--yes); }
+.ed-status.bad { color: var(--no); }
+.editor {
+  width: 100%; font-family: var(--mono); font-size: .85rem; line-height: 1.5; padding: .75rem;
+  border: 1px solid var(--rule); border-radius: .5rem; background: var(--wash);
+  color: var(--ink); resize: vertical; tab-size: 2;
+}
+.editor:focus-visible { outline: 2px solid var(--p); outline-offset: 1px; }
+.ed-errors { margin-top: .6rem; display: grid; gap: .3rem; }
+.ed-error { margin: 0; font-size: .9em; color: var(--no); }
+.ed-error code { font-family: var(--mono); font-weight: 700; }
+
+/* ---------------------------------------------------------------- spoken argument (exhibition) */
+.spoken-toggle { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem; font-size: .9em; cursor: pointer; }
+.spoken-toggle input { accent-color: var(--p); }
+.exhibition-tag {
+  font-style: normal; font-size: .72em; text-transform: uppercase; letter-spacing: .06em;
+  padding: .1rem .35rem; border: 1px solid var(--rule); border-radius: .25rem; color: var(--muted);
+}
+.spoken-note { margin: 0 0 .6rem; font-size: .82em; color: var(--muted); }
+.spoken {
+  margin: .25rem 0 .5rem 1.1rem; padding-left: .7rem; font-style: italic; font-size: .9em;
+  border-left: 2px solid var(--rule); color: var(--ink-2);
+}
+.spoken.prosecution { border-left-color: var(--p); }
+.spoken.defense { border-left-color: var(--d); }
+
+/* ---------------------------------------------------------------- certified vs exhibition mode */
+.mode-bar { border-bottom: 1px solid var(--rule); background: var(--wash); }
+.mode-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding-block: .5rem; }
+.mode-pick { display: inline-flex; border: 1px solid var(--rule); border-radius: .4rem; overflow: hidden; }
+.mode-btn {
+  appearance: none; border: 0; background: transparent; color: var(--muted);
+  font: inherit; font-size: .85rem; padding: .35rem .7rem; cursor: pointer; display: flex; gap: .4rem; align-items: baseline;
+}
+.mode-btn em { font-style: normal; font-size: .72em; text-transform: uppercase; letter-spacing: .05em; opacity: .75; }
+.mode-btn + .mode-btn { border-left: 1px solid var(--rule); }
+.mode-btn.is-on { background: var(--yes-soft); color: var(--ink); font-weight: 600; }
+#mode-llm.is-on { background: var(--no-soft); }
+.mode-say { margin: 0; font-size: .82em; color: var(--muted); flex: 1 1 18rem; }
+/* An unmissable tint while the exhibition is on, so a screenshot can never be misread. */
+body.exhibition-mode .mode-bar { background: var(--no-soft); }
+body.exhibition-mode .panel::before {
+  content: "LLM exhibition \2014 replayed from a cache, not equilibrium analysis";
+  display: block; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--no); border: 1px dashed var(--no); border-radius: .3rem;
+  padding: .3rem .5rem; margin-bottom: .9rem;
+}
+
+/* ---------------------------------------------------------------- certified analysis card */
+.analysis-card { margin-top: 1.4rem; }
+.cert-tag {
+  font-style: normal; font-size: .62em; text-transform: uppercase; letter-spacing: .06em; vertical-align: middle;
+  padding: .1rem .35rem; border: 1px solid var(--rule); border-radius: .25rem; color: var(--muted);
+}
+.analysis-table th, .analysis-table td { text-align: left; vertical-align: top; padding: .45rem .6rem; font-size: .88rem; }
+.analysis-table td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.analysis-table tr.current { background: var(--yes-soft); }
+.analysis-detail { font-size: .85rem; color: var(--muted); margin: .6rem 0 0; }
+
+/* ---------------------------------------------------------------- the bar: three questions */
+.thr-q { margin: 1.4rem 0 .15rem; font-size: 1rem; }
+.thr-qnote { margin: 0 0 .6rem; font-size: .85rem; color: var(--muted); }
+.thr-live { margin-top: .2rem; }
+.thr-eq { margin-top: .8rem; }
+.thr-eq .headline { font-weight: 700; margin: 0 0 .3rem; }
+.thr-eq p { margin: .2rem 0; }
+.inline-field { display: inline-flex; align-items: center; gap: .4rem; font-size: .85rem; margin-right: .6rem; }
+.inline-field input { width: 4.5rem; }
+
+/* ---------------------------------------------------------------- evidence injection */
+.inject-panel { margin: 1rem 0; border: 1px solid var(--rule); border-radius: .5rem; padding: .6rem .9rem; }
+.inject-panel summary { cursor: pointer; font-weight: 600; }
+.inject-form { display: grid; gap: .7rem; margin-top: .7rem; max-width: 40rem; }
+.inject-form label:not(.inline-field) { display: grid; gap: .2rem; font-size: .88rem; }
+.inject-form fieldset { border: 1px solid var(--rule); border-radius: .4rem; padding: .5rem .7rem; }
+.inject-form legend { font-size: .85rem; font-weight: 600; padding: 0 .3rem; }
+.t-btn.t-inject { border-left: 3px solid var(--yes); font-style: italic; }
+
+/* ---------------------------------------------------------------- the LLM exhibition mode */
+body:not(.exhibition-mode) .exhibition-only { display: none !important; }
+/* The seed field is hidden offline, but the exhibition has trials 0-4 to choose between. */
+body.exhibition-mode.offline .seed-field.live-only { display: block !important; }
+/* Things that only make sense for the certified engine are not offered while the exhibition is on:
+   the replay holds fixed trials, so it cannot add evidence, move the bar, or recompute a matrix. */
+body.exhibition-mode #inject-panel,
+body.exhibition-mode .thr-live,
+body.exhibition-mode .thr-q3,
+body.exhibition-mode #analysis-card,
+body.exhibition-mode #strategy .game-controls,
+body.exhibition-mode #strategy #styles-body,
+body.exhibition-mode #strategy #game-tech,
+body.exhibition-mode #strategy .tech-hint { display: none !important; }
+.mode-trial { margin: 0; flex: 1 1 100%; font-size: .8rem; color: var(--ink-2); }
+.cert-tag.exhibition { color: var(--no); border-color: var(--no); }
+.exh-facts { margin: 0 0 .9rem; padding-left: 1.1rem; font-size: .88rem; color: var(--ink-2); }
+.exh-baseline { margin: .9rem 0; }
+.exh-baseline summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
+
+/* The exhibition adds a sixth style to each picker, which no longer fits the three-column setup. */
+body.exhibition-mode .setup { grid-template-columns: minmax(0, 1fr); }
+body.exhibition-mode .seg { width: auto; }
+body.exhibition-mode .submit-field { justify-self: start; }

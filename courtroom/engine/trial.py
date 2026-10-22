@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import math
 import random
+from collections.abc import Sequence
 
 from courtroom.agents import Agent, Oracle, ScoreCache, make_agent, perceive
 from courtroom.contracts import (
@@ -24,6 +25,7 @@ from courtroom.contracts import (
     EvidenceGraph,
     GraphEdge,
     GraphNode,
+    Injection,
     PartyView,
     PerceivedItem,
     Phase,
@@ -34,7 +36,7 @@ from courtroom.contracts import (
     Verdict,
     Window,
 )
-from courtroom.engine.audit import GENESIS, chain
+from courtroom.engine.audit import GENESIS, chain, digest_item
 from courtroom.engine.utility import utilities
 from courtroom.judge import Judge
 from courtroom.judge.admissibility import BAD_FAITH_GROUNDS
@@ -47,10 +49,9 @@ from courtroom.judge.rules import (
     SANCTION_BAD_FAITH_EVIDENCE,
     SANCTION_OVERRULED_OBJECTION,
     SANCTION_VIOLATION,
-    THRESHOLD_LOG_ODDS,
 )
 from courtroom.procedure import ProcedureState, Violation, validate
-from courtroom.procedure.state import STALL_LIMIT
+from courtroom.procedure.state import CASE_PHASES, STALL_LIMIT
 from courtroom.procedure.validator import VIOLATION_RULES
 
 MAX_EVENTS = 400
@@ -69,6 +70,8 @@ class Court:
         seed: int = 0,
         prosecution_strategy: str | None = None,
         defense_strategy: str | None = None,
+        *,
+        injections: Sequence[Injection] = (),
     ) -> None:
         self.case = case
         self.agents: dict[Side, Agent] = {Side.PROSECUTION: prosecution, Side.DEFENSE: defense}
@@ -84,6 +87,8 @@ class Court:
         self._perceived: PerceivedItem | None = None
         self._events: list[TrialEvent] = []
         self._last_hash = GENESIS
+        self._injections, self._cases_after = _plan_injections(case, injections)
+        self._requested: tuple[Injection, ...] = tuple(self._injections)  # every input, applied or not
 
     # ------------------------------------------------------------------ event plumbing
 
@@ -150,7 +155,7 @@ class Court:
             budget=st.ledgers[side].budget,
             reserve_basis=st.ledgers[side].budget_start,
             opponent_budget=st.ledgers[opp].budget,
-            turns_left=st.turns_left(),
+            turns_left=st.turns_left(side),
             impeachment_options=options,
             rebuttal_targets=st.rebuttal_targets() if side is Side.PROSECUTION else (),
             opponent_objections=st.ledgers[opp].objections,
@@ -163,7 +168,7 @@ class Court:
         st = self.state
         opening = " | ".join(f"{s.value}: {self._opening(s)}" for s in Side)
         self._emit(EventKind.PHASE_CHANGE, f"Court is in session: {self.case.title}. {opening}")
-        self._enter(Phase.PROSECUTION_CASE, "The prosecution may present its case.")
+        self._enter(Phase.EVIDENCE, "Both sides present, turn and turn about; the prosecution opens.")
 
         while st.phase not in (Phase.DELIBERATION, Phase.CLOSED):
             if len(self._events) >= MAX_EVENTS:
@@ -174,8 +179,12 @@ class Court:
                 )
                 st.enter(Phase.DELIBERATION)
                 break
+            if st.phase in CASE_PHASES and st.pending is None and st.phase_is_over():
+                self._enter(st.next_phase_after_rest(), "No one left to present.")
+                continue
+            self._apply_due_injections()
             side, window = st.expected()  # type: ignore[misc]
-            if window == "primary" and st.turns_left() == 0:
+            if window == "primary" and st.turns_left(side) == 0:
                 self._rest(side, RuleFiring(rule_id="TURN-CAP", detail=f"{side.value} exhausted its {st.turn_cap()} turns."))
                 continue
             if window == "response":
@@ -188,6 +197,41 @@ class Court:
                 self._dispatch(side, window, action)
 
         return self._deliberate()
+
+    def _rest_if_spent(self, side: Side) -> None:
+        """End a side's participation after a fruitless primary turn.
+
+        Two triggers, checked only once the side has actually had its turn so that an
+        over-budget attempt is still caught by the validator (V-BUDGET) rather than
+        silently excused: it can no longer afford any action, or it has passed twice.
+        """
+        st = self.state
+        if not self._can_afford_a_primary_action(side):
+            self._rest(
+                side,
+                RuleFiring(rule_id="BUDGET-1", detail=f"{side.value} can afford no further action; deemed rested."),
+            )
+        elif st.passes.get(side, 0) >= STALL_LIMIT:
+            self._rest(side, RuleFiring(rule_id="STALL-1", detail="Consecutive passes deemed a rest."))
+
+    def _can_afford_a_primary_action(self, side: Side) -> bool:
+        """Whether ``side`` could still do anything but pass.
+
+        Budget exhaustion is one of the two triggers (with two consecutive passes) that end a
+        side's participation, so the directed-verdict review has a well-defined moment to fire.
+        """
+        st = self.state
+        budget = st.ledgers[side].budget
+        if budget >= IMPEACHMENT_COST and st.testified_witnesses(side.opponent):
+            return True
+        allowed = set(st.rebuttal_targets()) if st.phase is Phase.REBUTTAL else None
+        return any(
+            item.owner is side
+            and item.id not in st.presented
+            and item.presentation_cost <= budget
+            and (allowed is None or item.id in allowed)
+            for item in self.case.evidence
+        )
 
     def _opening(self, side: Side) -> str:
         try:
@@ -205,6 +249,59 @@ class Court:
         except Exception as exc:
             return None, Violation("V-AGENT-FAULT", f"{VIOLATION_RULES['V-AGENT-FAULT']} ({type(exc).__name__}: {exc})")
         return action, validate(action, self.state, side, window)
+
+    # ------------------------------------------------------------------ injected evidence
+
+    def _apply_due_injections(self) -> None:
+        """Add due exhibits to their owners' hands, but only between turns.
+
+        An injection never lands inside a response window: an objection must be ruled on against the
+        case as it stood when the exhibit was offered. It waits for the next primary turn, which keeps
+        every ruling a pure function of the record it was made on.
+        """
+        st = self.state
+        while (
+            self._injections
+            and self._injections[0].at_seq <= len(self._events)
+            and st.pending is None
+            and st.phase in CASE_PHASES
+        ):
+            inj = self._injections.pop(0)
+            self.case = self._cases_after.pop(0)
+            self.judge = Judge(self.case)
+            st.case = self.case
+            self.cache = ScoreCache(self.case)
+            item = inj.item
+            self._emit(
+                EventKind.INJECTION,
+                f"New evidence enters {item.owner.value}'s hand: {item.id}, {item.title}.",
+                subject=item.id,
+                status="injected",
+                rules=[
+                    RuleFiring(
+                        rule_id="INJ-1",
+                        detail=f"Injected for {item.owner.value} at step {inj.at_seq}; exhibit sha256 {digest_item(item)}.",
+                    )
+                ],
+            )
+
+    def _report_unapplied_injections(self) -> None:
+        for inj in self._injections:
+            self._emit(
+                EventKind.RULING,
+                f"{inj.item.id} was not added: the trial had left the evidence phases before step {inj.at_seq}.",
+                subject=inj.item.id,
+                rules=[
+                    RuleFiring(
+                        rule_id="INJ-2",
+                        detail=(
+                            "Injection point not reached while evidence could still be offered; "
+                            f"exhibit sha256 {digest_item(inj.item)}."
+                        ),
+                    )
+                ],
+            )
+        self._injections = []
 
     # ------------------------------------------------------------------ penalties
 
@@ -226,8 +323,8 @@ class Court:
         elif window == "motion":
             self._directed_verdict_review(moved=False)
         else:
-            st.consume_primary_turn()
-            st.consecutive_passes += 1
+            st.consume_primary_turn(side)
+            st.passes[side] = st.passes.get(side, 0) + 1
             if ledger.violations >= CONTEMPT_VIOLATIONS:
                 self._rest(
                     side,
@@ -236,8 +333,8 @@ class Court:
                         detail=f"{ledger.violations} violations: counsel held in contempt; case deemed rested.",
                     ),
                 )
-            elif st.consecutive_passes >= STALL_LIMIT:
-                self._rest(side, RuleFiring(rule_id="STALL-1", detail="Consecutive passes deemed a rest."))
+            else:
+                self._rest_if_spent(side)
 
     # ------------------------------------------------------------------ dispatch
 
@@ -252,8 +349,8 @@ class Court:
                 ledger.presented += 1
                 st.presented.append(item.id)
                 st.pending = item.id
-                st.consume_primary_turn()
-                st.consecutive_passes = 0
+                st.consume_primary_turn(side)
+                st.passes[side] = 0
                 self._perceived = perceive(item, self.case, self._perception_rng)
                 self._emit(
                     EventKind.ACTION,
@@ -273,8 +370,8 @@ class Court:
                 assert item is not None and witness is not None
                 ledger.charge(IMPEACHMENT_COST)
                 st.used_impeachments.add((item.id, witness))
-                st.consume_primary_turn()
-                st.consecutive_passes = 0
+                st.consume_primary_turn(side)
+                st.passes[side] = 0
                 ok, rule = self.judge.rule_on_impeachment(item, witness)
                 if ok:
                     st.impeachments[witness] = st.impeachments.get(witness, 0) + 1
@@ -305,11 +402,10 @@ class Court:
                     self._emit(EventKind.ACTION, f"{side.value} makes no motion.", side, action)
                     self._directed_verdict_review(moved=False)
                 else:
-                    st.consume_primary_turn()
-                    st.consecutive_passes += 1
+                    st.consume_primary_turn(side)
+                    st.passes[side] = st.passes.get(side, 0) + 1
                     self._emit(EventKind.ACTION, f"{side.value} passes.", side, action)
-                    if st.consecutive_passes >= STALL_LIMIT:
-                        self._rest(side, RuleFiring(rule_id="STALL-1", detail="Consecutive passes deemed a rest."))
+                    self._rest_if_spent(side)
 
             case ActionType.REST:
                 self._emit(EventKind.ACTION, f"{side.value} rests.", side, action)
@@ -383,8 +479,12 @@ class Court:
             self._admit_pending(waived=True)
         if forced is not None:
             self._emit(EventKind.RULING, f"{side.value} is deemed to have rested.", side, rules=[forced])
-        nxt = st.next_phase_after_rest()
-        self._enter(nxt, f"{side.value} rested.")
+        st.rest(side)
+        if st.phase_is_over():
+            self._enter(st.next_phase_after_rest(), f"{side.value} rested.")
+        else:
+            # The other side is still going, so the phase continues without this one.
+            self._emit(EventKind.RULING, f"{side.value} has finished presenting; {side.opponent.value} continues.", side)
 
     def _directed_verdict_review(self, moved: bool) -> None:
         st = self.state
@@ -403,6 +503,7 @@ class Court:
         st = self.state
         if st.phase is not Phase.DELIBERATION:
             st.enter(Phase.DELIBERATION)
+        self._report_unapplied_injections()
         verdict: Verdict = self.judge.deliberate(st.admitted, st.impeachments, st.directed)
         self._emit(
             EventKind.VERDICT,
@@ -423,6 +524,7 @@ class Court:
             utilities=utilities(verdict.outcome, ledgers),
             digest=self._last_hash,
             graph=self._graph(verdict),
+            injections=self._requested,
         )
 
     def _graph(self, verdict: Verdict) -> EvidenceGraph:
@@ -457,12 +559,64 @@ class Court:
         return EvidenceGraph(nodes=nodes, edges=tuple(edges))
 
 
-def run_trial(case: CaseFile, prosecution: str, defense: str, seed: int = 0) -> TrialResult:
+def _plan_injections(case: CaseFile, injections: Sequence[Injection]) -> tuple[list[Injection], list[CaseFile]]:
+    """Order the injections and validate each cumulative case up front.
+
+    Doing it before the trial starts means a bad exhibit (duplicate id, unknown element, a
+    contradiction with something that does not exist) is refused with a clear message instead of
+    failing halfway through a trial, and the case after each injection is ready to swap in.
+    """
+    ordered = sorted(injections, key=lambda i: (i.at_seq, i.item.id))
+    cases: list[CaseFile] = []
+    current = case
+    for inj in ordered:
+        helps_prosecution = [k for k, v in inj.item.support.items() if v > 0]
+        if inj.item.owner is Side.DEFENSE and helps_prosecution:
+            # The directed-verdict review is sound only because defense evidence can never raise an
+            # element's log-odds (see DEVIATIONS D5/D6). An injected exhibit must not reopen that.
+            raise ValueError(
+                f"injected exhibit {inj.item.id!r} is defense evidence with positive support for "
+                f"{helps_prosecution}; a defense exhibit may only help the defense"
+            )
+        try:
+            current = CaseFile.model_validate(
+                {**current.model_dump(mode="json"), "evidence": [*(e.model_dump(mode="json") for e in current.evidence), inj.item.model_dump(mode="json")]}
+            )
+        except ValueError as exc:
+            raise ValueError(f"injected exhibit {inj.item.id!r} does not fit this case: {exc}") from exc
+        cases.append(current)
+    return list(ordered), cases
+
+
+def run_trial(
+    case: CaseFile, prosecution: str, defense: str, seed: int = 0, injections: Sequence[Injection] = ()
+) -> TrialResult:
     """Convenience entry point used by the CLI, API, and tournament."""
     p_agent = make_agent(prosecution, random.Random(f"{seed}:agent:prosecution"))
     d_agent = make_agent(defense, random.Random(f"{seed}:agent:defense"))
-    return Court(case, p_agent, d_agent, seed, prosecution, defense).run()
+    return Court(case, p_agent, d_agent, seed, prosecution, defense, injections=injections).run()
 
 
-def threshold_probability(case: CaseFile) -> float:
-    return _sigmoid(float(THRESHOLD_LOG_ODDS[case.standard]))
+def replay_trial(result: TrialResult, case: CaseFile) -> TrialResult:
+    """Re-run a finished trial from nothing but its recorded inputs, injections included."""
+    return run_trial(case, result.prosecution_strategy, result.defense_strategy, result.seed, result.injections)
+
+
+def verify_injections(result: TrialResult) -> bool:
+    """Whether every injection recorded in ``result`` is the exhibit the hash chain committed to.
+
+    ``result.injections`` is every injection that was *requested*, applied or not, because a replay
+    needs all of its inputs: an injection that arrived too late still shaped the trial by producing
+    an INJ-2 event. The chain hashes events, and both INJ-1 (applied) and INJ-2 (not reached) carry
+    the exhibit's SHA-256. Editing an exhibit afterwards leaves the chain valid but fails this check,
+    and editing the event itself fails ``verify_chain``.
+    """
+    committed = {
+        ev.subject: ru.detail
+        for ev in result.events
+        for ru in ev.rules
+        if ru.rule_id in {"INJ-1", "INJ-2"}
+    }
+    if set(committed) != {i.item.id for i in result.injections}:
+        return False
+    return all(digest_item(i.item) in committed[i.item.id] for i in result.injections)

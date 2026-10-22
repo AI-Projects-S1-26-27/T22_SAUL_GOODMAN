@@ -11,8 +11,12 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
+from typing import TYPE_CHECKING
 
 from courtroom.contracts import CaseType, StandardOfProof
+
+if TYPE_CHECKING:
+    from courtroom.contracts import CaseFile
 
 ZERO = Fraction(0)
 ONE = Fraction(1)
@@ -70,6 +74,38 @@ def sigmoid(log_odds: float) -> float:
     return z / (1.0 + z)
 
 
-def threshold_met(log_odds: Fraction, standard: StandardOfProof) -> bool:
-    tau = THRESHOLD_LOG_ODDS[standard]
+def threshold_for(case: CaseFile) -> Fraction:
+    """The bar a case must clear, in log-odds.
+
+    The standard's own bar unless the case carries an explicit ``bar_log_odds``. With no
+    override this is exactly ``THRESHOLD_LOG_ODDS[case.standard]``, which is every library case
+    and the whole certified analysis; ``tests/test_golden.py`` pins that digest for digest.
+    """
+    if case.bar_log_odds is not None:
+        return Fraction(case.bar_log_odds)
+    return THRESHOLD_LOG_ODDS[case.standard]
+
+
+def threshold_met(log_odds: Fraction, standard: StandardOfProof, tau: Fraction | None = None) -> bool:
+    """Whether ``log_odds`` clears the bar. The standard decides whether a tie passes."""
+    tau = THRESHOLD_LOG_ODDS[standard] if tau is None else tau
     return log_odds > tau if standard in STRICT_STANDARDS else log_odds >= tau
+
+
+def bar_log_odds_for(probability: float) -> str:
+    """A probability as the exact, short rational string ``CaseFile.bar_log_odds`` expects."""
+    text = f"{round(math.log(probability / (1.0 - probability)), 4):.4f}".rstrip("0").rstrip(".")
+    return text or "0"
+
+
+def override_for_bar(case: CaseFile, probability: float) -> str | None:
+    """The ``bar_log_odds`` to use for a requested probability, or ``None`` for "the case's own".
+
+    A bar within the same whole percent as the standard's own is treated as the standard
+    itself. Without that, picking "90%" on a beyond-reasonable-doubt case would silently swap
+    the exact 11/5 for a rounded 2.1972 and nudge borderline verdicts.
+    """
+    own = sigmoid(float(THRESHOLD_LOG_ODDS[case.standard]))
+    if round(100 * probability) == round(100 * own):
+        return None
+    return bar_log_odds_for(probability)

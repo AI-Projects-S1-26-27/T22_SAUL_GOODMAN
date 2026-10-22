@@ -12,23 +12,35 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from courtroom import __version__
 from courtroom.agents import describe_strategies, make_agent
 from courtroom.cases import CASES, generate_case, get_case
-from courtroom.contracts import CaseFile, TrialResult
+from courtroom.contracts import CaseFile, Injection, TrialResult
 from courtroom.engine import run_trial
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
+from courtroom.gametheory.bootstrap import equilibrium_label
+from courtroom.judge.rules import THRESHOLD_LOG_ODDS, fmt, override_for_bar, sigmoid, threshold_for
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "viz" / "web"
 
 
+# Bounds on an examiner-supplied case, so a pasted file cannot hang a live demo.
+MAX_INLINE_EVIDENCE = 60
+MAX_INLINE_ELEMENTS = 12
+
+
 class TrialRequest(BaseModel):
-    case_id: str
+    case_id: str | None = None
+    case: CaseFile | None = None  # an examiner's own case file, instead of a library id
     prosecution: str = "aggressive"
     defense: str = "conservative"
     seed: int = Field(default=0, ge=0, le=2**31)
+    # The proof standard's bar as a probability. Omit it to use the case's own.
+    bar: float | None = Field(default=None, ge=0.5, le=0.999)
+    # Exhibits added to a party's hand once the trial has produced ``at_seq`` events.
+    injections: list[Injection] = Field(default_factory=list, max_length=3)
 
     @field_validator("prosecution", "defense")
     @classmethod
@@ -40,7 +52,9 @@ class TrialRequest(BaseModel):
 
 
 class GameRequest(BaseModel):
-    case_id: str
+    case_id: str | None = None
+    case: CaseFile | None = None
+    bar: float | None = Field(default=None, ge=0.5, le=0.999)
     strategies: list[str] = Field(default_factory=lambda: ["aggressive", "conservative"], min_length=2, max_length=4)
     seeds: int = Field(default=20, ge=1, le=100)
 
@@ -55,6 +69,35 @@ def _resolve_case(case_id: str) -> CaseFile:
         return get_case(case_id)
     except KeyError as exc:
         raise HTTPException(404, str(exc)) from None
+
+
+def _case_for(case_id: str | None, inline: CaseFile | None, bar: float | None) -> CaseFile:
+    """The case a request is about: library or inline, with the requested bar applied."""
+    if inline is not None:
+        if len(inline.evidence) > MAX_INLINE_EVIDENCE or len(inline.elements) > MAX_INLINE_ELEMENTS:
+            raise HTTPException(
+                422, f"a pasted case may have at most {MAX_INLINE_ELEMENTS} points and {MAX_INLINE_EVIDENCE} exhibits"
+            )
+        case = inline
+    elif case_id:
+        case = _resolve_case(case_id)
+    else:
+        raise HTTPException(422, "give either case_id or an inline case")
+    if bar is not None:
+        if case.bar_log_odds is not None:
+            raise HTTPException(422, "the case already carries bar_log_odds; give either that or a bar, not both")
+        override = override_for_bar(case, bar)
+        if override is not None:
+            case = case.model_copy(update={"bar_log_odds": override})
+    return case
+
+
+def _run(case: CaseFile, req: TrialRequest) -> TrialResult:
+    """Run the requested trial, turning a rejected injection into a clear 422 instead of a 500."""
+    try:
+        return run_trial(case, req.prosecution, req.defense, req.seed, req.injections)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from None
 
 
 def create_app() -> FastAPI:
@@ -93,20 +136,124 @@ def create_app() -> FastAPI:
     def strategies() -> list[dict[str, str]]:
         return describe_strategies()
 
+    @app.get("/api/rules")
+    def rules_info() -> dict[str, object]:
+        """Judge constants and, per objection ground, the chance a flaw is actually caught."""
+        from courtroom.agents.base import OBSERVABLE_GROUNDS, PRIOR_DEFECT_RATE, defect_posteriors
+        from courtroom.agents.policies import PROFILES
+        from courtroom.contracts import ObjectionGround
+        from courtroom.judge.rules import PRIOR_LOG_ODDS, THRESHOLD_LOG_ODDS, fmt, sigmoid
+
+        accuracies = sorted({round(c.perception_accuracy, 4) for c in CASES.values()})
+        catch: dict[str, list[dict[str, object]]] = {}
+        for acc in accuracies:
+            posterior_yes, _ = defect_posteriors(acc)
+            rows: list[dict[str, object]] = []
+            for ground in ObjectionGround:
+                observable = ground in OBSERVABLE_GROUNDS
+                rows.append(
+                    {
+                        "ground": ground.value,
+                        "observable": observable,
+                        "belief_if_flagged": 1.0 if observable else round(posterior_yes, 4),
+                        # A flaw is caught when the signal fires AND the belief clears the
+                        # profile's objection threshold. Observable grounds always do both.
+                        "caught_by": {
+                            name: round(1.0 if observable else (acc if posterior_yes >= p.objection_belief else 0.0), 4)
+                            for name, p in PROFILES.items()
+                        },
+                    }
+                )
+            catch[str(acc)] = rows
+        return {
+            "prior_defect_rate": PRIOR_DEFECT_RATE,
+            "bar_range": {"min_probability": 0.5, "max_probability": 0.999},
+            "priors": {k.value: {"log_odds": fmt(v), "probability": round(sigmoid(float(v)), 4)} for k, v in PRIOR_LOG_ODDS.items()},
+            "standards": {
+                k.value: {"log_odds": fmt(v), "probability": round(sigmoid(float(v)), 4)} for k, v in THRESHOLD_LOG_ODDS.items()
+            },
+            "catch_probability": catch,
+        }
+
+    @app.post("/api/validate")
+    def validate(payload: dict) -> JSONResponse:
+        """Check an examiner's case file through the same validator the library uses."""
+        try:
+            case = CaseFile.model_validate(payload)
+        except ValidationError as exc:
+            return JSONResponse(
+                status_code=422,
+                content={
+                    "ok": False,
+                    "errors": [
+                        {"field": ".".join(str(p) for p in e["loc"]), "message": e["msg"]} for e in exc.errors()
+                    ],
+                },
+            )
+        return JSONResponse(
+            {
+                "ok": True,
+                "case_id": case.id,
+                "title": case.title,
+                "elements": len(case.elements),
+                "witnesses": len(case.witnesses),
+                "evidence": len(case.evidence),
+            }
+        )
+
+    @app.post("/api/narrate")
+    def narrate_trial(req: TrialRequest) -> JSONResponse:
+        """Spoken argument text for a trial, generated after it has already been decided.
+
+        Exhibition only. The trial is run and scored first; this adds words to a finished
+        record and can never change a verdict. Reads the committed response cache and otherwise
+        falls back to templates; it never calls a model.
+        """
+        from courtroom.llm import LLMClient, narrate
+
+        case = _case_for(req.case_id, req.case, req.bar)
+        result = _run(case, req)
+        # Cache only, whatever the environment holds. A page view must never be able to spend money,
+        # so the server's key (if any) is deliberately unreachable from here.
+        client = LLMClient(allow_network=False)
+        lines = narrate(result, case, client)
+        client.save()
+        return JSONResponse(
+            {
+                "digest": result.digest,
+                "narration": {str(k): v for k, v in lines.items()},
+                "source": "llm" if client.usage.calls or client.usage.cache_hits else "template",
+                "usage": {
+                    "calls": client.usage.calls,
+                    "cache_hits": client.usage.cache_hits,
+                    "unavailable": client.usage.refusals,
+                    "cost_estimate_usd": client.usage.cost_estimate(),
+                },
+            }
+        )
+
     @app.post("/api/trial", response_model=TrialResult)
     def trial(req: TrialRequest) -> TrialResult:
-        return run_trial(_resolve_case(req.case_id), req.prosecution, req.defense, req.seed)
+        return _run(_case_for(req.case_id, req.case, req.bar), req)
 
     @app.post("/api/game")
     def game(req: GameRequest) -> JSONResponse:
         if "chaos" in req.strategies:
             raise HTTPException(422, "chaos is a fuzzing agent, not a strategy for equilibrium analysis")
-        table: PayoffTable = estimate_payoffs(_resolve_case(req.case_id), req.strategies, seeds=range(req.seeds))
+        case = _case_for(req.case_id, req.case, req.bar)
+        table: PayoffTable = estimate_payoffs(case, req.strategies, seeds=range(req.seeds))
         k = len(req.strategies)
         start = [1.0 / k] * k
         traj = replicator(table.analysis.A, table.analysis.B, start, start, steps=300)
         body = table.model_dump(mode="json")
         body["dynamics"] = [{"x": x, "y": y} for x, y in traj[::5]]
+        body["label"] = equilibrium_label(table.analysis)
+        body["bar"] = {
+            "standard": case.standard.value,
+            "probability": round(sigmoid(float(threshold_for(case))), 4),
+            "log_odds": case.bar_log_odds or fmt(THRESHOLD_LOG_ODDS[case.standard]),
+            "overridden": case.bar_log_odds is not None,
+        }
         return JSONResponse(body)
 
     if WEB_DIR.exists():  # mounted last so /api/* routes take precedence

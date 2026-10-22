@@ -8,3 +8,11 @@ dist/
 .venv/
 .vercel
 .env*
+
+# Regenerable analysis output (python -m courtroom analysis). Listed file by file because a
+# directory-level ignore cannot be negated per file: git does not descend into an ignored
+# directory, so results/llm_exhibition.json could never be re-included.
+results/payoffs.json
+results/bootstrap.json
+results/sensitivity.json
+.claude/

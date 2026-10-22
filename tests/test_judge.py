@@ -195,3 +195,103 @@ def test_conjunctive_element_test() -> None:
 def test_judge_is_pure(simple_case) -> None:
     j = Judge(simple_case)
     assert j.deliberate(["P1", "P2"], {}) == j.deliberate(["P2", "P1"], {})
+
+
+# ----------------------------------------------------------------- directed-verdict soundness
+#
+# The directed-verdict review is only sound because nothing after it can raise L_e:
+#   P1  the prosecution can present no more (it rested, stalled, ran out of turns or budget)
+#   P2  defense evidence never raises L_e
+#   P3  rebuttal is scope-limited and adds no new support
+# Under alternating turns P1 is what the EVIDENCE phase's end condition guarantees.
+
+
+def _replay(events, upto: int | None = None, skip=None) -> tuple[list[str], dict[str, int]]:
+    """The admitted set and impeachment counts as of ``upto``, optionally skipping a phase."""
+    admitted: list[str] = []
+    impeached: dict[str, int] = {}
+    for ev in events[:upto]:
+        if skip is not None and ev.phase is skip:
+            continue
+        if ev.subject and ev.status == "admitted":
+            admitted.append(ev.subject)
+        if ev.subject and ev.status == "impeached":
+            impeached[ev.subject] = impeached.get(ev.subject, 0) + 1
+    return admitted, impeached
+
+
+def test_p2_defense_evidence_can_never_raise_an_element() -> None:
+    """P2, for the hand-written library and the generator alike."""
+    from courtroom.cases import generate_case
+
+    offenders = [
+        (case.id, item.id, element, value)
+        for case in list(CASES.values()) + [generate_case(s) for s in range(60)]
+        for item in case.evidence
+        if item.owner is Side.DEFENSE
+        for element, value in item.support.items()
+        if value > 0
+    ]
+    assert not offenders, f"defense evidence with positive support breaks the DV guarantee: {offenders[:5]}"
+
+
+def test_log_odds_never_rise_between_the_dv_review_and_the_end_of_the_defense_case() -> None:
+    """P1 + P2: across the window the directed-verdict review actually reasons about.
+
+    DV-1 grants when an element is already below zero, justified by "nothing after this can
+    raise L_e". That holds for the defense case. It does NOT currently hold for REBUTTAL:
+    the proposal says rebuttal "cannot add new support for an element", but the engine lets
+    the prosecution present a full exhibit there, support and all. That gap is pre-existing
+    and unfixed; `test_any_post_dv_rise_is_confined_to_rebuttal` pins it so it stays visible
+    and cannot spread to the defense case unnoticed.
+    """
+    from courtroom.cases import generate_case
+    from courtroom.contracts import EventKind, Phase
+    from courtroom.engine import run_trial
+
+    risen = []
+    for case in list(CASES.values()) + [generate_case(s) for s in range(40)]:
+        judge = Judge(case)
+        for p in ("aggressive", "conservative", "adaptive", "chaos"):
+            for d in ("aggressive", "conservative", "adaptive", "chaos"):
+                result = run_trial(case, p, d, seed=7)
+                dv = next((i for i, e in enumerate(result.events) if e.kind is EventKind.DIRECTED_VERDICT), None)
+                if dv is None:
+                    continue
+                at_dv = judge.score(*_replay(result.events, dv)).log_odds
+                pre_rebuttal = judge.score(*_replay(result.events, upto=None, skip=Phase.REBUTTAL)).log_odds
+                risen += [(case.id, p, d, e) for e in at_dv if pre_rebuttal[e] > at_dv[e]]
+    assert not risen, f"L_e rose on defense evidence alone, so the DV guarantee is void: {risen[:5]}"
+
+
+def test_any_post_dv_rise_is_confined_to_rebuttal() -> None:
+    """Pins the known gap: only a rebuttal admission may raise L_e after the DV review.
+
+    This is not an endorsement. It is a tripwire, so the day someone enforces the proposal's
+    rebuttal rule this test fails and gets deleted, and until then no other phase can start
+    raising L_e without the suite noticing.
+    """
+    from courtroom.cases import generate_case
+    from courtroom.contracts import EventKind, Phase
+    from courtroom.engine import run_trial
+
+    for case in list(CASES.values()) + [generate_case(s) for s in range(40)]:
+        judge = Judge(case)
+        for p in ("aggressive", "conservative", "adaptive", "chaos"):
+            for d in ("aggressive", "conservative", "adaptive", "chaos"):
+                result = run_trial(case, p, d, seed=7)
+                dv = next((i for i, e in enumerate(result.events) if e.kind is EventKind.DIRECTED_VERDICT), None)
+                if dv is None:
+                    continue
+                at_dv = judge.score(*_replay(result.events, dv)).log_odds
+                at_end = judge.score(*_replay(result.events)).log_odds
+                for element in at_dv:
+                    if at_end[element] > at_dv[element]:
+                        rebuttal_adds = [
+                            ev.subject
+                            for ev in result.events[dv:]
+                            if ev.status == "admitted" and ev.phase is Phase.REBUTTAL
+                        ]
+                        assert rebuttal_adds, (
+                            f"{case.id} {p}/{d}: {element} rose after DV with no rebuttal admission"
+                        )
