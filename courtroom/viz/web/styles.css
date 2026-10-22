@@ -1091,3 +1091,18 @@ body.exhibition-mode .submit-field { justify-self: start; }
 .push-reaction .push-side p { margin: .2rem 0; }
 .push-reaction .push-why { color: var(--muted, inherit); font-style: italic; }
 .push-reaction .push-same { color: var(--muted, inherit); }
+
+.brief-card { margin: 1rem 0; border: 1px solid var(--rule); border-radius: .5rem; padding: .6rem 1rem; }
+.brief-card > summary { cursor: pointer; font-weight: 600; }
+.brief-card h3 { margin: .6rem 0 .1rem; }
+.brief-card h4 { margin: 1rem 0 .3rem; font-size: .95rem; }
+.brief-card p, .brief-card li { max-width: 62ch; }
+.brief-kind { color: var(--muted, inherit); margin: 0 0 .5rem; }
+.brief-count { display: block; color: var(--muted, inherit); font-size: .85rem; }
+.brief-issues { padding-left: 1.2rem; }
+.brief-gauge { margin: .7rem 0 1rem; max-width: 36rem; }
+.brief-gauge-track { position: relative; height: .6rem; border-radius: 99px; background: var(--rule); }
+.brief-gauge-start, .brief-gauge-bar { position: absolute; top: -.25rem; width: .25rem; height: 1.1rem; border-radius: 2px; transform: translateX(-50%); }
+.brief-gauge-start { background: var(--muted, currentColor); }
+.brief-gauge-bar { background: var(--accent, currentColor); }
+.brief-gauge-labels { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: .8rem; margin-top: .5rem; }

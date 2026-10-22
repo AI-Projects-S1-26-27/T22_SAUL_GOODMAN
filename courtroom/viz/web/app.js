@@ -626,10 +626,85 @@ function setupTrial() {
   renderThreshold();
   renderCatchTable();
   replayReset();
+  showBrief();
+}
+
+/* ------------------------------------------------------------------ case brief (opening screen)
+ * Plain-language statement of the case: story, charge, the issues as the judge frames them, who carries
+ * the burden and how high the bar is. It is built by the engine from the case file (judge/brief.py), so
+ * every number on it is one the judge uses. The page only lays it out.
+ */
+
+async function loadBrief() {
+  const c = S.baseCaseFile ?? S.caseFile;
+  if (!c) return null;
+  S.briefs = S.briefs ?? {};
+  const key = c.id;
+  if (S.briefs[key]) return S.briefs[key];
+  try {
+    let brief = S.bundle?.briefs?.[key] ?? null;
+    if (!brief && API && S.mode === "live") {
+      brief = await fetchJSON(`${API}/brief`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ case: c }) }, 15000);
+    }
+    if (brief) S.briefs[key] = brief;
+    return brief;
+  } catch {
+    return null;
+  }
+}
+
+function renderBrief(b) {
+  const card = $("#brief-card"), body = $("#brief-body");
+  if (!card || !body) return;
+  if (!b) { card.hidden = true; return; }
+  const bu = b.burden;
+  const gauge = el("div", { class: "brief-gauge", role: "img", "aria-label": `Starts at ${bu.presumption_probability}% and must pass ${bu.bar_probability}%` },
+    el("div", { class: "brief-gauge-track" },
+      el("span", { class: "brief-gauge-start", style: `left:${bu.presumption_probability}%` }),
+      el("span", { class: "brief-gauge-bar", style: `left:${bu.bar_probability}%` })),
+    el("div", { class: "brief-gauge-labels" },
+      el("span", {}, `Starting presumption ${bu.presumption_probability}%`),
+      el("span", {}, `Bar to clear ${bu.bar_probability}%`)));
+  const list = (items) => el("ul", {}, ...items.map((t) => el("li", {}, t)));
+  body.replaceChildren(
+    el("h3", {}, b.title),
+    el("p", { class: "brief-kind" }, `${b.kind} · ${b.charge}`),
+    el("p", {}, b.story),
+    el("h4", {}, "Who must prove what"),
+    el("p", {}, bu.statement),
+    el("p", {}, `${bu.standard[0].toUpperCase()}${bu.standard.slice(1)}: ${bu.standard_plain} ${bu.tie_rule}`),
+    gauge,
+    el("p", {}, bu.conjunctive),
+    el("h4", {}, "The issues the court must decide"),
+    el("ol", { class: "brief-issues" }, ...b.issues.map((i) =>
+      el("li", {}, el("strong", {}, i.name), ` — ${i.question} `,
+        el("span", { class: "brief-count" }, `Exhibits on file: ${i.supporting_exhibits.prosecution} for the prosecution side, ${i.supporting_exhibits.defense} for the defense.`)))),
+    el("h4", {}, `${b.parties.prosecution} must`), list(b.each_side.prosecution),
+    el("h4", {}, `${b.parties.defense} may`), list(b.each_side.defense),
+    el("h4", {}, "On the docket"), list(b.docket),
+    el("h4", {}, "How the judge weighs"), list(b.how_the_judge_weighs),
+    ...(b.published_risks.length ? [el("h4", {}, "Known risks in this case"), list(b.published_risks)] : []),
+  );
+  card.hidden = false;
+}
+
+async function showBrief() {
+  const brief = await loadBrief();
+  renderBrief(brief);
+  const card = $("#brief-card");
+  if (card) card.open = S.idx === 0;
+  S.briefWasOpening = S.idx === 0;
 }
 
 function renderFrame() {
   const t = S.trial, n = t.events.length, ev = t.events[S.idx];
+  // The brief is the opening screen: open at step 1, folded away once the trial moves on (still one click away).
+  const briefCard = $("#brief-card");
+  if (briefCard && !briefCard.hidden) {
+    if (S.idx === 0) briefCard.open = true;
+    else if (S.briefWasOpening) briefCard.open = false;
+    S.briefWasOpening = S.idx === 0;
+  }
   updateInjectionWhen();
   updatePushWhen();
   renderNow(ev);
