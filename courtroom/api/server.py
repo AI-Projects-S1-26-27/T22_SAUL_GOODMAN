@@ -250,6 +250,26 @@ def create_app() -> FastAPI:
         """The same brief for an examiner's own case file, so a custom case gets its opening screen too."""
         return JSONResponse(json.loads(build_brief(_case_for(req.case_id, req.case, req.bar)).model_dump_json()))
 
+    @app.post("/api/explain")
+    def explain_verdict(req: TrialRequest) -> JSONResponse:
+        """A plain-language account of this trial's verdict, read from its record. Changes nothing.
+
+        The trial is re-run from the request (deterministic, so it is the trial on screen). The text comes from the
+        configured local model when one answers within the judge's own figures, and from a template otherwise.
+        Gemini is replay-only here, as everywhere on the page: a request can never spend money.
+        """
+        from courtroom.llm import make_client, provider_name
+        from courtroom.llm.explainer import explain
+
+        case = _case_for(req.case_id, req.case, req.bar)
+        result = _run(case, req)
+        client = make_client(allow_network=provider_name() == "ollama")
+        try:
+            out = explain(result, case, client)
+        finally:
+            client.save()
+        return JSONResponse(json.loads(out.model_dump_json()))
+
     @app.post("/api/adverse")
     def adverse(req: TrialRequest) -> JSONResponse:
         """Run the trial with the requested pushes and again without the last one, and report what changed."""

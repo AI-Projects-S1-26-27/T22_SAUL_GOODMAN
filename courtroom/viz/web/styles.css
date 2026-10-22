@@ -1106,3 +1106,11 @@ body.exhibition-mode .submit-field { justify-self: start; }
 .brief-gauge-start { background: var(--muted, currentColor); }
 .brief-gauge-bar { background: var(--accent, currentColor); }
 .brief-gauge-labels { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: .8rem; margin-top: .5rem; }
+
+.explain-out { margin-top: .8rem; display: grid; gap: .6rem; max-width: 46rem; }
+.explain-text { margin: 0; line-height: 1.55; }
+.explain-source { margin: 0; font-size: .85rem; color: var(--muted, inherit); }
+.explain-table { border-collapse: collapse; font-size: .9rem; width: 100%; }
+.explain-table th, .explain-table td { text-align: left; padding: .3rem .5rem; border-bottom: 1px solid var(--rule); }
+.explain-table .ok { font-weight: 600; }
+.explain-table .bad { font-weight: 600; }

@@ -519,6 +519,27 @@ Selection is by `COURTROOM_LLM_PROVIDER` or `--provider`; `make_client` is the o
   documented API and is tested against a stub only. `docs/OLLAMA.md` has the model recommendation, the one-time setup and the
   pre-demo check.
 
+## D18 — "Why did it rule that way?": a verdict explainer that reads the record and cannot change it
+
+A button on the Verdict tab writes a plain-language account of the verdict (`courtroom/llm/explainer.py`, `POST /api/explain`).
+
+* **Read-only by construction.** `build_facts` copies the judge's own snapshot (scores, bars, probabilities, counted exhibits) and the
+  public events (exclusions, credibility changes, adverse events) out of a *finished* `TrialResult`. It runs no agent and scores nothing.
+  Explaining a trial leaves its serialised result byte-identical (`test_explaining_changes_nothing_about_the_trial`).
+* **The numbers are shown beside the prose** as a table taken from the same facts, so every figure in the text can be checked against the
+  judge's.
+* **A model can phrase it but not add to it.** Its text is accepted only if every number and every exhibit id appears in the facts;
+  otherwise it is discarded and the template is used, with the reason shown. Tested with invented figures and exhibits.
+* **Works offline.** The always-available path is a template written from the facts. If `COURTROOM_LLM_PROVIDER=ollama` and a local server
+  answers, the page shows its phrasing; the answer is cached, so a replay needs no server. Gemini is replay-only here as everywhere on the
+  page, so a request can never spend money. The static page shows the template stored in the bundle (`explanations`, one per bundled trial).
+* **What it can read:** exhibit titles and ids, the grounds argued, rulings, and the judge's numbers. Not exhibit flags or witness flaws.
+* **A wording bug found and fixed while testing:** the first template said every early ending meant "no accepted exhibit supported it".
+  That is only DV-2; DV-1 (below even odds, on motion) is a different finding, so the facts now carry which rule fired
+  (`test_the_reason_for_ending_the_case_early_matches_the_rule_the_judge_fired`).
+* **Not done:** the explainer was exercised against stubs, not a live Ollama. The template runs long (it lists every point); a model's
+  version is capped at about 120 words by its prompt.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`
