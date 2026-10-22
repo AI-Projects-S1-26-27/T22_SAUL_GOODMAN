@@ -20,6 +20,7 @@ from courtroom.agents import Agent, Oracle, ScoreCache, make_agent, perceive, pe
 from courtroom.contracts import (
     Action,
     ActionType,
+    AdversePush,
     CaseFile,
     EventKind,
     EvidenceGraph,
@@ -80,6 +81,7 @@ class Court:
         defense_strategy: str | None = None,
         *,
         injections: Sequence[Injection] = (),
+        adverse_pushes: Sequence[AdversePush] = (),
     ) -> None:
         self.case = case
         self.agents: dict[Side, Agent] = {Side.PROSECUTION: prosecution, Side.DEFENSE: defense}
@@ -106,6 +108,8 @@ class Court:
         self._last_hash = GENESIS
         self._injections, self._cases_after = _plan_injections(case, injections)
         self._requested: tuple[Injection, ...] = tuple(self._injections)  # every input, applied or not
+        self._pushes = _plan_pushes(case, adverse_pushes)
+        self._requested_pushes: tuple[AdversePush, ...] = tuple(self._pushes)
 
     # ------------------------------------------------------------------ event plumbing
 
@@ -176,6 +180,7 @@ class Court:
             impeachment_options=options,
             examine_options=st.examine_options(side),
             exam_options=tuple((w, g.value) for w, g in st.exam_options(side)),
+            known_adverse=tuple(st.known_adverse),
             adverse=(
                 {
                     "no_show": self.case.rules.no_show,  # type: ignore[union-attr]
@@ -219,6 +224,7 @@ class Court:
                 self._enter(st.next_phase_after_rest(), "No one left to present.")
                 continue
             self._apply_due_injections()
+            self._apply_due_pushes()
             side, window = st.expected()  # type: ignore[misc]
             if window == "primary" and st.turns_left(side) == 0:
                 self._rest(side, RuleFiring(rule_id="TURN-CAP", detail=f"{side.value} exhausted its {st.turn_cap()} turns."))
@@ -467,6 +473,12 @@ class Court:
 
     def _roll_offer(self, item: EvidenceItem) -> str | None:
         """Whether offering ``item`` fails outright. Draws only for the events the item is exposed to."""
+        st = self.state
+        # A pushed event is forced, so it consumes no randomness and works on any case, flag or not.
+        if item.id in st.armed_no_show:
+            return "no_show"
+        if item.id in st.armed_certificate:
+            return "no_certificate"
         if not self.case.adverse_events:
             return None
         rules = self.case.rules
@@ -482,21 +494,32 @@ class Court:
             witness = self.case.witness(item.witness_id) if item.witness_id else None
             who = witness.name if witness else str(item.witness_id)
             summary = f"{side.value} offers {item.id}, but the witness, {who}, does not appear. The testimony is lost."
-            rule = RuleFiring(rule_id="ADV-1", detail=f"Witness no-show for {item.id}; the exhibit is excluded and its cost is not refunded.")
+            pushed = " (pushed by the examiner)" if item.id in self.state.armed_no_show else ""
+            rule = RuleFiring(rule_id="ADV-1", detail=f"Witness no-show for {item.id}{pushed}; the exhibit is excluded and its cost is not refunded.")
         else:
             summary = f"{side.value} offers {item.id}, but it has no section 65B certificate. The court excludes it."
-            rule = RuleFiring(rule_id="ADV-2", detail=f"Electronic record {item.id} lacks a certificate of authenticity; excluded without objection, no bad-faith sanction.")
+            pushed = " (pushed by the examiner)" if item.id in self.state.armed_certificate else ""
+            rule = RuleFiring(rule_id="ADV-2", detail=f"Electronic record {item.id}{pushed} lacks a certificate of authenticity; excluded without objection, no bad-faith sanction.")
         self._emit(EventKind.ADVERSE, summary, side, action, [rule], subject=item.id, status=failure)  # type: ignore[arg-type]
 
     def _after_admission(self, item: EvidenceItem) -> None:
         """A witness whose testimony has just been admitted may turn hostile (once per witness)."""
         st = self.state
-        if not self.case.adverse_events or item.witness_id is None or item.witness_id in st.hostile:
+        if item.witness_id is None or item.witness_id in st.hostile:
             return
-        rules = self.case.rules
-        assert rules is not None
-        if self._adverse_rng.random() >= rules.hostile:
-            return
+        pushed = item.witness_id in st.armed_hostile
+        if not pushed:
+            if not self.case.adverse_events:
+                return
+            rules = self.case.rules
+            assert rules is not None
+            if self._adverse_rng.random() >= rules.hostile:
+                return
+        self._turn_hostile(item, pushed)
+
+    def _turn_hostile(self, item: EvidenceItem, pushed: bool) -> None:
+        st = self.state
+        assert item.witness_id is not None
         st.hostile.add(item.witness_id)
         st.impeachments[hostile_key(item.witness_id)] = 1
         witness = self.case.witness(item.witness_id)
@@ -506,8 +529,74 @@ class Court:
             f"{who} turns hostile on the stand; the testimony of {item.witness_id} now carries a quarter of its weight.",
             subject=item.witness_id,
             status="hostile",
-            rules=[RuleFiring(rule_id="ADV-3", detail=f"Witness {item.witness_id} turned hostile after {item.id}; credibility x1/4.")],
+            rules=[
+                RuleFiring(
+                    rule_id="ADV-3",
+                    detail=f"Witness {item.witness_id} turned hostile after {item.id}{' (pushed by the examiner)' if pushed else ''}; credibility x1/4.",
+                )
+            ],
         )
+
+    # ------------------------------------------------------------------ pushed adverse events
+
+    def _apply_due_pushes(self) -> None:
+        """Announce due pushes, between turns and never inside a response window (like injections)."""
+        st = self.state
+        while self._pushes and self._pushes[0].at_seq <= len(self._events) and st.pending is None and st.phase in CASE_PHASES:
+            self._apply_push(self._pushes.pop(0))
+
+    def _push_rule(self, push: AdversePush, rule_id: str, detail: str) -> RuleFiring:
+        return RuleFiring(rule_id=rule_id, detail=f"{detail} [push at step {push.at_seq}: {push.kind} on {push.target}]")
+
+    def _refuse_push(self, push: AdversePush, why: str) -> None:
+        self._emit(
+            EventKind.ADVERSE,
+            f"The request to apply {push.kind.replace('_', ' ')} to {push.target} was refused: {why}.",
+            subject=push.target,
+            status="not_applied",
+            rules=[self._push_rule(push, "ADV-5", why)],
+        )
+
+    def _apply_push(self, push: AdversePush) -> None:
+        st = self.state
+        known = f"{push.kind}:{push.target}"
+        if push.kind in ("no_show", "missing_certificate"):
+            if push.target in st.presented:
+                return self._refuse_push(push, f"{push.target} has already been offered")
+            (st.armed_no_show if push.kind == "no_show" else st.armed_certificate).add(push.target)
+            what = (
+                f"The witness for {push.target} has told the court they may not attend."
+                if push.kind == "no_show"
+                else f"The court is told {push.target} may lack its section 65B certificate."
+            )
+            st.known_adverse.append(known)
+            self._emit(
+                EventKind.ADVERSE, what, subject=push.target, status="announced",
+                rules=[self._push_rule(push, "ADV-4", "Announced in court; both sides know")],
+            )
+            return
+        testimony = next((self.case.item(i) for i in st.admitted if (it := self.case.item(i)) and it.witness_id == push.target), None)
+        if push.target in st.hostile:
+            return self._refuse_push(push, f"{push.target} is already hostile")
+        if testimony is not None:
+            if testimony.owner is Side.DEFENSE and st.phase is not Phase.EVIDENCE:
+                # Down-weighting a defense witness after the directed-verdict review would raise the prosecution
+                # after the point where the review is sound (DEVIATIONS D5, D15).
+                return self._refuse_push(push, "that would help the prosecution after the directed-verdict review")
+            st.known_adverse.append(known)
+            self._turn_hostile(testimony, pushed=True)
+            return
+        st.armed_hostile.add(push.target)
+        st.known_adverse.append(known)
+        self._emit(
+            EventKind.ADVERSE, f"The court is told {push.target} may turn hostile when called.", subject=push.target,
+            status="announced", rules=[self._push_rule(push, "ADV-4", "Announced in court; both sides know")],
+        )
+
+    def _report_unapplied_pushes(self) -> None:
+        for push in self._pushes:
+            self._refuse_push(push, "the trial had left the evidence phases before that step")
+        self._pushes = []
 
     def _cross_examine(self, side: Side, action: Action) -> None:
         st = self.state
@@ -655,6 +744,7 @@ class Court:
         if st.phase is not Phase.DELIBERATION:
             st.enter(Phase.DELIBERATION)
         self._report_unapplied_injections()
+        self._report_unapplied_pushes()
         verdict: Verdict = self.judge.deliberate(st.admitted, st.impeachments, st.directed)
         self._emit(
             EventKind.VERDICT,
@@ -676,6 +766,7 @@ class Court:
             digest=self._last_hash,
             graph=self._graph(verdict),
             injections=self._requested,
+            adverse_pushes=self._requested_pushes,
         )
 
     def _graph(self, verdict: Verdict) -> EvidenceGraph:
@@ -739,18 +830,43 @@ def _plan_injections(case: CaseFile, injections: Sequence[Injection]) -> tuple[l
     return list(ordered), cases
 
 
+def _plan_pushes(case: CaseFile, pushes: Sequence[AdversePush]) -> list[AdversePush]:
+    """Order the pushes and refuse any that name something that cannot be affected, before the trial starts."""
+    ordered = sorted(pushes, key=lambda p: (p.at_seq, p.kind, p.target))
+    for push in ordered:
+        if push.kind == "hostile":
+            if case.witness(push.target) is None:
+                raise ValueError(f"adverse push: {push.target!r} is not a witness in this case")
+            continue
+        item = case.item(push.target)
+        if item is None:
+            raise ValueError(f"adverse push: {push.target!r} is not an exhibit in this case")
+        if push.kind == "no_show" and item.witness_id is None:
+            raise ValueError(f"adverse push: {push.target!r} has no witness, so there is no one to fail to appear")
+        if push.kind == "missing_certificate" and item.kind is not EvidenceKind.DIGITAL_LOG:
+            raise ValueError(f"adverse push: {push.target!r} is not a digital record, so it needs no section 65B certificate")
+    return ordered
+
+
 def run_trial(
-    case: CaseFile, prosecution: str, defense: str, seed: int = 0, injections: Sequence[Injection] = ()
+    case: CaseFile,
+    prosecution: str,
+    defense: str,
+    seed: int = 0,
+    injections: Sequence[Injection] = (),
+    adverse_pushes: Sequence[AdversePush] = (),
 ) -> TrialResult:
     """Convenience entry point used by the CLI, API, and tournament."""
     p_agent = make_agent(prosecution, random.Random(f"{seed}:agent:prosecution"))
     d_agent = make_agent(defense, random.Random(f"{seed}:agent:defense"))
-    return Court(case, p_agent, d_agent, seed, prosecution, defense, injections=injections).run()
+    return Court(case, p_agent, d_agent, seed, prosecution, defense, injections=injections, adverse_pushes=adverse_pushes).run()
 
 
 def replay_trial(result: TrialResult, case: CaseFile) -> TrialResult:
     """Re-run a finished trial from nothing but its recorded inputs, injections included."""
-    return run_trial(case, result.prosecution_strategy, result.defense_strategy, result.seed, result.injections)
+    return run_trial(
+        case, result.prosecution_strategy, result.defense_strategy, result.seed, result.injections, result.adverse_pushes
+    )
 
 
 def verify_injections(result: TrialResult) -> bool:

@@ -1066,6 +1066,7 @@ body.exhibition-mode.offline .seed-field.live-only { display: block !important; 
 /* Things that only make sense for the certified engine are not offered while the exhibition is on:
    the replay holds fixed trials, so it cannot add evidence, move the bar, or recompute a matrix. */
 body.exhibition-mode #inject-panel,
+body.exhibition-mode #push-panel,
 body.exhibition-mode .thr-live,
 body.exhibition-mode .thr-q3,
 body.exhibition-mode #analysis-card,
@@ -1083,3 +1084,10 @@ body.exhibition-mode #strategy .tech-hint { display: none !important; }
 body.exhibition-mode .setup { grid-template-columns: minmax(0, 1fr); }
 body.exhibition-mode .seg { width: auto; }
 body.exhibition-mode .submit-field { justify-self: start; }
+
+.push-reaction { display: grid; gap: .6rem; margin-top: .8rem; }
+.push-reaction .push-side { border: 1px solid var(--rule); border-radius: .4rem; padding: .6rem .8rem; font-size: .9rem; }
+.push-reaction .push-side h4 { margin: 0 0 .3rem; font-size: .9rem; }
+.push-reaction .push-side p { margin: .2rem 0; }
+.push-reaction .push-why { color: var(--muted, inherit); font-style: italic; }
+.push-reaction .push-same { color: var(--muted, inherit); }

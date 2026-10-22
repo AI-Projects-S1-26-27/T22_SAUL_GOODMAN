@@ -89,6 +89,12 @@ class ProcedureState:
     used_crosses: set[tuple[str, ExamGround]] = field(default_factory=set)
     used_examines: set[str] = field(default_factory=set)
     hostile: set[str] = field(default_factory=set)  # witnesses who turned hostile (adverse events only)
+    # Pushed adverse events (AdversePush): armed against exhibits or witnesses not yet affected, and the public
+    # record of what has been announced, which is all the agents are allowed to know about them.
+    armed_no_show: set[str] = field(default_factory=set)
+    armed_certificate: set[str] = field(default_factory=set)
+    armed_hostile: set[str] = field(default_factory=set)
+    known_adverse: list[str] = field(default_factory=list)
     turns_used: dict[tuple[Phase, Side], int] = field(default_factory=dict)
     passes: dict[Side, int] = field(default_factory=dict)  # consecutive primary passes, per side
     rested: set[Side] = field(default_factory=set)

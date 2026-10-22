@@ -19,6 +19,7 @@ __all__ = [
     "DEFAULT_COST",
     "Action",
     "ActionType",
+    "AdversePush",
     "CaseFile",
     "CaseType",
     "Contribution",
@@ -357,6 +358,21 @@ class Injection(Frozen):
     item: EvidenceItem
 
 
+class AdversePush(Frozen):
+    """An adverse event the examiner pushes into a trial once it has produced ``at_seq`` events.
+
+    Like ``Injection`` it lives on the trial *result*, never on the hashed event, so no digest moves. It is
+    forced, not drawn: ``no_show`` and ``missing_certificate`` name an exhibit that has not been offered yet and
+    take effect when its owner offers it; ``hostile`` names a witness and takes effect now if the witness has
+    already testified, or on admission otherwise. The announcement is a logged event in the hash chain, and
+    both sides can see it.
+    """
+
+    at_seq: int = Field(ge=1, le=10_000)
+    kind: Literal["no_show", "missing_certificate", "hostile"]
+    target: str = Field(pattern=r"^[A-Za-z0-9_\-]+$")
+
+
 # --------------------------------------------------------------------------- actions
 
 
@@ -461,6 +477,7 @@ class PartyView(Frozen):
     witness_beliefs: dict[str, dict[str, float]] = Field(default_factory=dict)
     own_exposures: tuple[tuple[str, str], ...] = ()  # (own witness, ground of its latest exposure), public record
     adverse: dict[str, float] = Field(default_factory=dict)  # the case's published adverse-event rates; empty if off
+    known_adverse: tuple[str, ...] = ()  # pushed events announced in court, "<kind>:<target>"; public to both sides
 
 
 # --------------------------------------------------------------------------- trial record
@@ -490,7 +507,7 @@ class TrialEvent(Frozen):
     action: Action | None = None
     summary: str
     subject: str | None = None  # evidence id this event is about, if any
-    status: Literal["offered", "admitted", "excluded", "impeached", "injected", "exposed", "unfounded", "rehabilitated", "no_show", "no_certificate", "hostile"] | None = None
+    status: Literal["offered", "admitted", "excluded", "impeached", "injected", "exposed", "unfounded", "rehabilitated", "no_show", "no_certificate", "hostile", "announced", "not_applied"] | None = None
     rules: tuple[RuleFiring, ...] = ()
     burden_index: float | None = None
     element_probabilities: dict[str, float] = Field(default_factory=dict)
@@ -531,3 +548,4 @@ class TrialResult(Frozen):
     digest: str
     graph: EvidenceGraph
     injections: tuple[Injection, ...] = ()  # every injection requested, in order, applied or not
+    adverse_pushes: tuple[AdversePush, ...] = ()  # every adverse push requested, in order, applied or not

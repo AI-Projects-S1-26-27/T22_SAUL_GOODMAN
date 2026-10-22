@@ -457,6 +457,29 @@ Adding risk made two cases *more* stable and *less* strategic: when a play can f
 dominates, so the matrix collapses toward Conservative. That is a result worth stating, and it is the opposite of the hoped
 for "more strategic variety". Helix keeps its mixed equilibrium.
 
+### D15 addendum: adverse events the examiner pushes in (step 2)
+
+`POST /api/adverse` and a panel on the Courtroom tab ("Push an adverse event mid-trial") mirror evidence injection.
+`AdversePush(at_seq, kind, target)` lives on the trial result, never on a hashed event, so no digest moves; every push
+requested is recorded, applied or not, and `replay_trial` reproduces the trial from it.
+
+* `no_show` / `missing_certificate` name an exhibit not yet offered and take effect when it is offered. `hostile` takes
+  effect now if the witness has testified, otherwise on admission. Pushes are forced, draw no randomness, and work on a
+  certified case with no flag.
+* Each push is **announced** as a logged `ADVERSE` event (`ADV-4`), so both sides know. Agents see only the public
+  announcement (`PartyView.known_adverse`), never the armed state.
+* **Refused rather than applied:** an exhibit already offered, a witness already hostile, a hostile push on a defense witness
+  after the directed-verdict review (it would help the prosecution after the point where the review is sound), and a push the
+  trial never reaches (`ADV-5`).
+* **Adaptive reacts, the others do not.** The expected-value profile prices an announced exhibit at survival 0 (or a hostile
+  witness at 0.25) and stops offering it; Aggressive and Conservative ignore the announcement and walk into the failure. The page
+  shows, per side, the first decision that changed, the announcement behind it, and the lawyer's own logged rationale. It is
+  computed from two finished trials (`engine/reaction.py`); no language model is involved.
+
+Measured on `helix-espionage`, Adaptive v Adaptive, seed 0: a missing-certificate announcement for `P-VPN` makes the
+prosecution offer `P-EXPERT` instead (the verdict goes from guilty to a directed acquittal); Aggressive still offers `P-VPN`
+and loses it to exclusion.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

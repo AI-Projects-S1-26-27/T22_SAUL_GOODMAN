@@ -15,7 +15,7 @@ const S = {
   mode: null, bundle: null, cases: [], strategies: [], caseFiles: {}, caseFile: null,
   trial: null, trialKey: null, idx: 0, timer: null, loadToken: 0, caseToken: 0,
   tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null, rules: null,
-  spoken: null, spokenOn: false, spokenKey: null, baseCaseFile: null, injections: [],
+  spoken: null, spokenOn: false, spokenKey: null, baseCaseFile: null, injections: [], pushes: [],
   exhibition: null, exhibitionOn: false, modeToken: 0, setupNote: null, stylesIntro: null,
 };
 
@@ -427,7 +427,7 @@ async function selectCase(id) {
   if (token !== S.caseToken) return;
   S.caseFile = c;
   S.baseCaseFile = c;
-  S.injections = [];
+  S.injections = []; S.pushes = [];
   S.trial = null;
   S.trialKey = null;
   document.querySelectorAll("[data-side-label]").forEach((n) => (n.textContent = sideLabel(n.dataset.sideLabel)));
@@ -461,7 +461,7 @@ async function loadTrial({ autoplay = false } = {}) {
   const token = ++S.loadToken;
   stop();
   if (S.injections.length && S.baseCaseFile) {
-    S.injections = [];
+    S.injections = []; S.pushes = [];
     S.caseFile = S.baseCaseFile;
     buildEvidenceBoard();
   }
@@ -485,6 +485,7 @@ async function loadTrial({ autoplay = false } = {}) {
     S.trialKey = key;
     updateExhibitionTrialNote();
     buildInjectionForm();
+    buildPushForm();
     setupTrial();
     renderThreshold();
     renderCatchTable();
@@ -630,6 +631,7 @@ function setupTrial() {
 function renderFrame() {
   const t = S.trial, n = t.events.length, ev = t.events[S.idx];
   updateInjectionWhen();
+  updatePushWhen();
   renderNow(ev);
   updatePhases(ev);
   updateMeters(ev, t.events[S.idx - 1]);
@@ -1851,7 +1853,7 @@ async function runInjection() {
   btn.disabled = true;
   status.textContent = "Replaying the trial with the new evidence…";
   try {
-    const request = { ...currentRequest(), injections: [...S.injections, injection] };
+    const request = { ...currentRequest(), injections: [...S.injections, injection], adverse_pushes: S.pushes };
     const trial = await fetchJSON(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }, 60000);
     stop();
     S.injections = trial.injections;
@@ -1860,6 +1862,7 @@ async function runInjection() {
     S.trial = trial;
     S.trialKey = `${S.baseCaseFile.id}|${request.prosecution}|${request.defense}|${request.seed}|inj${S.injections.length}`;
     buildInjectionForm();
+    buildPushForm();
     setupTrial();
     renderThreshold();
     const at = trial.events.findIndex((e) => e.kind === "injection" && e.subject === injection.item.id);
@@ -1882,6 +1885,86 @@ async function runInjection() {
 
 function initInjection() {
   $("#inj-run")?.addEventListener("click", runInjection);
+  initPush();
+}
+
+/* ------------------------------------------------------------------ pushed adverse events (courtroom tab)
+ * Mirrors the evidence panel: the examiner pushes a failure into the trial at the step being viewed, the
+ * engine replays from there, and the server also runs the same trial without the push so the page can show
+ * each side's first changed decision. The reason shown is the rationale the lawyer logged (its own belief),
+ * plus the announcement it reacted to. Nothing on this panel is written by a language model.
+ */
+
+const PUSH_TARGETS = {
+  no_show: () => S.caseFile.evidence.filter((e) => e.witness_id).map((e) => [e.id, `${e.title} (${witnessById(e.witness_id)?.name ?? e.witness_id})`]),
+  missing_certificate: () => S.caseFile.evidence.filter((e) => e.kind === "digital_log").map((e) => [e.id, e.title]),
+  hostile: () => S.caseFile.witnesses.map((w) => [w.id, `${w.name}, ${lowerFirst(w.role)}`]),
+};
+
+function buildPushForm() {
+  const kind = $("#push-kind"), target = $("#push-target");
+  if (!kind || !target || !S.caseFile) return;
+  target.replaceChildren(...(PUSH_TARGETS[kind.value] ?? PUSH_TARGETS.no_show)().map(([id, label]) => el("option", { value: id }, label)));
+  updatePushWhen();
+}
+
+function updatePushWhen() {
+  const out = $("#push-when");
+  if (!out || !S.trial) return;
+  const ev = S.trial.events[S.idx];
+  out.textContent = `It happens after step ${S.idx + 1}: ${ev ? narrate(ev).short ?? narrate(ev).head : ""}`;
+}
+
+function renderReaction(r) {
+  const box = $("#push-reaction");
+  if (!box) return;
+  const describe = (d) => d ? `${title(d.type)}${d.evidence_id ? ` ${d.evidence_id}` : ""}${d.witness_id && !d.evidence_id ? ` ${d.witness_id}` : ""} (step ${d.step})` : "nothing more";
+  const sides = r.sides.map((s) => {
+    const head = el("h4", {}, `${sideName(s.side)} plays ${styleInfo(s.strategy).label}`);
+    if (!s.reacted) return el("div", { class: "push-side" }, head, el("p", { class: "push-same" }, "Its decisions did not change."));
+    const rows = [head, el("p", {}, `Without the push it would next have: ${describe(s.before)}.`), el("p", {}, `With the push it now: ${describe(s.after)}.`)];
+    if (s.belief) rows.push(el("p", { class: "push-why" }, s.belief));
+    if (s.after?.rationale) rows.push(el("p", { class: "push-why" }, `Its own reasoning: ${s.after.rationale}`));
+    return el("div", { class: "push-side" }, ...rows);
+  });
+  box.replaceChildren(
+    el("p", {}, r.applied ? r.announcement : `Not applied: ${r.announcement}`),
+    el("p", {}, `Verdict without the push: ${outcomeWord(r.verdict_before)}. With it: ${outcomeWord(r.verdict_after)}.`),
+    ...sides,
+  );
+}
+
+async function runPush() {
+  const status = $("#push-status"), btn = $("#push-run");
+  if (S.exhibitionOn) { status.textContent = "Events can't be pushed into a replayed exhibition trial. Switch to the certified mode."; return; }
+  if (!S.trial || !API || S.mode !== "live") { status.textContent = "Pushing an event needs the local simulator: python -m courtroom serve"; return; }
+  if (S.pushes.length >= 3) { status.textContent = "Three events is the limit for one trial. Start a new trial to try more."; return; }
+  const push = { at_seq: S.idx + 1, kind: $("#push-kind").value, target: $("#push-target").value };
+  btn.disabled = true;
+  status.textContent = "Replaying the trial with the event…";
+  try {
+    const request = { ...currentRequest(), injections: S.injections, adverse_pushes: [...S.pushes, push] };
+    const data = await fetchJSON(`${API}/adverse`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }, 60000);
+    stop();
+    S.pushes = data.trial.adverse_pushes;
+    S.trial = data.trial;
+    S.trialKey = `${S.baseCaseFile.id}|${request.prosecution}|${request.defense}|${request.seed}|inj${S.injections.length}|adv${S.pushes.length}`;
+    setupTrial();
+    renderThreshold();
+    const at = data.trial.events.findIndex((e) => e.kind === "adverse" && e.subject === push.target && ["announced", "hostile", "not_applied"].includes(e.status));
+    seek(at >= 0 ? at : 0);
+    renderReaction(data.reaction);
+    status.textContent = `Pushed after step ${push.at_seq}. The verdict is ${outcomeWord(data.trial.verdict.outcome)}.`;
+  } catch (err) {
+    status.textContent = `It was refused: ${explainApiError(err).map((e) => e.message).join("; ").slice(0, 300)}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function initPush() {
+  $("#push-kind")?.addEventListener("change", buildPushForm);
+  $("#push-run")?.addEventListener("click", runPush);
 }
 
 /* ------------------------------------------------------------------ catch probability (judge tab) */
@@ -2008,9 +2091,10 @@ function initEditor() {
       if (S.exhibitionOn) applyModeUi(false);
       S.caseFile = p.value;
       S.baseCaseFile = p.value;
-      S.injections = [];
+      S.injections = []; S.pushes = [];
       buildEvidenceBoard();
       buildInjectionForm();
+      buildPushForm();
       S.trial = trial;
       S.trialKey = `custom|${Date.now()}`;
       setupTrial();

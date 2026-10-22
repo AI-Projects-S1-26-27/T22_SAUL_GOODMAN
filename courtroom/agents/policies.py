@@ -198,6 +198,7 @@ class CounselAgent:
             if gain <= 0:
                 continue
             value = self._value_presentation(view, item, gain, defects)
+            survival = self._survival(view, item) if self.profile.adaptive else 1.0
             out.append(
                 _Option(
                     value=value,
@@ -209,6 +210,7 @@ class CounselAgent:
                         rationale=(
                             f"Offer {item.id}: +{gain:.2f} potential"
                             + (f", known defects {[d.value for d in defects]}" if defects else "")
+                            + (f", expected survival {survival:.2f}" if survival != 1.0 else "")
                             + f" (value {value:.2f})."
                         ),
                     ),
@@ -300,13 +302,17 @@ class CounselAgent:
         expected-value profile uses it: the others keep ignoring the risk, which is the difference the
         adverse-event measurement is meant to expose.
         """
-        if not view.adverse:
-            return 1.0
+        known = set(view.known_adverse)
+        if f"no_show:{item.id}" in known or f"missing_certificate:{item.id}" in known:
+            return 0.0  # announced in court: the exhibit will fail when offered
         keep = 1.0
-        if item.witness_id is not None:
-            keep *= (1.0 - view.adverse["no_show"]) * (1.0 - 0.75 * view.adverse["hostile"])
-        if item.kind is EvidenceKind.DIGITAL_LOG:
-            keep *= 1.0 - view.adverse["missing_certificate"]
+        if item.witness_id is not None and f"hostile:{item.witness_id}" in known:
+            keep *= 0.25
+        if view.adverse:
+            if item.witness_id is not None:
+                keep *= (1.0 - view.adverse["no_show"]) * (1.0 - 0.75 * view.adverse["hostile"])
+            if item.kind is EvidenceKind.DIGITAL_LOG:
+                keep *= 1.0 - view.adverse["missing_certificate"]
         return keep
 
     def _impeachment_options(self, view: PartyView, oracle: Oracle) -> list[_Option]:

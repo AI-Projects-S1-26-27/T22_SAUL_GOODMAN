@@ -358,6 +358,24 @@
               <span class="field-help" id="inj-status" role="status"></span>
             </form>
           </details>
+          <details class="inject-panel live-only" id="push-panel">
+            <summary>Push an adverse event mid-trial</summary>
+            <p class="thr-qnote">Something goes wrong for one side once the trial reaches the step you are looking at, and the trial plays out again from there. The court is told, so both sides know. An expected-value lawyer (Adaptive) changes what it offers; the other styles do not. The change is written into the tamper-evident log.</p>
+            <form class="inject-form" id="push-form" autocomplete="off">
+              <label>What happens
+                <select id="push-kind">
+                  <option value="no_show">A witness fails to turn up</option>
+                  <option value="missing_certificate">A digital record has no section 65B certificate</option>
+                  <option value="hostile">A witness turns hostile</option>
+                </select>
+              </label>
+              <label>To whom or what <select id="push-target"></select></label>
+              <p class="thr-qnote" id="push-when"></p>
+              <button class="btn" type="button" id="push-run">Push it and replay from here</button>
+              <span class="field-help" id="push-status" role="status"></span>
+            </form>
+            <div id="push-reaction" class="push-reaction" aria-live="polite"></div>
+          </details>
           <p class="ev-footnote">Hidden flaws are visible to you but not to the other side. A lawyer has to spot them and object.</p>
           <div class="next-up">
             <p>When the verdict is in, see exactly why.</p>

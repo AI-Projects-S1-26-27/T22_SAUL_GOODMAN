@@ -6,6 +6,7 @@ Input sizes are bounded so a demo audience can't hang the server.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
@@ -17,8 +18,8 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 from courtroom import __version__
 from courtroom.agents import describe_strategies, make_agent
 from courtroom.cases import CASES, generate_case, get_case
-from courtroom.contracts import CaseFile, Injection, TrialResult
-from courtroom.engine import run_trial
+from courtroom.contracts import AdversePush, CaseFile, Injection, TrialResult
+from courtroom.engine import push_reaction, run_trial
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
 from courtroom.gametheory.bootstrap import equilibrium_label
 from courtroom.judge.rules import THRESHOLD_LOG_ODDS, fmt, override_for_bar, sigmoid, threshold_for
@@ -41,6 +42,8 @@ class TrialRequest(BaseModel):
     bar: float | None = Field(default=None, ge=0.5, le=0.999)
     # Exhibits added to a party's hand once the trial has produced ``at_seq`` events.
     injections: list[Injection] = Field(default_factory=list, max_length=3)
+    # Adverse events pushed in once the trial has produced ``at_seq`` events (no_show, missing_certificate, hostile).
+    adverse_pushes: list[AdversePush] = Field(default_factory=list, max_length=3)
 
     @field_validator("prosecution", "defense")
     @classmethod
@@ -95,7 +98,7 @@ def _case_for(case_id: str | None, inline: CaseFile | None, bar: float | None) -
 def _run(case: CaseFile, req: TrialRequest) -> TrialResult:
     """Run the requested trial, turning a rejected injection into a clear 422 instead of a 500."""
     try:
-        return run_trial(case, req.prosecution, req.defense, req.seed, req.injections)
+        return run_trial(case, req.prosecution, req.defense, req.seed, req.injections, req.adverse_pushes)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from None
 
@@ -235,6 +238,21 @@ def create_app() -> FastAPI:
     @app.post("/api/trial", response_model=TrialResult)
     def trial(req: TrialRequest) -> TrialResult:
         return _run(_case_for(req.case_id, req.case, req.bar), req)
+
+    @app.post("/api/adverse")
+    def adverse(req: TrialRequest) -> JSONResponse:
+        """Run the trial with the requested pushes and again without the last one, and report what changed."""
+        if not req.adverse_pushes:
+            raise HTTPException(422, "send at least one adverse push")
+        case = _case_for(req.case_id, req.case, req.bar)
+        after = _run(case, req)
+        before = _run(case, req.model_copy(update={"adverse_pushes": req.adverse_pushes[:-1]}))
+        return JSONResponse(
+            {
+                "trial": json.loads(after.model_dump_json()),
+                "reaction": push_reaction(before, after, req.adverse_pushes[-1], case),
+            }
+        )
 
     @app.post("/api/game")
     def game(req: GameRequest) -> JSONResponse:
