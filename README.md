@@ -51,7 +51,7 @@ python -m courtroom serve
 Open <http://127.0.0.1:8000>. The local server runs the **live simulator**, so you can use any
 trial number, any pairing of styles (including a mixed strategy) and larger strategy games.
 
-Run the test suite (932 tests):
+Run the test suite (935 tests):
 
 ```bash
 python -m pytest
@@ -332,7 +332,7 @@ judge only through the read-only `Oracle`, and the visualisation layer can't inf
 - **Agent crashes:** caught at the fault barrier (`V-AGENT-FAULT`), including in `opening_statement()`.
 - **Demo infrastructure:** bundle fallback, works from `file://`, and `no-cache` headers.
 - **Verified:** a 2,500-trial fuzz run, including the Chaotic agent, had 0 crashes and 0 invariant
-  violations, and 250/250 replays were bit-identical. All 932 tests pass (353 test functions,
+  violations, and 250/250 replays were bit-identical. All 935 tests pass (356 test functions,
   parametrised). Measured figures and what they depend on are in [`RESULTS.md`](RESULTS.md).
 
 ---
@@ -377,9 +377,10 @@ courtroom/
   viz/         terminal dashboard + web/ (index.html, styles.css, app.js, data/bundle.js)
   cli.py       command-line entry point
 docs/DESIGN.md design dialectic and calibration notes
+PROVENANCE.md  how to verify every claim yourself: commands, expected results, hashes, bugs found
 RESULTS.md     measured equilibria, bootstrap stability, sensitivity sweep
 DEVIATIONS.md  every intentional divergence from the proposal, with reasons
-tests/         353 test functions -> 932 parametrised cases
+tests/         356 test functions -> 935 parametrised cases
 ```
 
 ---
