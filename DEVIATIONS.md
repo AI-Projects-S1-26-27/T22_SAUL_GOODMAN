@@ -499,6 +499,26 @@ events). It is shown as the opening screen of the Courtroom tab and folds away o
 * **Wording choice to check with a lawyer:** civil cases still say "prosecution side" for the plaintiff, because the engine uses
   one pair of side names for both case types.
 
+## D17 — Ollama as a second language-model provider (exhibition only; no result changed)
+
+`courtroom/llm/ollama.py` adds `OllamaClient`, a subclass of the Gemini `LLMClient` that swaps only the transport (a local HTTP
+call to `/api/chat`). The cache, the per-trial and per-run caps, the usage counters and the never-raises rule are inherited.
+Selection is by `COURTROOM_LLM_PROVIDER` or `--provider`; `make_client` is the one place that decides.
+
+* **Separate everything.** Cache keys carry `ollama/<model>` and the default file is `responses.ollama.json`; results go to
+  `results/llm_exhibition_ollama.json`. The shipped Gemini cache, results and `exhibition.js` are byte-identical to before
+  (`test_the_shipped_gemini_exhibition_is_byte_for_byte_what_it_was`), and exporting an Ollama exhibition refuses to replace them
+  without `--force`.
+* **Replayable.** A live run writes to the cache; a later run with the network disabled reproduces the same trial and digest.
+* **Same label.** Exhibition, not equilibrium analysis. Local inference is not bit-stable across hardware, so a cold-cache rerun can differ.
+* **Never fatal.** A server that is down, a model that is not pulled, a timeout, an empty answer and a malformed index are each counted
+  and become a fallback, with the fix in the message (`ollama serve`, `ollama pull`).
+* **A logged rationale changed shape.** The policy's rationale now reads `[<provider>] chose option ...`; for Gemini it is still
+  `[gemini]`, so no committed trial changed.
+* **Not verified against a real server.** Ollama is not installed on the development machine; the wire format follows Ollama's
+  documented API and is tested against a stub only. `docs/OLLAMA.md` has the model recommendation, the one-time setup and the
+  pre-demo check.
+
 ## Corrections to claims made about the repo (no code or doc changed)
 
 - **"84 tests, not 483."** Both numbers are right and describe the same suite: 84 `def test_`

@@ -30,12 +30,12 @@ Measured against the current engine, in which **the two sides alternate turns** 
 
 | Check | Command | Result |
 |---|---|---|
-| Test suite | `python -m pytest` | **892 passed, 0 failed** |
+| Test suite | `python -m pytest` | **914 passed, 0 failed** |
 | Fuzz | `python -m courtroom stress --cases 100` | 2,500 trials, **0 crashes, 0 invariant failures** |
 | Replay determinism | `python -m courtroom verify` | 250/250 replays bit-identical; every case × pairing combination gives identical digests and valid hash chains |
 
-The suite is 318 test functions across 18 files, which `@pytest.mark.parametrize` expands into the **892 test
-cases** pytest reports. 892 is what the tool prints.
+The suite is 337 test functions across 18 files, which `@pytest.mark.parametrize` expands into the **914 test
+cases** pytest reports. 914 is what the tool prints.
 
 Fuzz verdict mix over 2,500 generated cases: 1,548 directed acquittal · 559 liable · 273 not
 guilty · 78 guilty · 42 not liable. The generator produces weak cases — **61.9% end at the

@@ -46,9 +46,9 @@ def cmd_run(a: argparse.Namespace) -> int:
     case = _case(a.case)
     result = run_trial(case, a.prosecution, a.defense, a.seed, _injections(a))
     if getattr(a, "narrate", False):
-        from courtroom.llm import LLMClient, narrate
+        from courtroom.llm import make_client, narrate
 
-        client = LLMClient()
+        client = make_client(getattr(a, "provider", None), model=getattr(a, "model", None))
         lines = narrate(result, case, client)
         client.save()
         for ev in result.events:
@@ -97,8 +97,24 @@ def cmd_tournament(a: argparse.Namespace) -> int:
 
 
 def cmd_llm_models(a: argparse.Namespace) -> int:
-    """List the Gemini models this key can actually call. Pricing is not exposed by the API."""
+    """List the models the chosen provider can call. Gemini pricing is not exposed by the API."""
     import os
+
+    from courtroom.llm import provider_name
+
+    if provider_name(getattr(a, "provider", None)) == "ollama":
+        from courtroom.llm import OllamaClient
+
+        client = OllamaClient(model=a.model) if a.model else OllamaClient()
+        try:
+            names = client.installed_models()
+        except Exception as exc:
+            console.print(f"[red]Ollama is not answering at {client.host}[/] ({type(exc).__name__}). Start it with `ollama serve`.")
+            return 2
+        for name in names:
+            console.print(f"  {name}{'[green] <- configured[/]' if name == client.model else ''}")
+        console.print(f"\n[grey50]{len(names)} models installed. Ollama runs locally: no key, no cost.[/]")
+        return 0
 
     if not os.environ.get("GEMINI_API_KEY"):
         console.print("[red]GEMINI_API_KEY is not set.[/] The LLM layer falls back to templates without it.")
@@ -121,10 +137,12 @@ def cmd_llm_models(a: argparse.Namespace) -> int:
 
 
 def cmd_llm_exhibition(a: argparse.Namespace) -> int:
-    from courtroom.llm import LLMClient
+    from courtroom.llm import make_client
     from courtroom.llm.exhibition import run_exhibition
 
-    client = LLMClient(cost_ceiling=a.cost_ceiling, max_calls_per_run=a.max_calls)
+    client = make_client(a.provider, model=a.model, cost_ceiling=a.cost_ceiling, max_calls_per_run=a.max_calls)
+    if not client.available and client.allow_network:
+        console.print(f"[yellow]{getattr(client, 'last_error', None) or 'The provider is not available (no key?).'}[/]")
     done = [0]
 
     def progress(side, opponent, seed, result, agent, cl):
@@ -137,7 +155,9 @@ def cmd_llm_exhibition(a: argparse.Namespace) -> int:
 
     report = run_exhibition(
         case_id=a.case, seeds=range(a.seeds), client=client,
-        max_calls=a.max_calls, out_path=Path(a.out), on_trial=progress,
+        max_calls=a.max_calls, out_path=Path(a.out or (
+            "results/llm_exhibition_ollama.json" if client.provider_tag == "ollama" else "results/llm_exhibition.json"
+        )), on_trial=progress,
     )
     console.print(f"[bold]{report['model']}[/]  case {report['case_id']}  seeds {len(report['seeds'])}")
     for cell in report["cells"]:
@@ -475,7 +495,19 @@ def cmd_export_exhibition(a: argparse.Namespace) -> int:
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(data, separators=(",", ":"))
-    (out / "exhibition.js").write_text(f"window.COURTROOM_EXHIBITION = {payload};\n", encoding="utf-8")
+    target = out / "exhibition.js"
+    if target.exists() and not getattr(a, "force", False):
+        try:
+            old = json.loads(target.read_text(encoding="utf-8")[len("window.COURTROOM_EXHIBITION = ") :].rstrip().rstrip(";"))["meta"]
+        except (ValueError, KeyError):
+            old = {}
+        if old and (old.get("model"), old.get("provider", "gemini")) != (meta["model"], meta.get("provider", "gemini")):
+            raise SystemExit(
+                f"{target} holds a {old.get('provider', 'gemini')} exhibition ({old.get('model')}); this one is "
+                f"{meta.get('provider', 'gemini')} ({meta['model']}). Pass --force to replace it, and "
+                f"`git checkout {target}` restores the shipped one."
+            )
+    target.write_text(f"window.COURTROOM_EXHIBITION = {payload};\n", encoding="utf-8")
     console.print(
         f"replayed {len(data['trials'])} trials from the cache, {meta['cache_misses']} cache misses, "
         f"{len(meta['mismatches_vs_live_run'])} mismatches against the live run"
@@ -513,6 +545,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--delay", type=float, default=0.35)
     p.add_argument("--json", help="write the TrialResult JSON here")
     p.add_argument("--narrate", action="store_true", help="spoken argument text (exhibition; never affects the verdict)")
+    p.add_argument("--provider", choices=("gemini", "ollama"), default=None, help="provider for --narrate (default: $COURTROOM_LLM_PROVIDER or gemini)")
+    p.add_argument("--model", default=None, help="model for --narrate")
     p.set_defaults(fn=cmd_run)
 
     p = sub.add_parser("verify", help="prove determinism: run twice, compare digests, check hash chain")
@@ -533,16 +567,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--workers", type=int, default=1)
     p.set_defaults(fn=cmd_tournament)
 
-    p = sub.add_parser("llm-models", help="list Gemini models available on GEMINI_API_KEY")
+    p = sub.add_parser("llm-models", help="list models the provider can call (Gemini: GEMINI_API_KEY; Ollama: installed locally)")
+    p.add_argument("--provider", choices=("gemini", "ollama"), default=None)
     p.add_argument("--model", default="", help="highlight this model in the list")
     p.set_defaults(fn=cmd_llm_models)
 
     p = sub.add_parser("llm-exhibition", help="Gemini policy vs the four deterministic strategies (NOT equilibrium analysis)")
     p.add_argument("--case", default="helix-espionage")
     p.add_argument("--seeds", type=int, default=5)
+    p.add_argument("--provider", choices=("gemini", "ollama"), default=None, help="default: $COURTROOM_LLM_PROVIDER or gemini")
+    p.add_argument("--model", default=None, help="model name for the provider (Ollama default: qwen3:8b)")
     p.add_argument("--max-calls", dest="max_calls", type=int, default=400, help="hard per-run call ceiling")
     p.add_argument("--cost-ceiling", dest="cost_ceiling", type=float, default=None, help="abort above this estimated spend")
-    p.add_argument("--out", default="results/llm_exhibition.json")
+    p.add_argument("--out", default=None, help="default: results/llm_exhibition.json (Gemini) or results/llm_exhibition_ollama.json")
     p.set_defaults(fn=cmd_llm_exhibition)
 
     p = sub.add_parser("bootstrap", help="bootstrap stability of each case's equilibrium label")
@@ -594,6 +631,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("export-exhibition", help="replay the committed LLM cache into data/exhibition.js (no key, no network)")
     p.add_argument("--results", default="results/llm_exhibition.json")
     p.add_argument("--out", default=str(EXPORT_DIR))
+    p.add_argument("--force", action="store_true", help="replace an exhibition from a different provider or model")
     p.set_defaults(fn=cmd_export_exhibition)
 
     p = sub.add_parser("serve", help="start the web UI + API")

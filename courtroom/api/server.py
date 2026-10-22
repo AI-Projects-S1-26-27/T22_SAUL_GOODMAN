@@ -213,13 +213,13 @@ def create_app() -> FastAPI:
         record and can never change a verdict. Reads the committed response cache and otherwise
         falls back to templates; it never calls a model.
         """
-        from courtroom.llm import LLMClient, narrate
+        from courtroom.llm import make_client, narrate
 
         case = _case_for(req.case_id, req.case, req.bar)
         result = _run(case, req)
         # Cache only, whatever the environment holds. A page view must never be able to spend money,
         # so the server's key (if any) is deliberately unreachable from here.
-        client = LLMClient(allow_network=False)
+        client = make_client(allow_network=False)
         lines = narrate(result, case, client)
         client.save()
         return JSONResponse(
