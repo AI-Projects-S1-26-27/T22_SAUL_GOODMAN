@@ -6,7 +6,7 @@
  */
 "use strict";
 
-const TOUR_KEY = "courtroom-tour";
+const TOUR_KEY = "courtroom-tour-v2";
 
 /* Each step: tab to open, element to spotlight (null = centred card), copy, optional hooks.
  * Steps whose target isn't visible (e.g. live-only controls in the offline demo) are skipped automatically. */
@@ -268,10 +268,8 @@ function tourInit() {
   window.addEventListener("hashchange", () => { if (location.hash === "#tour") tourStart(); });
   let seen = null;
   try { seen = localStorage.getItem(TOUR_KEY); } catch { /* storage unavailable: show the tour */ }
-  const asked = location.hash === "#tour";
-  // first landing only, and not when someone followed a shared link straight to a specific tab
-  const deepLink = location.hash && !["#", "#overview", "#tour"].includes(location.hash);
-  if (asked || (!seen && !deepLink)) setTimeout(() => tourStart(), 700);
+  // every first-time visitor gets the tour, whichever tab link they arrived on
+  if (location.hash === "#tour" || !seen) setTimeout(() => tourStart(), 250);
 }
 
 tourInit();

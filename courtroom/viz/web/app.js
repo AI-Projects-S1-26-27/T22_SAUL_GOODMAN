@@ -1,1322 +1,807 @@
-/* Courtroom visualiser: a plain-language trial viewer. Vanilla JS, no build step, no network dependencies.
- * Data source: the FastAPI backend when reachable, otherwise the pre-exported
- * bundle (data/bundle.js, loaded by a <script> tag so it also works from file://),
- * so a live demo survives a dead server or no network at all.
- * Everything a newcomer sees is translated from the event stream into everyday words;
- * rule IDs, agent rationales, hashes and exact arithmetic sit behind the "Technical details" switch.
+/* Courtroom viewer: pick a case, brief two lawyers, then step into a 3D courtroom and watch and hear the trial.
+ * Cases, strategy tables and pre-run trials come from data/bundle.js (works offline and from file://).
+ * When the FastAPI backend is reachable, trials for any style pairing are run live instead.
+ * Each trial event becomes one or two spoken "beats" (a lawyer's line, then the judge's ruling); the camera
+ * cuts to whoever speaks, captions follow along, and auto-play waits for the voice before moving on.
  */
 "use strict";
 
-const $ = (sel) => document.querySelector(sel);
-const SVG_NS = "http://www.w3.org/2000/svg";
+const $ = (s, root = document) => root.querySelector(s);
+const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+const B = window.COURTROOM_BUNDLE;
 const API = location.protocol.startsWith("http") ? "/api" : null;
-const SIDES = ["prosecution", "defense"];
-const S = {
-  mode: null, bundle: null, cases: [], strategies: [], caseFiles: {}, caseFile: null,
-  trial: null, trialKey: null, idx: 0, timer: null, loadToken: 0, caseToken: 0,
-  tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null,
-};
+const hasGsap = !!window.gsap;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const S = { live: false, filter: "everyday", caseId: null, p: "aggressive", d: "conservative", trial: null, idx: 0, auto: false, voice: true, run: 0 };
 
 function el(tag, attrs = {}, ...kids) {
-  const node = document.createElement(tag);
+  const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
-    if (v === false || v == null) continue;
-    if (k === "class") node.className = v;
-    else node.setAttribute(k, v === true ? "" : v);
+    if (v == null || v === false) continue;
+    if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? "" : v);
   }
-  for (const kid of kids.flat()) if (kid != null && kid !== false) node.append(kid);
-  return node;
+  for (const c of kids.flat()) if (c != null && c !== false) n.append(c);
+  return n;
 }
-function svg(tag, attrs = {}, text) {
-  const node = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const pct = (p) => `${Math.round(100 * p)}%`;
-const pct1 = (p) => `${(100 * p).toFixed(1)}%`;
-const title = (s) => s.replaceAll("_", " ");
-const capFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-const lowerFirst = (s) => (/^[A-Z][a-z]/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);
-const joinList = (xs) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
+const capFirst = (s) => s[0].toUpperCase() + s.slice(1);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function fetchJSON(url, opts = {}, timeoutMs = 20000) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, { ...opts, signal: ctrl.signal });
-    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    return await res.json();
-  } finally {
-    clearTimeout(t);
-  }
-}
+/* ------------------------------------------------------------------ plain words */
 
-/* ------------------------------------------------------------------ plain-language vocabulary */
-
+const CASE_PLAIN = {
+  "helix-espionage": "An engineer is accused of secretly copying his company's chip design and selling it to a rival. He says hackers stole his password and he was home asleep.",
+  "aurora-defi": "$31 million was taken from a crypto app. The accused says he only took it to keep it safe, like a friendly hacker, and gave most of it back.",
+  "kestrel-av": "A self-driving taxi hit a cyclist. The cyclist says the car's software was faulty. The company says the cyclist rode through a red light.",
+  "edge-empty-docket": "The Accuser brings a case but has no evidence at all. What should a fair judge do?",
+  "edge-mutual-exclusion": "Two equally believable workers tell opposite stories about who sent a bad drone command. There's nothing else to go on.",
+  "edge-poisoned-tree": "Every piece of the Accuser's evidence has a problem. If the Defender objects, it all gets thrown out. If not, it counts.",
+  "edge-defense-only": "The only evidence in the file actually helps the person accused. The judge should end the trial early.",
+};
 const STYLE = {
-  aggressive: { label: "Aggressive", adverb: "aggressively", blurb: "Offers everything, even shaky evidence, and objects often." },
-  conservative: { label: "Careful", adverb: "carefully", blurb: "Offers only solid evidence and objects only when sure." },
-  adaptive: { label: "Adaptive", adverb: "adaptively", blurb: "Watches how the other side plays and adjusts." },
-  chaos: { label: "Chaotic", adverb: "chaotically", blurb: "Makes random, often illegal moves. A stress test for the rules." },
+  aggressive: { label: "Bold", blurb: "Shows every piece of evidence, even weak ones, and objects a lot." },
+  conservative: { label: "Careful", blurb: "Shows only strong evidence and objects only when sure." },
+  adaptive: { label: "Smart", blurb: "Watches the other lawyer and changes plan to match." },
+  reckless: { label: "Wild", blurb: "Grabs evidence at random, objects on a whim and sometimes breaks the rules." },
+  chaos: { label: "Chaos", blurb: "Pure random moves. A stress test for the rules." },
 };
-const STYLE_ORDER = ["aggressive", "conservative", "adaptive", "chaos"];
-function styleInfo(name) {
-  if (STYLE[name]) return STYLE[name];
-  if (name.startsWith("mixed:")) {
-    const share = pct(+name.slice(6));
-    return { label: "Mixed", adverb: "with a mixed strategy", blurb: `Aggressive ${share} of the time, careful otherwise.` };
-  }
-  return { label: capFirst(title(name)), adverb: title(name), blurb: "" };
-}
-
-const KIND = {
-  document: "Document", digital_log: "Digital record", physical: "Physical evidence",
-  financial_record: "Financial record", testimony: "Witness testimony", expert: "Expert opinion",
-};
+const STYLE_ORDER = ["aggressive", "conservative", "adaptive", "reckless"];
+const styleOf = (n) => STYLE[n] ?? { label: n.startsWith("mixed:") ? "Mixed" : capFirst(n), blurb: "" };
+const KIND = { document: "Document", digital_log: "Digital record", physical: "Physical evidence", financial_record: "Money record", testimony: "Witness", expert: "Expert opinion" };
 const GROUND = {
-  hearsay: ["it's hearsay, someone repeating what they were told", "hearsay"],
-  relevance: ["it has nothing to do with the case", "irrelevant"],
-  authentication: ["no one has shown it's genuine", "not verified"],
-  illegally_obtained: ["it was obtained illegally", "obtained illegally"],
-  late_disclosure: ["it wasn't shared with them before the trial", "shared too late"],
-  speculation: ["the witness is only guessing", "guesswork"],
+  hearsay: "that's only a rumour. The witness heard it from someone else",
+  relevance: "that has nothing to do with this case",
+  authentication: "nobody has shown that it's real",
+  illegally_obtained: "it was collected illegally",
+  late_disclosure: "we were never shown it before the trial",
+  speculation: "the witness is only guessing",
 };
 const STANDARD = {
-  beyond_reasonable_doubt: "beyond reasonable doubt",
-  clear_and_convincing: "by clear and convincing evidence",
-  preponderance: "on the balance of probabilities",
+  beyond_reasonable_doubt: "The judge must be almost certain, about 90 percent.",
+  clear_and_convincing: "The judge must be fairly sure, about 75 percent.",
+  preponderance: "The judge just needs to think it's more likely than not.",
 };
-// Display-only fallbacks; the judge itself compares exact fractions (see courtroom/judge/rules.py).
-const THRESHOLD = { beyond_reasonable_doubt: 1 / (1 + Math.exp(-2.2)), clear_and_convincing: 1 / (1 + Math.exp(-1.1)), preponderance: 0.5 };
-const STATUS_TEXT = {
-  unshown: "Not shown", offered: "Waiting for ruling", admitted: "Accepted", excluded: "Thrown out",
-  used: "Used against a witness", "used-failed": "Challenge failed",
-};
+const PHASE_NAME = { opening: "Court opens", prosecution_case: "The Accuser's turn", directed_verdict_review: "A quick check", defense_case: "The Defender's turn", rebuttal: "The last word", deliberation: "The decision", closed: "The decision" };
+const WHO = { prosecution: ["The Accuser", "p"], defense: ["The Defender", "d"], court: ["The Judge", "j"], witness: ["Witness", "w"], bailiff: ["The Bailiff", "b"] };
 
-/* ------------------------------------------------------------------ case helpers */
+const caseById = (id) => B.cases.find((c) => c.id === id);
+const C = () => caseById(S.caseId);
+const item = (id) => C().evidence.find((e) => e.id === id);
+const witness = (id) => C().witnesses.find((w) => w.id === id);
+const pointName = (id) => window.STORY?.[S.caseId]?.points?.[id] ?? C().elements.find((e) => e.id === id)?.name ?? id;
+// lower-case the first letter mid-sentence, unless it starts with a name
+const lowerFirst = (t) => (/^[A-Z][a-z]/.test(t) && !/^(Sam|Raj|Rex|Vance|Lark|Kaur|Park)\b/.test(t) ? t[0].toLowerCase() + t.slice(1) : t);
+const Side = (s) => WHO[s]?.[0] ?? "The judge";
+const category = (c) => (c.tags.includes("everyday") ? "everyday" : c.tags.includes("edge-case") ? "edge-case" : "serious");
+const splitTitle = (t) => { const i = t.indexOf(" — "); return i < 0 ? { parties: "", name: t } : { parties: t.slice(0, i), name: t.slice(i + 3) }; };
 
-const isCivil = () => S.caseFile?.case_type === "civil";
-function sideName(side, { the = true, cap = true } = {}) {
-  const base = side === "prosecution" ? (isCivil() ? "plaintiff" : "prosecution") : "defense";
-  const s = the ? `the ${base}` : base;
-  return cap ? capFirst(s) : s;
-}
-const The = (side) => sideName(side);
-const the = (side) => sideName(side, { cap: false });
-const sideLabel = (side) => sideName(side, { the: false });
-const opponent = (side) => (side === "prosecution" ? "defense" : "prosecution");
-const sideClass = (side) => (side === "prosecution" ? "p" : side === "defense" ? "d" : "j");
-
-function splitTitle(t) {
-  const i = t.indexOf(" — ");
-  return i < 0 ? { parties: "", name: t } : { parties: t.slice(0, i), name: t.slice(i + 3) };
-}
-const elementName = (id) => S.caseFile.elements.find((e) => e.id === id)?.name ?? capFirst(title(id));
-const itemById = (id) => S.caseFile.evidence.find((e) => e.id === id);
-const witnessById = (id) => S.caseFile.witnesses.find((w) => w.id === id);
-
-const threshold = () => S.trial?.verdict.snapshot.elements[0]?.threshold_probability ?? THRESHOLD[S.caseFile.standard];
-const strictStandard = () => S.caseFile.standard === "preponderance";
-const proven = (p) => (strictStandard() ? p > threshold() + 1e-9 : p >= threshold() - 1e-9);
-const barPhrase = () => `${strictStandard() ? "more than" : "at least"} ${pct(threshold())}`;
-
-function flawsOf(item) {
-  const flaws = [];
-  if (item.hearsay) flaws.push("second-hand information (hearsay)");
-  if (!item.authenticated) flaws.push("not verified as genuine");
-  if (!item.lawfully_obtained) flaws.push("obtained illegally");
-  if (!item.disclosed) flaws.push("not shared before the trial");
-  if (item.kind === "testimony" && !item.personal_knowledge) flaws.push("the witness didn't see it first-hand");
-  if (Math.max(0, ...Object.values(item.support).map(Math.abs)) < 0.05) flaws.push("barely related to the case");
-  return flaws;
-}
-function supportText(item) {
-  const helps = [], hurts = [];
-  for (const [k, v] of Object.entries(item.support)) (v > 0 ? helps : hurts).push(lowerFirst(elementName(k)));
-  return [helps.length && `Helps prove ${joinList(helps)}`, hurts.length && `Argues against ${joinList(hurts)}`].filter(Boolean).join(". ");
-}
-const itemMeta = (item) => `${[KIND[item.kind] ?? capFirst(title(item.kind)), supportText(item)].filter(Boolean).join(". ")}.`;
-
-/* ------------------------------------------------------------------ narration: event -> everyday words */
-
-function phaseLabel(phase) {
-  return {
-    opening: "Opening",
-    prosecution_case: `${sideLabel("prosecution")}'s case`,
-    directed_verdict_review: "Judge's check",
-    defense_case: "Defense's case",
-    rebuttal: "Rebuttal",
-    deliberation: "Verdict",
-    closed: "Verdict",
-  }[phase] ?? capFirst(title(phase));
+function flaws(it) {
+  const f = [];
+  if (it.hearsay) f.push("it's a rumour");
+  if (!it.authenticated) f.push("not proven real");
+  if (!it.lawfully_obtained) f.push("collected illegally");
+  if (!it.disclosed) f.push("kept secret until now");
+  if (it.kind === "testimony" && !it.personal_knowledge) f.push("the witness didn't see it");
+  return f;
 }
 
-function phaseNarration(ev) {
-  const P = The("prosecution"), p = the("prosecution");
-  if (ev.phase === "opening") {
-    const t = S.trial;
-    return {
-      head: "Court is in session.",
-      sub: `${P} plays ${styleInfo(t.prosecution_strategy).adverb}. The defense plays ${styleInfo(t.defense_strategy).adverb}.`,
-    };
+/* ------------------------------------------------------------------ narration: event -> spoken beats */
+
+const story = () => window.STORY?.[S.caseId] ?? { ev: {} };
+const witnessKey = (it) => it?.witness_id ?? it?.id;
+const CALL = ["Your Honour, I'd like to call my witness, {X}.", "Your Honour, the {S} calls {X}."];
+/* a witness exhibit plays out like a film: the call, the walk to the box, the oath, the question, the testimony */
+function witnessBeats(ev, actor, it, s, say) {
+  const key = witnessKey(it), name = s.witness.split(",")[0];
+  const sworn = S.trial.events.some((e) => e.seq < ev.seq && e.action?.type === "present_evidence" && story().ev[e.action.evidence_id]?.wit && witnessKey(item(e.action.evidence_id)) === key);
+  // split into sentences without breaking on titles like "Mrs." or "Dr."
+  const safe = say.replace(/\b(Mrs|Mr|Ms|Dr|Det|Prof|St)\./g, "$1§");
+  const sentences = (safe.match(/[^.?!]+[.?!]+/g) ?? [safe]).map((x) => x.trim().replaceAll("§", "."));
+  const callIdx = sentences.findIndex((x) => / calls /.test(x));
+  const who = callIdx >= 0 ? sentences[callIdx].replace(/^.* calls /, "").replace(/\.$/, "") : s.witness.replace(",", ", the");
+  const question = sentences.filter((_, k) => k !== callIdx).join(" ");
+  const keep = { mode: "keep" };
+  const beats = [{ who: actor, text: pick(CALL, ev.seq).replace("{X}", who).replace("{S}", actor === "prosecution" ? "Accuser" : "Defender"), exhibit: { item: it, mode: "show" }, call: key }];
+  if (sworn) beats.push({ who: "court", text: `${name}, please remember you are still under oath.`, shot: "witness", waitWitness: true, exhibit: keep });
+  else beats.push(
+    { who: "bailiff", text: "Please raise your right hand. Do you swear to tell the truth, the whole truth, and nothing but the truth?", shot: "witness", waitWitness: true, oath: true, exhibit: keep },
+    { who: "witness", name: s.witness, text: "I do.", shot: "witness", oath: true, exhibit: keep },
+  );
+  if (question) beats.push({ who: actor, text: question, exhibit: keep });
+  beats.push({ who: "witness", name: s.witness, text: s.wit, shot: "witness", exhibit: keep });
+  return beats;
+}
+/* the witness standing at the stand after event i: called by the latest exhibit, sent away by a phase change */
+function witnessAt(i) {
+  for (let k = i; k >= 0; k--) {
+    const ev = S.trial.events[k];
+    if (ev.kind === "phase_change") return null;
+    if (ev.action?.type === "present_evidence") {
+      const it = item(ev.action.evidence_id);
+      return story().ev[it?.id]?.wit ? witnessKey(it) : null;
+    }
   }
-  return {
-    prosecution_case: { head: `${P} presents its case.`, sub: "It offers evidence one piece at a time. The defense can object to each piece." },
-    directed_verdict_review: {
-      head: `${P} has finished. The defense can now ask the judge to end the trial early.`,
-      sub: `The judge will only do that if ${p} has no accepted evidence for one of the points it must prove.`,
-    },
-    defense_case: { head: "The defense presents its case.", sub: `Now ${p} can object.` },
-    rebuttal: { head: `${P} gets a final chance to respond.`, sub: "It can answer anything the defense brought up." },
-    deliberation: { head: "The judge weighs the evidence.", sub: "Only accepted evidence counts toward the verdict." },
-  }[ev.phase] ?? { head: ev.summary };
+  return null;
 }
-
-function verdictNarration() {
-  const v = S.trial.verdict;
-  const winner = ["guilty", "liable"].includes(v.outcome) ? "prosecution" : "defense";
-  const word = {
-    guilty: "Guilty", not_guilty: "Not guilty", liable: "Liable", not_liable: "Not liable",
-    directed_acquittal: isCivil() ? "Dismissed" : "Not guilty",
-  }[v.outcome] ?? capFirst(title(v.outcome));
-  const P = The("prosecution");
-  const decisive = v.snapshot.elements.find((e) => e.element_id === v.decisive_element);
-  const point = v.decisive_element ? `“${lowerFirst(elementName(v.decisive_element))}”` : "one of the points";
-  let reason;
-  if (winner === "prosecution") reason = `${P} proved every point ${STANDARD[S.caseFile.standard]}.`;
-  else if (v.outcome === "directed_acquittal") reason = `${P} had no accepted evidence for ${point}, so the judge ended the trial early.`;
-  else if (decisive) reason = `${P} didn't prove ${point} strongly enough. The judge was ${pct(decisive.probability)} sure and needed ${barPhrase()}.`;
-  else reason = v.reason;
-  return { winner, word, reason };
-}
+const shortOf = (it) => (it ? story().ev[it.id]?.short ?? `the ${(KIND[it.kind] ?? "evidence").toLowerCase()}` : "that evidence");
+const pick = (arr, seed) => arr[Math.abs(seed) % arr.length];
+const NO_OBJ = ["No objection, Your Honour.", "We don't object.", "No objection. Let the court see it.", "That's fine by us, Your Honour."];
+const REST = ["That's all my evidence, Your Honour.", "Nothing further, Your Honour.", "We rest our case.", "I have nothing more to show."];
+const PASS = ["I'll pass for now.", "Nothing to add right now, Your Honour.", "We'll wait, Your Honour."];
+const ADMIT = ["Accepted. {S} counts as evidence.", "Very well. {S} is accepted.", "I'll allow it. {S} is now part of the record."];
+const WILD = ["Your Honour, I demand you end this trial right now!", "Let's skip ahead, Your Honour. Just declare them guilty!", "I move to end the trial immediately!"];
+const RULING_WHY = {
+  hearsay: "A rumour isn't proof.",
+  relevance: "It doesn't help decide this case.",
+  authentication: "Nobody has shown it's real.",
+  illegally_obtained: "Evidence taken illegally can't be used.",
+  late_disclosure: "Both sides must see evidence before the trial.",
+  speculation: "Guesses aren't evidence.",
+};
 
 function narrate(ev) {
-  const a = ev.action, actor = ev.actor;
-  const rules = new Set(ev.rules.map((r) => r.rule_id));
+  const a = ev.action, actor = ev.actor, rules = new Set(ev.rules.map((r) => r.rule_id)), seed = ev.seq;
+  const J = (text, extra = {}) => ({ who: "court", text, ...extra });
+  const st = story();
   switch (ev.kind) {
     case "phase_change": {
-      const n = phaseNarration(ev);
-      return { speaker: "court", ...n, short: ev.phase === "opening" ? n.head : phaseLabel(ev.phase) };
+      const t = S.trial;
+      const line = {
+        opening: [`Court is now in session. This is the case of ${splitTitle(C().title).name}.`, `The Accuser will play ${styleOf(t.prosecution_strategy).label.toLowerCase()}. The Defender will play ${styleOf(t.defense_strategy).label.toLowerCase()}. ${STANDARD[C().standard]}`],
+        prosecution_case: ["Accuser, please show your evidence.", "The Defender may object to anything unfair."],
+        directed_verdict_review: ["Before we go on, a quick check. Does the Accuser have real evidence for every point?", "If a point has none, the trial ends here."],
+        defense_case: ["Defender, it's your turn.", "Now the Accuser may object."],
+        rebuttal: ["Accuser, you may reply one last time.", ""],
+        deliberation: ["Thank you both. I will now weigh the evidence.", "Only accepted evidence counts."],
+      }[ev.phase] ?? [ev.summary, ""];
+      const beats = [];
+      if (ev.phase === "deliberation" && st.close) beats.push({ who: "prosecution", text: st.close.prosecution, aside: "Closing argument" }, { who: "defense", text: st.close.defense, aside: "Closing argument" });
+      beats.push(J(line[0], { aside: line[1] }));
+      if (ev.phase === "opening" && st.open) beats.push({ who: "prosecution", text: st.open.prosecution, aside: "Opening statement" }, { who: "defense", text: st.open.defense, aside: "Opening statement" });
+      return { log: line[0], beats };
     }
     case "action": {
-      const W = The(actor);
-      switch (a?.type) {
-        case "present_evidence": {
-          const item = itemById(a.evidence_id);
-          return {
-            speaker: actor, head: `${W} presents new evidence.`, exhibit: item,
-            sub: `${The(opponent(actor))} can object if it spots a problem.`,
-            short: `${W} presents: ${item?.title ?? a.evidence_id}`,
-          };
-        }
-        case "pass":
-          if (ev.summary.includes("does not object")) return { speaker: actor, head: `${W} doesn't object.` };
-          if (ev.summary.includes("no motion")) return { speaker: actor, head: `${W} doesn't ask to end the trial early.` };
-          return { speaker: actor, head: `${W} passes its turn.` };
-        case "rest":
-          return { speaker: actor, head: `${W} rests its case.`, sub: "It has nothing more to present." };
-        case "motion_directed_verdict":
-          return {
-            speaker: actor, head: `${W} asks the judge to end the trial now.`,
-            sub: `It argues ${the("prosecution")} hasn't shown real evidence for every point.`,
-            short: `${W} asks to end the trial early.`,
-          };
+      const W = Side(actor);
+      if (a?.type === "present_evidence") {
+        const it = item(a.evidence_id);
+        const s = st.ev[a.evidence_id] ?? {};
+        const say = s.say ?? `Your Honour, I'd like to show the court this: ${it?.title ?? a.evidence_id}.`;
+        if (!s.wit) return { log: `${W} shows: ${it?.title ?? a.evidence_id}`, beats: [{ who: actor, text: say, exhibit: { item: it, mode: "show" } }] };
+        return { log: `${W} calls ${s.witness.split(",")[0]}.`, beats: witnessBeats(ev, actor, it, s, say) };
+      }
+      if (a?.type === "pass") {
+        if (ev.summary.includes("does not object")) return { log: `${W} doesn't object.`, beats: [{ who: actor, text: pick(NO_OBJ, seed), exhibit: { mode: "keep" } }] };
+        if (ev.summary.includes("no motion")) return { log: `${W} lets the trial go on.`, beats: [{ who: actor, text: "We're happy to carry on, Your Honour." }] };
+        return { log: `${W} passes.`, beats: [{ who: actor, text: pick(PASS, seed) }] };
+      }
+      if (a?.type === "rest") return { log: `${W} is done.`, beats: [{ who: actor, text: pick(REST, seed) }] };
+      if (a?.type === "motion_directed_verdict") {
+        const probs = ev.element_probabilities, weakest = Object.keys(probs).sort((x, y) => probs[x] - probs[y])[0];
+        return { log: `${W} asks to end the trial early.`, beats: [{ who: actor, text: `Your Honour, they haven't given you real proof that ${lowerFirst(pointName(weakest))}. Please end the trial now.` }] };
       }
       break;
     }
     case "ruling": {
-      const W = actor ? The(actor) : "";
+      const W = actor ? Side(actor) : "";
       if (a?.type === "object") {
-        const item = itemById(ev.subject);
-        const sustained = ev.status === "excluded";
-        const [long, short] = GROUND[a.ground] ?? [title(a.ground ?? "objection"), title(a.ground ?? "")];
-        const penalties = [];
-        if (rules.has("SANCTION-BF") && item) penalties.push(`${The(item.owner)} is penalised for knowingly offering flawed evidence.`);
-        if (rules.has("SANCTION-OVR")) penalties.push(`${W} is penalised for a failed objection.`);
+        const it = item(ev.subject), ok = ev.status === "excluded", S1 = capFirst(shortOf(it));
+        const fines = [rules.has("SANCTION-BF") && it ? `${Side(it.owner)} loses points for using bad evidence.` : "", rules.has("SANCTION-OVR") ? `${W} loses points for a wrong objection.` : ""].filter(Boolean).join(" ");
         return {
-          speaker: actor, head: `${W} objects: ${long}.`, exhibit: item, penalties,
-          judge: sustained ? "Objection accepted. The evidence is thrown out." : "Objection rejected. The evidence stays in.",
-          tone: sustained ? "no" : "yes",
-          short: `${W} objects (${short}). ${sustained ? "Thrown out." : "Overruled."}`,
+          log: `${W} objects. ${ok ? "Thrown out." : "Overruled."}`,
+          beats: [
+            { who: actor, text: `Objection, Your Honour! ${capFirst(GROUND[a.ground] ?? "that's not fair")}.`, exhibit: { item: it, mode: "keep" }, sting: true },
+            J(ok ? `Sustained. ${RULING_WHY[a.ground] ?? ""} ${S1} is thrown out.` : `Overruled. I see no problem with it. ${S1} stays in.`, { tone: ok ? "no" : "yes", aside: fines, gavel: 1, exhibit: { item: it, mode: ok ? "no" : "ok" } }),
+          ],
         };
       }
       if (a?.type === "impeach") {
-        const w = witnessById(ev.subject ?? a.witness_id);
-        const who = w ? `${w.name} (${lowerFirst(w.role)})` : ev.subject;
-        const ok = ev.status === "impeached";
+        const w = witness(ev.subject ?? a.witness_id), ok = ev.status === "impeached", it = item(a.evidence_id);
+        const name = w?.name ?? "this witness";
+        const say = st.ev[a.evidence_id]?.say ?? `Can we really trust ${name}? ${w?.bias_note ?? ""}`.trim();
         return {
-          speaker: actor, head: `${W} challenges the credibility of ${who}.`, exhibit: itemById(a.evidence_id),
-          judge: ok ? "Challenge succeeds. This witness now counts for half as much." : `Challenge rejected. ${W} is penalised.`,
-          tone: ok ? "yes" : "no",
-          short: `${W} challenges ${w?.name ?? ev.subject}. ${ok ? "It works." : "Rejected."}`,
+          log: `${W} questions ${name}. ${ok ? "It works." : "Rejected."}`,
+          beats: [
+            { who: actor, text: say, exhibit: it ? { item: it, mode: "show" } : null },
+            J(ok ? `A fair point. From now on, ${name}'s word counts for half.` : "No. That doesn't show any bias.", { tone: ok ? "yes" : "no", exhibit: it ? { item: it, mode: ok ? "noted" : "no" } : null }),
+          ],
         };
       }
       if (ev.status === "admitted") {
-        const item = itemById(ev.subject);
-        return {
-          speaker: "court", head: "The judge accepts the evidence.", exhibit: item, tone: "yes",
-          sub: "No one objected, so it now counts toward the verdict.", short: "Judge accepts it.",
-        };
+        const it = item(ev.subject);
+        return { log: "The judge accepts the evidence.", beats: [J(pick(ADMIT, seed).replace("{S}", capFirst(shortOf(it))), { tone: "yes", exhibit: { item: it, mode: "ok" } })] };
       }
-      if (rules.has("TURN-CAP")) return { speaker: "court", head: `${W} has used all its turns, so its case is closed.` };
-      if (rules.has("STALL-1")) return { speaker: "court", head: `${W} kept passing, so the judge treats its case as finished.` };
-      if (rules.has("CONTEMPT-1")) return { speaker: "court", head: `${W} broke the rules too many times. The judge closes its case.`, tone: "no" };
+      if (rules.has("TURN-CAP")) return { log: `${W} is out of turns.`, beats: [J(`${W} has used all their turns. Let's move on.`)] };
+      if (rules.has("STALL-1")) return { log: `${W}'s turn ends.`, beats: [J(`${W} keeps passing, so their turn is over.`)] };
+      if (rules.has("CONTEMPT-1")) return { log: `${W} is stopped for breaking rules.`, beats: [J(`${W}, you have broken the rules too often. Your turn is over.`, { tone: "no", gavel: 2 })] };
       break;
     }
-    case "violation":
-      return {
-        speaker: actor, head: `${The(actor)} tries a move that isn't allowed right now.`,
-        judge: "The judge counts it as a pass and fines them.", tone: "no", short: `${The(actor)} makes an illegal move and is fined.`,
-      };
+    case "violation": {
+      if (a?.type === "motion_directed_verdict") {
+        return { log: `${Side(actor)} breaks a rule.`, beats: [{ who: actor, text: pick(WILD, seed) }, J("Only the Defender may ask for that, and only at the right time. Request denied, and you lose a point.", { tone: "no", gavel: 1 })] };
+      }
+      return { log: `${Side(actor)} breaks a rule.`, beats: [{ who: actor, text: "Your Honour, I have something else to say!" }, J("That's not allowed right now. It counts as a pass, and you lose a point.", { tone: "no", gavel: 1 })] };
+    }
     case "directed_verdict": {
       const m = ev.summary.match(/GRANTED on (\S+?)\.?$/);
-      if (m) {
-        return {
-          speaker: "court", head: "The judge ends the trial early.", tone: "no",
-          sub: `There's no accepted evidence for “${lowerFirst(elementName(m[1]))}”, so ${the("prosecution")} can't win.`,
-        };
-      }
-      return { speaker: "court", head: "The judge lets the trial continue.", sub: `${The("prosecution")} has shown enough to keep going.`, short: "The trial continues." };
+      if (m) return { log: "The judge ends the trial early.", beats: [J(`There is no accepted evidence that ${lowerFirst(pointName(m[1]))}. This trial ends now.`, { tone: "no", gavel: 1 })] };
+      return { log: "The trial goes on.", beats: [J("Request denied. There is enough evidence to keep going.")] };
     }
     case "watchdog":
-      return { speaker: "court", head: "The trial has run too long. The judge moves straight to a decision." };
+      return { log: "The judge moves to a decision.", beats: [J("This has gone on long enough. It's time to decide.")] };
     case "verdict": {
-      const v = verdictNarration();
-      return { speaker: "court", head: v.reason, verdict: v, short: `Verdict: ${v.word.toLowerCase()}.` };
+      const v = verdictInfo();
+      return { log: `Verdict: ${v.word}.`, verdict: true, beats: [J(`I have reached my verdict. ${v.word}. ${v.reason}`, { gavel: 3, shot: "verdict" })] };
     }
   }
-  return { speaker: actor ?? "court", head: ev.summary };
+  return { log: ev.summary, beats: [{ who: actor ?? "court", text: ev.summary }] };
 }
 
-/* ------------------------------------------------------------------ data layer */
+function verdictInfo() {
+  const v = S.trial.verdict;
+  const pWins = ["guilty", "liable"].includes(v.outcome);
+  const word = { guilty: "Guilty", not_guilty: "Not guilty", liable: "Must pay", not_liable: "Doesn't have to pay", directed_acquittal: "Case dismissed" }[v.outcome] ?? capFirst(v.outcome.replaceAll("_", " "));
+  const dec = v.snapshot.elements.find((e) => e.element_id === v.decisive_element);
+  let reason;
+  if (pWins) reason = "The Accuser proved every point.";
+  else if (v.outcome === "directed_acquittal") reason = `The Accuser had no accepted evidence that "${pointName(v.decisive_element)}".`;
+  else if (dec) reason = `The Accuser didn't prove that "${pointName(dec.element_id)}". I was ${pct(dec.probability)} sure, and I needed ${pct(dec.threshold_probability)}.`;
+  else reason = v.reason;
+  return { pWins, word, reason };
+}
 
-async function init() {
-  initTechToggle();
-  initTheme();
-  initTabs();
-  try {
-    if (!API) throw new Error("opened from disk");
-    await fetchJSON(`${API}/health`, {}, 1500);
-    S.mode = "live";
-    S.cases = await fetchJSON(`${API}/cases`);
-    S.strategies = await fetchJSON(`${API}/strategies`);
-  } catch {
-    if (!window.COURTROOM_BUNDLE) {
-      $("#source").textContent = "No trial data found.";
-      showStageMessage("The trial data didn't load. Start the simulator with python -m courtroom serve, or save trials for offline use with python -m courtroom export.");
-      return;
-    }
-    S.bundle = window.COURTROOM_BUNDLE;
-    S.mode = "offline";
-    S.cases = S.bundle.cases;
-    S.strategies = S.bundle.strategies;
-    S.bundle.cases.forEach((c) => (S.caseFiles[c.id] = c));
+/* ------------------------------------------------------------------ voices (Web Speech API) */
+
+const Voice = (() => {
+  const synth = window.speechSynthesis;
+  let picks = null;
+  function choose() {
+    const all = synth?.getVoices().filter((v) => /^en/i.test(v.lang)) ?? [];
+    if (!all.length) return null;
+    const find = (...res) => res.map((re) => all.find((v) => re.test(v.name))).find(Boolean);
+    const judge = find(/Google UK English Male/, /Daniel/, /George/, /Ryan/, /Guy/, /David/, /Male/i) ?? all[0];
+    const p = find(/Google UK English Female/, /Sonia/, /Libby/, /Hazel/, /Samantha/, /Zira/, /Female/i) ?? all[1 % all.length];
+    const d = find(/Google US English/, /Aria/, /Jenny/, /Mark/, /Alex/, /Karen/) ?? all[2 % all.length];
+    return { bailiff: { v: judge, pitch: 1.0, rate: 0.95 }, court: { v: judge, pitch: 0.82, rate: 0.9 }, prosecution: { v: p, pitch: 1.05, rate: 0.98 }, defense: { v: d === p ? all[(all.indexOf(p) + 1) % all.length] : d, pitch: 0.95, rate: 0.98 } };
   }
-  document.body.classList.add(S.mode);
-  $("#source").textContent = S.mode === "live" ? "Connected to the live simulator." : "Showing saved trials.";
-
-  const caseSel = $("#case");
-  const main = el("optgroup", { label: "Main cases" }), edge = el("optgroup", { label: "Edge cases: stress tests for the rules" });
-  for (const c of S.cases) (c.id.startsWith("edge-") ? edge : main).append(el("option", { value: c.id }, splitTitle(c.title).name));
-  caseSel.append(...[main, edge].filter((g) => g.children.length));
-  buildStyleControls();
-
-  caseSel.addEventListener("change", () => selectCase(caseSel.value));
-  $("#seed").addEventListener("change", () => loadTrial());
-  $("#setup").addEventListener("submit", (e) => { e.preventDefault(); loadTrial({ autoplay: true }); });
-  $("#hero-start").addEventListener("click", () => {
-    activateTab("courtroom");
-    loadTrial({ autoplay: true });
-  });
-  $("#replay-open").addEventListener("click", () => {
-    activateTab("courtroom");
-    if (S.trial) { stop(); seek(0); play(); }
-  });
-  $("#play").addEventListener("click", togglePlay);
-  $("#first").addEventListener("click", () => { stop(); seek(0); });
-  $("#last").addEventListener("click", () => { stop(); seek(Infinity); });
-  $("#prev").addEventListener("click", () => { stop(); seek(S.idx - 1); });
-  $("#next").addEventListener("click", () => { stop(); seek(S.idx + 1); });
-  $("#scrub").addEventListener("input", (e) => { stop(); seek(+e.target.value); });
-  $("#speed").addEventListener("change", () => { if (S.timer) { stop(); play(); } });
-  $("#grun").addEventListener("click", runGame);
-  document.addEventListener("keydown", (e) => {
-    if (e.target.matches("input, select, textarea, [role=tab]") || e.metaKey || e.ctrlKey || e.altKey || !S.trial || S.tab !== "courtroom") return;
-    if (e.key === "ArrowRight") { stop(); seek(S.idx + 1); }
-    if (e.key === "ArrowLeft") { stop(); seek(S.idx - 1); }
-    if (e.key === " " && !e.target.matches("button, a, summary")) { e.preventDefault(); togglePlay(); }
-  });
-
-  await selectCase(caseSel.value);
-}
-
-async function getCaseFile(id) {
-  if (!S.caseFiles[id]) S.caseFiles[id] = await fetchJSON(`${API}/cases/${encodeURIComponent(id)}`);
-  return S.caseFiles[id];
-}
-
-async function selectCase(id) {
-  const token = ++S.caseToken;
-  let c;
-  try {
-    c = await getCaseFile(id);
-  } catch (err) {
-    showStageMessage(`This case couldn't load (${err.message}). Check that the simulator is still running, then pick the case again.`);
-    return;
-  }
-  if (token !== S.caseToken) return;
-  S.caseFile = c;
-  S.trial = null;
-  S.trialKey = null;
-  document.querySelectorAll("[data-side-label]").forEach((n) => (n.textContent = sideLabel(n.dataset.sideLabel)));
-  document.querySelectorAll("[data-side-lower]").forEach((n) => (n.textContent = sideName(n.dataset.sideLower, { the: false, cap: false })));
-  updateAvailability();
-  renderBrief();
-  renderCaseStrip();
-  renderCaseFile();
-  buildEvidenceBoard();
-  loadGame();
-  await loadTrial();
-}
-
-function currentRequest() {
+  synth?.addEventListener?.("voiceschanged", () => { picks = choose(); });
   return {
-    case_id: S.caseFile.id,
-    prosecution: selectedStyle("prosecution"),
-    defense: selectedStyle("defense"),
-    seed: S.mode === "live" ? Math.max(0, Math.floor(+$("#seed").value || 0)) : 0,
+    ok: !!synth,
+    stop() { synth?.cancel(); },
+    say(text, who, pace, name) {
+      if (!synth) return Promise.resolve();
+      picks ??= choose();
+      return new Promise((resolve) => {
+        const u = new SpeechSynthesisUtterance(text.replace(/[“”"]/g, ""));
+        let pk = picks?.[who];
+        if (who === "witness" && picks) { // vary voice and pitch per witness so each sounds like someone new
+          const h = [...(name ?? "")].reduce((a, c) => a + c.charCodeAt(0), 0);
+          const pool = [picks.prosecution, picks.defense, picks.court];
+          pk = { ...pool[h % 3], pitch: 0.8 + (h % 7) * 0.08 };
+        }
+        if (pk?.v) u.voice = pk.v;
+        u.pitch = pk?.pitch ?? 1;
+        u.rate = Math.min(1.35, (pk?.rate ?? 1) * (0.85 + pace * 0.18));
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        u.onend = finish; u.onerror = finish;
+        // Chrome sometimes never fires onend; never let the trial hang on it
+        setTimeout(finish, 2500 + text.split(/\s+/).length * 520 / pace);
+        synth.speak(u);
+      });
+    },
   };
+})();
+
+/* ------------------------------------------------------------------ landing: docket + brief */
+
+function renderCases() {
+  const box = $("#cases");
+  box.replaceChildren(...B.cases.filter((c) => category(c) === S.filter).map((c) => {
+    const t = splitTitle(c.title);
+    return el("button", { class: "folder", "aria-pressed": String(c.id === S.caseId), onclick: () => selectCase(c.id), "data-id": c.id },
+      el("span", { class: "tab" }, c.case_type === "civil" ? "Dispute" : "Accusation"),
+      el("span", { class: "body" },
+        el("h3", {}, t.name),
+        t.parties && el("span", { class: "parties" }, t.parties),
+        el("p", {}, CASE_PLAIN[c.id] ?? c.synopsis),
+        el("span", { class: "meta" }, `${c.evidence.length} pieces of evidence · ${c.witnesses.length} witnesses`)));
+  }));
+  if (hasGsap && !reduced) gsap.from(box.children, { y: 40, rotate: () => gsap.utils.random(-2, 2), opacity: 0, duration: .7, stagger: .08, ease: "power3.out" });
 }
 
-async function loadTrial({ autoplay = false } = {}) {
-  if (!S.caseFile) return;
-  const req = currentRequest();
-  const key = `${req.case_id}|${req.prosecution}|${req.defense}|${req.seed}`;
-  if (S.trial && S.trialKey === key) {
-    if (autoplay) { stop(); seek(0); play(); }
-    return;
-  }
-  const token = ++S.loadToken;
-  stop();
-  $("#run").disabled = true;
-  try {
-    const trial = S.mode === "live"
-      ? await fetchJSON(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(req) })
-      : S.bundle.trials[key];
-    if (token !== S.loadToken) return;
-    if (!trial) {
-      showStageMessage("This matchup isn't in the saved trials. Pick another style, or run the simulator on your computer to try any combination.");
-      return;
+function selectCase(id) {
+  S.caseId = id;
+  $$(".folder").forEach((f) => f.setAttribute("aria-pressed", String(f.dataset.id === id)));
+  fixCombo("p");
+  renderStyles();
+  // next step: brief the lawyers, with the courtroom button right below
+  const head = $("#brief-title");
+  scrollTo({ top: head.getBoundingClientRect().top + scrollY - 90, behavior: reduced ? "auto" : "smooth" });
+  if (hasGsap && !reduced) gsap.fromTo(".start-row", { y: 16, opacity: .4 }, { y: 0, opacity: 1, duration: .7, delay: .5, ease: "power3.out" });
+}
+
+const available = (p, d) => S.live || !!B.trials[`${S.caseId}|${p}|${d}|0`];
+
+function renderStyles() {
+  for (const [side, key] of [["prosecution", "p"], ["defense", "d"]]) {
+    const col = $(`#style-${key}`);
+    $$(".style-opt", col).forEach((n) => n.remove());
+    for (const name of STYLE_ORDER) {
+      const st = STYLE[name];
+      const ok = side === "prosecution" ? STYLE_ORDER.some((o) => available(name, o)) : available(S.p, name);
+      col.append(el("button", {
+        class: "style-opt", type: "button", "aria-pressed": String(S[key] === name), disabled: !ok,
+        title: ok ? null : "Not in the offline demo. Run the local server to try every pairing.",
+        onclick: () => { S[key] = name; fixCombo(key); renderStyles(); },
+      }, el("b", {}, st.label), el("small", {}, st.blurb), el("span", { class: "tick", "aria-hidden": "true" })));
     }
-    S.trial = trial;
-    S.trialKey = key;
-    setupTrial();
-    seek(0);
-    if (autoplay) play();
-  } catch (err) {
-    if (token === S.loadToken) showStageMessage(`The trial couldn't run (${err.message}). Check that the simulator is still running, then press Start trial again.`);
-  } finally {
-    if (token === S.loadToken) $("#run").disabled = false;
   }
+  const ok = !!S.caseId && available(S.p, S.d);
+  $("#start").disabled = !ok;
+  $("#start-case").textContent = S.caseId ? splitTitle(C().title).name : "No case picked yet";
+  $("#combo-note").textContent = !S.caseId ? "Pick a case first." : ok ? `A ${STYLE[S.p].label.toLowerCase()} Accuser against a ${STYLE[S.d].label.toLowerCase()} Defender.` : "That pairing isn't in the offline demo. Pick another style.";
 }
 
-function showStageMessage(text) {
-  stop();
-  S.trial = null;
-  S.trialKey = null;
-  $("#now").className = "now";
-  $("#now").replaceChildren(el("p", { class: "sub" }, text));
-  for (const id of ["#phases", "#meters", "#transcript", "#bar-note", "#meters-note"]) $(id).replaceChildren();
-  for (const id of ["#first", "#prev", "#play", "#next", "#last", "#scrub"]) $(id).disabled = true;
-  $("#step-label").textContent = "";
-  renderVerdictTab();
-  replayReset();
+function fixCombo(changed) {
+  if (available(S.p, S.d)) return;
+  if (changed === "p") S.d = STYLE_ORDER.find((o) => available(S.p, o)) ?? S.d;
+  else S.p = STYLE_ORDER.find((o) => available(o, S.d)) ?? S.p;
 }
 
-/* ------------------------------------------------------------------ setup controls */
+/* ------------------------------------------------------------------ entering and leaving the courtroom */
 
-function buildStyleControls() {
-  const names = STYLE_ORDER.filter((n) => S.strategies.some((s) => s.name === n));
-  for (const s of S.strategies) if (!names.includes(s.name) && !s.name.includes("<")) names.push(s.name);
-  if (S.mode === "live") names.push("mixed:0.4");
-  for (const side of SIDES) {
-    const group = $(`#${side}-style`);
-    group.setAttribute("aria-label", `${sideLabel(side)} style`);
-    group.replaceChildren(...names.map((n) =>
-      el("label", {}, el("input", { type: "radio", name: `${side}-style`, value: n }), el("span", {}, styleInfo(n).label))));
-    group.addEventListener("change", () => {
-      updateAvailability();
-      loadTrial();
-    });
-  }
-  setStyle("prosecution", "aggressive");
-  setStyle("defense", "conservative");
-}
-const selectedStyle = (side) => document.querySelector(`input[name="${side}-style"]:checked`)?.value;
-function setStyle(side, value) {
-  const input = document.querySelector(`input[name="${side}-style"][value="${CSS.escape(value)}"]`);
-  if (input) input.checked = true;
-}
+async function enterCourt() {
+  window.Sound?.unlock();
+  const key = `${S.caseId}|${S.p}|${S.d}|0`;
+  $("#start").disabled = true;
+  try {
+    S.trial = S.live
+      ? await (await fetch(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ case_id: S.caseId, prosecution: S.p, defense: S.d, seed: 0 }) })).json()
+      : B.trials[key];
+  } catch { S.trial = B.trials[key]; }
+  $("#start").disabled = false;
+  if (!S.trial?.events) return;
 
-function updateAvailability() {
-  if (S.mode === "offline" && S.caseFile) {
-    const pairs = new Set(Object.keys(S.bundle.trials).filter((k) => k.startsWith(`${S.caseFile.id}|`)).map((k) => k.split("|").slice(1, 3).join("|")));
-    const inputs = (side) => [...document.querySelectorAll(`input[name="${side}-style"]`)];
-    const choose = (side, ok) => {
-      for (const input of inputs(side)) {
-        input.disabled = !ok(input.value);
-        input.parentElement.title = input.disabled ? "Not in the saved trials. Run the simulator locally to try this matchup." : "";
-      }
-      const current = inputs(side).find((i) => i.checked);
-      if (!current || current.disabled) {
-        const pick = ["conservative", "aggressive"].map((v) => inputs(side).find((i) => i.value === v && !i.disabled)).find(Boolean)
-          ?? inputs(side).find((i) => !i.disabled);
-        if (pick) pick.checked = true;
-      }
-    };
-    choose("prosecution", (v) => [...pairs].some((k) => k.startsWith(`${v}|`)));
-    const p = selectedStyle("prosecution");
-    choose("defense", (v) => pairs.has(`${p}|${v}`));
-  }
-  for (const side of SIDES) $(`#${side}-style-help`).textContent = styleInfo(selectedStyle(side) ?? "").blurb;
-}
-
-function renderBrief() {
-  const c = S.caseFile;
-  const { parties, name } = splitTitle(c.title);
-  const kind = isCivil() ? "civil" : "criminal";
-  const bar = strictStandard() ? `more than ${pct(THRESHOLD[c.standard])}` : `at least ${pct(THRESHOLD[c.standard])}`;
-  $("#brief").replaceChildren(
-    el("div", {},
-      parties && el("p", { class: "parties" }, parties),
-      el("h3", {}, name),
-      el("p", { class: "synopsis" }, c.synopsis),
-      el("p", { class: "charge" }, `${isCivil() ? "Claim" : "Charge"}: ${c.charge}`)),
-    el("div", { class: "points" },
-      el("h4", {}, `To win, ${the("prosecution")} must prove every one of these`),
-      el("ul", {}, c.elements.map((e) => el("li", {}, el("strong", {}, e.name), el("span", {}, e.description)))),
-      el("p", { class: "bar-rule" },
-        `This is a ${kind} case, so the judge must be ${bar} sure of each point (${STANDARD[c.standard]}).`)),
-  );
-}
-
-/* ------------------------------------------------------------------ playback */
-
-function togglePlay() {
-  if (S.timer) stop();
-  else play();
-}
-function play() {
-  if (!S.trial || S.timer) return;
-  if (S.idx >= S.trial.events.length - 1) seek(0);
-  $("#play").classList.add("playing");
-  $("#play").setAttribute("aria-label", "Pause");
-  S.timer = setInterval(() => {
-    if (S.idx >= S.trial.events.length - 1) return stop();
-    seek(S.idx + 1);
-  }, +$("#speed").value);
-}
-function stop() {
-  clearInterval(S.timer);
-  S.timer = null;
-  $("#play").classList.remove("playing");
-  $("#play").setAttribute("aria-label", "Play");
-}
-function seek(i) {
-  if (!S.trial) return;
-  S.idx = Math.max(0, Math.min(S.trial.events.length - 1, i));
-  renderFrame();
-}
-
-/* ------------------------------------------------------------------ trial rendering */
-
-function setupTrial() {
-  const t = S.trial;
-  $("#scrub").max = t.events.length - 1;
-  for (const id of ["#first", "#prev", "#play", "#next", "#last", "#scrub"]) $(id).disabled = false;
-  buildPhases();
+  const c = C();
+  $("#court-case").textContent = splitTitle(c.title).name;
+  $("#verdict").hidden = true;
   buildMeters();
-  buildTranscript();
-  buildWorking();
-  renderVerdictTab();
-  replayReset();
-}
-
-function renderFrame() {
-  const t = S.trial, n = t.events.length, ev = t.events[S.idx];
-  renderNow(ev);
-  updatePhases(ev);
-  updateMeters(ev, t.events[S.idx - 1]);
-  updateTranscript();
-  updateEvidenceBoard();
-  $("#scrub").value = S.idx;
-  $("#step-label").textContent = `Step ${S.idx + 1} of ${n}`;
-  $("#first").disabled = $("#prev").disabled = S.idx === 0;
-  $("#next").disabled = $("#last").disabled = S.idx === n - 1;
-}
-
-const speakerTag = (who) => el("span", { class: `tag ${sideClass(who)}` }, who === "court" ? "Judge" : sideLabel(who));
-
-function exhibitCard(item) {
-  if (!item) return null;
-  const flaws = flawsOf(item);
-  return el("div", { class: "exhibit" },
-    el("span", { class: `tag ${sideClass(item.owner)}` }, item.id),
-    el("p", { class: "ex-title" }, item.title),
-    el("p", { class: "ex-meta" }, itemMeta(item)),
-    flaws.length ? el("p", { class: "flaw" }, `Hidden flaw: ${joinList(flaws)}.`) : null);
-}
-
-function techBlock(ev) {
-  return el("div", { class: "tech tech-block" },
-    ev.rules.map((r) => el("p", {}, el("span", { class: "rule-chip" }, r.rule_id), r.detail)),
-    ev.action?.rationale ? el("p", {}, el("strong", {}, "Lawyer's reasoning: "), ev.action.rationale) : null,
-    el("p", {}, el("strong", {}, "Log: "), ev.summary),
-    el("p", { class: "hash" }, `Event #${ev.seq}  sha256 ${ev.hash}`));
-}
-
-function renderNow(ev) {
-  const n = narrate(ev);
-  const box = $("#now");
-  box.className = n.verdict ? `now verdict win-${sideClass(n.verdict.winner)}` : "now";
-  const kids = [el("div", { class: "speaker" }, speakerTag(n.speaker), n.verdict ? "Verdict" : null)];
-  if (n.verdict) {
-    kids.push(el("p", { class: "verdict-word" }, n.verdict.word));
-    kids.push(el("p", { class: "winner" }, speakerTag(n.verdict.winner), `${The(n.verdict.winner)} wins the case.`));
-  }
-  kids.push(el("p", { class: "line" }, n.head));
-  if (n.exhibit) kids.push(exhibitCard(n.exhibit));
-  if (n.judge) kids.push(el("div", { class: `judge-says ${n.tone ?? ""}` }, speakerTag("court"), el("p", {}, n.judge)));
-  for (const p of n.penalties ?? []) kids.push(el("p", { class: "penalty" }, p));
-  if (n.sub) kids.push(el("p", { class: "sub" }, n.sub));
-  kids.push(techBlock(ev));
-  box.replaceChildren(...kids);
-}
-
-function trialPhases() {
-  const seen = [];
-  for (const ev of S.trial.events) {
-    const ph = ev.phase === "closed" ? "deliberation" : ev.phase;
-    if (!seen.includes(ph)) seen.push(ph);
-  }
-  return seen;
-}
-function buildPhases() {
-  $("#phases").replaceChildren(...trialPhases().map((ph) => el("li", { "data-phase": ph }, phaseLabel(ph))));
-}
-function updatePhases(ev) {
-  const cur = ev.phase === "closed" ? "deliberation" : ev.phase;
-  let passed = true;
-  for (const li of $("#phases").children) {
-    const isCur = li.dataset.phase === cur;
-    if (isCur) passed = false;
-    li.className = isCur ? "current" : passed ? "done" : "";
-    if (isCur) {
-      li.setAttribute("aria-current", "step");
-      const ol = li.parentElement; // keep the current stage visible when the stepper scrolls sideways on phones
-      if (ol.scrollWidth > ol.clientWidth) ol.scrollLeft = li.offsetLeft - (ol.clientWidth - li.offsetWidth) / 2;
-    } else li.removeAttribute("aria-current");
-  }
-}
-
-function buildMeters() {
-  const first = S.trial.events[0].element_probabilities;
-  const thr = threshold();
-  $("#bar-note").replaceChildren(el("i", { class: "key-bar", "aria-hidden": "true" }), `Line = the ${pct(thr)} needed to prove a point`);
-  $("#meters").replaceChildren(...Object.keys(first).map((id) =>
-    el("div", { class: "meter", "data-el": id },
-      el("div", { class: "meter-name" }, el("span", {}, elementName(id)), el("span", { class: "proven-mark" }, "Proven")),
-      el("div", { class: "meter-track", role: "meter", "aria-valuemin": "0", "aria-valuemax": "100", "aria-label": elementName(id) },
-        el("div", { class: "meter-fill" }), el("div", { class: "meter-bar", style: `left: ${100 * thr}%` })),
-      el("div", { class: "meter-value" }, el("span", { class: "delta" }), el("span", { class: "val" })))));
-  const start = Object.values(first)[0] ?? 0.5;
-  $("#meters-note").textContent = isCivil()
-    ? `Every point starts at ${pct(start)}: undecided. Evidence moves the judge one way or the other.`
-    : `Every point starts at ${pct(start)} because the accused is presumed innocent. Evidence moves the judge one way or the other.`;
-}
-function updateMeters(ev, prev) {
-  const final = S.idx === S.trial.events.length - 1;
-  const exact = Object.fromEntries(S.trial.verdict.snapshot.elements.map((e) => [e.element_id, e.met]));
-  for (const row of $("#meters").children) {
-    const id = row.dataset.el, p = ev.element_probabilities[id];
-    const ok = final && id in exact ? exact[id] : proven(p);
-    row.classList.toggle("proven", ok);
-    row.querySelector(".meter-fill").style.setProperty("--fill", `${100 * p}%`);
-    row.querySelector(".val").textContent = pct(p);
-    row.querySelector(".meter-track").setAttribute("aria-valuenow", Math.round(100 * p));
-    row.querySelector(".meter-track").setAttribute("aria-valuetext", `${pct(p)} sure${ok ? ", proven" : ""}. Needs ${barPhrase()}.`);
-    const d = prev ? Math.round(100 * p) - Math.round(100 * prev.element_probabilities[id]) : 0;
-    row.querySelector(".delta").textContent = d ? `${d > 0 ? "+" : "−"}${Math.abs(d)}` : "";
-  }
-}
-
-function buildTranscript() {
-  const ol = $("#transcript");
-  ol.replaceChildren();
-  S.trial.events.forEach((ev, i) => {
+  $("#transcript").replaceChildren(...S.trial.events.map((ev, i) => {
     const n = narrate(ev);
-    const cls = ev.kind === "phase_change" ? "t-btn t-phase" : `t-btn ${n.speaker}`;
-    const btn = el("button", { type: "button", class: cls }, el("span", { class: "tech t-seq" }, `#${ev.seq}`), n.short ?? n.head);
-    btn.addEventListener("click", () => { stop(); seek(i); });
-    ol.append(el("li", { "data-i": i }, btn));
-  });
-  ol.append(el("li", { class: "t-more", id: "t-more" }));
-}
-function updateTranscript() {
-  const ol = $("#transcript"), n = S.trial.events.length;
-  let current = null;
-  for (const li of ol.children) {
-    if (li.id === "t-more") continue;
-    const i = +li.dataset.i;
-    li.hidden = i > S.idx;
-    const btn = li.firstChild;
-    if (i === S.idx) { btn.setAttribute("aria-current", "step"); current = li; } else btn.removeAttribute("aria-current");
-  }
-  const left = n - 1 - S.idx;
-  $("#t-more").textContent = left ? `${left} more ${left === 1 ? "step" : "steps"} to go` : "End of the trial.";
-  if (current && (current.offsetTop < ol.scrollTop || current.offsetTop + current.offsetHeight > ol.scrollTop + ol.clientHeight)) {
-    ol.scrollTop = current.offsetTop - ol.clientHeight / 2;
-  }
-}
+    return el("li", { "data-i": i, hidden: true }, el("button", { onclick: () => { setAuto(false); present(i, false); } },
+      el("span", { class: `s ${WHO[n.beats[0]?.who]?.[1] ?? "j"}` }), el("span", {}, n.log)));
+  }));
+  window.Sound?.unlock();
+  const firstVisit = !S.visited;
+  S.visited = true;
+  if (firstVisit) window.Sound?.logo(); // the big opening sound, only the first time
+  else window.Sound?.door();
+  window.Sound?.score(firstVisit ? 8 : 2.5);
+  Exhibit.hide(false);
+  const court = $("#court");
+  court.hidden = false;
+  document.body.style.overflow = "hidden";
+  window.Scene?.pause?.();
+  window.Court3D?.reset();
+  window.Court3D?.open();
+  $("#leave-btn").focus({ preventScroll: true });
+  showCaption("court", "All rise.", "");
+  S.idx = 0;
 
-/* ------------------------------------------------------------------ evidence board */
-
-function buildEvidenceBoard() {
-  for (const side of SIDES) {
-    $(`#${side}-ev-title`).textContent = `${sideLabel(side)}'s evidence`;
-    const items = S.caseFile.evidence.filter((e) => e.owner === side);
-    const list = $(`#${side}-evidence`);
-    list.replaceChildren(...items.map((item) => {
-      const flaws = flawsOf(item);
-      return el("li", { class: "ev-item", "data-id": item.id },
-        el("span", { class: `tag ${sideClass(side)}` }, item.id),
-        el("div", {},
-          el("p", { class: "ev-title" }, item.title),
-          el("p", { class: "ev-meta" }, itemMeta(item)),
-          flaws.length ? el("p", { class: "flaw" }, `Hidden flaw: ${joinList(flaws)}.`) : null),
-        el("span", { class: "status unshown" }, STATUS_TEXT.unshown));
-    }));
-    if (!items.length) list.append(el("li", { class: "ev-empty" }, "No evidence on file for this side."));
-    $(`#${side}-score`).replaceChildren();
-  }
-}
-
-function boardState(upto) {
-  const status = {};
-  const score = Object.fromEntries(SIDES.map((s) => [s, { shown: 0, accepted: 0, thrown: 0, objections: 0, won: 0 }]));
-  for (const ev of S.trial.events.slice(0, upto + 1)) {
-    const a = ev.action;
-    if (a?.type === "impeach") status[a.evidence_id] = ev.status === "impeached" ? "used" : "used-failed";
-    else if (ev.subject && ev.status && itemById(ev.subject)) status[ev.subject] = ev.status;
-    if (ev.kind === "action" && a?.type === "present_evidence" && score[ev.actor]) score[ev.actor].shown++;
-    const owner = ev.kind === "ruling" && itemById(ev.subject ?? "")?.owner;
-    if (owner && ev.status === "admitted") score[owner].accepted++;
-    if (owner && ev.status === "excluded") score[owner].thrown++;
-    if (ev.kind === "ruling" && a?.type === "object" && score[ev.actor]) {
-      score[ev.actor].objections++;
-      if (ev.status === "excluded") score[ev.actor].won++;
-    }
-  }
-  return { status, score };
-}
-
-function updateEvidenceBoard() {
-  if (!S.trial) return;
-  const { status, score } = boardState(S.idx);
-  const subject = S.trial.events[S.idx].subject ?? S.trial.events[S.idx].action?.evidence_id;
-  document.querySelectorAll(".ev-item").forEach((li) => {
-    const st = status[li.dataset.id] ?? "unshown";
-    li.classList.toggle("excluded", st === "excluded");
-    li.classList.toggle("current", li.dataset.id === subject);
-    const badge = li.querySelector(".status");
-    badge.className = `status ${st}`;
-    badge.textContent = STATUS_TEXT[st] ?? st;
-  });
-  for (const side of SIDES) {
-    const s = score[side];
-    const stat = (label, value) => el("div", {}, el("dt", {}, label), el("dd", {}, value));
-    $(`#${side}-score`).replaceChildren(
-      stat("Shown", String(s.shown)), stat("Accepted", String(s.accepted)), stat("Thrown out", String(s.thrown)),
-      stat("Objections won", `${s.won} of ${s.objections}`));
-  }
-}
-
-/* ------------------------------------------------------------------ technical working (final verdict) */
-
-function buildWorking() {
-  const t = S.trial, v = t.verdict;
-  const findings = $("#findings");
-  findings.replaceChildren(el("tr", {}, ["Point", "Certainty", "Needed", "Result", "Exact log-odds", "Evidence counted (log-odds)"].map((h) => el("th", {}, h))));
-  for (const es of v.snapshot.elements) {
-    const counted = es.contributions.filter((c) => c.counted).map((c) => `${c.evidence_id} ${c.log_odds >= 0 ? "+" : ""}${c.log_odds.toFixed(2)}`);
-    findings.append(el("tr", {},
-      el("td", {}, elementName(es.element_id)), el("td", { class: "num" }, pct1(es.probability)),
-      el("td", { class: "num" }, `${pct1(es.threshold_probability)} (${es.threshold})`),
-      el("td", { class: es.met ? "met" : "unmet" }, es.met ? "Proven" : "Not proven"),
-      el("td", { class: "num mono" }, es.log_odds), el("td", {}, counted.join(", ") || "None")));
-  }
-  const lp = t.ledgers.prosecution, ld = t.ledgers.defense;
-  const ledger = $("#ledger");
-  ledger.replaceChildren(el("tr", {}, el("th", {}, ""), el("th", {}, sideLabel("prosecution")), el("th", {}, "Defense")));
-  const rows = [
-    ["Style", styleInfo(t.prosecution_strategy).label, styleInfo(t.defense_strategy).label],
-    ...[["Budget left", "budget"], ["Budget spent", "spent"], ["Evidence accepted / shown", null], ["Evidence thrown out", "excluded"],
-      ["Objections (won)", "obj"], ["Witness challenges", "impeachments"], ["Rule violations", "violations"], ["Penalty points", "sanctions"],
-    ].map(([label, k]) => {
-      const f = (l) => (k === null ? `${l.admitted} / ${l.presented}` : k === "obj" ? `${l.objections} (${l.sustained})` : `${+l[k].toFixed(2)}`);
-      return [label, f(lp), f(ld)];
-    }),
-    ["Payoff (utility)", t.utilities.prosecution.toFixed(2), t.utilities.defense.toFixed(2)],
-  ];
-  for (const [a, b, c] of rows) ledger.append(el("tr", {}, el("td", {}, a), el("td", { class: "num" }, b), el("td", { class: "num" }, c)));
-  $("#digest").textContent = t.digest;
-}
-
-/* ------------------------------------------------------------------ which style wins */
-
-function loadGame() {
-  S.game = null;
-  const { name } = splitTitle(S.caseFile.title);
-  $("#styles-case").textContent = `Case: ${name}`;
-  $("#gstatus").textContent = "";
-  if (S.mode === "offline") return renderGame(S.bundle.games[S.caseFile.id]);
-  $("#matrix").replaceChildren();
-  $("#matrix-note").replaceChildren();
-  $("#insight").replaceChildren(el("p", { class: "empty-note" }, "Press Run the numbers to replay this case for every combination of styles."));
-  $("#game-notes").replaceChildren();
-  $("#dynamics").replaceChildren();
-}
-
-async function runGame() {
-  const strategies = $("#gstrats").value.split(",");
-  const seeds = Math.min(100, Math.max(1, Math.floor(+$("#gseeds").value || 20)));
-  const btn = $("#grun"), status = $("#gstatus"), caseId = S.caseFile.id;
-  btn.disabled = true;
-  status.textContent = `Running ${seeds} trials for each of ${strategies.length ** 2} matchups…`;
-  try {
-    const game = await fetchJSON(`${API}/game`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ case_id: caseId, strategies, seeds }) }, 180000);
-    if (caseId !== S.caseFile.id) return;
-    renderGame(game);
-    status.textContent = `Done: ${game.seeds.length} trials per matchup.`;
-  } catch (err) {
-    status.textContent = `The numbers couldn't be run (${err.message}). Try fewer trials per matchup.`;
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-function equilibriumWinRate(game, eq) {
-  let w = 0;
-  for (const c of game.cells) w += (eq.row_mix[c.row] ?? 0) * (eq.col_mix[c.col] ?? 0) * c.prosecution_win_rate;
-  return w;
-}
-const pureChoice = (mix) => Object.keys(mix).find((k) => mix[k] === 1);
-
-function renderGame(game) {
-  if (!game) {
-    $("#insight").replaceChildren(el("p", { class: "empty-note" }, "No comparison is saved for this case."));
-    return;
-  }
-  S.game = game;
-  const a = game.analysis, n = game.seeds.length;
-  const P = The("prosecution"), p = the("prosecution");
-  $("#styles-intro").textContent = `Should a lawyer go on the attack or play it safe? We replayed this case ${n} times for every combination of styles to find out.`;
-
-  const stable = new Set(a.equilibria.filter((e) => e.pure).map((e) => `${pureChoice(e.row_mix)}|${pureChoice(e.col_mix)}`));
-  const cells = Object.fromEntries(game.cells.map((c) => [`${c.row}|${c.col}`, c]));
-  const head = el("tr", {}, el("td", { class: "corner" }), game.col_strategies.map((c) => el("th", { scope: "col" }, el("small", {}, "Defense"), styleInfo(c).label)));
-  const body = game.row_strategies.map((r) => el("tr", {},
-    el("th", { scope: "row" }, el("small", {}, sideLabel("prosecution")), styleInfo(r).label),
-    game.col_strategies.map((c) => {
-      const cell = cells[`${r}|${c}`];
-      const isStable = stable.has(`${r}|${c}`);
-      const split = el("div", { class: "split", "aria-hidden": "true" }, el("span", { style: `width: ${100 * cell.prosecution_win_rate}%` }));
-      return el("td", { class: isStable ? "stable" : "" },
-        el("p", { class: "cell-rate" }, pct(cell.prosecution_win_rate)),
-        el("p", { class: "cell-label" }, `of trials won by ${p}`),
-        split,
-        isStable ? el("p", { class: "cell-badge" }, "Stable choice") : null,
-        el("p", { class: "tech cell-tech" },
-          `Payoffs: ${sideLabel("prosecution")} ${cell.mean_row.toFixed(2)} ± ${cell.se_row.toFixed(2)}, defense ${cell.mean_col.toFixed(2)} ± ${cell.se_col.toFixed(2)}`));
-    })));
-  $("#matrix").replaceChildren(el("caption", { class: "tech" }, `Mean payoffs over ${n} seeds per cell.`), el("thead", {}, head), el("tbody", {}, body));
-  $("#matrix-note").replaceChildren(...[
-    el("span", {}, el("i", { style: `background: ${cssVar("--p")}` }), `${sideLabel("prosecution")} wins`),
-    el("span", {}, el("i", { style: `background: ${cssVar("--d")}` }), "Defense wins"),
-    stable.size ? el("span", {}, "Outlined: where both sides end up when each plays its best response.") : null,
-  ].filter(Boolean));
-
-  const eqs = a.equilibria;
-  const kids = [];
-  if (!eqs.length) {
-    kids.push(el("p", { class: "headline" }, "No stable way to play this case was found."));
-  } else if (eqs.length === 1 && eqs[0].pure) {
-    const r = pureChoice(eqs[0].row_mix), c = pureChoice(eqs[0].col_mix);
-    kids.push(el("p", { class: "headline" }, `If both sides play smart, ${p} plays ${styleInfo(r).adverb} and the defense plays ${styleInfo(c).adverb}.`));
-    kids.push(el("p", {}, "Neither side can do better by switching style on its own. Game theorists call this a Nash equilibrium."));
-  } else if (eqs.length === 1) {
-    kids.push(el("p", { class: "headline" }, "There's no single best style here. Smart lawyers mix it up."));
-    kids.push(el("p", {}, "If each side picks its style at random with the odds below, neither can do better by changing its approach. Game theorists call this a mixed Nash equilibrium."));
+  if (hasGsap && !reduced) {
+    gsap.set(".door.l", { xPercent: 0 }); gsap.set(".door.r", { xPercent: 0 });
+    gsap.set([".hud-top", ".hud-meters", ".caption", ".hud-bottom"], { opacity: 0 });
+    await gsap.timeline()
+      .to(".door.l", { xPercent: -100, duration: 1.6, ease: "power3.inOut", delay: .3 })
+      .to(".door.r", { xPercent: 100, duration: 1.6, ease: "power3.inOut" }, "<")
+      .to([".hud-top", ".hud-meters", ".caption", ".hud-bottom"], { opacity: 1, y: 0, stagger: .1, duration: .6 }, "-=.4");
   } else {
-    kids.push(el("p", { class: "headline" }, `There are ${eqs.length} stable ways to play this case.`));
-    kids.push(el("p", {}, "In each one, neither side can do better by switching style on its own. Which one happens depends on what each side expects the other to do."));
+    $(".doors").hidden = true;
   }
-  const dominance = [];
-  if (a.row_dominant) dominance.push(`For ${p}, ${styleInfo(a.row_dominant).label.toLowerCase()} is always the better choice, whatever the defense does.`);
-  if (a.col_dominant) dominance.push(`For the defense, ${styleInfo(a.col_dominant).label.toLowerCase()} is always the better choice, whatever ${p} does.`);
-  if (dominance.length) kids.push(el("p", { class: "dominance" }, dominance.join(" ")));
-
-  const mixed = eqs.filter((e) => !e.pure);
-  if (mixed.length) {
-    const mixRow = (side, mix, exact) => {
-      const entries = Object.entries(mix);
-      const full = cssVar(`--${sideClass(side)}`), soft = cssVar(`--${sideClass(side)}-soft`);
-      const shades = entries.length > 2 ? [full, `color-mix(in srgb, ${full} 50%, ${soft})`, soft] : [full, soft];
-      return el("div", {},
-        el("p", { class: "mix-label" }, speakerTag(side), `${sideLabel(side)}'s smart mix`),
-        el("div", { class: "mix-bar", role: "img", "aria-label": entries.map(([k, v]) => `${styleInfo(k).label} ${pct(v)}`).join(", ") },
-          entries.map(([, v], j) => el("span", { style: `width: ${100 * v}%; background: ${shades[j % shades.length]}` }))),
-        el("p", { class: "mix-legend" }, entries.map(([k, v], j) => v < 0.005 ? null :
-          el("span", {}, el("i", { style: `background: ${shades[j % shades.length]}` }), el("b", {}, `${styleInfo(k).label} ${pct(v)}`),
-            el("span", { class: "tech" }, ` (${exact[k]})`)))));
-    };
-    kids.push(el("div", { class: "mixes" }, mixed.slice(0, 1).flatMap((e) => [mixRow("prosecution", e.row_mix, e.row_mix_exact), mixRow("defense", e.col_mix, e.col_mix_exact)])));
-  }
-  if (eqs.length) {
-    kids.push(el("div", { class: "big-stat" },
-      el("strong", {}, pct(equilibriumWinRate(game, eqs[0]))),
-      el("span", {}, `of trials won by ${p} when both sides play smart.`)));
-  }
-  $("#insight").replaceChildren(...kids);
-
-  const facts = [
-    `Dominant strategy: ${sideLabel("prosecution")} ${a.row_dominant ? `${a.row_dominant} (${a.row_dominance})` : "none"}; defense ${a.col_dominant ? `${a.col_dominant} (${a.col_dominance})` : "none"}.`,
-    `Survivors of iterated elimination of strictly dominated strategies: {${a.iesds_rows.join(", ")}} × {${a.iesds_cols.join(", ")}}.`,
-    ...eqs.map((e, i) => `Equilibrium ${i + 1} (${e.pure ? "pure" : "mixed"}, ${e.verified ? "verified" : "unverified"}): expected payoff ${sideLabel("prosecution")} ${e.row_payoff.toFixed(3)}, defense ${e.col_payoff.toFixed(3)}.`),
-    ...a.notes,
-  ];
-  $("#game-notes").replaceChildren(...facts.map((f) => el("li", {}, f)));
-  renderDynamics(game);
+  await wait(reduced ? 0 : firstVisit && window.Sound ? 5600 : 1200);
+  if (!$("#court").hidden) setAuto(true);
 }
 
-function renderDynamics(game) {
-  const g = $("#dynamics");
-  g.replaceChildren();
-  const pad = 44, W = 420, span = W - 2 * pad;
-  const X = (v) => pad + span * v, Y = (v) => W - pad - span * v;
-  g.append(svg("rect", { x: pad, y: pad, width: span, height: span, style: `fill: none; stroke: ${cssVar("--rule-strong")}` }));
-  g.append(svg("text", { x: W / 2, y: W - 8, "text-anchor": "middle", class: "muted" }, `${sideLabel("prosecution")} share playing ${styleInfo(game.row_strategies[0]).label.toLowerCase()}`));
-  g.append(svg("text", { x: 14, y: W / 2, "text-anchor": "middle", class: "muted", transform: `rotate(-90 14 ${W / 2})` }, `Defense share playing ${styleInfo(game.col_strategies[0]).label.toLowerCase()}`));
-  for (const v of [0, 0.5, 1]) {
-    g.append(svg("text", { x: X(v), y: W - pad + 16, "text-anchor": "middle", class: "muted" }, pct(v)));
-    g.append(svg("text", { x: pad - 6, y: Y(v) + 4, "text-anchor": "end", class: "muted" }, pct(v)));
-  }
-  if (game.dynamics?.length) {
-    const d = game.dynamics.map((pt, i) => `${i ? "L" : "M"}${X(pt.x[0]).toFixed(1)},${Y(pt.y[0]).toFixed(1)}`).join("");
-    g.append(svg("path", { d, style: `fill: none; stroke: ${cssVar("--d")}; stroke-width: 2` }));
-    const s = game.dynamics[0], e = game.dynamics.at(-1);
-    g.append(svg("circle", { cx: X(s.x[0]), cy: Y(s.y[0]), r: 4, style: `fill: ${cssVar("--muted")}` }));
-    g.append(svg("circle", { cx: X(e.x[0]), cy: Y(e.y[0]), r: 5, style: `fill: ${cssVar("--d")}` }));
-  }
-  for (const eq of game.analysis.equilibria) {
-    const cx = X(eq.row_mix[game.row_strategies[0]] ?? 0), cy = Y(eq.col_mix[game.col_strategies[0]] ?? 0);
-    g.append(svg("circle", { cx, cy, r: 7, style: `fill: none; stroke: ${cssVar("--ink")}; stroke-width: 2.5` }));
-    g.append(svg("text", { x: cx + 10, y: cy - 8 }, "Equilibrium"));
-  }
+function leaveCourt() {
+  S.run++;
+  setAuto(false);
+  Voice.stop();
+  window.Court3D?.close();
+  window.Sound?.stopScore();
+  window.Scene?.resume?.();
+  $("#court").hidden = true;
+  $(".doors").hidden = false;
+  Exhibit.hide(false);
+  document.body.style.overflow = "";
+  $("#notes").hidden = true;
+  $("#notes-btn").setAttribute("aria-expanded", "false");
+  $("#court").classList.remove("show-meters");
 }
 
-/* ------------------------------------------------------------------ tabs and theme */
+/* ------------------------------------------------------------------ exhibits drawn as the real thing (data in artifacts.js) */
 
-const TABS = ["overview", "courtroom", "casefile", "verdict", "strategy", "judge"];
-const TAB_ALIAS = { trial: "courtroom", styles: "strategy", top: "overview" };
-function tabFromHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
-  const t = TAB_ALIAS[h] ?? h;
-  return TABS.includes(t) ? t : null;
-}
-
-function initTabs() {
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
-  for (const t of tabs) {
-    t.addEventListener("click", () => activateTab(t.dataset.tab, { push: true }));
-    t.addEventListener("keydown", (e) => {
-      const i = tabs.indexOf(t);
-      const j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
-      if (j === undefined) return;
-      e.preventDefault();
-      const next = tabs[(j + tabs.length) % tabs.length];
-      next.focus();
-      activateTab(next.dataset.tab, { push: true });
-    });
-  }
-  document.addEventListener("click", (e) => {
-    const link = e.target.closest("[data-tab-link]");
-    if (!link || e.metaKey || e.ctrlKey || e.shiftKey) return;
-    e.preventDefault();
-    activateTab(link.dataset.tabLink, { push: true });
-  });
-  window.addEventListener("hashchange", () => {
-    const t = tabFromHash();
-    if (t && t !== S.tab) activateTab(t);
-  });
-  document.addEventListener("visibilitychange", replaySync);
-  if ("ResizeObserver" in window) new ResizeObserver(() => drawEvidenceMap()).observe($("#evmap"));
-  activateTab(tabFromHash() ?? "overview", { initial: true });
-  // a tab's hash would otherwise make the browser jump past the header on load
-  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  window.scrollTo(0, 0);
-}
-
-function activateTab(name, { push = false, initial = false } = {}) {
-  const prev = S.tab;
-  S.tab = name;
-  for (const t of document.querySelectorAll('[role="tab"]')) {
-    const on = t.dataset.tab === name;
-    t.setAttribute("aria-selected", String(on));
-    t.tabIndex = on ? 0 : -1;
-    if (on && !initial) t.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }
-  for (const panel of document.querySelectorAll('[role="tabpanel"]')) {
-    const on = panel.id === name;
-    panel.hidden = !on;
-    if (on && !initial && prev !== name) {
-      panel.classList.remove("entering");
-      void panel.offsetWidth; // restart the entrance animation
-      panel.classList.add("entering");
-    }
-  }
-  if (push && location.hash !== `#${name}`) history.pushState(null, "", `#${name}`);
-  // a new tab starts at the top of the folder, not wherever the last one was scrolled to
-  const top = $(".site-header").offsetHeight;
-  if (!initial && window.scrollY > top) window.scrollTo({ top, behavior: "instant" });
-  if (name === "verdict") drawEvidenceMap();
-  replaySync();
-}
-
-function initTheme() {
-  const btn = $("#theme-toggle"), root = document.documentElement;
-  const mq = matchMedia("(prefers-color-scheme: dark)");
-  const sync = () => {
-    const dark = root.dataset.theme ? root.dataset.theme === "dark" : mq.matches;
-    root.toggleAttribute("data-dark", dark);
-    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
-    btn.title = btn.getAttribute("aria-label");
-    $('meta[name="theme-color"]').content = cssVar("--desk");
-    if (S.game) renderGame(S.game); // its chart colours are read from the theme at render time
-  };
-  btn.addEventListener("click", () => {
-    root.dataset.theme = root.hasAttribute("data-dark") ? "light" : "dark";
-    try { localStorage.setItem("courtroom-theme", root.dataset.theme); } catch { /* storage unavailable */ }
-    sync();
-  });
-  mq.addEventListener?.("change", sync);
-  sync();
-}
-
-const icon = (id) => {
-  const s = svg("svg", { "aria-hidden": "true" });
-  s.append(svg("use", { href: `#${id}` }));
-  return s;
+const SCENE = {
+  shirt: '<svg viewBox="0 0 160 100"><path class="fill" d="M58 14l22 8 22-8 26 14-10 18-12-6v52H54V40l-12 6-10-18z"/><path d="M58 14l22 8 22-8 26 14-10 18-12-6v52H54V40l-12 6-10-18z"/><g class="dots"><circle cx="70" cy="50" r="2.5"/><circle cx="84" cy="58" r="2"/><circle cx="76" cy="66" r="3"/><circle cx="92" cy="47" r="2"/><circle cx="66" cy="74" r="2"/><circle cx="96" cy="70" r="2.5"/></g></svg>',
+  kid: '<svg viewBox="0 0 160 100"><path d="M20 92h120M100 20h36v72h-36z"/><circle cx="62" cy="34" r="9"/><path class="red" d="M50 46h24l4 30H46z"/><path d="M54 76l-2 16M70 76l2 16"/></svg>',
+  bike: '<svg viewBox="0 0 160 100"><circle cx="42" cy="66" r="22"/><circle cx="118" cy="66" r="22"/><path d="M42 66l26-34h34l16 34M68 32l14 34h-40M96 24h14M82 66l20-34"/></svg>',
+  friends: '<svg viewBox="0 0 160 100"><circle class="fill" cx="128" cy="22" r="10"/><circle cx="56" cy="38" r="10"/><circle cx="96" cy="36" r="10"/><path d="M38 92c0-20 8-36 18-36s18 16 18 36M78 92c0-20 8-38 18-38s18 18 18 38M70 64l12-6"/><path d="M10 92h140"/></svg>',
+  paws: '<svg viewBox="0 0 160 100"><g class="fill-all"><g transform="translate(24 66)"><ellipse rx="7" ry="6"/><circle cx="-8" cy="-9" r="3"/><circle cx="0" cy="-12" r="3"/><circle cx="8" cy="-9" r="3"/></g><g transform="translate(62 48) rotate(-10)"><ellipse rx="7" ry="6"/><circle cx="-8" cy="-9" r="3"/><circle cx="0" cy="-12" r="3"/><circle cx="8" cy="-9" r="3"/></g><g transform="translate(100 62) rotate(8)"><ellipse rx="7" ry="6"/><circle cx="-8" cy="-9" r="3"/><circle cx="0" cy="-12" r="3"/><circle cx="8" cy="-9" r="3"/></g></g><path d="M136 10v84M146 10v84M128 30h26M128 70h26"/></svg>',
+  gate: '<svg viewBox="0 0 160 100"><path d="M8 92h144M14 30v62M30 30v62M46 30v62M62 26v66M118 26v66M134 30v62M150 30v62M8 46h54M118 46h36M8 76h54M118 76h36"/><path class="fill" d="M62 30l40-18v70l-40 10z"/><path d="M62 30l40-18v70l-40 10z"/></svg>',
+  car: '<svg viewBox="0 0 160 100"><path d="M10 92h140"/><path class="fill" d="M34 70l10-24h62l16 24v14H34z"/><path d="M34 70l10-24h62l16 24v14H34zM50 50h24v18H44zM80 50h22l10 18H80z"/><circle cx="54" cy="84" r="8"/><circle cx="104" cy="84" r="8"/></svg>',
+  helmet: '<svg viewBox="0 0 160 100"><circle cx="42" cy="70" r="20"/><circle cx="118" cy="70" r="20"/><path d="M42 70l24-30h32l20 30M66 40l14 30h-38"/><path class="fill" d="M84 22c0-10 22-10 22 0v6H84z"/><path d="M84 22c0-10 22-10 22 0v6H84z"/></svg>',
+  drive: '<svg viewBox="0 0 160 100"><rect class="fill" x="36" y="20" width="88" height="62" rx="6"/><rect x="36" y="20" width="88" height="62" rx="6"/><circle cx="80" cy="50" r="18"/><circle cx="80" cy="50" r="3"/><path d="M98 66l14 8"/></svg>',
 };
 
-/* ------------------------------------------------------------------ overview: the bench replay */
-
-const REPLAY_MS = 2300;
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-function replayReset() {
-  clearTimeout(S.replayTimer);
-  // skip the quiet "doesn't object" beats so the short replay stays lively
-  S.replaySteps = S.trial ? S.trial.events.map((ev, i) => (ev.kind === "action" && ev.action?.type === "pass" ? -1 : i)).filter((i) => i >= 0) : [];
-  S.replayIdx = reducedMotion() ? Math.max(0, S.replaySteps.length - 1) : 0;
-  replayRender();
-  replaySync();
-}
-function replaySync() {
-  clearTimeout(S.replayTimer);
-  S.replayTimer = null;
-  const live = Boolean(S.trial) && S.tab === "overview" && !document.hidden && !reducedMotion();
-  $("#replay").classList.toggle("paused", !live);
-  if (live) S.replayTimer = setTimeout(replayTick, S.replayIdx >= S.replaySteps.length - 1 ? 5200 : REPLAY_MS);
-}
-function replayTick() {
-  if (!S.trial) return;
-  S.replayIdx = S.replayIdx >= S.replaySteps.length - 1 ? 0 : S.replayIdx + 1;
-  replayRender(true);
-  replaySync();
-}
-function replayRender(animate = false) {
-  const t = S.trial, now = $("#replay-now"), meters = $("#replay-meters");
-  if (!t || !S.caseFile) {
-    $("#replay-case").textContent = S.caseFile ? "Loading a trial…" : "No trial loaded yet.";
-    for (const id of ["#replay-matchup", "#replay-step"]) $(id).replaceChildren();
-    now.replaceChildren(el("p", { class: "bench-line" }, "Pick a case in the courtroom to start a trial."));
-    meters.replaceChildren();
-    meters.dataset.key = "";
-    $("#replay-progress").style.width = "0";
-    return;
-  }
-  const i = S.replaySteps[S.replayIdx] ?? 0, ev = t.events[i], n = narrate(ev);
-  const final = i === t.events.length - 1;
-  $("#replay-case").textContent = splitTitle(S.caseFile.title).name;
-  $("#replay-matchup").replaceChildren(
-    speakerTag("prosecution"), styleInfo(t.prosecution_strategy).label, el("span", {}, "vs"), speakerTag("defense"), styleInfo(t.defense_strategy).label);
-  $("#replay-step").textContent = `Step ${i + 1} of ${t.events.length}`;
-  const kids = [el("div", { class: "speaker" }, speakerTag(n.speaker), el("span", {}, phaseLabel(ev.phase === "closed" ? "deliberation" : ev.phase)))];
-  if (n.verdict) kids.push(el("p", { class: `bench-verdict ${sideClass(n.verdict.winner)}` }, n.verdict.word));
-  kids.push(el("p", { class: `bench-line${animate ? " swap" : ""}` }, n.verdict ? `${The(n.verdict.winner)} wins the case.` : n.judge ? `${n.head} ${n.judge}` : n.head));
-  now.replaceChildren(...kids);
-
-  const thr = threshold();
-  if (meters.dataset.key !== S.trialKey) {
-    meters.dataset.key = S.trialKey;
-    meters.replaceChildren(...Object.keys(ev.element_probabilities).map((id) =>
-      el("div", { class: "mini", "data-el": id },
-        el("span", { class: "mini-name", title: elementName(id) }, elementName(id)),
-        el("span", { class: "mini-track", "aria-hidden": "true" }, el("span", { class: "mini-fill" }), el("span", { class: "mini-bar", style: `left: ${100 * thr}%` })),
-        el("span", { class: "mini-val" }))));
-  }
-  const exact = Object.fromEntries(t.verdict.snapshot.elements.map((e) => [e.element_id, e.met]));
-  for (const row of meters.children) {
-    const id = row.dataset.el, p = ev.element_probabilities[id] ?? 0;
-    row.classList.toggle("proven", final && id in exact ? exact[id] : proven(p));
-    row.querySelector(".mini-fill").style.setProperty("--fill", `${100 * p}%`);
-    row.querySelector(".mini-val").textContent = pct(p);
-  }
-  $("#replay-progress").style.width = `${(100 * (i + 1)) / t.events.length}%`;
-}
-
-/* ------------------------------------------------------------------ case strip and case file */
-
-function renderCaseStrip() {
-  const c = S.caseFile, { parties, name } = splitTitle(c.title);
-  $("#case-strip").replaceChildren(
-    el("div", {},
-      parties && el("p", { class: "parties" }, parties),
-      el("h3", {}, name),
-      el("p", { class: "must" }, `${The("prosecution")} must prove `, el("b", {}, joinList(c.elements.map((e) => lowerFirst(e.name)))), ` ${STANDARD[c.standard]}.`)),
-    el("a", { class: "btn quiet small", href: "#casefile", "data-tab-link": "casefile" }, "Read the case file", icon("i-arrow")));
-}
-
-function initials(name) {
-  return name.split(/\s+/).filter((w) => /^[A-Za-z']/.test(w) && !w.endsWith(".")).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
-}
-
-function renderCaseFile() {
-  const c = S.caseFile;
-  const fact = (k, v) => el("div", {}, el("dt", {}, k), el("dd", {}, v));
-  $("#case-facts").replaceChildren(
-    fact("Type of case", isCivil() ? "Civil" : "Criminal"),
-    fact("Exhibits on file", String(c.evidence.length)),
-    fact("Budget per side", `${c.budget} points`),
-    fact("Moves per stage", String(c.max_primary_turns)),
-    fact("Flaws read correctly", pct(c.perception_accuracy)));
-
-  const wl = $("#witnesses");
-  wl.replaceChildren(...c.witnesses.map((w) => {
-    const gave = c.evidence.filter((e) => e.witness_id === w.id);
-    const challenged = c.evidence.filter((e) => e.impeaches?.includes(w.id));
-    return el("li", { class: "witness" },
-      el("div", { class: "witness-head" },
-        el("span", { class: "avatar", "aria-hidden": "true" }, initials(w.name)),
-        el("div", {}, el("h4", {}, w.name), el("p", { class: "role" }, w.role))),
-      el("div", { class: "cred" }, el("span", {}, "Credibility"),
-        el("span", { class: "cred-track", "aria-hidden": "true" }, el("span", { style: `width: ${100 * w.credibility}%` })),
-        el("b", {}, pct(w.credibility))),
-      w.bias_note ? el("p", { class: "bias" }, `Possible bias: ${lowerFirst(w.bias_note)}`) : null,
-      gave.length ? el("p", { class: "gave" }, `Testifies in ${joinList(gave.map((g) => g.id))} for ${the(gave[0].owner)}.`) : null,
-      challenged.length ? el("p", { class: "gave" }, `Can be challenged with ${joinList(challenged.map((g) => g.id))}.`) : null);
-  }));
-  if (!c.witnesses.length) wl.append(el("li", { class: "empty-note" }, "No witnesses in this case."));
-
-  $("#exhibits").replaceChildren(...SIDES.map((side) => {
-    const items = c.evidence.filter((e) => e.owner === side);
-    return el("section", { class: sideClass(side) },
-      el("h4", {}, `${sideLabel(side)}'s exhibits`),
-      items.length ? el("ul", {}, items.map(exhibitRow)) : el("p", { class: "empty-note xh" }, "No evidence on file for this side."));
-  }));
-}
-
-function exhibitRow(item) {
-  const flaws = flawsOf(item);
-  const w = item.witness_id && witnessById(item.witness_id);
-  const links = [];
-  if (w) links.push(`Witness: ${w.name}`);
-  if (item.contradicts.length) links.push(`Clashes with ${joinList(item.contradicts)}`);
-  if (item.impeaches?.length) links.push(`Can discredit ${joinList(item.impeaches.map((id) => witnessById(id)?.name ?? id))}`);
-  return el("li", { class: "xh" },
-    el("span", { class: `tag ${sideClass(item.owner)}` }, item.id),
-    el("p", { class: "xh-title" }, item.title),
-    el("p", { class: "xh-meta" }, itemMeta(item)),
-    el("div", { class: "xh-rel" }, el("span", {}, "Reliability"),
-      el("span", { class: "cred-track", "aria-hidden": "true" }, el("span", { style: `width: ${100 * item.reliability}%` })),
-      el("b", {}, pct(item.reliability))),
-    links.length ? el("p", { class: "xh-links" }, `${links.join(". ")}.`) : null,
-    flaws.length ? el("p", { class: "flaw" }, `Hidden flaw: ${joinList(flaws)}.`) : null);
-}
-
-/* ------------------------------------------------------------------ verdict tab */
-
-function renderVerdictTab() {
-  const t = S.trial, ruling = $("#ruling");
-  if (!t) {
-    ruling.className = "ruling empty";
-    ruling.replaceChildren(el("p", { class: "empty-note" }, "No trial is loaded yet. Pick a case and a style for each side in the courtroom, then come back here."));
-    for (const id of ["#breakdown", "#evmap", "#map-legend", "#chain", "#findings", "#ledger"]) $(id).replaceChildren();
-    $("#digest").textContent = "";
-    return;
-  }
-  const v = verdictNarration();
-  ruling.className = `ruling win-${sideClass(v.winner)}`;
-  ruling.replaceChildren(
-    el("p", { class: "verdict-word" }, v.word),
-    el("div", { class: "ruling-why" },
-      el("p", { class: "winner" }, speakerTag(v.winner), `${The(v.winner)} wins the case.`),
-      el("p", {}, v.reason)),
-    el("div", { class: "ruling-meta" },
-      el("span", {}, `${sideLabel("prosecution")} played: ${styleInfo(t.prosecution_strategy).label}`),
-      el("span", {}, `Defense played: ${styleInfo(t.defense_strategy).label}`),
-      S.mode === "live" ? el("span", {}, `Trial number ${t.seed}`) : null,
-      el("a", { href: "#courtroom", "data-tab-link": "courtroom" }, "Replay it in the courtroom")));
-
-  renderBreakdown();
-  renderEvidenceMap();
-
-  $("#chain").replaceChildren(...t.events.map((ev, i) => {
-    const n = narrate(ev);
-    return el("li", { class: `${SIDES.includes(n.speaker) ? n.speaker : "court"}${i === t.events.length - 1 ? " last-row" : ""}` },
-      el("span", { class: "seq" }, `#${ev.seq}`),
-      el("span", { class: "what" }, n.short ?? n.head),
-      el("span", { class: "hash", title: `This step: ${ev.hash}\nPrevious step: ${ev.prev_hash}` }, el("b", {}, ev.hash.slice(0, 10)), ` ← ${ev.prev_hash.slice(0, 6)}`));
-  }));
-}
-
-function renderBreakdown() {
-  const t = S.trial, start = t.events[0].element_probabilities;
-  const all = t.verdict.snapshot.elements.flatMap((es) => es.contributions.map((c) => Math.abs(c.log_odds)));
-  const maxAbs = Math.max(0.01, ...all);
-  const points = t.verdict.snapshot.elements.map((es) => {
-    const rows = [...es.contributions].sort((a, b) => b.log_odds - a.log_odds).map((c) => {
-      const item = itemById(c.evidence_id), pos = c.log_odds >= 0, size = Math.abs(c.log_odds);
-      const why = [];
-      if (c.contradiction_discount > 0) why.push(`cut ${pct(c.contradiction_discount)} by clashing evidence`);
-      if (c.corroboration_factor > 1) why.push(`boosted ${pct(c.corroboration_factor - 1)} by backing evidence`);
-      if (!c.counted) why.push("not counted: the same fact was already counted");
-      return el("div", { class: `bd-row${c.counted ? "" : " uncounted"}`, title: why.length ? capFirst(why.join("; ")) : "" },
-        el("p", { class: "bd-label" }, el("span", { class: `tag ${sideClass(item?.owner)}` }, c.evidence_id), el("span", {}, item?.title ?? "")),
-        el("div", { class: "bd-bar", role: "img", "aria-label": `${pos ? "Toward" : "Against"} proving this point by ${size.toFixed(1)}${why.length ? `, ${why.join(", ")}` : ""}` },
-          el("i", { class: pos ? "p" : "d", style: `width: ${(50 * size) / maxAbs}%` })),
-        el("p", { class: "bd-val" }, `${pos ? "+" : "−"}${size.toFixed(1)}`));
-    });
-    return el("article", { class: "bd-point" },
-      el("div", { class: "bd-head" },
-        el("h4", {}, elementName(es.element_id)),
-        el("span", { class: `bd-result ${es.met ? "met" : "unmet"}` }, es.met ? "Proven" : "Not proven")),
-      el("p", { class: "bd-sum" }, `Started at ${pct(start[es.element_id] ?? 0)} and ended at ${pct(es.probability)}. The judge needed ${barPhrase()}.`),
-      el("div", { class: `meter-track bd-meter${es.met ? " proven" : ""}`, role: "meter", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": Math.round(100 * es.probability), "aria-label": `${elementName(es.element_id)} certainty` },
-        el("div", { class: "meter-fill", style: `--fill: ${100 * es.probability}%` }),
-        el("div", { class: "meter-bar", style: `left: ${100 * es.threshold_probability}%` })),
-      rows.length ? el("div", { class: "bd-rows" }, rows) : el("p", { class: "bd-none bd-rows" }, "No accepted evidence touched this point, so it stayed where it started."));
-  });
-  $("#breakdown").replaceChildren(...points,
-    el("p", { class: "bd-foot" }, "Numbers show the size of each push in the judge's arithmetic (log-odds). The judge adds them to the starting point. Hover a row to see whether clashing or backing evidence changed it."));
-}
-
-const NODE_STATUS = { admitted: "Accepted", excluded: "Thrown out", unpresented: "Never shown" };
-function renderEvidenceMap() {
-  const g = S.trial.graph, box = $("#evmap");
-  const lgLine = (cls, text) => {
-    const s = svg("svg", { viewBox: "0 0 28 10", "aria-hidden": "true" });
-    s.append(svg("line", { x1: 0, y1: 5, x2: 28, y2: 5, class: `lg-line ${cls}` }));
-    return el("span", {}, s, text);
-  };
-  const lgBox = (cls, text) => el("span", {}, el("i", { class: `lg-box ${cls}`, "aria-hidden": "true" }), text);
-  $("#map-legend").replaceChildren(
-    lgLine("corroborates", "Backs each other up"), lgLine("contradicts", "Clash: both count for less"),
-    lgBox("admitted", "Accepted"), lgBox("excluded", "Thrown out"), lgBox("unpresented", "Never shown"));
-  if (!g.nodes.length) {
-    box.replaceChildren(el("p", { class: "empty-note" }, "There's no evidence in this case, so there's nothing to map."));
-    return;
-  }
-  const maxW = Math.max(0.01, ...g.nodes.map((n) => n.weight));
-  const linksOf = (id) => g.edges.filter((e) => e.source === id || e.target === id)
-    .map((e) => `${e.relation === "contradicts" ? "clashes with" : "backed by"} ${e.source === id ? e.target : e.source}`);
-  const col = (side) => el("div", { class: `evmap-col ${sideClass(side)}` },
-    el("h4", {}, el("span", { class: `tag ${sideClass(side)}` }, sideLabel(side))),
-    g.nodes.filter((n) => n.owner === side).map((n) => {
-      const links = linksOf(n.id);
-      const node = el("button", {
-        type: "button", class: `node ${n.status}`, "data-id": n.id, title: n.label,
-        "aria-label": `${n.id}, ${n.label}. ${NODE_STATUS[n.status] ?? n.status}.${links.length ? ` ${capFirst(joinList(links))}.` : ""}`,
-      },
-      el("span", { class: "node-top" }, el("span", { class: `tag ${sideClass(side)}` }, n.id), el("span", {}, n.label)),
-      el("span", { class: "node-w", "aria-hidden": "true" }, el("i", { style: `width: ${(100 * n.weight) / maxW}%` })));
-      for (const [on, off] of [["mouseenter", "mouseleave"], ["focus", "blur"]]) {
-        node.addEventListener(on, () => focusNode(n.id));
-        node.addEventListener(off, () => focusNode(null));
-      }
-      return node;
-    }));
-  box.replaceChildren(col("prosecution"), col("defense"), svg("svg", { class: "evmap-lines", "aria-hidden": "true" }));
-  drawEvidenceMap();
-}
-
-function drawEvidenceMap() {
-  const box = $("#evmap"), lines = box.querySelector(".evmap-lines");
-  if (!lines || !S.trial || box.offsetParent === null) return;
-  const B = box.getBoundingClientRect();
-  const room = parseFloat(getComputedStyle(box).paddingLeft) - 4;
-  const pos = (id) => {
-    const n = box.querySelector(`.node[data-id="${CSS.escape(id)}"]`);
-    if (!n) return null;
-    const r = n.getBoundingClientRect();
-    return { l: r.left - B.left, r: r.right - B.left, y: r.top - B.top + r.height / 2, p: n.parentElement.classList.contains("p") };
-  };
-  lines.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
-  lines.replaceChildren(...S.trial.graph.edges.map((e) => {
-    const a = pos(e.source), b = pos(e.target);
-    if (!a || !b) return null;
-    let d;
-    if (a.p !== b.p) {
-      const [L, R] = a.p ? [a, b] : [b, a];
-      const mx = (L.r + R.l) / 2;
-      d = `M${L.r},${L.y} C${mx},${L.y} ${mx},${R.y} ${R.l},${R.y}`;
-    } else {
-      // same side: arc out into the margin so the line doesn't cross other exhibits
-      const out = a.p ? -1 : 1, x = a.p ? Math.min(a.l, b.l) : Math.max(a.r, b.r);
-      const bulge = out * Math.min(room, 10 + Math.abs(a.y - b.y) * 0.15);
-      d = `M${x},${a.y} C${x + bulge},${a.y} ${x + bulge},${b.y} ${x},${b.y}`;
+function renderArtifact(a) {
+  const rows = (list, cls) => el("table", { class: cls }, el("tbody", {}, ...list.map((r, i) => el("tr", { class: i === a.mark ? "mark" : null }, ...r.map((c) => el("td", {}, c))))));
+  switch (a.type) {
+    case "note":
+      return el("div", { class: "art note" }, el("p", {}, a.text));
+    case "sms":
+    case "chat":
+      if (a.type === "chat") return el("div", { class: "art forum" }, el("p", { class: "site" }, a.site), el("p", { class: "user" }, a.user), el("p", {}, a.text));
+      return el("div", { class: "art phone" }, el("p", { class: "contact" }, a.contact, el("small", {}, a.time)),
+        ...a.msgs.map(([who, t]) => el("p", { class: `bubble ${who}` }, t)));
+    case "receipt":
+      return el("div", { class: "art receipt" }, el("p", { class: "shop" }, a.shop), el("p", { class: "date" }, a.date),
+        rows(a.lines, "lines"), el("p", { class: "total" }, el("span", {}, "TOTAL"), el("span", {}, `$${a.total}`)));
+    case "log":
+      return el("div", { class: "art log" }, el("p", { class: "title" }, a.title), rows(a.rows, "rows"));
+    case "ledger":
+      return el("div", { class: "art ledger" }, el("p", { class: "title" }, a.title), rows(a.rows, "rows"), a.foot ? el("p", { class: "foot" }, a.foot) : null);
+    case "cctv": {
+      const frame = el("div", { class: "art cctv" }, el("p", { class: "osd" }, el("span", {}, `● ${a.cam}`), el("span", {}, a.time)));
+      frame.insertAdjacentHTML("beforeend", SCENE[a.scene] ?? "");
+      frame.append(el("p", { class: "cap" }, a.caption));
+      return frame;
     }
-    return svg("path", { d, class: e.relation, "data-a": e.source, "data-b": e.target });
-  }).filter(Boolean));
-}
-
-function focusNode(id) {
-  const box = $("#evmap");
-  box.classList.toggle("focus", Boolean(id));
-  const lit = new Set(id ? [id] : []);
-  for (const p of box.querySelectorAll(".evmap-lines path")) {
-    const on = Boolean(id) && (p.dataset.a === id || p.dataset.b === id);
-    p.classList.toggle("lit", on);
-    if (on) { lit.add(p.dataset.a); lit.add(p.dataset.b); }
+    case "photo": {
+      const ph = el("div", { class: "art photo" });
+      ph.insertAdjacentHTML("beforeend", SCENE[a.scene] ?? "");
+      ph.append(el("p", { class: "cap" }, a.caption));
+      return ph;
+    }
+    case "ad":
+      return el("div", { class: "art ad" }, el("p", { class: "title" }, a.title), el("p", { class: "price" }, a.price), el("p", {}, a.text));
+    default: // doc: letters, memos, emails, forms
+      return el("div", { class: "art doc" }, el("p", { class: "head" }, a.head), el("p", { class: "title" }, a.title),
+        ...a.lines.map((l) => el("p", {}, l)), a.sign ? el("p", { class: "sign" }, a.sign) : null);
   }
-  for (const n of box.querySelectorAll(".node")) n.classList.toggle("lit", lit.has(n.dataset.id));
 }
 
-/* ------------------------------------------------------------------ technical details switch */
+/* ------------------------------------------------------------------ the exhibit card (HTML, paper style) */
 
-function initTechToggle() {
-  const box = $("#tech-toggle");
-  let on = false;
-  try { on = localStorage.getItem("courtroom-tech") === "1"; } catch { /* storage unavailable */ }
-  box.checked = on;
-  document.body.classList.toggle("show-tech", on);
-  box.addEventListener("change", () => {
-    document.body.classList.toggle("show-tech", box.checked);
-    try { localStorage.setItem("courtroom-tech", box.checked ? "1" : "0"); } catch { /* storage unavailable */ }
+const ART = {
+  document: '<svg viewBox="0 0 80 100"><path class="fill" d="M14 6h36l16 16v72H14z"/><path d="M14 6h36l16 16v72H14z"/><path d="M50 6v16h16M24 40h32M24 52h32M24 64h24M24 76h28"/></svg>',
+  digital_log: '<svg viewBox="0 0 110 90"><rect class="fill" x="8" y="8" width="94" height="60" rx="5"/><rect x="8" y="8" width="94" height="60" rx="5"/><path d="M42 82h26M55 68v14M20 24h40M20 36h60M20 48h30"/><circle cx="86" cy="24" r="4"/></svg>',
+  physical: '<svg viewBox="0 0 90 100"><path class="fill" d="M12 22h66v70H12z"/><path d="M12 22h66v70H12zM12 22l8-14h50l8 14"/><path d="M12 38h66"/><path d="M28 60h34M28 72h22"/></svg>',
+  financial_record: '<svg viewBox="0 0 80 100"><path class="fill" d="M16 6h48v84l-8-6-8 6-8-6-8 6-8-6-8 6z"/><path d="M16 6h48v84l-8-6-8 6-8-6-8 6-8-6-8 6z"/><path d="M26 24h28M26 36h28M26 48h18M44 64h12"/></svg>',
+  testimony: '<svg viewBox="0 0 110 100"><circle class="fill" cx="36" cy="40" r="14"/><circle cx="36" cy="40" r="14"/><path d="M10 92c0-16 12-28 26-28s26 12 26 28"/><path d="M62 12h40v26H78l-10 10V38h-6z"/><path d="M70 22h24M70 30h16"/></svg>',
+  expert: '<svg viewBox="0 0 100 100"><path d="M10 88h80M18 88V60M36 88V44M54 88V54M72 88V30"/><circle class="fill" cx="56" cy="34" r="18"/><circle cx="56" cy="34" r="18"/><path d="M69 47l16 16"/></svg>',
+};
+const STAMP = { ok: ["Accepted", "ok"], no: ["Thrown out", "no"], noted: ["Noted", "ok"] };
+
+const Exhibit = {
+  id: null, stamped: null,
+  show(it, animate) {
+    if (!it) return;
+    const card = $("#exhibit"), fresh = this.id !== it.id || card.hidden;
+    this.id = it.id;
+    if (!fresh) return;
+    this.stamped = null;
+    const art = window.ARTIFACTS?.[it.id];
+    card.className = `exhibit ${it.owner === "prosecution" ? "p" : "d"}${art ? " has-artifact" : ""}`;
+    $("#ex-tag").textContent = `Exhibit ${it.id} · ${it.owner === "prosecution" ? "Accuser" : "Defender"}`;
+    const box = $("#ex-art");
+    box.replaceChildren();
+    if (art) box.append(renderArtifact(art)); else box.innerHTML = ART[it.kind] ?? ART.document;
+    $("#ex-kind").textContent = KIND[it.kind] ?? "Evidence";
+    $("#ex-title").textContent = it.title;
+    const f = flaws(it);
+    $("#ex-flaw").textContent = f.length ? `Possible problem: ${f.join(", ")}` : "";
+    $("#ex-stamp").hidden = true;
+    card.hidden = false;
+    if (!animate || !hasGsap || reduced) { if (hasGsap) gsap.set(card, { clearProps: "all" }); return; }
+    window.Sound?.whoosh();
+    const fromX = it.owner === "prosecution" ? -innerWidth * 0.6 : innerWidth * 0.3;
+    gsap.fromTo(card, { x: fromX, y: 120, rotate: it.owner === "prosecution" ? -25 : 25, opacity: 0, scale: .7 },
+      { x: 0, y: 0, rotate: it.owner === "prosecution" ? -2 : 2, opacity: 1, scale: 1, duration: .9, ease: "power3.out" });
+    gsap.from(["#ex-art > *", "#ex-kind", "#ex-title", "#ex-flaw"], { y: 10, opacity: 0, stagger: .08, duration: .4, delay: .5 });
+  },
+  stamp(mode, animate) {
+    const [label, cls] = STAMP[mode] ?? STAMP.ok;
+    const s = $("#ex-stamp");
+    s.textContent = label; s.className = `ex-stamp ${cls}`; s.hidden = false;
+    if (this.stamped === mode) return;
+    this.stamped = mode;
+    if (!animate || !hasGsap || reduced) return;
+    window.Sound?.stamp(cls === "ok");
+    gsap.fromTo(s, { scale: 2.6, opacity: 0, rotate: -30 }, { scale: 1, opacity: 1, rotate: -12, duration: .32, ease: "power4.in" });
+    gsap.fromTo("#exhibit", { y: 0 }, { y: 6, duration: .08, delay: .3, yoyo: true, repeat: 1 });
+  },
+  hide(animate) {
+    const card = $("#exhibit");
+    if (card.hidden) return;
+    const mode = this.stamped;
+    this.id = null; this.stamped = null;
+    if (!animate || !hasGsap || reduced) { card.hidden = true; return; }
+    // accepted exhibits are filed away; thrown-out ones drop off the screen
+    const to = mode === "no" ? { y: innerHeight, rotate: 35, opacity: 0, duration: .8, ease: "power2.in" } : { x: -80, y: 260, scale: .25, opacity: 0, duration: .7, ease: "power2.in" };
+    gsap.to(card, { ...to, onComplete: () => { card.hidden = true; gsap.set(card, { clearProps: "all" }); } });
+  },
+};
+
+/* ------------------------------------------------------------------ the trial engine */
+
+function buildMeters() {
+  const c = C(), th = S.trial.verdict.snapshot.elements;
+  $("#meters").replaceChildren(el("p", { class: "title" }, "How sure is the judge?"), ...c.elements.map((e) => {
+    const t = th.find((x) => x.element_id === e.id)?.threshold_probability ?? .5;
+    return el("div", { class: "meter", "data-el": e.id },
+      el("div", { class: "meter-head" }, el("span", {}, pointName(e.id)), el("span", { class: "val" }, "50%")),
+      el("div", { class: "meter-bar" }, el("div", { class: "meter-fill" }), el("div", { class: "meter-line", style: `left:calc(${t * 100}% - 1.5px)` })));
+  }));
+}
+
+function statusAt(i) {
+  const st = {};
+  for (let k = 0; k <= i; k++) {
+    const ev = S.trial.events[k];
+    if (ev.subject && ev.status && item(ev.subject)) st[ev.subject] = ev.status;
+  }
+  return st;
+}
+
+function showCaption(who, text, aside, tone, label) {
+  const [base, cls] = WHO[who] ?? WHO.court;
+  const name = label ?? base;
+  const w = $("#cap-who"), t = $("#cap-text"), a = $("#cap-aside");
+  w.textContent = name; w.className = `who ${cls}`;
+  t.replaceChildren(tone ? el("span", { class: tone }, text) : text);
+  a.textContent = aside ?? "";
+  if (hasGsap && !reduced) gsap.fromTo([w, t, a], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: .45, stagger: .06, ease: "power2.out" });
+}
+
+/* Update everything that reflects "the state after event i" (instant, works in both directions). */
+function syncState(i, forward) {
+  const evs = S.trial.events, ev = evs[i];
+  for (const m of $$(".meter")) {
+    const p = ev.element_probabilities[m.dataset.el] ?? .5;
+    const t = S.trial.verdict.snapshot.elements.find((e) => e.element_id === m.dataset.el)?.threshold_probability ?? .5;
+    $(".meter-fill", m).style.width = `${p * 100}%`;
+    const v = $(".val", m); v.textContent = `${pct(p)} sure`; v.classList.toggle("met", p >= t);
+  }
+  window.Court3D?.setBalance(ev.burden_index ?? .5);
+  $("#court-phase").textContent = PHASE_NAME[ev.phase] ?? "";
+  const st = statusAt(i);
+  for (const [side, id] of [["prosecution", "#ev-p"], ["defense", "#ev-d"]]) {
+    const own = C().evidence.filter((e) => e.owner === side);
+    $(id).replaceChildren(...(own.length ? own.map((e) => {
+      const s = st[e.id] ?? "unshown";
+      const [label, cls] = { offered: ["Waiting for the judge", "wait"], admitted: ["Accepted", "ok"], excluded: ["Thrown out", "no"] }[s] ?? ["Not shown yet", ""];
+      return el("li", { class: s }, el("span", { class: "ev-title" }, e.title), s !== "unshown" ? el("span", { class: `state ${cls}` }, label) : null);
+    }) : [el("li", { class: "unshown" }, "No evidence")]));
+  }
+  $$("#transcript li").forEach((li, k) => { li.hidden = k > i; li.classList.toggle("current", k === i); });
+  $("#progress-bar").style.width = `${(100 * (i + 1)) / evs.length}%`;
+  $("#step-count").textContent = `${i + 1} / ${evs.length}`;
+  // the 3D paper card follows the same exhibit as the HTML card
+  const current = item(ev.action?.evidence_id ?? ev.subject ?? "");
+  if (current && ev.action?.type === "present_evidence") window.Court3D?.exhibit(current, "offered", forward);
+  window.Court3D?.syncExhibits(st, current?.id, forward);
+}
+
+/* Play event i: set the state, then perform its beats (camera, caption, voice). Resolves when done. */
+async function present(i, forward = true) {
+  const evs = S.trial.events;
+  S.idx = Math.max(0, Math.min(evs.length - 1, i));
+  const run = ++S.run;
+  Voice.stop();
+  $("#verdict").hidden = true;
+  $("#caption").hidden = false;
+  const ev = evs[S.idx], n = narrate(ev);
+  syncState(S.idx, forward);
+  const pace = +$("#speed").value;
+  if (!n.beats.some((b) => b.exhibit)) Exhibit.hide(forward);
+  const onStand = witnessAt(S.idx), calling = n.beats.find((b) => b.call);
+  if (!forward) onStand ? window.Court3D?.callWitness(onStand, false) : window.Court3D?.dismissWitness(false);
+  else if (!onStand) window.Court3D?.dismissWitness(true);
+  let arrival = Promise.resolve();
+  for (const b of n.beats) {
+    if (run !== S.run) return false;
+    if (b.call && forward) arrival = window.Court3D?.callWitness(b.call, true) ?? arrival;
+    if (b.waitWitness) { await Promise.race([arrival, wait(6000)]); if (run !== S.run) return false; }
+    window.Court3D?.shot(b.shot ?? b.who, reduced ? 0 : 1.3);
+    window.Court3D?.speak(b.who, true);
+    if (b.exhibit) {
+      const it = b.exhibit.item ?? (Exhibit.id && item(Exhibit.id));
+      if (b.exhibit.mode === "show" || b.exhibit.mode === "keep") Exhibit.show(it, forward);
+      else { Exhibit.show(it, false); setTimeout(() => Exhibit.stamp(b.exhibit.mode, forward), forward && !reduced ? 650 : 0); }
+    }
+    if (b.gavel) {
+      window.Court3D?.gavel(b.gavel);
+      for (let g = 0; g < b.gavel; g++) setTimeout(() => window.Sound?.gavel(), 320 + g * 470);
+    }
+    window.Court3D?.oath?.(!!b.oath);
+    if (b.sting) window.Sound?.sting();
+    showCaption(b.who, b.text, b.aside, b.tone, b.name);
+    const words = (b.text + " " + (b.aside ?? "")).split(/\s+/).length;
+    const readMs = Math.max(2400, words * 330) / pace;
+    window.Sound?.duck(true);
+    if (S.voice && Voice.ok) await Promise.all([Voice.say(b.text, b.who, pace, b.name), wait(900 / pace)]);
+    else await wait(readMs);
+    window.Court3D?.speak(b.who, false);
+    window.Sound?.duck(false);
+    if (run !== S.run) return false;
+    await wait(450 / pace);
+  }
+  if (n.verdict && run === S.run) { setAuto(false); showVerdict(); }
+  return run === S.run;
+}
+
+async function autoLoop() {
+  while (S.auto) {
+    const ok = await present(S.idx, true);
+    if (!ok || !S.auto) return;
+    if (S.idx >= S.trial.events.length - 1) { setAuto(false); return; }
+    await wait(600 / +$("#speed").value);
+    if (!S.auto) return;
+    S.idx++;
+  }
+}
+
+function setAuto(on) {
+  const was = S.auto;
+  S.auto = on;
+  const b = $("#play-btn");
+  b.classList.toggle("on", on);
+  $(".lbl", b).textContent = on ? "Pause" : "Auto-play";
+  if (on && !was) {
+    if (S.idx >= S.trial.events.length - 1) S.idx = 0;
+    autoLoop();
+  }
+  if (!on && was) { S.run++; Voice.stop(); Object.keys(WHO).forEach((w) => window.Court3D?.speak(w, false)); }
+}
+
+function step(d) {
+  setAuto(false);
+  present(S.idx + d, d > 0);
+}
+
+/* ------------------------------------------------------------------ verdict */
+
+function showVerdict() {
+  const v = verdictInfo(), box = $("#verdict"), word = $("#verdict-word");
+  word.textContent = v.word;
+  word.className = `verdict-word ${v.pWins ? "p" : "d"}`;
+  $(".verdict-winner").textContent = `${v.pWins ? "The Accuser" : "The Defender"} wins this case.`;
+  $(".verdict-reason").textContent = v.reason.replace("I was", "The judge was").replace("I needed", "needed");
+  box.hidden = false;
+  $("#caption").hidden = true;
+  window.Sound?.stopScore();
+  window.Sound?.ending(v.pWins);
+  $("#v-replay").focus({ preventScroll: true });
+  if (!hasGsap || reduced) return;
+  gsap.timeline()
+    .fromTo(box, { yPercent: -40, rotate: -3, opacity: 0 }, { yPercent: -50, rotate: 0, opacity: 1, duration: .7, ease: "back.out(1.4)" })
+    .fromTo(word, { scale: 1.8, opacity: 0 }, { scale: 1, opacity: 1, duration: .5, ease: "power4.out" }, "-=.3")
+    .fromTo([".verdict-winner", ".verdict-reason", ".verdict-actions"], { y: 12, opacity: 0 }, { y: 0, opacity: 1, stagger: .08, duration: .4 }, "-=.2");
+}
+
+/* ------------------------------------------------------------------ strategy */
+
+function renderStrategy(cid) {
+  const g = B.games[cid], box = $("#matrix");
+  if (!g) { box.replaceChildren(el("p", { class: "muted" }, "No strategy data for this case.")); return; }
+  const rows = g.row_strategies, cols = g.col_strategies;
+  const pureKey = (mix) => Object.keys(mix).find((k) => mix[k] === 1);
+  const eq = new Set(g.analysis.equilibria.filter((e) => e.pure).map((e) => `${pureKey(e.row_mix)}|${pureKey(e.col_mix)}`));
+  const cell = Object.fromEntries(g.cells.map((c) => [`${c.row}|${c.col}`, c]));
+  box.style.setProperty("--cols", cols.length);
+  const kids = [el("div", { class: "h" }, ""), ...cols.map((c) => el("div", { class: "h col" }, `${styleOf(c).label} Defender`))];
+  for (const r of rows) {
+    kids.push(el("div", { class: "h row" }, `${styleOf(r).label} Accuser`));
+    for (const c of cols) {
+      const w = cell[`${r}|${c}`]?.prosecution_win_rate ?? 0;
+      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}` },
+        el("span", { class: "bg", style: `transform:scaleY(${w})` }), el("b", {}, pct(w)), el("small", {}, "Accuser wins")));
+    }
+  }
+  box.replaceChildren(...kids);
+  if (hasGsap && !reduced) gsap.from($$(".cell .bg", box), { scaleY: 0, duration: 1, stagger: .1, ease: "power3.out" });
+  const e = g.analysis.equilibria.find((x) => x.pure);
+  const t = $("#takeaway");
+  t.replaceChildren();
+  if (e) t.append(el("b", {}, "The stable pick: "), `a ${styleOf(pureKey(e.row_mix)).label.toLowerCase()} Accuser against a ${styleOf(pureKey(e.col_mix)).label.toLowerCase()} Defender. Neither lawyer can do better by switching alone. Game theory calls this a Nash equilibrium.`);
+  else t.append(el("b", {}, "No single best style here. "), "Each lawyer does best by mixing it up, so the other side can't predict them.");
+}
+
+/* ------------------------------------------------------------------ page motion */
+
+function initMotion() {
+  const nav = $("#nav");
+  addEventListener("scroll", () => nav.classList.toggle("solid", scrollY > 40), { passive: true });
+  if (!hasGsap || reduced) return;
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.timeline({ delay: .1 })
+    .from(".hero-title .line > span", { yPercent: 110, duration: 1.2, stagger: .14, ease: "power4.out" })
+    .from([".hero-sub", ".hero .btn"], { y: 24, opacity: 0, duration: .8, stagger: .12, ease: "power3.out" }, "-=.8");
+  gsap.to(".hero-title", { yPercent: -25, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+  const enter = (sel, trigger, extra = {}) => gsap.from(sel, { y: 28, opacity: 0, duration: .8, stagger: .08, ease: "power3.out", scrollTrigger: { trigger, start: "top 78%" }, ...extra });
+  enter(".how .section-title", ".how");
+  enter(".how-list li", ".how-list", { stagger: .12 });
+  enter([".docket .section-title", ".docket .filters", ".docket .lede"], ".docket");
+  enter([".brief .section-title", ".brief .lede"], ".brief");
+  enter(".style-col", ".styles", { stagger: .12 });
+  enter([".strategy .section-title", ".strategy .lede", ".strategy .select-label"], ".strategy");
+  ScrollTrigger.create({ trigger: "#strategy", start: "top 70%", once: true, onEnter: () => renderStrategy($("#strat-case").value) });
+}
+
+/* ------------------------------------------------------------------ boot */
+
+async function init() {
+  if (!B) { document.body.prepend(el("p", { class: "noscript" }, "Could not load the case data (data/bundle.js).")); return; }
+  $$(".filters .chip").forEach((b) => b.addEventListener("click", () => {
+    S.filter = b.dataset.filter;
+    $$(".filters .chip").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+    renderCases();
+  }));
+  S.caseId = B.cases.find((c) => category(c) === "everyday")?.id ?? B.cases[0].id;
+  renderCases();
+  renderStyles();
+
+  $("#start").addEventListener("click", enterCourt);
+  $("#leave-btn").addEventListener("click", leaveCourt);
+  $("#home-btn").addEventListener("click", () => { leaveCourt(); scrollTo({ top: 0, behavior: "instant" }); });
+  $("#play-btn").addEventListener("click", () => setAuto(!S.auto));
+  $("#next").addEventListener("click", () => step(1));
+  $("#back").addEventListener("click", () => step(-1));
+  $("#voice-btn").addEventListener("click", (e) => {
+    S.voice = !S.voice;
+    e.currentTarget.setAttribute("aria-pressed", String(S.voice));
+    e.currentTarget.textContent = S.voice ? "Voices on" : "Voices off";
+    if (!S.voice) Voice.stop();
   });
+  if (!Voice.ok) { S.voice = false; $("#voice-btn").hidden = true; }
+  const vol = $("#music-vol");
+  if (window.Sound) {
+    vol.value = Math.round(window.Sound.volume * 100);
+    vol.addEventListener("input", () => { window.Sound.volume = vol.value / 100; });
+  } else vol.closest("label").hidden = true;
+  $("#notes-btn").addEventListener("click", (e) => {
+    const open = $("#notes").hidden;
+    $("#notes").hidden = !open;
+    e.currentTarget.setAttribute("aria-expanded", String(open));
+    $("#court").classList.toggle("show-meters", open);
+  });
+  $("#v-replay").addEventListener("click", () => { $("#verdict").hidden = true; Exhibit.hide(false); window.Sound?.score(0.5); window.Court3D?.reset(); S.idx = 0; window.Court3D?.shot("wide"); setAuto(true); });
+  $("#v-styles").addEventListener("click", () => { leaveCourt(); $("#brief").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
+  $("#v-cases").addEventListener("click", () => { leaveCourt(); $("#docket").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
+  addEventListener("keydown", (e) => {
+    if ($("#court").hidden || e.target.closest("select")) return;
+    if (e.key === "Escape") leaveCourt();
+    else if (e.key === "ArrowRight") step(1);
+    else if (e.key === "ArrowLeft") step(-1);
+    else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); setAuto(!S.auto); }
+  });
+
+  const sc = $("#strat-case");
+  sc.replaceChildren(...B.cases.filter((c) => B.games[c.id]).map((c) => el("option", { value: c.id }, splitTitle(c.title).name)));
+  const varied = B.cases.find((c) => new Set(B.games[c.id]?.cells.map((x) => x.prosecution_win_rate)).size > 1);
+  if (varied) sc.value = varied.id;
+  sc.addEventListener("change", () => renderStrategy(sc.value));
+  initMotion();
+  if (!hasGsap || reduced) renderStrategy(sc.value);
+  if (API) { // a live server unlocks every style pairing
+    try {
+      const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 1500);
+      S.live = (await fetch(`${API}/health`, { signal: ctrl.signal })).ok;
+      clearTimeout(t);
+    } catch { S.live = false; }
+    if (S.live) renderStyles();
+  }
 }
 
 init();

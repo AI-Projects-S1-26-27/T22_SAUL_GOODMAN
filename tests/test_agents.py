@@ -85,3 +85,18 @@ def test_agents_emit_rationales() -> None:
     r = run_trial(CASES["helix-espionage"], "adaptive", "aggressive", 0)
     acts = [e.action for e in r.events if e.action is not None and e.action.type is not ActionType.REST]
     assert acts and all(a.rationale for a in acts)
+
+
+@pytest.mark.parametrize("case_id", [c for c in CASES if CASES[c].evidence])
+def test_reckless_agent_plays_the_game(case_id: str) -> None:
+    """Unlike chaos, the reckless agent mostly makes legal moves, so its evidence reaches the court."""
+    for side in ("prosecution", "defense"):
+        p, d = ("reckless", "aggressive") if side == "prosecution" else ("aggressive", "reckless")
+        r = run_trial(CASES[case_id], p, d, seed=0)
+        own = [e for e in CASES[case_id].evidence if e.owner.value == side]
+        shown = [e for e in r.events if e.action and e.action.actor.value == side and e.action.type is ActionType.PRESENT_EVIDENCE]
+        violations = [e for e in r.events if e.kind.value == "violation" and e.actor and e.actor.value == side]
+        had_turn = side == "prosecution" or any(e.phase.value == "defense_case" for e in r.events)
+        if own and had_turn:  # a directed acquittal can end the trial before the defense ever plays
+            assert shown, f"reckless {side} never showed evidence in {case_id}"
+        assert len(violations) <= max(3, len(shown))

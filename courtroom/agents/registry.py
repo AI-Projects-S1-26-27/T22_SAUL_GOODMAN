@@ -4,15 +4,16 @@ from __future__ import annotations
 
 import random
 
-from courtroom.agents.adversarial import ChaosAgent
+from courtroom.agents.adversarial import ChaosAgent, RecklessAgent
 from courtroom.agents.base import Agent
 from courtroom.agents.policies import PROFILES, CounselAgent, MixedAgent
 
-STRATEGY_NAMES: tuple[str, ...] = ("aggressive", "conservative", "adaptive", "chaos")
+STRATEGY_NAMES: tuple[str, ...] = ("aggressive", "conservative", "adaptive", "reckless", "chaos")
 
 
 def describe_strategies() -> list[dict[str, str]]:
     out = [{"name": p.name, "label": p.label, "description": p.description} for p in PROFILES.values()]
+    out.append({"name": "reckless", "label": "Reckless", "description": "Random legal moves and the occasional rule break."})
     out.append({"name": "chaos", "label": "Chaos", "description": "Random, often illegal actions (robustness fuzzing)."})
     out.append({"name": "mixed:<p>", "label": "Mixed", "description": "Aggressive with probability p, else Conservative."})
     return out
@@ -24,6 +25,8 @@ def make_agent(strategy: str, rng: random.Random) -> Agent:
         return CounselAgent(PROFILES[strategy])
     if strategy == "chaos":
         return ChaosAgent(rng)
+    if strategy == "reckless":
+        return RecklessAgent(rng)
     if strategy.startswith("mixed:"):
         p = float(strategy.split(":", 1)[1])
         if not 0.0 <= p <= 1.0:
