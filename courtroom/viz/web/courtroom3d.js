@@ -83,7 +83,7 @@ window.Court3D = (() => {
     x.strokeStyle = "#c79a4e"; x.lineWidth = 10; x.beginPath(); x.arc(w / 2, w / 2, 236, 0, 7); x.stroke();
     x.lineWidth = 3; x.beginPath(); x.arc(w / 2, w / 2, 200, 0, 7); x.stroke();
     x.fillStyle = "#c79a4e"; x.font = "600 34px 'EB Garamond', Georgia, serif"; x.textAlign = "center";
-    const text = "FIAT JUSTITIA RUAT CAELUM ·  ";
+    const text = "SAUL GOODMAN · FIAT JUSTITIA · ";
     for (let i = 0; i < text.length; i++) {
       const a = (i / text.length) * Math.PI * 2 - Math.PI / 2;
       x.save(); x.translate(w / 2 + Math.cos(a) * 218, w / 2 + Math.sin(a) * 218); x.rotate(a + Math.PI / 2);
@@ -145,7 +145,18 @@ window.Court3D = (() => {
   box(22, 6, 0.2, M.plaster, 0, 7, -7.1);
   box(22, 0.25, 0.3, M.walnutDark, 0, 4.05, -6.9);
   const seal = new THREE.Mesh(new THREE.CircleGeometry(1.1, 64), new THREE.MeshStandardMaterial({ map: sealTex, roughness: 0.5, metalness: 0.3 }));
-  seal.position.set(0, 5.6, -6.95); scene.add(seal);
+  seal.position.set(0, 6.0, -6.95); scene.add(seal);
+  // the team's name, in brass letters on the wall above the bench
+  const plaque = canvasTex(1024, 128, (x, w, h) => {
+    x.clearRect(0, 0, w, h);
+    x.fillStyle = "#d9a54a"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.font = "700 92px 'EB Garamond', Georgia, serif";
+    if ("letterSpacing" in x) x.letterSpacing = "18px";
+    x.shadowColor = "rgba(0,0,0,.6)"; x.shadowOffsetY = 4; x.shadowBlur = 6;
+    x.fillText("SAUL GOODMAN", w / 2, h / 2 + 4);
+  });
+  const inscription = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 0.8), new THREE.MeshStandardMaterial({ map: plaque, transparent: true, metalness: 0.8, roughness: 0.3 }));
+  inscription.position.set(0, 4.6, -6.93); scene.add(inscription);
   for (const x of [-4.2, 4.2]) { // pilasters either side of the seal
     box(0.7, 8, 0.4, M.walnutDark, x, 4, -6.8);
     box(0.95, 0.3, 0.55, M.walnut, x, 8, -6.75);
