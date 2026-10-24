@@ -266,11 +266,46 @@ const Voice = (() => {
     return { bailiff: { v: judge, pitch: 1.0, rate: 0.95 }, court: { v: judge, pitch: 0.82, rate: 0.9 }, prosecution: { v: p, pitch: 1.05, rate: 0.98 }, defense: { v: d === p ? all[(all.indexOf(p) + 1) % all.length] : d, pitch: 0.95, rate: 0.98 } };
   }
   synth?.addEventListener?.("voiceschanged", () => { picks = choose(); });
+
+  /* Pre-recorded lines (scripts/record_voices.py): every character has one fixed voice on every device.
+   * One shared <audio> element, unlocked on the "Enter the courtroom" click so Safari lets it play later. */
+  let clips = {};
+  fetch("voices/manifest.json?v=1").then((r) => (r.ok ? r.json() : {})).then((m) => { clips = m; }).catch(() => {});
+  const player = new Audio();
+  player.preload = "auto";
+  let stopCurrent = null;
+  const keyOf = (text, who, name) => `${who === "witness" ? `witness:${name}` : who}|${text}`;
+  const clipFor = (text, who, name) => clips[keyOf(text, who, name)];
+  function silentWav() { // 50 ms of silence, built in memory, to unlock audio inside the click
+    const n = 1200, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    const w = (o, str) => [...str].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    w(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, 24000, true); v.setUint32(28, 48000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 2, true);
+    return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+  }
+  function playClip(file, pace) {
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = () => { if (done) return; done = true; player.onended = player.onerror = null; clearTimeout(guard); stopCurrent = null; resolve(); };
+      stopCurrent = () => { player.pause(); finish(); };
+      player.onended = finish; player.onerror = finish;
+      player.src = `voices/${file}`;
+      player.playbackRate = Math.min(1.3, 0.92 + pace * 0.09);
+      const guard = setTimeout(finish, 30000);
+      player.play().catch(finish);
+    });
+  }
+
   return {
-    ok: !!synth,
-    stop() { synth?.cancel(); },
+    ok: true,
+    unlock() { player.src = silentWav(); player.play().catch(() => {}); },
+    /* warm the browser cache for lines that are about to be spoken */
+    preload(beats) { for (const b of beats) { const f = clipFor(b.text, b.who, b.name); if (f) fetch(`voices/${f}`).catch(() => {}); } },
+    stop() { stopCurrent?.(); synth?.cancel(); },
     say(text, who, pace, name) {
-      if (!synth) return Promise.resolve();
+      const file = clipFor(text, who, name);
+      if (file) return playClip(file, pace);
+      if (!synth) return wait(Math.max(1500, text.split(/\s+/).length * 330) / pace);
       picks ??= choose();
       return new Promise((resolve) => {
         const u = new SpeechSynthesisUtterance(text.replace(/[“”"]/g, ""));
@@ -354,6 +389,7 @@ function fixCombo(changed) {
 
 async function enterCourt() {
   window.Sound?.unlock();
+  Voice.unlock();
   const key = `${S.caseId}|${S.p}|${S.d}|0`;
   $("#start").disabled = true;
   try {
@@ -606,6 +642,7 @@ async function present(i, forward = true) {
   const pace = +$("#speed").value;
   if (!n.beats.some((b) => b.exhibit)) Exhibit.hide(forward);
   const onStand = witnessAt(S.idx), calling = n.beats.find((b) => b.call);
+  if (S.voice) { Voice.preload(n.beats); if (evs[S.idx + 1]) Voice.preload(narrate(evs[S.idx + 1]).beats); }
   if (!forward) onStand ? window.Court3D?.callWitness(onStand, false) : window.Court3D?.dismissWitness(false);
   else if (!onStand) window.Court3D?.dismissWitness(true);
   let arrival = Promise.resolve();
