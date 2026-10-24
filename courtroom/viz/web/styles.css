@@ -341,3 +341,11 @@ select { min-height: 44px; padding: 8px 12px; border-radius: 6px; border: 0; bac
 .door.l .door-word { right: 76px; }
 .door.r .door-word { left: 76px; }
 @media (max-width: 600px) { .door.l .door-word { right: 40px; } .door.r .door-word { left: 40px; } .door-word { font-size: 26px; letter-spacing: .06em; } }
+
+/* the case notes drawer has its own close button (it covers the header buttons) */
+.notes { padding-top: 20px; }
+.notes-bar { position: sticky; top: -20px; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -20px -24px 20px; padding: 16px 24px; background: var(--ink-2); }
+.notes-title { font: 600 22px/1 var(--serif); }
+.notes-close { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 0; border-radius: 6px; background: var(--ink-3); font-weight: 600; font-size: 15px; transition: background .2s; }
+.notes-close:hover { background: #3a2f25; }
+.notes-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }

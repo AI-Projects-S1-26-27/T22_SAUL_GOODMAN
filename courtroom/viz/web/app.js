@@ -807,21 +807,24 @@ async function init() {
     vol.value = Math.round(window.Sound.volume * 100);
     vol.addEventListener("input", () => { window.Sound.volume = vol.value / 100; });
   } else vol.closest("label").hidden = true;
-  $("#notes-btn").addEventListener("click", (e) => {
-    const open = $("#notes").hidden;
+  // the notes drawer covers the header, so it carries its own close button
+  const setNotes = (open) => {
     $("#notes").hidden = !open;
-    e.currentTarget.setAttribute("aria-expanded", String(open));
+    $("#notes-btn").setAttribute("aria-expanded", String(open));
     $("#court").classList.toggle("show-meters", open);
-  });
+    (open ? $("#notes-close") : $("#notes-btn")).focus({ preventScroll: true });
+  };
+  $("#notes-btn").addEventListener("click", () => setNotes($("#notes").hidden));
+  $("#notes-close").addEventListener("click", () => setNotes(false));
   $("#v-replay").addEventListener("click", () => { $("#verdict").hidden = true; Exhibit.hide(false); window.Sound?.score(0.5); window.Court3D?.reset(); S.idx = 0; window.Court3D?.shot("wide"); setAuto(true); });
   $("#v-styles").addEventListener("click", () => { leaveCourt(); $("#brief").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
   $("#v-cases").addEventListener("click", () => { leaveCourt(); $("#docket").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
   addEventListener("keydown", (e) => {
-    if ($("#court").hidden || e.target.closest("select")) return;
-    if (e.key === "Escape") leaveCourt();
+    if ($("#court").hidden || e.target.closest?.("select")) return;
+    if (e.key === "Escape") { if (!$("#notes").hidden) setNotes(false); else leaveCourt(); }
     else if (e.key === "ArrowRight") step(1);
     else if (e.key === "ArrowLeft") step(-1);
-    else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); setAuto(!S.auto); }
+    else if (e.key === " " && !e.target.closest?.("button")) { e.preventDefault(); setAuto(!S.auto); }
   });
 
   const sc = $("#strat-case");
