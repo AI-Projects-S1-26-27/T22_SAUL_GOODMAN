@@ -14,6 +14,7 @@ const SIDES = ["prosecution", "defense"];
 const S = {
   mode: null, bundle: null, cases: [], strategies: [], caseFiles: {}, caseFile: null,
   trial: null, trialKey: null, idx: 0, timer: null, loadToken: 0, caseToken: 0,
+  tab: null, game: null, replaySteps: [], replayIdx: 0, replayTimer: null,
 };
 
 function el(tag, attrs = {}, ...kids) {
@@ -293,6 +294,8 @@ function narrate(ev) {
 
 async function init() {
   initTechToggle();
+  initTheme();
+  initTabs();
   try {
     if (!API) throw new Error("opened from disk");
     await fetchJSON(`${API}/health`, {}, 1500);
@@ -324,8 +327,12 @@ async function init() {
   $("#seed").addEventListener("change", () => loadTrial());
   $("#setup").addEventListener("submit", (e) => { e.preventDefault(); loadTrial({ autoplay: true }); });
   $("#hero-start").addEventListener("click", () => {
-    $("#trial").scrollIntoView();
+    activateTab("courtroom");
     loadTrial({ autoplay: true });
+  });
+  $("#replay-open").addEventListener("click", () => {
+    activateTab("courtroom");
+    if (S.trial) { stop(); seek(0); play(); }
   });
   $("#play").addEventListener("click", togglePlay);
   $("#first").addEventListener("click", () => { stop(); seek(0); });
@@ -336,7 +343,7 @@ async function init() {
   $("#speed").addEventListener("change", () => { if (S.timer) { stop(); play(); } });
   $("#grun").addEventListener("click", runGame);
   document.addEventListener("keydown", (e) => {
-    if (e.target.matches("input, select, textarea") || e.metaKey || e.ctrlKey || e.altKey || !S.trial) return;
+    if (e.target.matches("input, select, textarea, [role=tab]") || e.metaKey || e.ctrlKey || e.altKey || !S.trial || S.tab !== "courtroom") return;
     if (e.key === "ArrowRight") { stop(); seek(S.idx + 1); }
     if (e.key === "ArrowLeft") { stop(); seek(S.idx - 1); }
     if (e.key === " " && !e.target.matches("button, a, summary")) { e.preventDefault(); togglePlay(); }
@@ -364,8 +371,11 @@ async function selectCase(id) {
   S.trial = null;
   S.trialKey = null;
   document.querySelectorAll("[data-side-label]").forEach((n) => (n.textContent = sideLabel(n.dataset.sideLabel)));
+  document.querySelectorAll("[data-side-lower]").forEach((n) => (n.textContent = sideName(n.dataset.sideLower, { the: false, cap: false })));
   updateAvailability();
   renderBrief();
+  renderCaseStrip();
+  renderCaseFile();
   buildEvidenceBoard();
   loadGame();
   await loadTrial();
@@ -421,6 +431,8 @@ function showStageMessage(text) {
   for (const id of ["#phases", "#meters", "#transcript", "#bar-note", "#meters-note"]) $(id).replaceChildren();
   for (const id of ["#first", "#prev", "#play", "#next", "#last", "#scrub"]) $(id).disabled = true;
   $("#step-label").textContent = "";
+  renderVerdictTab();
+  replayReset();
 }
 
 /* ------------------------------------------------------------------ setup controls */
@@ -528,6 +540,8 @@ function setupTrial() {
   buildMeters();
   buildTranscript();
   buildWorking();
+  renderVerdictTab();
+  replayReset();
 }
 
 function renderFrame() {
@@ -763,6 +777,7 @@ function buildWorking() {
 /* ------------------------------------------------------------------ which style wins */
 
 function loadGame() {
+  S.game = null;
   const { name } = splitTitle(S.caseFile.title);
   $("#styles-case").textContent = `Case: ${name}`;
   $("#gstatus").textContent = "";
@@ -804,6 +819,7 @@ function renderGame(game) {
     $("#insight").replaceChildren(el("p", { class: "empty-note" }, "No comparison is saved for this case."));
     return;
   }
+  S.game = game;
   const a = game.analysis, n = game.seeds.length;
   const P = The("prosecution"), p = the("prosecution");
   $("#styles-intro").textContent = `Should a lawyer go on the attack or play it safe? We replayed this case ${n} times for every combination of styles to find out.`;
@@ -909,6 +925,384 @@ function renderDynamics(game) {
     g.append(svg("circle", { cx, cy, r: 7, style: `fill: none; stroke: ${cssVar("--ink")}; stroke-width: 2.5` }));
     g.append(svg("text", { x: cx + 10, y: cy - 8 }, "Equilibrium"));
   }
+}
+
+/* ------------------------------------------------------------------ tabs and theme */
+
+const TABS = ["overview", "courtroom", "casefile", "verdict", "strategy", "judge"];
+const TAB_ALIAS = { trial: "courtroom", styles: "strategy", top: "overview" };
+function tabFromHash() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  const t = TAB_ALIAS[h] ?? h;
+  return TABS.includes(t) ? t : null;
+}
+
+function initTabs() {
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  for (const t of tabs) {
+    t.addEventListener("click", () => activateTab(t.dataset.tab, { push: true }));
+    t.addEventListener("keydown", (e) => {
+      const i = tabs.indexOf(t);
+      const j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (j === undefined) return;
+      e.preventDefault();
+      const next = tabs[(j + tabs.length) % tabs.length];
+      next.focus();
+      activateTab(next.dataset.tab, { push: true });
+    });
+  }
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("[data-tab-link]");
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    activateTab(link.dataset.tabLink, { push: true });
+  });
+  window.addEventListener("hashchange", () => {
+    const t = tabFromHash();
+    if (t && t !== S.tab) activateTab(t);
+  });
+  document.addEventListener("visibilitychange", replaySync);
+  if ("ResizeObserver" in window) new ResizeObserver(() => drawEvidenceMap()).observe($("#evmap"));
+  activateTab(tabFromHash() ?? "overview", { initial: true });
+  // a tab's hash would otherwise make the browser jump past the header on load
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+}
+
+function activateTab(name, { push = false, initial = false } = {}) {
+  const prev = S.tab;
+  S.tab = name;
+  for (const t of document.querySelectorAll('[role="tab"]')) {
+    const on = t.dataset.tab === name;
+    t.setAttribute("aria-selected", String(on));
+    t.tabIndex = on ? 0 : -1;
+    if (on && !initial) t.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+  for (const panel of document.querySelectorAll('[role="tabpanel"]')) {
+    const on = panel.id === name;
+    panel.hidden = !on;
+    if (on && !initial && prev !== name) {
+      panel.classList.remove("entering");
+      void panel.offsetWidth; // restart the entrance animation
+      panel.classList.add("entering");
+    }
+  }
+  if (push && location.hash !== `#${name}`) history.pushState(null, "", `#${name}`);
+  // a new tab starts at the top of the folder, not wherever the last one was scrolled to
+  const top = $(".site-header").offsetHeight;
+  if (!initial && window.scrollY > top) window.scrollTo({ top, behavior: "instant" });
+  if (name === "verdict") drawEvidenceMap();
+  replaySync();
+}
+
+function initTheme() {
+  const btn = $("#theme-toggle"), root = document.documentElement;
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const sync = () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : mq.matches;
+    root.toggleAttribute("data-dark", dark);
+    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    btn.title = btn.getAttribute("aria-label");
+    $('meta[name="theme-color"]').content = cssVar("--desk");
+    if (S.game) renderGame(S.game); // its chart colours are read from the theme at render time
+  };
+  btn.addEventListener("click", () => {
+    root.dataset.theme = root.hasAttribute("data-dark") ? "light" : "dark";
+    try { localStorage.setItem("courtroom-theme", root.dataset.theme); } catch { /* storage unavailable */ }
+    sync();
+  });
+  mq.addEventListener?.("change", sync);
+  sync();
+}
+
+const icon = (id) => {
+  const s = svg("svg", { "aria-hidden": "true" });
+  s.append(svg("use", { href: `#${id}` }));
+  return s;
+};
+
+/* ------------------------------------------------------------------ overview: the bench replay */
+
+const REPLAY_MS = 2300;
+const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function replayReset() {
+  clearTimeout(S.replayTimer);
+  // skip the quiet "doesn't object" beats so the short replay stays lively
+  S.replaySteps = S.trial ? S.trial.events.map((ev, i) => (ev.kind === "action" && ev.action?.type === "pass" ? -1 : i)).filter((i) => i >= 0) : [];
+  S.replayIdx = reducedMotion() ? Math.max(0, S.replaySteps.length - 1) : 0;
+  replayRender();
+  replaySync();
+}
+function replaySync() {
+  clearTimeout(S.replayTimer);
+  S.replayTimer = null;
+  const live = Boolean(S.trial) && S.tab === "overview" && !document.hidden && !reducedMotion();
+  $("#replay").classList.toggle("paused", !live);
+  if (live) S.replayTimer = setTimeout(replayTick, S.replayIdx >= S.replaySteps.length - 1 ? 5200 : REPLAY_MS);
+}
+function replayTick() {
+  if (!S.trial) return;
+  S.replayIdx = S.replayIdx >= S.replaySteps.length - 1 ? 0 : S.replayIdx + 1;
+  replayRender(true);
+  replaySync();
+}
+function replayRender(animate = false) {
+  const t = S.trial, now = $("#replay-now"), meters = $("#replay-meters");
+  if (!t || !S.caseFile) {
+    $("#replay-case").textContent = S.caseFile ? "Loading a trial…" : "No trial loaded yet.";
+    for (const id of ["#replay-matchup", "#replay-step"]) $(id).replaceChildren();
+    now.replaceChildren(el("p", { class: "bench-line" }, "Pick a case in the courtroom to start a trial."));
+    meters.replaceChildren();
+    meters.dataset.key = "";
+    $("#replay-progress").style.width = "0";
+    return;
+  }
+  const i = S.replaySteps[S.replayIdx] ?? 0, ev = t.events[i], n = narrate(ev);
+  const final = i === t.events.length - 1;
+  $("#replay-case").textContent = splitTitle(S.caseFile.title).name;
+  $("#replay-matchup").replaceChildren(
+    speakerTag("prosecution"), styleInfo(t.prosecution_strategy).label, el("span", {}, "vs"), speakerTag("defense"), styleInfo(t.defense_strategy).label);
+  $("#replay-step").textContent = `Step ${i + 1} of ${t.events.length}`;
+  const kids = [el("div", { class: "speaker" }, speakerTag(n.speaker), el("span", {}, phaseLabel(ev.phase === "closed" ? "deliberation" : ev.phase)))];
+  if (n.verdict) kids.push(el("p", { class: `bench-verdict ${sideClass(n.verdict.winner)}` }, n.verdict.word));
+  kids.push(el("p", { class: `bench-line${animate ? " swap" : ""}` }, n.verdict ? `${The(n.verdict.winner)} wins the case.` : n.judge ? `${n.head} ${n.judge}` : n.head));
+  now.replaceChildren(...kids);
+
+  const thr = threshold();
+  if (meters.dataset.key !== S.trialKey) {
+    meters.dataset.key = S.trialKey;
+    meters.replaceChildren(...Object.keys(ev.element_probabilities).map((id) =>
+      el("div", { class: "mini", "data-el": id },
+        el("span", { class: "mini-name", title: elementName(id) }, elementName(id)),
+        el("span", { class: "mini-track", "aria-hidden": "true" }, el("span", { class: "mini-fill" }), el("span", { class: "mini-bar", style: `left: ${100 * thr}%` })),
+        el("span", { class: "mini-val" }))));
+  }
+  const exact = Object.fromEntries(t.verdict.snapshot.elements.map((e) => [e.element_id, e.met]));
+  for (const row of meters.children) {
+    const id = row.dataset.el, p = ev.element_probabilities[id] ?? 0;
+    row.classList.toggle("proven", final && id in exact ? exact[id] : proven(p));
+    row.querySelector(".mini-fill").style.setProperty("--fill", `${100 * p}%`);
+    row.querySelector(".mini-val").textContent = pct(p);
+  }
+  $("#replay-progress").style.width = `${(100 * (i + 1)) / t.events.length}%`;
+}
+
+/* ------------------------------------------------------------------ case strip and case file */
+
+function renderCaseStrip() {
+  const c = S.caseFile, { parties, name } = splitTitle(c.title);
+  $("#case-strip").replaceChildren(
+    el("div", {},
+      parties && el("p", { class: "parties" }, parties),
+      el("h3", {}, name),
+      el("p", { class: "must" }, `${The("prosecution")} must prove `, el("b", {}, joinList(c.elements.map((e) => lowerFirst(e.name)))), ` ${STANDARD[c.standard]}.`)),
+    el("a", { class: "btn quiet small", href: "#casefile", "data-tab-link": "casefile" }, "Read the case file", icon("i-arrow")));
+}
+
+function initials(name) {
+  return name.split(/\s+/).filter((w) => /^[A-Za-z']/.test(w) && !w.endsWith(".")).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+}
+
+function renderCaseFile() {
+  const c = S.caseFile;
+  const fact = (k, v) => el("div", {}, el("dt", {}, k), el("dd", {}, v));
+  $("#case-facts").replaceChildren(
+    fact("Type of case", isCivil() ? "Civil" : "Criminal"),
+    fact("Exhibits on file", String(c.evidence.length)),
+    fact("Budget per side", `${c.budget} points`),
+    fact("Moves per stage", String(c.max_primary_turns)),
+    fact("Flaws read correctly", pct(c.perception_accuracy)));
+
+  const wl = $("#witnesses");
+  wl.replaceChildren(...c.witnesses.map((w) => {
+    const gave = c.evidence.filter((e) => e.witness_id === w.id);
+    const challenged = c.evidence.filter((e) => e.impeaches?.includes(w.id));
+    return el("li", { class: "witness" },
+      el("div", { class: "witness-head" },
+        el("span", { class: "avatar", "aria-hidden": "true" }, initials(w.name)),
+        el("div", {}, el("h4", {}, w.name), el("p", { class: "role" }, w.role))),
+      el("div", { class: "cred" }, el("span", {}, "Credibility"),
+        el("span", { class: "cred-track", "aria-hidden": "true" }, el("span", { style: `width: ${100 * w.credibility}%` })),
+        el("b", {}, pct(w.credibility))),
+      w.bias_note ? el("p", { class: "bias" }, `Possible bias: ${lowerFirst(w.bias_note)}`) : null,
+      gave.length ? el("p", { class: "gave" }, `Testifies in ${joinList(gave.map((g) => g.id))} for ${the(gave[0].owner)}.`) : null,
+      challenged.length ? el("p", { class: "gave" }, `Can be challenged with ${joinList(challenged.map((g) => g.id))}.`) : null);
+  }));
+  if (!c.witnesses.length) wl.append(el("li", { class: "empty-note" }, "No witnesses in this case."));
+
+  $("#exhibits").replaceChildren(...SIDES.map((side) => {
+    const items = c.evidence.filter((e) => e.owner === side);
+    return el("section", { class: sideClass(side) },
+      el("h4", {}, `${sideLabel(side)}'s exhibits`),
+      items.length ? el("ul", {}, items.map(exhibitRow)) : el("p", { class: "empty-note xh" }, "No evidence on file for this side."));
+  }));
+}
+
+function exhibitRow(item) {
+  const flaws = flawsOf(item);
+  const w = item.witness_id && witnessById(item.witness_id);
+  const links = [];
+  if (w) links.push(`Witness: ${w.name}`);
+  if (item.contradicts.length) links.push(`Clashes with ${joinList(item.contradicts)}`);
+  if (item.impeaches?.length) links.push(`Can discredit ${joinList(item.impeaches.map((id) => witnessById(id)?.name ?? id))}`);
+  return el("li", { class: "xh" },
+    el("span", { class: `tag ${sideClass(item.owner)}` }, item.id),
+    el("p", { class: "xh-title" }, item.title),
+    el("p", { class: "xh-meta" }, itemMeta(item)),
+    el("div", { class: "xh-rel" }, el("span", {}, "Reliability"),
+      el("span", { class: "cred-track", "aria-hidden": "true" }, el("span", { style: `width: ${100 * item.reliability}%` })),
+      el("b", {}, pct(item.reliability))),
+    links.length ? el("p", { class: "xh-links" }, `${links.join(". ")}.`) : null,
+    flaws.length ? el("p", { class: "flaw" }, `Hidden flaw: ${joinList(flaws)}.`) : null);
+}
+
+/* ------------------------------------------------------------------ verdict tab */
+
+function renderVerdictTab() {
+  const t = S.trial, ruling = $("#ruling");
+  if (!t) {
+    ruling.className = "ruling empty";
+    ruling.replaceChildren(el("p", { class: "empty-note" }, "No trial is loaded yet. Pick a case and a style for each side in the courtroom, then come back here."));
+    for (const id of ["#breakdown", "#evmap", "#map-legend", "#chain", "#findings", "#ledger"]) $(id).replaceChildren();
+    $("#digest").textContent = "";
+    return;
+  }
+  const v = verdictNarration();
+  ruling.className = `ruling win-${sideClass(v.winner)}`;
+  ruling.replaceChildren(
+    el("p", { class: "verdict-word" }, v.word),
+    el("div", { class: "ruling-why" },
+      el("p", { class: "winner" }, speakerTag(v.winner), `${The(v.winner)} wins the case.`),
+      el("p", {}, v.reason)),
+    el("div", { class: "ruling-meta" },
+      el("span", {}, `${sideLabel("prosecution")} played: ${styleInfo(t.prosecution_strategy).label}`),
+      el("span", {}, `Defense played: ${styleInfo(t.defense_strategy).label}`),
+      S.mode === "live" ? el("span", {}, `Trial number ${t.seed}`) : null,
+      el("a", { href: "#courtroom", "data-tab-link": "courtroom" }, "Replay it in the courtroom")));
+
+  renderBreakdown();
+  renderEvidenceMap();
+
+  $("#chain").replaceChildren(...t.events.map((ev, i) => {
+    const n = narrate(ev);
+    return el("li", { class: `${SIDES.includes(n.speaker) ? n.speaker : "court"}${i === t.events.length - 1 ? " last-row" : ""}` },
+      el("span", { class: "seq" }, `#${ev.seq}`),
+      el("span", { class: "what" }, n.short ?? n.head),
+      el("span", { class: "hash", title: `This step: ${ev.hash}\nPrevious step: ${ev.prev_hash}` }, el("b", {}, ev.hash.slice(0, 10)), ` ← ${ev.prev_hash.slice(0, 6)}`));
+  }));
+}
+
+function renderBreakdown() {
+  const t = S.trial, start = t.events[0].element_probabilities;
+  const all = t.verdict.snapshot.elements.flatMap((es) => es.contributions.map((c) => Math.abs(c.log_odds)));
+  const maxAbs = Math.max(0.01, ...all);
+  const points = t.verdict.snapshot.elements.map((es) => {
+    const rows = [...es.contributions].sort((a, b) => b.log_odds - a.log_odds).map((c) => {
+      const item = itemById(c.evidence_id), pos = c.log_odds >= 0, size = Math.abs(c.log_odds);
+      const why = [];
+      if (c.contradiction_discount > 0) why.push(`cut ${pct(c.contradiction_discount)} by clashing evidence`);
+      if (c.corroboration_factor > 1) why.push(`boosted ${pct(c.corroboration_factor - 1)} by backing evidence`);
+      if (!c.counted) why.push("not counted: the same fact was already counted");
+      return el("div", { class: `bd-row${c.counted ? "" : " uncounted"}`, title: why.length ? capFirst(why.join("; ")) : "" },
+        el("p", { class: "bd-label" }, el("span", { class: `tag ${sideClass(item?.owner)}` }, c.evidence_id), el("span", {}, item?.title ?? "")),
+        el("div", { class: "bd-bar", role: "img", "aria-label": `${pos ? "Toward" : "Against"} proving this point by ${size.toFixed(1)}${why.length ? `, ${why.join(", ")}` : ""}` },
+          el("i", { class: pos ? "p" : "d", style: `width: ${(50 * size) / maxAbs}%` })),
+        el("p", { class: "bd-val" }, `${pos ? "+" : "−"}${size.toFixed(1)}`));
+    });
+    return el("article", { class: "bd-point" },
+      el("div", { class: "bd-head" },
+        el("h4", {}, elementName(es.element_id)),
+        el("span", { class: `bd-result ${es.met ? "met" : "unmet"}` }, es.met ? "Proven" : "Not proven")),
+      el("p", { class: "bd-sum" }, `Started at ${pct(start[es.element_id] ?? 0)} and ended at ${pct(es.probability)}. The judge needed ${barPhrase()}.`),
+      el("div", { class: `meter-track bd-meter${es.met ? " proven" : ""}`, role: "meter", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": Math.round(100 * es.probability), "aria-label": `${elementName(es.element_id)} certainty` },
+        el("div", { class: "meter-fill", style: `--fill: ${100 * es.probability}%` }),
+        el("div", { class: "meter-bar", style: `left: ${100 * es.threshold_probability}%` })),
+      rows.length ? el("div", { class: "bd-rows" }, rows) : el("p", { class: "bd-none bd-rows" }, "No accepted evidence touched this point, so it stayed where it started."));
+  });
+  $("#breakdown").replaceChildren(...points,
+    el("p", { class: "bd-foot" }, "Numbers show the size of each push in the judge's arithmetic (log-odds). The judge adds them to the starting point. Hover a row to see whether clashing or backing evidence changed it."));
+}
+
+const NODE_STATUS = { admitted: "Accepted", excluded: "Thrown out", unpresented: "Never shown" };
+function renderEvidenceMap() {
+  const g = S.trial.graph, box = $("#evmap");
+  const lgLine = (cls, text) => {
+    const s = svg("svg", { viewBox: "0 0 28 10", "aria-hidden": "true" });
+    s.append(svg("line", { x1: 0, y1: 5, x2: 28, y2: 5, class: `lg-line ${cls}` }));
+    return el("span", {}, s, text);
+  };
+  const lgBox = (cls, text) => el("span", {}, el("i", { class: `lg-box ${cls}`, "aria-hidden": "true" }), text);
+  $("#map-legend").replaceChildren(
+    lgLine("corroborates", "Backs each other up"), lgLine("contradicts", "Clash: both count for less"),
+    lgBox("admitted", "Accepted"), lgBox("excluded", "Thrown out"), lgBox("unpresented", "Never shown"));
+  if (!g.nodes.length) {
+    box.replaceChildren(el("p", { class: "empty-note" }, "There's no evidence in this case, so there's nothing to map."));
+    return;
+  }
+  const maxW = Math.max(0.01, ...g.nodes.map((n) => n.weight));
+  const linksOf = (id) => g.edges.filter((e) => e.source === id || e.target === id)
+    .map((e) => `${e.relation === "contradicts" ? "clashes with" : "backed by"} ${e.source === id ? e.target : e.source}`);
+  const col = (side) => el("div", { class: `evmap-col ${sideClass(side)}` },
+    el("h4", {}, el("span", { class: `tag ${sideClass(side)}` }, sideLabel(side))),
+    g.nodes.filter((n) => n.owner === side).map((n) => {
+      const links = linksOf(n.id);
+      const node = el("button", {
+        type: "button", class: `node ${n.status}`, "data-id": n.id, title: n.label,
+        "aria-label": `${n.id}, ${n.label}. ${NODE_STATUS[n.status] ?? n.status}.${links.length ? ` ${capFirst(joinList(links))}.` : ""}`,
+      },
+      el("span", { class: "node-top" }, el("span", { class: `tag ${sideClass(side)}` }, n.id), el("span", {}, n.label)),
+      el("span", { class: "node-w", "aria-hidden": "true" }, el("i", { style: `width: ${(100 * n.weight) / maxW}%` })));
+      for (const [on, off] of [["mouseenter", "mouseleave"], ["focus", "blur"]]) {
+        node.addEventListener(on, () => focusNode(n.id));
+        node.addEventListener(off, () => focusNode(null));
+      }
+      return node;
+    }));
+  box.replaceChildren(col("prosecution"), col("defense"), svg("svg", { class: "evmap-lines", "aria-hidden": "true" }));
+  drawEvidenceMap();
+}
+
+function drawEvidenceMap() {
+  const box = $("#evmap"), lines = box.querySelector(".evmap-lines");
+  if (!lines || !S.trial || box.offsetParent === null) return;
+  const B = box.getBoundingClientRect();
+  const room = parseFloat(getComputedStyle(box).paddingLeft) - 4;
+  const pos = (id) => {
+    const n = box.querySelector(`.node[data-id="${CSS.escape(id)}"]`);
+    if (!n) return null;
+    const r = n.getBoundingClientRect();
+    return { l: r.left - B.left, r: r.right - B.left, y: r.top - B.top + r.height / 2, p: n.parentElement.classList.contains("p") };
+  };
+  lines.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  lines.replaceChildren(...S.trial.graph.edges.map((e) => {
+    const a = pos(e.source), b = pos(e.target);
+    if (!a || !b) return null;
+    let d;
+    if (a.p !== b.p) {
+      const [L, R] = a.p ? [a, b] : [b, a];
+      const mx = (L.r + R.l) / 2;
+      d = `M${L.r},${L.y} C${mx},${L.y} ${mx},${R.y} ${R.l},${R.y}`;
+    } else {
+      // same side: arc out into the margin so the line doesn't cross other exhibits
+      const out = a.p ? -1 : 1, x = a.p ? Math.min(a.l, b.l) : Math.max(a.r, b.r);
+      const bulge = out * Math.min(room, 10 + Math.abs(a.y - b.y) * 0.15);
+      d = `M${x},${a.y} C${x + bulge},${a.y} ${x + bulge},${b.y} ${x},${b.y}`;
+    }
+    return svg("path", { d, class: e.relation, "data-a": e.source, "data-b": e.target });
+  }).filter(Boolean));
+}
+
+function focusNode(id) {
+  const box = $("#evmap");
+  box.classList.toggle("focus", Boolean(id));
+  const lit = new Set(id ? [id] : []);
+  for (const p of box.querySelectorAll(".evmap-lines path")) {
+    const on = Boolean(id) && (p.dataset.a === id || p.dataset.b === id);
+    p.classList.toggle("lit", on);
+    if (on) { lit.add(p.dataset.a); lit.add(p.dataset.b); }
+  }
+  for (const n of box.querySelectorAll(".node")) n.classList.toggle("lit", lit.has(n.dataset.id));
 }
 
 /* ------------------------------------------------------------------ technical details switch */
