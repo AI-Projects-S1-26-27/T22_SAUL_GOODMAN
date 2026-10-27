@@ -26,6 +26,29 @@ Aggressive/Conservative games. Run `python -m courtroom serve` locally for the l
 any pairing, mixed strategies, larger games). After changing cases, agents or
 judge constants, run `python -m courtroom export` and redeploy.
 
+## The web UI
+
+The web UI is laid out as a case folder with six tabs. Each tab has its own link (`#overview`,
+`#courtroom`, `#casefile`, `#verdict`, `#strategy`, `#judge`), so you can share a specific tab.
+
+| Tab | What it shows |
+|---|---|
+| **Overview** | The idea in one page: a live replay of a real trial, who's in the room (judge, record, both lawyers), the five moves a lawyer can make, the four playing styles, and why every result can be checked |
+| **Courtroom** | Pick a case and a style for each side, then step through the trial with plain-English narration, the judge's certainty meters, a running transcript and both sides' evidence boards |
+| **Case file** | The accusation, the points that must be proven, the standard of proof, the case budget, witnesses with their credibility and possible bias, and every exhibit with its reliability, clashes and hidden flaws |
+| **Verdict** | Why the loaded trial ended the way it did: how much each exhibit pushed each point, an evidence map of what backs up or clashes with what, the judge's exact working, both sides' records and the fingerprinted event chain |
+| **Strategy** | Which style wins: the win-rate matrix, Nash equilibria in plain language and (with Technical details on) payoffs and replicator dynamics |
+| **The judge** | How rulings and verdicts are decided, the three standards of proof, the six objection grounds and the exact formula |
+
+There's a **Technical details** switch in the header that reveals rule IDs, agent reasoning, hashes and
+exact payoffs, plus a light/dark theme toggle. The UI is plain HTML, CSS and JavaScript with no
+build step, uses self-hosted fonts, and works offline or opened straight from `file://` using
+`data/bundle.js`. Run it locally with:
+
+```bash
+python -m courtroom serve   # then open http://127.0.0.1:8000
+```
+
 ## What the demo shows
 
 | Case | Phenomenon | Equilibrium (2×2, Aggressive/Conservative) |
