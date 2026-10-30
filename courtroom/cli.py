@@ -111,14 +111,8 @@ def cmd_export(a: argparse.Namespace) -> int:
         "trials": {},
         "games": {},
     }
-    pairs = [
-        ("aggressive", "conservative"),
-        ("aggressive", "aggressive"),
-        ("conservative", "aggressive"),
-        ("conservative", "conservative"),
-        ("adaptive", "adaptive"),
-        ("chaos", "aggressive"),
-    ]
+    ui_styles = ("aggressive", "conservative", "adaptive", "reckless")
+    pairs = [(p, d) for p in ui_styles for d in ui_styles]  # every pairing the web UI offers
     for cid, case in CASES.items():
         for p, d in pairs:
             r = run_trial(case, p, d, seed=0)
