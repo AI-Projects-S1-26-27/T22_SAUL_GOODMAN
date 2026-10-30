@@ -586,7 +586,122 @@ DEFENSE_ONLY = CaseFile(
 )
 
 
-CASES: dict[str, CaseFile] = {c.id: c for c in (HELIX, AURORA, KESTREL, EMPTY, STALEMATE, TAINTED, DEFENSE_ONLY)}
+# ============================================================================ 8-10. Everyday cases (plain language)
+
+
+COOKIE = CaseFile(
+    id="cookie-jar",
+    title="School v. Sam — The Missing Cookies",
+    synopsis=(
+        "A whole jar of cookies vanished from the school kitchen during lunch. A classmate says she saw "
+        "Sam near the kitchen with crumbs on his shirt. Sam says he was in the library the whole time."
+    ),
+    case_type=CaseType.CRIMINAL,
+    standard=StandardOfProof.BEYOND_REASONABLE_DOUBT,
+    charge="Taking the cookies without asking",
+    elements=(
+        LegalElement(id="there", name="Sam was in the kitchen", description="Sam was in the kitchen when the cookies went missing."),
+        LegalElement(id="took", name="Sam took the cookies", description="Sam is the one who took the cookies."),
+    ),
+    witnesses=(
+        Witness(id="W-MAYA", name="Maya", role="Classmate", credibility=0.75, bias_note="Sam beat her in the spelling contest."),
+        Witness(id="W-LIB", name="Mr. Ortiz", role="Librarian", credibility=0.9),
+        Witness(id="W-COOK", name="Mrs. Bell", role="School cook", credibility=0.85),
+    ),
+    evidence=(
+        ev("P-MAYA", P, K.TESTIMONY, "Maya: 'I saw Sam walk into the kitchen'", {"there": 0.7}, 0.8, witness_id="W-MAYA",
+           contradicts=("D-LIBRARIAN",)),
+        ev("P-CRUMBS", P, K.PHYSICAL, "Cookie crumbs found on Sam's shirt", {"took": 0.8}, 0.8),
+        ev("P-CAMERA", P, K.DIGITAL_LOG, "Hallway camera: a kid in a red jacket near the kitchen", {"there": 0.8}, 0.85),
+        ev("P-RUMOR", P, K.TESTIMONY, "Mrs. Bell: 'A student told me Sam did it'", {"took": 0.5}, 0.7, witness_id="W-COOK",
+           hearsay=True),
+        ev("D-LIBRARIAN", D, K.TESTIMONY, "Mr. Ortiz: 'Sam was reading in the library all lunch'", {"there": -0.7}, 0.9,
+           witness_id="W-LIB", contradicts=("P-MAYA",)),
+        ev("D-SNACK", D, K.DOCUMENT, "Lunch note: Sam's mom packed cookies in his own lunchbox", {"took": -0.5}, 0.85),
+        ev("D-CONTEST", D, K.DOCUMENT, "Spelling contest results: Sam beat Maya last week", {"took": -0.05}, 0.95,
+           impeaches=("W-MAYA",)),
+    ),
+    budget=8.0,
+    max_primary_turns=5,
+    tags=("everyday", "simple", "alibi"),
+)
+
+BIKE = CaseFile(
+    id="broken-bike",
+    title="Lee v. Patel — The Broken Bike",
+    synopsis=(
+        "Ana lent her new bike to her neighbour Raj for one afternoon. It came back with a bent wheel. "
+        "Ana wants Raj to pay for the repair. Raj says the wheel was already wobbly when he got it."
+    ),
+    case_type=CaseType.CIVIL,
+    standard=StandardOfProof.PREPONDERANCE,
+    charge="Not paying for damage to a borrowed bike",
+    elements=(
+        LegalElement(id="damaged", name="Raj damaged the bike", description="The wheel got bent while Raj had the bike."),
+        LegalElement(id="cost", name="The repair costs money", description="Ana had to pay to fix the wheel."),
+    ),
+    witnesses=(
+        Witness(id="W-SHOP", name="Kim", role="Bike shop mechanic", credibility=0.9),
+        Witness(id="W-FRIEND", name="Leo", role="Raj's friend", credibility=0.6, bias_note="Best friends with Raj."),
+    ),
+    evidence=(
+        ev("P-PHOTO", P, K.PHYSICAL, "Photo of the bike with a straight wheel, taken the morning Raj borrowed it",
+           {"damaged": 0.4}, 0.75, contradicts=("D-WOBBLE",)),
+        ev("P-TEXT", P, K.DOCUMENT, "Text from Raj: 'Sorry, I hit a curb'", {"damaged": 0.8}, 0.8, authenticated=False),
+        ev("P-RECEIPT", P, K.FINANCIAL_RECORD, "Bike shop receipt: $90 for a new wheel", {"cost": 0.9}, 0.95),
+        ev("P-MECHANIC", P, K.EXPERT, "Kim: 'This bend comes from hitting something hard'", {"damaged": 0.3}, 0.8),
+        ev("D-WOBBLE", D, K.TESTIMONY, "Leo: 'The wheel was already wobbly when Raj picked it up'", {"damaged": -0.6}, 0.7,
+           witness_id="W-FRIEND", contradicts=("P-PHOTO",)),
+        ev("D-OLD", D, K.DOCUMENT, "Bike sale ad: 'Used bike, small wheel issue'", {"damaged": -0.3}, 0.6, disclosed=False),
+        ev("D-FRIENDSHIP", D, K.DOCUMENT, "Photo of Leo and Raj on holiday together", {"damaged": -0.02}, 0.95,
+           impeaches=("W-FRIEND",)),
+    ),
+    budget=8.0,
+    max_primary_turns=5,
+    tags=("everyday", "simple", "civil"),
+)
+
+DOG = CaseFile(
+    id="garden-dog",
+    title="Neighbours v. Rex's Owner — The Dug-Up Garden",
+    synopsis=(
+        "Someone dug up Mrs. Green's tomato garden overnight. She thinks it was Rex, the dog next door. "
+        "Rex's owner says the fence was closed and Rex never left the yard."
+    ),
+    case_type=CaseType.CIVIL,
+    standard=StandardOfProof.PREPONDERANCE,
+    charge="Letting a dog ruin a neighbour's garden",
+    elements=(
+        LegalElement(id="dog", name="Rex dug the garden", description="Rex is the one who dug up the tomatoes."),
+        LegalElement(id="careless", name="The owner was careless", description="The owner let Rex get out."),
+    ),
+    witnesses=(
+        Witness(id="W-GREEN", name="Mrs. Green", role="Garden owner", credibility=0.7, bias_note="Has complained about Rex before."),
+        Witness(id="W-VET", name="Dr. Fox", role="Vet", credibility=0.9),
+    ),
+    evidence=(
+        ev("P-PAWS", P, K.PHYSICAL, "Muddy paw prints leading from the garden to the fence", {"dog": 0.8}, 0.85),
+        ev("P-GATE", P, K.PHYSICAL, "Photo of the fence gate left open in the morning", {"careless": 0.7}, 0.8,
+           contradicts=("D-LOCK",)),
+        ev("P-GREEN", P, K.TESTIMONY, "Mrs. Green: 'I heard barking in my garden at night'", {"dog": 0.5}, 0.75,
+           witness_id="W-GREEN"),
+        ev("P-RACCOON", P, K.TESTIMONY, "Mrs. Green: 'My cousin says Rex always digs'", {"dog": 0.4}, 0.5,
+           witness_id="W-GREEN", hearsay=True),
+        ev("D-LOCK", D, K.DIGITAL_LOG, "Smart lock log: gate locked from 9 pm to 7 am", {"careless": -0.7}, 0.85,
+           contradicts=("P-GATE",)),
+        ev("D-VET", D, K.EXPERT, "Dr. Fox: 'These prints are too small for Rex. They look like a raccoon'", {"dog": -0.6}, 0.85),
+        ev("D-COMPLAINTS", D, K.DOCUMENT, "Mrs. Green's five past complaints about Rex", {"dog": -0.05}, 0.9,
+           impeaches=("W-GREEN",)),
+    ),
+    budget=8.0,
+    max_primary_turns=5,
+    tags=("everyday", "simple", "civil", "expert"),
+)
+
+
+CASES: dict[str, CaseFile] = {
+    c.id: c for c in (COOKIE, BIKE, DOG, HELIX, AURORA, KESTREL, EMPTY, STALEMATE, TAINTED, DEFENSE_ONLY)
+}
 
 
 def get_case(case_id: str) -> CaseFile:
