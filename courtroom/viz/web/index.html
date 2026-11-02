@@ -4,518 +4,200 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Saul Goodman Courtroom</title>
-  <meta name="description" content="Watch two AI lawyers argue a fictional case while a rule-based judge explains every ruling in plain English.">
-  <meta name="theme-color" content="#e9ecf1">
-  <script>try { const t = localStorage.getItem("courtroom-theme"); if (t) document.documentElement.dataset.theme = t; } catch { /* storage unavailable */ }</script>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Two AI lawyers argue a case in a 3D courtroom. A fair, rule-based judge decides. Watch and listen as the trial unfolds.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
-  <svg class="sprite" aria-hidden="true" focusable="false">
-    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
-    <symbol id="i-gavel" viewBox="0 0 24 24"><path d="m14.5 12.5-8 8a2.12 2.12 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></symbol>
-    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
-    <symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.9.6-1.9 1-3 1s-2.1-.4-3-1z"/><path d="m2 16 3-8 3 8c-.9.6-1.9 1-3 1s-2.1-.4-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v18"/></symbol>
-    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
-    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
-    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
-    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
-    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/></symbol>
-    <symbol id="i-user-x" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5M22 8l-5 5"/></symbol>
-    <symbol id="i-stop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
-    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
-    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
-    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
-  </svg>
+  <a class="skip" href="#docket">Skip to the cases</a>
 
-  <a class="skip-link" href="#panels">Skip to the content</a>
+  <canvas id="scene" aria-hidden="true"></canvas>
 
-  <header class="site-header">
-    <div class="wrap">
-    <div class="header-inner">
-      <a class="wordmark" href="#overview" data-tab-link="overview" aria-label="Saul Goodman Courtroom, overview">
-        <span class="mark" aria-hidden="true"><i></i><i></i></span>
-        Saul Goodman Courtroom
-      </a>
-      <p class="source" id="source">Connecting…</p>
-      <div class="header-tools">
-        <label class="switch">
-          <input type="checkbox" id="tech-toggle">
-          <span class="track" aria-hidden="true"></span>
-          <span class="switch-long">Technical details</span><span class="switch-short">Details</span>
-        </label>
-        <button class="theme-btn" type="button" id="tour-btn" aria-label="Take the guided tour" title="Take the guided tour">
-          <svg><use href="#i-help"/></svg>
-        </button>
-        <button class="theme-btn" type="button" id="theme-toggle" aria-label="Switch to dark theme">
-          <svg class="i-sun"><use href="#i-sun"/></svg><svg class="i-moon"><use href="#i-moon"/></svg>
-        </button>
-      </div>
-    </div>
-    </div>
+  <header class="nav" id="nav">
+    <a class="brand" href="#top">Saul Goodman Courtroom</a>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#strategy">Which style wins</a>
+      <a class="nav-cta" href="#docket">Pick a case</a>
+    </nav>
   </header>
 
-  <div class="tabs-rail">
-    <div class="wrap">
-      <div class="tabs" role="tablist" aria-label="Sections">
-        <button class="tab" role="tab" type="button" id="tab-overview" aria-controls="overview" data-tab="overview"><svg><use href="#i-home"/></svg>Overview</button>
-        <button class="tab" role="tab" type="button" id="tab-courtroom" aria-controls="courtroom" data-tab="courtroom"><svg><use href="#i-gavel"/></svg>Courtroom</button>
-        <button class="tab" role="tab" type="button" id="tab-casefile" aria-controls="casefile" data-tab="casefile"><svg><use href="#i-folder"/></svg>Case file</button>
-        <button class="tab" role="tab" type="button" id="tab-verdict" aria-controls="verdict" data-tab="verdict"><svg><use href="#i-scale"/></svg>Verdict</button>
-        <button class="tab" role="tab" type="button" id="tab-strategy" aria-controls="strategy" data-tab="strategy"><svg><use href="#i-grid"/></svg>Strategy</button>
-        <button class="tab" role="tab" type="button" id="tab-judge" aria-controls="judge" data-tab="judge"><svg><use href="#i-book"/></svg>The judge</button>
+  <main>
+    <section class="hero" id="top">
+      <h1 class="hero-title">
+        <span class="line"><span>Two AI lawyers.</span></span>
+        <span class="line"><span>One fair judge.</span></span>
+      </h1>
+      <p class="hero-sub">Pick a small case, like missing cookies or a broken bike, and step into a 3D courtroom. You'll hear both lawyers argue and watch the judge rule, one step at a time.</p>
+      <a class="btn primary" href="#docket">Pick a case</a>
+    </section>
+
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <h2 id="how-title" class="section-title">How a trial works</h2>
+        <ol class="how-list">
+          <li>
+            <h3>Two lawyers argue</h3>
+            <p>The <b class="t-p">Accuser</b> says it happened. The <b class="t-d">Defender</b> says it didn't. Each one shows evidence, like a photo, a text message or a witness.</p>
+          </li>
+          <li>
+            <h3>Unfair evidence gets thrown out</h3>
+            <p>A rumour, a fake photo, something taken illegally: the other lawyer can object. If the judge agrees, that evidence stops counting.</p>
+          </li>
+          <li>
+            <h3>The judge is a rulebook</h3>
+            <p>There's no AI on the bench. The judge follows fixed rules and weighs only accepted evidence. Same case, same choices, same verdict, every time.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="docket" id="docket" aria-labelledby="docket-title">
+      <div class="wrap">
+        <div class="docket-head">
+          <h2 id="docket-title" class="section-title">Today's docket</h2>
+          <div class="filters" role="tablist" aria-label="Kind of case">
+            <button role="tab" class="chip" data-filter="everyday" aria-selected="true">Everyday</button>
+            <button role="tab" class="chip" data-filter="serious" aria-selected="false">Serious</button>
+            <button role="tab" class="chip" data-filter="edge-case" aria-selected="false">Tricky tests</button>
+          </div>
+        </div>
+        <p class="lede">Start with an everyday case. They're short and use plain words.</p>
+        <div class="cases" id="cases"></div>
+      </div>
+    </section>
+
+    <section class="brief" id="brief" aria-labelledby="brief-title">
+      <div class="wrap">
+        <h2 id="brief-title" class="section-title">Brief your lawyers</h2>
+        <p class="lede">Bold lawyers show everything they've got. Careful ones show only strong evidence. Which works better? Try both.</p>
+        <div class="styles">
+          <fieldset class="style-col p" id="style-p"><legend>The Accuser will play…</legend></fieldset>
+          <fieldset class="style-col d" id="style-d"><legend>The Defender will play…</legend></fieldset>
+        </div>
+        <div class="start-row">
+          <div class="start-text">
+            <p class="start-case" id="start-case"></p>
+            <p class="combo-note" id="combo-note" role="status"></p>
+            <a class="change-case" href="#docket">Change case</a>
+          </div>
+          <button class="btn primary big" id="start">Enter the courtroom</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="strategy" id="strategy" aria-labelledby="strat-title">
+      <div class="wrap strat-grid">
+        <div>
+          <h2 id="strat-title" class="section-title">Which style wins?</h2>
+          <p class="lede">We replayed every case many times with each mix of styles. Each box shows how often the <b class="t-p">Accuser</b> wins.</p>
+          <label class="select-label">Case <select id="strat-case"></select></label>
+          <p class="takeaway" id="takeaway"></p>
+        </div>
+        <div class="matrix" id="matrix"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Every person, company and case here is made up. The judge is a fixed rulebook, so you can always check the results.</p>
+    <p class="muted">Team Saul Goodman · Agents and game theory</p>
+  </footer>
+
+  <!-- ============================================================ The courtroom -->
+  <div class="court" id="court" role="dialog" aria-modal="true" aria-labelledby="court-case" hidden>
+    <canvas id="court-canvas" aria-hidden="true"></canvas>
+    <div class="doors" aria-hidden="true"><div class="door l"><span class="handle"></span></div><div class="door r"><span class="handle"></span></div></div>
+
+    <div class="hud-top">
+      <div class="hud-case">
+        <h2 id="court-case"></h2>
+        <p id="court-phase"></p>
+      </div>
+      <div class="hud-actions">
+        <label class="tbtn vol">Music <input id="music-vol" type="range" min="0" max="100" value="100" aria-label="Music volume"></label>
+        <button class="tbtn" id="voice-btn" aria-pressed="true">Voices on</button>
+        <button class="tbtn" id="notes-btn" aria-expanded="false" aria-controls="notes">Case notes</button>
+        <button class="tbtn" id="leave-btn">Leave</button>
+      </div>
+    </div>
+
+    <div class="hud-meters" id="meters" aria-label="How sure the judge is"></div>
+
+    <figure class="exhibit" id="exhibit" hidden>
+      <span class="ex-tag" id="ex-tag"></span>
+      <div class="ex-art" id="ex-art" aria-hidden="true"></div>
+      <figcaption>
+        <span class="ex-kind" id="ex-kind"></span>
+        <b class="ex-title" id="ex-title"></b>
+        <span class="ex-flaw" id="ex-flaw"></span>
+      </figcaption>
+      <span class="ex-stamp" id="ex-stamp" hidden></span>
+    </figure>
+
+    <div class="caption" id="caption" aria-live="polite">
+      <p class="who" id="cap-who"></p>
+      <p class="said" id="cap-text"></p>
+      <p class="aside" id="cap-aside"></p>
+    </div>
+
+    <div class="hud-bottom" role="group" aria-label="Trial controls">
+      <button class="cbtn" id="back" aria-label="Previous step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="cbtn wide" id="play-btn"><span class="lbl">Auto-play</span></button>
+      <button class="cbtn" id="next" aria-label="Next step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+      <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+      <span class="step-count" id="step-count"></span>
+      <label class="speed">Pace
+        <select id="speed">
+          <option value="1">Relaxed</option>
+          <option value="1.5">Normal</option>
+          <option value="2.2">Quick</option>
+        </select>
+      </label>
+    </div>
+
+    <aside class="notes" id="notes" aria-label="Case notes" hidden>
+      <button class="btn ghost home-btn" id="home-btn">Back to the home page</button>
+      <h3>Evidence</h3>
+      <p class="hint">Accepted evidence counts. Thrown-out evidence doesn't.</p>
+      <h4 class="t-p">Accuser</h4><ul id="ev-p" class="ev-list"></ul>
+      <h4 class="t-d">Defender</h4><ul id="ev-d" class="ev-list"></ul>
+      <h3>What happened so far</h3>
+      <ol id="transcript" class="transcript"></ol>
+    </aside>
+
+    <div class="verdict" id="verdict" hidden>
+      <p class="verdict-label">The verdict</p>
+      <p id="verdict-word" class="verdict-word"></p>
+      <p class="verdict-winner"></p>
+      <p class="verdict-reason"></p>
+      <div class="verdict-actions">
+        <button class="btn primary" id="v-replay">Watch again</button>
+        <button class="btn ghost" id="v-styles">Try other styles</button>
+        <button class="btn ghost" id="v-cases">Pick another case</button>
       </div>
     </div>
   </div>
 
-  <main class="folder" id="panels">
-    <div class="wrap">
-      <div class="sheet">
+  <noscript><p class="noscript">This page needs JavaScript to run the trial.</p></noscript>
 
-        <!-- ================================================================ OVERVIEW -->
-        <section class="panel" id="overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="-1">
-          <div class="hero">
-            <div class="hero-copy">
-              <h1><span>Two AI lawyers.</span> <span>One rulebook judge.</span></h1>
-              <p class="lede">
-                Pick a fictional case and choose how each lawyer plays. Then watch the trial step by step: every piece of
-                evidence, every objection and every ruling, explained in plain English. The judge isn't an AI. It follows fixed
-                rules, so the same trial always ends the same way.
-              </p>
-              <div class="hero-actions">
-                <button class="btn primary" type="button" id="hero-start">Watch a trial</button>
-                <a class="btn quiet" href="#judge" data-tab-link="judge">How the judge decides</a>
-              </div>
-            </div>
-
-            <figure class="bench" id="replay" aria-label="A short replay of a real trial from the simulator">
-              <div class="bench-top">
-                <span class="live-dot" aria-hidden="true"></span>
-                <span class="bench-label">Court in session</span>
-                <span class="bench-step" id="replay-step"></span>
-              </div>
-              <p class="bench-case" id="replay-case">Loading a trial…</p>
-              <p class="bench-matchup" id="replay-matchup"></p>
-              <div class="bench-now" id="replay-now">
-                <div class="speaker" id="replay-speaker"></div>
-                <p class="bench-line" id="replay-line"></p>
-              </div>
-              <div class="bench-meters" id="replay-meters"></div>
-              <div class="bench-foot">
-                <div class="bench-progress" aria-hidden="true"><span id="replay-progress"></span></div>
-                <button class="btn primary small" type="button" id="replay-open">Open in the courtroom<svg><use href="#i-arrow"/></svg></button>
-              </div>
-            </figure>
-          </div>
-
-          <section class="block" aria-labelledby="room-title">
-            <header class="block-head">
-              <h2 id="room-title">Who's in the room</h2>
-              <p>Three seats, two strategies and one rulebook. The lawyers are AI agents that make choices. The judge never does: it only applies rules.</p>
-            </header>
-            <div class="floor" role="list">
-              <div class="seat seat-judge" role="listitem">
-                <span class="tag j">Judge</span>
-                <h3>A rulebook, not an AI</h3>
-                <p>Rules on every objection with a written rule, then weighs only the accepted evidence. The same record always gives the same verdict.</p>
-              </div>
-              <div class="seat seat-record" role="listitem">
-                <svg class="seat-icon" aria-hidden="true"><use href="#i-doc"/></svg>
-                <h3>The record</h3>
-                <p>Every move lands here and is fingerprinted, so any trial can be replayed and checked.</p>
-              </div>
-              <div class="seat seat-p" role="listitem">
-                <span class="tag p">Prosecution</span>
-                <h3>Has to prove every point</h3>
-                <p>Chooses which evidence to show and when. One unproven point and the whole case fails. In civil cases this seat is the plaintiff.</p>
-              </div>
-              <div class="seat seat-d" role="listitem">
-                <span class="tag d">Defense</span>
-                <h3>Only has to break one point</h3>
-                <p>Objects to flawed evidence, challenges witnesses and offers evidence of its own.</p>
-              </div>
-              <svg class="floor-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M25 72 C25 50 50 56 50 40"/><path d="M75 72 C75 50 50 56 50 40"/><path d="M50 40 V20"/>
-              </svg>
-            </div>
-            <p class="floor-note">
-              The catch: neither lawyer can see the other side's hidden flaws for sure. Each one has to guess whether a piece of
-              evidence is second-hand, unverified or obtained illegally, and objecting wrongly costs a penalty.
-            </p>
-          </section>
-
-          <section class="block" aria-labelledby="moves-title">
-            <header class="block-head">
-              <h2 id="moves-title">What a lawyer can do on a turn</h2>
-              <p>Five moves. Each one costs part of a fixed budget, so no side can do everything.</p>
-            </header>
-            <dl class="moves">
-              <div><dt><svg aria-hidden="true"><use href="#i-doc"/></svg>Present evidence</dt><dd>Offer a document, record or witness. The other side gets one chance to object.</dd></div>
-              <div><dt><svg aria-hidden="true"><use href="#i-hand"/></svg>Object</dt><dd>Claim the evidence is hearsay, unverified, illegally obtained, shared too late, guesswork or off-topic. Wrong objections are penalised.</dd></div>
-              <div><dt><svg aria-hidden="true"><use href="#i-user-x"/></svg>Challenge a witness</dt><dd>Use evidence to show a witness can't be trusted. If it works, that witness counts for half.</dd></div>
-              <div><dt><svg aria-hidden="true"><use href="#i-stop"/></svg>Ask to end early</dt><dd>The defense can ask the judge to stop the trial if a point has no accepted evidence at all.</dd></div>
-              <div><dt><svg aria-hidden="true"><use href="#i-flag"/></svg>Rest</dt><dd>Stop presenting. Passing twice in a row counts as resting, so nobody can stall forever.</dd></div>
-            </dl>
-          </section>
-
-          <section class="block" aria-labelledby="ways-title">
-            <header class="block-head">
-              <h2 id="ways-title">Four ways to play</h2>
-              <p>You pick a style for each lawyer. The styles are fixed strategies, so you can compare them fairly.</p>
-            </header>
-            <ul class="ways">
-              <li><span class="way-chip">Aggressive</span><p>Offers everything that helps, even shaky evidence, and objects on thin suspicion.</p></li>
-              <li><span class="way-chip">Careful</span><p>Offers only clean evidence that matters, and objects only when it's confident.</p></li>
-              <li><span class="way-chip">Adaptive</span><p>Weighs the odds of every move and learns how often the other side objects.</p></li>
-              <li><span class="way-chip">Chaotic</span><p>Makes random, often illegal moves. It exists to prove the rules can't be broken.</p></li>
-            </ul>
-          </section>
-
-          <section class="block" aria-labelledby="try-title">
-            <header class="block-head">
-              <h2 id="try-title">Try it in three steps</h2>
-            </header>
-            <ol class="steps">
-              <li><strong>Pick a case</strong><span>A stolen chip design, a crypto heist, a robotaxi crash and more. Read the facts in the <a href="#casefile" data-tab-link="casefile">case file</a>.</span></li>
-              <li><strong>Choose each side's style</strong><span>Aggressive lawyers take risks. Careful ones play it safe. Set both in the <a href="#courtroom" data-tab-link="courtroom">courtroom</a>.</span></li>
-              <li><strong>Watch the verdict take shape</strong><span>See how sure the judge is after every move, then open the <a href="#verdict" data-tab-link="verdict">verdict breakdown</a>.</span></li>
-            </ol>
-          </section>
-
-          <section class="block trust" aria-labelledby="trust-title">
-            <header class="block-head">
-              <h2 id="trust-title">Why you can check every result</h2>
-            </header>
-            <ul class="trust-list">
-              <li><strong>Exact fractions, not rounding.</strong> The judge compares exact numbers, so rounding can never flip a verdict.</li>
-              <li><strong>Every ruling cites a rule.</strong> Objections, fines and early endings each point to a written rule.</li>
-              <li><strong>Every step is fingerprinted.</strong> Each event is chained to the one before it, so any edit to the record shows.</li>
-              <li><strong>Stress-tested.</strong> 2,500 trials with random and rule-breaking lawyers ran with no crashes, and every replay matched bit for bit.</li>
-            </ul>
-          </section>
-        </section>
-
-        <!-- ================================================================ COURTROOM -->
-        <section class="panel" id="courtroom" role="tabpanel" aria-labelledby="tab-courtroom" tabindex="-1" hidden>
-          <span id="trial" class="anchor" aria-hidden="true"></span>
-          <header class="panel-head">
-            <h2 id="trial-title">Watch a trial</h2>
-            <p>Choose a case and a style for each side, then press Start trial.</p>
-          </header>
-
-          <form class="setup" id="setup">
-            <div class="field case-field">
-              <label for="case">Case</label>
-              <select id="case"></select>
-            </div>
-            <fieldset class="field">
-              <legend><span class="tag p" data-side-label="prosecution">Prosecution</span> plays</legend>
-              <div class="seg p" id="prosecution-style" role="radiogroup"></div>
-              <p class="field-help" id="prosecution-style-help"></p>
-            </fieldset>
-            <fieldset class="field">
-              <legend><span class="tag d">Defense</span> plays</legend>
-              <div class="seg d" id="defense-style" role="radiogroup"></div>
-              <p class="field-help" id="defense-style-help"></p>
-            </fieldset>
-            <div class="field seed-field live-only">
-              <label for="seed">Trial number</label>
-              <input id="seed" type="number" min="0" value="0" inputmode="numeric">
-              <p class="field-help">Same number, same trial.</p>
-            </div>
-            <div class="field submit-field">
-              <button class="btn primary" type="submit" id="run">Start trial</button>
-            </div>
-            <p class="setup-note offline-only" id="setup-note">
-              The online demo includes six saved matchups per case, so some combinations are greyed out. Run the
-              simulator on your computer to try any combination.
-            </p>
-          </form>
-
-          <div class="case-strip" id="case-strip"></div>
-
-          <div class="courtroom">
-            <section class="stage" aria-label="Trial in progress">
-              <ol class="phases" id="phases" aria-label="Stages of the trial"></ol>
-              <div class="now" id="now" aria-live="polite">
-                <p class="line">Loading the trial…</p>
-              </div>
-              <div class="meters">
-                <div class="meters-head">
-                  <h3>How sure is the judge?</h3>
-                  <p id="bar-note"></p>
-                </div>
-                <div id="meters"></div>
-                <p class="meters-note" id="meters-note"></p>
-              </div>
-              <div class="player" aria-label="Playback controls">
-                <div class="transport">
-                  <button class="icon-btn" type="button" id="first" aria-label="Back to the start">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 6l-9 6 9 6V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-                  </button>
-                  <button class="icon-btn" type="button" id="prev" aria-label="Previous step">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-                  </button>
-                  <button class="icon-btn play-btn" type="button" id="play" aria-label="Play">
-                    <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5L8 5.5z" fill="currentColor"/></svg>
-                    <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor"/></svg>
-                  </button>
-                  <button class="icon-btn" type="button" id="next" aria-label="Next step">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-                  </button>
-                  <button class="icon-btn" type="button" id="last" aria-label="Skip to the verdict">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M6 6l9 6-9 6V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-                  </button>
-                </div>
-                <div class="progress">
-                  <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Trial progress">
-                  <span class="progress-label" id="step-label"></span>
-                </div>
-                <label class="speed">
-                  <span>Speed</span>
-                  <select id="speed">
-                    <option value="2000">Slow</option>
-                    <option value="1200" selected>Normal</option>
-                    <option value="500">Fast</option>
-                  </select>
-                </label>
-              </div>
-              <p class="keys-hint">Keyboard: <kbd>←</kbd> <kbd>→</kbd> to step, <kbd>Space</kbd> to play or pause.</p>
-            </section>
-
-            <aside class="transcript" aria-labelledby="transcript-title">
-              <h3 id="transcript-title">What's happened so far</h3>
-              <ol id="transcript"></ol>
-            </aside>
-          </div>
-
-          <div class="evidence">
-            <section class="ev-col p" aria-labelledby="prosecution-ev-title">
-              <header class="ev-head">
-                <h3 id="prosecution-ev-title">Prosecution's evidence</h3>
-                <dl class="score" id="prosecution-score"></dl>
-              </header>
-              <ul class="ev-list" id="prosecution-evidence"></ul>
-            </section>
-            <section class="ev-col d" aria-labelledby="defense-ev-title">
-              <header class="ev-head">
-                <h3 id="defense-ev-title">Defense's evidence</h3>
-                <dl class="score" id="defense-score"></dl>
-              </header>
-              <ul class="ev-list" id="defense-evidence"></ul>
-            </section>
-          </div>
-          <p class="ev-footnote">Hidden flaws are visible to you but not to the other side. A lawyer has to spot them and object.</p>
-          <div class="next-up">
-            <p>When the verdict is in, see exactly why.</p>
-            <a class="btn quiet" href="#verdict" data-tab-link="verdict">Open the verdict breakdown<svg><use href="#i-arrow"/></svg></a>
-          </div>
-        </section>
-
-        <!-- ================================================================ CASE FILE -->
-        <section class="panel" id="casefile" role="tabpanel" aria-labelledby="tab-casefile" tabindex="-1" hidden>
-          <header class="panel-head">
-            <h2>Case file</h2>
-            <p>Everything on the table before the trial starts: the accusation, the points that must be proven, the witnesses and every exhibit.</p>
-          </header>
-          <div class="brief" id="brief"></div>
-          <dl class="case-facts" id="case-facts"></dl>
-
-          <section class="block" aria-labelledby="witness-title">
-            <header class="block-head">
-              <h3 id="witness-title">Witnesses</h3>
-              <p>Credibility is how far the judge trusts a witness before anyone challenges them.</p>
-            </header>
-            <ul class="witnesses" id="witnesses"></ul>
-          </section>
-
-          <section class="block" aria-labelledby="exhibit-title">
-            <header class="block-head">
-              <h3 id="exhibit-title">Exhibits</h3>
-              <p>Reliability is how much the judge trusts a piece of evidence on its own. Evidence that clashes with other evidence counts for less.</p>
-            </header>
-            <div class="exhibits" id="exhibits"></div>
-          </section>
-        </section>
-
-        <!-- ================================================================ VERDICT -->
-        <section class="panel" id="verdict" role="tabpanel" aria-labelledby="tab-verdict" tabindex="-1" hidden>
-          <header class="panel-head">
-            <h2>Verdict breakdown</h2>
-            <p>Why the trial loaded in the courtroom ended the way it did, point by point and exhibit by exhibit.</p>
-          </header>
-          <div class="ruling" id="ruling"></div>
-
-          <section class="block" aria-labelledby="points-title">
-            <header class="block-head">
-              <h3 id="points-title">Each point, and what moved it</h3>
-              <p>Bars to the right pushed the judge toward the <span data-side-lower="prosecution">prosecution</span>. Bars to the left pushed toward the defense. Only accepted evidence counts.</p>
-            </header>
-            <div class="breakdown" id="breakdown"></div>
-          </section>
-
-          <section class="block" aria-labelledby="map-title">
-            <header class="block-head">
-              <h3 id="map-title">Evidence map</h3>
-              <p>How the exhibits relate. Lines show evidence that backs each other up or clashes. Hover or focus an exhibit to trace its links.</p>
-            </header>
-            <div class="map-legend" id="map-legend"></div>
-            <div class="evmap" id="evmap"></div>
-          </section>
-
-          <section class="block working" aria-labelledby="working-title">
-            <header class="block-head">
-              <h3 id="working-title">The judge's full working</h3>
-              <p class="working-note">Final numbers for the verdict. Certainty is computed with exact fractions, so rounding can never change a result.</p>
-            </header>
-            <div class="table-scroll"><table class="data" id="findings"></table></div>
-            <h4>Each side's record</h4>
-            <div class="table-scroll"><table class="data" id="ledger"></table></div>
-          </section>
-
-          <section class="block" aria-labelledby="chain-title">
-            <header class="block-head">
-              <h3 id="chain-title">The fingerprinted record</h3>
-              <p>Each step's fingerprint is computed from the step itself and the fingerprint before it. Change any step and every fingerprint after it changes.</p>
-            </header>
-            <ol class="chain" id="chain"></ol>
-            <p class="digest">Record fingerprint (SHA-256 of the whole event chain): <code id="digest"></code></p>
-          </section>
-        </section>
-
-        <!-- ================================================================ STRATEGY -->
-        <section class="panel" id="strategy" role="tabpanel" aria-labelledby="tab-strategy" tabindex="-1" hidden>
-          <span id="styles" class="anchor" aria-hidden="true"></span>
-          <header class="panel-head">
-            <h2 id="styles-title">Which style wins?</h2>
-            <p id="styles-intro">Should a lawyer go on the attack or play it safe? We replayed the case for every combination of styles to find out.</p>
-            <p class="styles-case" id="styles-case"></p>
-          </header>
-
-          <div class="game-controls live-only">
-            <label>Styles to compare
-              <select id="gstrats">
-                <option value="aggressive,conservative">Aggressive and careful</option>
-                <option value="aggressive,conservative,adaptive">Aggressive, careful and adaptive</option>
-              </select>
-            </label>
-            <label>Trials per matchup <input id="gseeds" type="number" min="1" max="100" value="20" inputmode="numeric"></label>
-            <button class="btn primary" type="button" id="grun">Run the numbers</button>
-            <p class="field-help" id="gstatus" role="status"></p>
-          </div>
-
-          <div class="styles-layout" id="styles-body">
-            <div>
-              <p class="matrix-axis">Rows: how the <span data-side-lower="prosecution">prosecution</span> plays. Columns: how the defense plays.</p>
-              <div class="table-scroll"><table class="matrix" id="matrix"></table></div>
-              <p class="matrix-note" id="matrix-note"></p>
-            </div>
-            <div class="insight" id="insight"></div>
-          </div>
-
-          <div class="tech game-tech" id="game-tech">
-            <div class="game-tech-grid">
-              <div>
-                <h3>Analysis notes</h3>
-                <ul id="game-notes"></ul>
-              </div>
-              <figure>
-                <svg id="dynamics" viewBox="0 0 420 420" role="img" aria-label="Replicator dynamics: how the share of aggressive play evolves"></svg>
-                <figcaption>Replicator dynamics: how the share of aggressive play would drift if both sides kept learning from results.</figcaption>
-              </figure>
-            </div>
-          </div>
-          <p class="tech-hint">Turn on <strong>Technical details</strong> at the top to see payoffs, exact equilibrium odds and how play would drift over time.</p>
-        </section>
-
-        <!-- ================================================================ JUDGE -->
-        <section class="panel" id="judge" role="tabpanel" aria-labelledby="tab-judge" tabindex="-1" hidden>
-          <header class="panel-head">
-            <h2 id="judge-title">How the judge decides</h2>
-            <p>There's no AI in the judge's chair. It's a fixed set of rules written down in advance, so anyone can check why a trial ended the way it did.</p>
-          </header>
-          <ol class="flow">
-            <li>
-              <h3>Evidence is offered</h3>
-              <p>One side presents a document, record or witness. The other side can object if it's second-hand, obtained illegally, unverified, shared too late or off-topic.</p>
-            </li>
-            <li>
-              <h3>The judge rules</h3>
-              <p>Each objection is accepted or rejected by a written rule. Evidence that's thrown out doesn't count. A failed objection costs a penalty, so objecting isn't free.</p>
-            </li>
-            <li>
-              <h3>The evidence is weighed</h3>
-              <p>Reliable sources count for more. When two pieces of evidence contradict each other, both count for less. A discredited witness counts for half.</p>
-            </li>
-            <li>
-              <h3>Every point must clear the bar</h3>
-              <p>Criminal cases need about 90% certainty on each point. Civil cases need more than 50%. If even one point falls short, the accused wins.</p>
-            </li>
-          </ol>
-
-          <section class="block" aria-labelledby="bars-title">
-            <header class="block-head">
-              <h3 id="bars-title">How high the bar is</h3>
-              <p>The judge has to be at least this sure of every single point. Each case in the simulator uses one of these.</p>
-            </header>
-            <div class="bars">
-              <div class="bar-row">
-                <p class="bar-name"><strong>Balance of probabilities</strong><span>Civil cases. More likely than not.</span></p>
-                <div class="bar-track" aria-hidden="true"><span style="--at: 50%"></span></div>
-                <p class="bar-val">&gt; 50%</p>
-              </div>
-              <div class="bar-row">
-                <p class="bar-name"><strong>Clear and convincing</strong><span>A middle bar for serious civil claims.</span></p>
-                <div class="bar-track" aria-hidden="true"><span style="--at: 75%"></span></div>
-                <p class="bar-val">about 75%</p>
-              </div>
-              <div class="bar-row">
-                <p class="bar-name"><strong>Beyond reasonable doubt</strong><span>Criminal cases. The accused is presumed innocent.</span></p>
-                <div class="bar-track" aria-hidden="true"><span style="--at: 90%"></span></div>
-                <p class="bar-val">about 90%</p>
-              </div>
-            </div>
-          </section>
-
-          <section class="block" aria-labelledby="grounds-title">
-            <header class="block-head">
-              <h3 id="grounds-title">When an objection succeeds</h3>
-              <p>Flawed evidence only gets thrown out if the other side objects on the right ground. Unchallenged flaws slip through, which is why spotting them matters.</p>
-            </header>
-            <dl class="grounds">
-              <div><dt>Hearsay <span class="rule-chip tech">OBJ-HEARSAY</span></dt><dd>Someone is repeating what they were told.</dd></div>
-              <div><dt>Not verified <span class="rule-chip tech">OBJ-AUTH</span></dt><dd>No one has shown the evidence is genuine.</dd></div>
-              <div><dt>Obtained illegally <span class="rule-chip tech">OBJ-EXCLUSIONARY</span></dt><dd>Applies to prosecution evidence in criminal cases. Knowingly offering it brings a heavier penalty.</dd></div>
-              <div><dt>Shared too late <span class="rule-chip tech">OBJ-DISCLOSURE</span></dt><dd>It wasn't handed over before the trial. Also a heavier penalty.</dd></div>
-              <div><dt>Guesswork <span class="rule-chip tech">OBJ-SPECULATION</span></dt><dd>A witness is testifying about something they didn't see first-hand.</dd></div>
-              <div><dt>Off-topic <span class="rule-chip tech">OBJ-RELEVANCE</span></dt><dd>The evidence barely touches any point in the case.</dd></div>
-            </dl>
-          </section>
-
-          <p class="promise">Same case, same choices, same verdict, every time. Each step of the trial record is fingerprinted, so any change to it would show.</p>
-          <div class="tech formula">
-            <h3>The exact rule, per point <i>e</i>, over accepted evidence only</h3>
-<pre>S_i    = reliability × witness credibility (halved per successful challenge)
-disc_i = min(9/10, Σ_{j contradicts i} (4/5)·S_j/(S_i+S_j))
-corr   = 1 + ½(1 − 2^-k),  k = other facts supporting the same way
-L_e    = prior + 3 · Σ support·S·(1−disc)·corr      (exact fractions)
-verdict: guilty / liable only if every L_e clears the standard</pre>
-            <p>Bars: beyond reasonable doubt 11/5 log-odds (about 90%), clear and convincing 11/10 (about 75%), balance of probabilities &gt; 0 (more than 50%).</p>
-          </div>
-        </section>
-      </div>
-    </div>
-  </main>
-
-  <footer class="site-footer">
-    <div class="wrap footer-inner">
-      <p>All cases, people and companies are fictional. This is a simulation, not legal advice.</p>
-      <p>Built by Team Saul Goodman.</p>
-    </div>
-  </footer>
-
-  <script src="data/bundle.js" onerror="void 0"></script>
-  <script src="app.js"></script>
-  <script src="tour.js"></script>
+  <script src="data/bundle.js?v=6"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="story.js?v=6"></script>
+  <script src="artifacts.js?v=6"></script>
+  <script src="sound.js?v=6"></script>
+  <script src="scene.js?v=6"></script>
+  <script src="courtroom3d.js?v=6"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
