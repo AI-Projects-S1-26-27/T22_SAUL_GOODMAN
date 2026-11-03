@@ -237,14 +237,14 @@ window.Sound = (() => {
       clearTimeout(startTimer); clearInterval(schedTimer); schedTimer = startTimer = null;
       if (ctx && !quick) { // notes already scheduled fade under a quick dip, then the level comes back for what's next
         duckGain.gain.cancelScheduledValues(ctx.currentTime);
-        duckGain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.35);
-        setTimeout(() => applyMusicGain(0.3), 1600);
+        duckGain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.12);
+        setTimeout(() => applyMusicGain(0.2), 700);
       }
     },
     /* the verdict theme */
     ending(accuserWins) {
       if (!init()) return;
-      const t = ctx.currentTime + 1.8;
+      const t = ctx.currentTime + 0.03;
       target = featureBus;
       try { this._ending(accuserWins, t); } finally { target = null; }
     },

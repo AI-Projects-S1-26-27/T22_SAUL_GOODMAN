@@ -335,3 +335,9 @@ select { min-height: 44px; padding: 8px 12px; border-radius: 6px; border: 0; bac
   .exhibit.has-artifact { width: min(330px, calc(100% - 32px)); }
   .exhibit.has-artifact .ex-art { max-height: 170px; overflow: hidden; }
 }
+
+/* the team name in brass on the courtroom doors */
+.door-word { position: absolute; top: 50%; transform: translateY(-50%); font: 700 clamp(30px, 6vw, 88px)/1 var(--serif); letter-spacing: .12em; color: var(--brass); text-shadow: 0 2px 0 #2a170e, 0 0 1px #000; z-index: 1; }
+.door.l .door-word { right: 76px; }
+.door.r .door-word { left: 76px; }
+@media (max-width: 600px) { .door.l .door-word { right: 40px; } .door.r .door-word { left: 40px; } .door-word { font-size: 26px; letter-spacing: .06em; } }
