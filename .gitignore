@@ -9,10 +9,6 @@ dist/
 .vercel
 .env*
 
-# Regenerable analysis output (python -m courtroom analysis). Listed file by file because a
-# directory-level ignore cannot be negated per file: git does not descend into an ignored
-# directory, so results/llm_exhibition.json could never be re-included.
-results/payoffs.json
-results/bootstrap.json
-results/sensitivity.json
+# The certified analysis (results/payoffs.json, bootstrap.json, sensitivity.json) is tracked on purpose: PROVENANCE.md
+# quotes its hashes, `courtroom export` reads it, and two tests check it. Regenerate it with `python -m courtroom analysis`.
 .claude/

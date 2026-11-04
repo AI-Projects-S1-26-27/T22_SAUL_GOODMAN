@@ -24,7 +24,7 @@ import json
 import statistics
 from pathlib import Path
 
-from courtroom.cases import get_case
+from courtroom.cases import get_plain_case
 from courtroom.contracts import Side
 from courtroom.llm.client import CACHE_PATH
 from courtroom.llm.exhibition import build_court
@@ -42,7 +42,7 @@ NOT_EQUILIBRIUM = (
 def replay_exhibition(results_path: Path, cache_path: Path | None = None) -> dict[str, object]:
     results = json.loads(results_path.read_text(encoding="utf-8"))
     case_id = results["case_id"]
-    case = get_case(case_id)
+    case = get_plain_case(case_id)  # the exhibition was recorded on the plain rulebook
     provider = results.get("provider", "gemini")
     # The cache holds responses for the provider and model the run used; replay reads the same file, offline.
     kwargs: dict[str, object] = {"allow_network": False}

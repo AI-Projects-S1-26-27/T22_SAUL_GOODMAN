@@ -18,7 +18,7 @@ pip install -e ".[dev]"
 | What | Command | Correct result |
 |---|---|---|
 | Determinism: same case, seeds and strategies give the same events and verdict | `python -m courtroom verify` | `bit-identical results: YES   hash chain valid: YES` |
-| The test suite | `python -m pytest` | 935 passed, about 90 seconds |
+| The test suite | `python -m pytest` | 1008 passed, about 90 seconds |
 | 42 pinned trial digests | `python -m pytest tests/test_golden.py` | all pass; a failure means the certified engine changed |
 | Fuzz | `python -m courtroom stress --cases 100` | `"trials": 2500`, `"crashes": 0`, `"failures": []` |
 | The certified analysis regenerates exactly | `python -m courtroom analysis --out /tmp/a --workers 4` then `cmp results/payoffs.json /tmp/a/payoffs.json` (and the other two files) | byte-identical; about 14 minutes |
@@ -38,9 +38,9 @@ The static Vercel build shows only bundled data. Anything that runs the engine n
 | `courtroom/procedure/`, `courtroom/contracts/` | legal moves and validation; the data models |
 | `courtroom/agents/` | Aggressive, Conservative, Adaptive, Mixed, Chaos (fuzzing only) |
 | `courtroom/gametheory/` | payoff matrices, Nash support enumeration, bootstrap, sensitivity sweep |
-| `courtroom/cases/` | seven library cases; `WITNESS_CASES` and `ADVERSE_CASES` are opt-in variants in their own registries |
+| `courtroom/cases/` | seven library cases (`CASES` as shipped, four with adverse events on; `PLAIN_CASES` without); `WITNESS_CASES` are opt-in variants; `events.py` holds the calibrated rates |
 | `courtroom/llm/` | **optional** Gemini and Ollama clients, narrator, exhibition, explainer. Nothing in the core imports this |
-| `results/` | the certified analysis; `results/adverse/` is the opt-in analysis of the adverse-event variants |
+| `results/` | the certified analysis; `results/calibration/` is the measured sweep that chose the adverse-event rates (`docs/CALIBRATION_SWEEP.md`) |
 | `docs/` | `DESIGN.md`, `DESIGN_WITNESS_POINTS.md`, `LEGAL_AND_BALANCE_AUDIT.md`, `OLLAMA.md`, `LLM_COST.md` |
 
 ---
@@ -70,22 +70,25 @@ Each is enforced by a test that fails loudly. If you need to break one, write a 
 
 ## 3. Known issues, stated plainly
 
-### 3.1 The aurora and kestrel values were calibrated for a configuration that is not the shipped one
-The values in `aurora-defi` and `kestrel-av` (PR #3 and the `P-RECALL` move to 0.15) were chosen from a sweep run **without** adverse events
-(`docs/LEGAL_AND_BALANCE_AUDIT.md`, appendix). With adverse events on (`ADVERSE_CASES`, PR #4) both cases become **dominance-solvable**,
-Conservative on both sides (`results/adverse/`). The shipped configuration is therefore not the one the calibration was chosen for.
-**Recommendation: re-run the sweep with adverse events on** before treating either case as calibrated. Helix kept its mixed equilibrium
-(same supports, Conservative and Adaptive on both sides, bootstrap stability 100%); its prosecution win range narrowed from 0 to 100% down to 0 to 68.5%.
+### 3.1 The aurora and kestrel calibration: resolved by measurement, and the answer is "dominance-solvable" (D19)
+The values were first chosen without adverse events, and the events' rates were guesses. That is now measured (`docs/CALIBRATION_SWEEP.md`, 21 settings,
+all seven cases, 200 seeds, 200 resamples). Four library cases ship with events on, at the rates the sweep selected. Re-running the case calibration at those rates
+found **no value** of either parameter that makes `aurora-defi` or `kestrel-av` anything but dominance-solvable (Conservative against Conservative), so the values were
+**left as they were and documented, not tuned**. Both are still contested in outcome (the prosecution wins 11 to 23% and 17.5 to 42%) but have one best strategy, and each
+holds stability of 99% or better. `helix-espionage` keeps its mixed equilibrium (100% label and support stability). *Correction:* earlier versions of this note said the
+library "ships with events on". It did not; it was on the plain rulebook until D19 made events the shipped configuration.
 
-### 3.2 Adverse events added stability and removed strategic depth
-They raised payoff variance exactly where it was missing (kestrel Conservative prosecution sd 0.00 to 3.77; aurora 0.33 to 2.65) but made two
-of the four contested cases collapse to a single dominant style. **The event rates (no-show 10%, missing certificate 15%, hostile 10%) and the
-hostile credibility factor (1/4) are guesses and have not been swept.** The generic ±25% sweep does not touch them.
+### 3.2 Adverse events raised risk and removed strategic depth; the finding stands
+Payoff variance rose where it was missing (kestrel Conservative prosecution sd 0.00 to 3.85, aurora Conservative 0.31 to 3.34). The rates are now swept (no-show 0 to 30%,
+missing certificate 0 to 35%, hostile 0 to 30%, credibility 1/8 to 3/4, and all together x0.5 to x3). **By the letter of the selection rules a qualifying band exists; counting only the four cases that
+are real contests, none does**: only `helix-espionage` keeps a mixed equilibrium anywhere in the band. Still unresolved: the rates are chosen, not observed; the plateau is narrow in the joint
+direction (all rates x1.5 fails the 95% stability floor by half a point); Conservative strategies that rarely offer an exposed exhibit stay flat.
 
-### 3.3 The case values were tuned after measuring
-D3 refused to retune `kestrel-av` because editing a case after seeing the result is result-driven design. D14 did it anyway, on instruction, and says so.
-Both rebalanced cases sit near a cliff: a clean kestrel exhibit of strength 0.275 or more gives the prosecution about 99%. `aurora-defi`'s equilibrium
-label survives only **80.5%** of bootstrap resamples; `kestrel-av`'s mixed label survives 98.0% but the exact mixture's support only 76.5%.
+### 3.3 The cases were tuned after measuring (D14) and this is now documented, not repeated
+D14's admission stands. D19 supersedes the process: the sweep is published, the shipped values are inside measured plateaus, no value was moved to taste, and the rule that
+a case which cannot be contested is documented as such was followed. **Still true:** `aurora-defi` sits 4% above a win-rate cliff (its label is unaffected); `kestrel-av`'s
+`P-RECALL` has a second regime above 0.275. Stability figures: helix 100.0/100.0%, aurora 100.0/99.0%, kestrel 99.5/99.5%, poisoned-tree and the three fixtures 100/100 (label/support),
+the same numbers `RESULTS.md` quotes.
 
 ### 3.4 The Ollama provider has never run against a real Ollama server
 It follows Ollama's documented API and is tested against a stub only (`tests/test_ollama.py`). Ollama is not installed on the development machine, so the
@@ -94,7 +97,7 @@ recommended model (`qwen3:8b`) and all speed figures in `docs/OLLAMA.md` are unt
 ### 3.5 Open team decisions (nobody has made these)
 * **Is the four-facts cap a bug fix or a scoring deviation?** The proposal (Sec. 6) states the cap and the code lacked it, so D12 treats it as a
   conformance fix. It changes no library result. If the team disagrees, set `rules.MAX_FACTS_PER_SIDE = None`, which restores the old judge.
-* **Retune `kestrel-av`, or document it as trivial.** It is currently retuned (D14). Reverting means `P-RECALL` removed and the case being unwinnable (D3).
+* **`kestrel-av` and `aurora-defi`: tune or document?** Decided by measurement (D19): with events on no value contests them, so they are documented as dominance-solvable and the values left alone. A team that prefers a mixed `kestrel-av` can run `PLAIN_CASES` (events off), where D14's calibration holds.
 * **Should witness moves join the strategy matrix?** Today the matrix is 4x4 and witness examination is an opt-in variant that has not been solved as a game.
   Adding a fifth strategy costs roughly double the regeneration time.
 

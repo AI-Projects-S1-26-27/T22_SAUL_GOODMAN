@@ -1,5 +1,7 @@
 # Legal conformance and case-balance audit
 
+> **Snapshot from before D19.** The balance figures below (win rates, labels, the appendix sweep) describe the plain rulebook, which is now `PLAIN_CASES`. With the shipped adverse events the library's labels and win rates differ; see `docs/CALIBRATION_SWEEP.md` and `RESULTS.md`.
+
 **Status: findings only. No code, case, or formula was changed.** Everything below was measured on branch
 `witness-moves` on 20 Oct 2026. Experiments that altered a case (marked *in memory*) were run in a scratch
 script against copies; the library is untouched. Scripts are not in the repo; every figure can be re-derived

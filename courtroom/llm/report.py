@@ -44,6 +44,7 @@ def render(results_path: Path, out_path: Path) -> str:
     out.append(f"| Model | `{data['model']}` |")
     out.append(f"| Temperature | {data['temperature']} |")
     out.append(f"| Case | `{data['case_id']}` |")
+    out.append("| Rulebook | the plain rulebook, **no adverse events** (the shipped library has them on since D19; this run predates that) |")
     out.append(f"| Seeds per pairing | {len(data['seeds'])} ({', '.join(map(str, data['seeds']))}) |")
     out.append(f"| Opponents | {', '.join(f'`{o}`' for o in data['opponents'])} |")
     out.append(f"| Trials completed | {len(data['completed_trials'])} of {2 * len(data['opponents']) * len(data['seeds'])} |")

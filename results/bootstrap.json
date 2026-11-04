@@ -1,6 +1,6 @@
 [
   {
-    "case_id": "helix-espionage-adverse",
+    "case_id": "helix-espionage",
     "row_strategies": [
       "aggressive",
       "conservative",
@@ -24,7 +24,7 @@
     "rng_seed": 0
   },
   {
-    "case_id": "aurora-defi-adverse",
+    "case_id": "aurora-defi",
     "row_strategies": [
       "aggressive",
       "conservative",
@@ -48,7 +48,7 @@
     "rng_seed": 0
   },
   {
-    "case_id": "kestrel-av-adverse",
+    "case_id": "kestrel-av",
     "row_strategies": [
       "aggressive",
       "conservative",
@@ -73,7 +73,31 @@
     "rng_seed": 0
   },
   {
-    "case_id": "edge-poisoned-tree-adverse",
+    "case_id": "edge-empty-docket",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "pure",
+    "baseline_equilibria": 16,
+    "label_counts": {
+      "pure": 200
+    },
+    "stability": 1.0,
+    "rng_seed": 0
+  },
+  {
+    "case_id": "edge-mutual-exclusion",
     "row_strategies": [
       "aggressive",
       "conservative",
@@ -90,6 +114,54 @@
     "n_resamples": 200,
     "baseline_label": "pure",
     "baseline_equilibria": 4,
+    "label_counts": {
+      "pure": 200
+    },
+    "stability": 1.0,
+    "rng_seed": 0
+  },
+  {
+    "case_id": "edge-poisoned-tree",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "pure",
+    "baseline_equilibria": 4,
+    "label_counts": {
+      "pure": 200
+    },
+    "stability": 1.0,
+    "rng_seed": 0
+  },
+  {
+    "case_id": "edge-defense-only",
+    "row_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "col_strategies": [
+      "aggressive",
+      "conservative",
+      "adaptive",
+      "mixed:0.5"
+    ],
+    "n_seeds": 200,
+    "n_resamples": 200,
+    "baseline_label": "pure",
+    "baseline_equilibria": 16,
     "label_counts": {
       "pure": 200
     },

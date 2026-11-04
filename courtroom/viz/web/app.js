@@ -1590,7 +1590,7 @@ function focusNode(id) {
 
 const MODE_SAY = {
   deterministic: "Exact rulebook judge, fixed strategies. Same case and choices give the same verdict, every time.",
-  exhibition: "A language-model policy plays one seat, replayed from a committed cache of its real moves: no network, no key. The judge is the same exact rulebook. It is not reproducible on another machine from a cold cache, so it is excluded from the equilibrium analysis.",
+  exhibition: "A language-model policy plays one seat, on the plain rulebook with no adverse events (the certified page now has them on), replayed from a committed cache of its real moves: no network, no key. The judge is the same exact rulebook. It is not reproducible on another machine from a cold cache, so it is excluded from the equilibrium analysis.",
 };
 
 /** The exhibition replay is 1.5 MB and the certified page never needs it, so it loads on demand. */

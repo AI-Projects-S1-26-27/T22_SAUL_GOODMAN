@@ -179,6 +179,8 @@ def allowed_numbers(facts: Facts) -> set[str]:
     # Numbers that are part of an exhibit's own title (a time stamp, an amount) are quoted from the record, not new.
     titles = [facts.case_title, *(c["title"] for e in facts.elements for c in (*e.for_prosecution, *e.for_defense))]
     titles += [x["title"] for x in facts.exclusions]
+    # So are numbers in the record's own event lines (the judge's reason, an impeachment, "section 65B" in an adverse event).
+    titles += [facts.reason, *facts.credibility, *facts.adverse]
     for t in titles:
         ok |= {tok.rstrip("%") for tok in _NUM.findall(t)}
     return ok

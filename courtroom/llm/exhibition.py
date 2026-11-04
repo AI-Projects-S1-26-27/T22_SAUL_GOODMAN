@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from courtroom.agents import make_agent
-from courtroom.cases import get_case
+from courtroom.cases import get_plain_case
 from courtroom.contracts import Side
 from courtroom.engine.trial import Court
 from courtroom.llm.client import LLMClient, QuotaExhausted, SpendCeilingReached
@@ -150,7 +150,8 @@ def run_exhibition(
     Aborts cleanly on the client's spend ceiling or ``max_calls``, reporting whatever
     completed rather than throwing the run away.
     """
-    case = get_case(case_id)
+    # The recorded exhibition was played on the plain rulebook (no adverse events); replay and re-runs must match it.
+    case = get_plain_case(case_id)
     client = client or make_client()
     cells: list[Cell] = []
     aborted: str | None = None

@@ -16,7 +16,8 @@ from pathlib import Path
 import pytest
 
 from courtroom.agents import ChaosAgent
-from courtroom.cases import ADVERSE_CASES, CASES, get_case
+from courtroom.cases import CASES, PLAIN_CASES
+from courtroom.cases.events import EVENT_CASES, SHIPPED_RULES
 from courtroom.contracts import EventKind, EvidenceKind, Phase, RuleSet
 from courtroom.engine import Court, replay_trial, run_trial
 from courtroom.engine.audit import verify_chain
@@ -25,7 +26,9 @@ from courtroom.judge.scoring import score_record
 from courtroom.llm.narrator import SPOKEN_KINDS, narrate
 
 STRATEGIES = ("aggressive", "conservative", "adaptive")
-HELIX = ADVERSE_CASES["helix-espionage-adverse"]
+# The cases that ship with events on, keyed by their ordinary ids.
+ADVERSE_CASES = {cid: CASES[cid] for cid in sorted(EVENT_CASES)}
+HELIX = ADVERSE_CASES["helix-espionage"]
 
 
 def _adverse(trial) -> list:
@@ -35,10 +38,11 @@ def _adverse(trial) -> list:
 # ----------------------------------------------------------------------- the fence
 
 
-def test_certified_cases_never_have_adverse_events() -> None:
-    assert all(not c.adverse_events for c in CASES.values())
-    assert not set(ADVERSE_CASES) & set(CASES)
-    for case in CASES.values():
+def test_the_plain_library_never_has_adverse_events_and_the_shipped_one_has_exactly_the_calibrated_ones() -> None:
+    assert all(c.rules is None for c in PLAIN_CASES.values())
+    assert {cid for cid, c in CASES.items() if c.adverse_events} == set(EVENT_CASES)
+    assert all(CASES[cid].rules == SHIPPED_RULES for cid in EVENT_CASES)
+    for case in PLAIN_CASES.values():
         for p, d in itertools.product(STRATEGIES, repeat=2):
             assert not _adverse(run_trial(case, p, d, seed=0))
 
@@ -51,11 +55,11 @@ def test_ruleset_defaults_to_no_adverse_events() -> None:
 def test_every_rate_at_zero_reproduces_the_plain_trial_exactly() -> None:
     """The adverse stream is separate: enabling the flag with nothing able to fire must not move a digest."""
     for cid, case in ADVERSE_CASES.items():
-        base = CASES[cid.removesuffix("-adverse")]
+        base = PLAIN_CASES[cid]
         quiet = base.model_copy(update={"rules": RuleSet(adverse_events=True, no_show=0.0, missing_certificate=0.0, hostile=0.0)})
         for p, d in (("aggressive", "conservative"), ("adaptive", "adaptive")):
             assert run_trial(quiet, p, d, seed=3).digest == run_trial(base, p, d, seed=3).digest
-        assert get_case(cid) is case
+        assert CASES[cid] is case
 
 
 # ----------------------------------------------------------------------- determinism
@@ -187,7 +191,7 @@ def test_only_the_adaptive_profile_discounts_for_the_published_risk() -> None:
     certified case gives it an empty ``adverse`` view, so its behaviour there is untouched (golden digests)."""
     differs = 0
     for cid, case in ADVERSE_CASES.items():
-        base = CASES[cid.removesuffix("-adverse")]
+        base = PLAIN_CASES[cid]
         quiet = base.model_copy(update={"rules": RuleSet(adverse_events=True, no_show=0.0, missing_certificate=0.0, hostile=0.0)})
         a = run_trial(case, "adaptive", "adaptive", seed=0)
         b = run_trial(quiet, "adaptive", "adaptive", seed=0)
@@ -220,3 +224,39 @@ def test_no_core_package_imports_the_language_model_layer() -> None:
             for node in ast.walk(ast.parse(path.read_text())):
                 names = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""] if isinstance(node, ast.ImportFrom) else []
                 assert not any(n == "courtroom.llm" or n.startswith("courtroom.llm.") for n in names), (path, names)
+
+
+# ----------------------------------------------------------------------- the hostile credibility factor is a per-case parameter
+
+
+def test_the_hostile_credibility_factor_is_read_from_the_case_and_stays_exact() -> None:
+    marks = {hostile_key("W-NANDA"): 1}
+    prior = Fraction(-1)
+    base = score_record(HELIX, ["P-NANDA"]).log_odds["intent"]
+    for text, factor in (("1/4", Fraction(1, 4)), ("1/2", Fraction(1, 2)), ("1/8", Fraction(1, 8)), ("0", Fraction(0))):
+        case = HELIX.model_copy(update={"rules": RuleSet(adverse_events=True, hostile_credibility=text)})
+        hit = score_record(case, ["P-NANDA"], marks).log_odds["intent"]
+        assert (hit - prior) == (base - prior) * factor, text
+
+
+@pytest.mark.parametrize("bad", ["2", "3/2", "x", "-1/2", "1/0"])
+def test_a_factor_outside_zero_to_one_is_refused(bad: str) -> None:
+    with pytest.raises(ValueError):
+        RuleSet(adverse_events=True, hostile_credibility=bad)
+
+
+def test_the_default_factor_leaves_every_events_trial_byte_identical_to_before() -> None:
+    """1/4 is the value that was hard-coded; making it a field must not move a digest."""
+    explicit = HELIX.model_copy(update={"rules": RuleSet(adverse_events=True, hostile_credibility="1/4")})
+    for p, d in (("aggressive", "conservative"), ("adaptive", "adaptive")):
+        assert run_trial(explicit, p, d, seed=2).digest == run_trial(HELIX, p, d, seed=2).digest
+
+
+def test_adaptive_prices_a_harsher_hostile_witness_lower() -> None:
+    mild = HELIX.model_copy(update={"rules": RuleSet(adverse_events=True, hostile=0.6, hostile_credibility="3/4")})
+    harsh = HELIX.model_copy(update={"rules": RuleSet(adverse_events=True, hostile=0.6, hostile_credibility="0")})
+    seen = {}
+    for name, case in (("mild", mild), ("harsh", harsh)):
+        t = run_trial(case, "adaptive", "adaptive", seed=0)
+        seen[name] = [e.action.rationale for e in t.events if e.action and "expected survival" in e.action.rationale]
+    assert seen["mild"] and seen["harsh"] and seen["mild"] != seen["harsh"]

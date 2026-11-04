@@ -112,5 +112,7 @@ def test_graph_statuses_consistent_with_events() -> None:
     for ev in r.events:
         if ev.subject and ev.status in ("admitted", "excluded"):
             final[ev.subject] = ev.status
+        elif ev.subject and ev.status in ("no_show", "no_certificate"):  # an adverse event also keeps an exhibit out
+            final[ev.subject] = "excluded"
     for node in r.graph.nodes:
         assert node.status == final.get(node.id, "unpresented")

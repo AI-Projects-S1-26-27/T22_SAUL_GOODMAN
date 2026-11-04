@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from courtroom.cases.events import ship
 from courtroom.contracts import (
     CaseFile,
     CaseType,
@@ -632,19 +633,28 @@ DEFENSE_ONLY = CaseFile(
 )
 
 
-CASES: dict[str, CaseFile] = {c.id: c for c in (HELIX, AURORA, KESTREL, EMPTY, STALEMATE, TAINTED, DEFENSE_ONLY)}
+#: The library as first built: the plain rulebook, no adverse events. Reproduces every result from before D19, and is what
+#: the recorded language-model exhibition was played on.
+PLAIN_CASES: dict[str, CaseFile] = {c.id: c for c in (HELIX, AURORA, KESTREL, EMPTY, STALEMATE, TAINTED, DEFENSE_ONLY)}
+
+#: The library as shipped: the cases with real play carry the calibrated adverse-event rules (see ``cases/events.py``).
+CASES: dict[str, CaseFile] = {cid: ship(c) for cid, c in PLAIN_CASES.items()}
 
 
 def get_case(case_id: str) -> CaseFile:
     if case_id in CASES:
         return CASES[case_id]
     # Witness-examination variants live in their own registry so nothing that iterates CASES sees them.
-    from courtroom.cases.adverse_cases import ADVERSE_CASES
     from courtroom.cases.witness_cases import WITNESS_CASES
 
-    for registry in (WITNESS_CASES, ADVERSE_CASES):
-        if case_id in registry:
-            return registry[case_id]
-    raise KeyError(
-        f"unknown case {case_id!r}; available: {sorted(CASES)}, {sorted(WITNESS_CASES)} and {sorted(ADVERSE_CASES)}"
-    ) from None
+    if case_id in WITNESS_CASES:
+        return WITNESS_CASES[case_id]
+    raise KeyError(f"unknown case {case_id!r}; available: {sorted(CASES)} and {sorted(WITNESS_CASES)}") from None
+
+
+def get_plain_case(case_id: str) -> CaseFile:
+    """The library case on the plain rulebook (no adverse events), for reproducing earlier results and the exhibition."""
+    try:
+        return PLAIN_CASES[case_id]
+    except KeyError:
+        raise KeyError(f"unknown case {case_id!r}; available: {sorted(PLAIN_CASES)}") from None

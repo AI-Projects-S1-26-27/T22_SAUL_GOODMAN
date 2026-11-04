@@ -16,6 +16,13 @@ reproduce bit-for-bit. Nothing on this page involves a language model; the optio
 is reported separately in [`LLM_EXHIBITION.md`](LLM_EXHIBITION.md) and is deliberately excluded
 from every number below.
 
+**Adverse events are on.** Since D19 the four library cases with real play (`helix-espionage`, `aurora-defi`,
+`kestrel-av`, `edge-poisoned-tree`) ship with seeded adverse events: a witness fails to appear (10% of offers),
+a digital record lacks its section 65B certificate (15%), a witness turns hostile (10% of admissions, credibility
+x1/4). The three structural fixtures stay on the plain rulebook. The rates were chosen by a measured sweep
+(`docs/CALIBRATION_SWEEP.md`). The earlier numbers, without events, are reproducible with `PLAIN_CASES`
+(see `PROVENANCE.md`) and are what `docs/archive/` and the earlier sections of `DEVIATIONS.md` describe.
+
 Configuration: the **4×4 game** over Aggressive, Conservative, Adaptive and Mixed(0.5), **200
 common random seeds per cell** (the same seeds in every cell, so noise cancels between cells),
 bootstrap **200 resamples**, sweep at **60 seeds** per cell. Chaos is a fuzzing agent and never
@@ -30,12 +37,12 @@ Measured against the current engine, in which **the two sides alternate turns** 
 
 | Check | Command | Result |
 |---|---|---|
-| Test suite | `python -m pytest` | **935 passed, 0 failed** |
+| Test suite | `python -m pytest` | **1008 passed, 0 failed** |
 | Fuzz | `python -m courtroom stress --cases 100` | 2,500 trials, **0 crashes, 0 invariant failures** |
 | Replay determinism | `python -m courtroom verify` | 250/250 replays bit-identical; every case × pairing combination gives identical digests and valid hash chains |
 
-The suite is 356 test functions across 18 files, which `@pytest.mark.parametrize` expands into the **935 test
-cases** pytest reports. 935 is what the tool prints.
+The suite is 378 test functions across 25 files, which `@pytest.mark.parametrize` expands into the **1008 test
+cases** pytest reports. 1008 is what the tool prints.
 
 Fuzz verdict mix over 2,500 generated cases: 1,548 directed acquittal · 559 liable · 273 not
 guilty · 78 guilty · 42 not liable. The generator produces weak cases — **61.9% end at the
@@ -49,92 +56,96 @@ fuzzing but not payoff analysis. All analysis below uses the seven hand-written 
 | Case | Type | Label | Equilibria | Dominance | Verified |
 |---|---|---|---|---|---|
 | `helix-espionage` | Criminal | **mixed** | 1 | none | ✓ |
-| `aurora-defi` | Criminal | pure | 2 | none | ✓ |
-| `kestrel-av` | Civil | **mixed** | 1 | none | ✓ |
+| `aurora-defi` | Criminal | **dominance-solvable** | 1 | Conservative dominant, both sides | ✓ |
+| `kestrel-av` | Civil | **dominance-solvable** | 1 | Conservative dominant (prosecution) | ✓ |
 | `edge-empty-docket` | Criminal | pure | 16 | none (all profiles tie) | ✓ |
 | `edge-mutual-exclusion` | Civil | pure | 4 | none | ✓ |
 | `edge-poisoned-tree` | Criminal | pure | 4 | Conservative dominant (prosecution) | ✓ |
 | `edge-defense-only` | Criminal | pure | 16 | none (all profiles tie) | ✓ |
 
-**The flagship case still behaves as the proposal hoped.** `helix-espionage` has **no pure
-equilibrium and no dominant strategy for either side**: optimal play requires randomisation. The
-unique mixed equilibrium, in exact rationals:
+**The flagship case still behaves as the proposal hoped, with adverse events on.** `helix-espionage` has **no pure
+equilibrium and no dominant strategy for either side**: optimal play requires randomisation. The unique mixed
+equilibrium, in exact rationals:
 
-- prosecution: Conservative **711/821** (≈86.6%), Adaptive **110/821** (≈13.4%), Aggressive 0, Mixed 0
-- defense: Adaptive **7870/8447** (≈93.2%), Conservative **577/8447** (≈6.8%), Aggressive 0, Mixed 0
+- prosecution: Conservative **837/1009** (≈83.0%), Adaptive **172/1009** (≈17.0%), Aggressive 0, Mixed 0
+- defense: Conservative **5395/20224** (≈26.7%), Adaptive **14829/20224** (≈73.3%), Aggressive 0, Mixed 0
 
-Alternating turns changed *which* mixture is optimal but not the structure: the case still
-requires randomisation, and the label held in 200/200 resamples.
+Turning adverse events on changed the mixture and narrowed the prosecution's win rate across cells from 0 to 100% down to
+0 to 68.5%, but not the structure: the same two styles on each side, and the label held in 200/200 resamples.
 
-**`aurora-defi` and `kestrel-av` were rebalanced (D14).** Before, both ended in a directed acquittal in all
-960 trials (prosecution win rate 0.000 in every cell) and `kestrel-av` was trivial. Now the prosecution wins
-0 to 16.5% of trials in `aurora-defi` and 0 to 42% in `kestrel-av`, and neither is trivial. `kestrel-av` has a
-unique mixed equilibrium (prosecution Conservative 1337/1639, Aggressive 302/1639; defense Conservative 1351/1700,
-Adaptive 349/1700). `aurora-defi` has two pure equilibria and no dominant strategy; its label is the least stable
-(80.5% of resamples, see section 3). The two 16-equilibrium edge cases are those where every profile ties, exactly
-as designed.
+**`aurora-defi` and `kestrel-av` are dominance-solvable with events on, and no case value fixes that.** In
+`aurora-defi` Conservative is dominant for both sides; in `kestrel-av` it is dominant for the prosecution, and the unique
+equilibrium is Conservative against Conservative. Without events they had a pure and a mixed equilibrium respectively (`docs/archive/`, D14). Re-running
+the case calibration at the shipped event rates found **no** value of the kestrel `P-RECALL` strength (0 to 0.5) or the aurora
+defense-evidence scale (0.6 to 1.8) that contests either case, so both were left as they were and are documented as
+dominance-solvable rather than tuned (D19). The prosecution still wins about 11 to 23% (aurora) and 17.5 to 42% (kestrel) of
+trials: the cases are contested in **outcome**, not in **strategy**. The two 16-equilibrium edge cases are those where every
+profile ties, exactly as designed.
 
 ---
 
 ## 3. Bootstrap stability
 
-Resampling the 200 seeds with replacement, 200 times, and re-solving each resampled game:
+Resampling the 200 seeds with replacement, 200 times, and re-solving each resampled game. **Label stability** is the share of
+resamples with the same label; **support stability** is the share with the same set of equilibrium supports (which strategies each
+side plays), which is stricter:
 
-| Case | Label | Stability |
-|---|---|---|
-| `helix-espionage` | mixed | **100.0%** (200/200) |
-| `aurora-defi` | pure | **80.5%** |
-| `kestrel-av` | mixed | **98.0%** |
-| `edge-empty-docket` | pure | **100.0%** |
-| `edge-mutual-exclusion` | pure | **100.0%** |
-| `edge-poisoned-tree` | pure | **100.0%** |
-| `edge-defense-only` | pure | **100.0%** |
+| Case | Label | Label stability | Support stability |
+|---|---|---|---|
+| `helix-espionage` | mixed | **100.0%** | 100.0% |
+| `aurora-defi` | dominance-solvable | **100.0%** | 99.0% |
+| `kestrel-av` | dominance-solvable | **99.5%** | 99.5% |
+| `edge-empty-docket` | pure | **100.0%** | 100.0% |
+| `edge-mutual-exclusion` | pure | **100.0%** | 100.0% |
+| `edge-poisoned-tree` | pure | **100.0%** | 100.0% |
+| `edge-defense-only` | pure | **100.0%** | 100.0% |
 
-Every label is stable under resampling — but only because the seed count is high. At 20 seeds
-`helix-espionage` reports **60%** stability and flips between *mixed* and *dominance-solvable*.
-The proposal's 200-seed requirement is doing real work: a 20-seed matrix would have supported a
-confident claim that is purely an artefact of the seeds.
+Both figures come from the same 200 seeds and 200 resamples. Label stability is `results/bootstrap.json`; support stability is
+`results/calibration/events.jsonl`, taken from the measurement that matches how each case ships (the `default` setting for the four
+cases with events on, `events-off` for the three plain fixtures). The two sources agree on label stability to the last digit for every
+case (`test_shipped_stability_figures_agree_with_the_certified_bootstrap`). The lowest figure anywhere is `aurora-defi`'s support
+stability, 99.0%.
+
+Every label is stable under resampling, but only because the seed count is high. At 20 seeds `helix-espionage` reported **60%** stability
+(before D19) and flipped between *mixed* and *dominance-solvable*. The proposal's 200-seed requirement is doing real work: a 20-seed matrix
+would have supported a confident claim that is purely an artefact of the seeds.
 
 ---
 
 ## 4. Sensitivity sweep
 
 Each parameter group perturbed by ±25%, plus the criminal standard swept across 80–95%.
-"Breaks" means the equilibrium label moved.
+"Breaks" means the equilibrium label moved. The adverse-event rates themselves are swept separately, in
+`docs/CALIBRATION_SWEEP.md`.
 
 | Case | Label survives | Breaks under |
 |---|---|---|
-| `kestrel-av` | 12 of 14 | `costs +25%`, `LLR_SCALE +25%` |
+| `helix-espionage` | 11 of 14 | `LLR_SCALE −25%`, `standards_of_proof +25%`, **BRD at 95%** |
+| `aurora-defi` | 13 of 14 | `PRIOR_DEFECT_RATE −25%` |
+| `kestrel-av` | 13 of 14 | `sanctions −25%` |
 | `edge-empty-docket` | **every variation** | — |
+| `edge-mutual-exclusion` | 13 of 14 | `PRIOR_DEFECT_RATE −25%` |
 | `edge-poisoned-tree` | **every variation** | — |
 | `edge-defense-only` | **every variation** | — |
-| `aurora-defi` | 12 of 14 | `sanctions −25%`, `PRIOR_DEFECT_RATE −25%` |
-| `edge-mutual-exclusion` | 13 of 14 | `PRIOR_DEFECT_RATE −25%` |
-| `helix-espionage` | 11 of 14 | `LLR_SCALE −25%`, `standards +25%`, **BRD at 95%** |
 
-**Three of seven cases are completely parameter-independent** (the structural edge fixtures: their outcomes follow from
-the rules, not from any tuned constant). `kestrel-av` left that group when it was rebalanced, which is the price of having
-real strategic content.
-
-Four cases are parameter-dependent, and the table says exactly which constant each depends on.
+**3 of seven cases are completely parameter-independent** (the structural edge fixtures: their outcomes follow from
+the rules, not from any tuned constant). The others are parameter-dependent, and the table says exactly which constant each depends on.
 No claim about them should be stated without that constant.
 
 ### The standard of proof, specifically
 
-The headline question — *is the 90% bar justified, or just picked?* — has a measured answer, and
-it is the same answer as before the turn order changed:
+The headline question — *is the 90% bar justified, or just picked?* — has a measured answer, and it survived both a change to the trial's
+turn order and the switch-on of adverse events:
 
 | Beyond-reasonable-doubt bar | `helix-espionage` label | Prosecution win rate |
 |---|---|---|
-| 80% | mixed | 0.357 |
-| 85% | mixed | 0.296 |
-| **90% (the shipped value, 11/5)** | **mixed** | **0.255** |
-| 95% | **collapses** | 0.000 |
+| 80% | mixed | 0.311 |
+| 85% | mixed | 0.247 |
+| **90% (the shipped value, 11/5)** | **mixed** | **0.200** |
+| 95% | **collapses** | 0.008 |
 
-The flagship case's mixed equilibrium is **stable anywhere from 80% to 90%** and collapses at 95%,
-where the prosecution can no longer win at all. The shipped value sits inside the stable band, not
-on its edge. **This result survived a change to the trial's turn order**, which is stronger
-evidence than a single measurement.
+The flagship case's mixed equilibrium is **stable anywhere from 80% to 90%** and collapses at 95%, where the prosecution can almost never win
+(0.8%). The shipped value sits inside the stable band, not on its edge.
 
 The bar itself remains a policy choice, not a measurement: 90% corresponds to the Blackstone 10:1
 error-cost ratio (convict only when P(guilt) > 10/11 ≈ 91%), and the civil preponderance bar of
@@ -154,12 +165,12 @@ produced by `python -m courtroom export`, and the web page reads it rather than 
 
 | Bar | Result | Prosecution plays | Defense plays | Prosecution wins at equilibrium |
 |---|---|---|---|---|
-| 50% | dominance-solvable | adaptive 100% | aggressive 100% | 42.0% |
-| 60% | dominance-solvable | adaptive 100% | adaptive 100% | 51.0% |
-| 70% | dominance-solvable | adaptive 100% | aggressive 100% | 18.0% |
-| 80% | mixed | conservative 61%, adaptive 39% | aggressive 68%, adaptive 32% | 5.3% |
-| 85% | mixed | conservative 88%, adaptive 12% | conservative 5%, adaptive 95% | 2.8% |
-| 90% (own) | mixed | conservative 87%, adaptive 13% | conservative 7%, adaptive 93% | 3.1% |
+| 50% | dominance-solvable | adaptive 100% | aggressive 100% | 27.5% |
+| 60% | dominance-solvable | adaptive 100% | aggressive 100% | 26.0% |
+| 70% | dominance-solvable | adaptive 100% | aggressive 100% | 11.5% |
+| 80% | mixed | conservative 53%, adaptive 47% | adaptive 55%, aggressive 45% | 8.8% |
+| 85% | mixed | conservative 84%, adaptive 16% | adaptive 90%, conservative 10% | 4.4% |
+| 90% (own) | mixed | conservative 83%, adaptive 17% | adaptive 73%, conservative 27% | 4.9% |
 | 95% | dominance-solvable | conservative 100% | conservative 100% | 0.0% |
 
 Read it as a shape rather than a lookup. On this ladder the flagship's mixed equilibrium appears
@@ -169,8 +180,8 @@ mixed band. The ladder has seven rungs, so it cannot say where the band starts b
 80% or where it ends between 90% and 95%; that would take a finer ladder. It also does not
 explain *why* the structure changes, only that it does.
 
-Cases whose label changes somewhere on the ladder: `helix-espionage`, `kestrel-av` (mixed at 50%, dominance-solvable from 60% up).
-Cases whose label never changes from 50% to 95%: `aurora-defi`, `edge-empty-docket`, `edge-mutual-exclusion`, `edge-poisoned-tree`, `edge-defense-only`.
+Cases whose label changes somewhere on the ladder: `helix-espionage`, `aurora-defi`.
+Cases whose label never changes from 50% to 95%: `kestrel-av`, `edge-empty-docket`, `edge-mutual-exclusion`, `edge-poisoned-tree`, `edge-defense-only`.
 
 ---
 
@@ -214,10 +225,10 @@ measurement*, and should be treated as a red flag rather than a result.
 
 ## 7. What is still open
 
-- **`kestrel-av` and `aurora-defi` were rebalanced** (D14). The change is case data only; no formula moved. Both sit near a
-  cliff. `kestrel-av` is published at `P-RECALL` 0.15, mid-way in a measured band (about 0.075 to 0.25); at 0.275 or more the
-  prosecution wins about 99% of trials. `aurora-defi` has label stability of only **80.5%**: its equilibrium label is
-  fragile because the prosecution wins at most 16.5% of any cell. See `docs/LEGAL_AND_BALANCE_AUDIT.md`, appendix.
+- **`aurora-defi` and `kestrel-av` are dominance-solvable with adverse events on, and the sweep found no case value that contests them (D19).**
+  They were calibrated (D14) on the plain rulebook; re-running the calibration at the shipped event rates showed no value of either
+  calibrated parameter that restores a mixed or pure structure with stable labels. They are left as they were and documented, not tuned.
+  `docs/CALIBRATION_SWEEP.md` has the tables, and the strict reading in which no setting fully qualifies.
 - **Rebuttal can still add support (D7).** Both available fixes are out of bounds: zeroing a
   rebuttal item's support changes judge arithmetic, and banning `PRESENT` in rebuttal changes the
   game again. `test_any_post_dv_rise_is_confined_to_rebuttal` pins the gap so it cannot spread.

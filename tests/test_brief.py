@@ -9,13 +9,13 @@ from pathlib import Path
 
 import pytest
 
-from courtroom.cases import ADVERSE_CASES, CASES, WITNESS_CASES
+from courtroom.cases import CASES, PLAIN_CASES, WITNESS_CASES
 from courtroom.contracts import Side
 from courtroom.judge import rules
 from courtroom.judge.brief import build_brief
 from courtroom.judge.rules import PRIOR_LOG_ODDS, fmt, sigmoid, threshold_for
 
-ALL = {**CASES, **WITNESS_CASES, **ADVERSE_CASES}
+ALL = {**CASES, **WITNESS_CASES, **{f"plain-{k}": v for k, v in PLAIN_CASES.items()}}
 
 
 @pytest.mark.parametrize("case_id", sorted(ALL))
@@ -78,8 +78,8 @@ def test_it_is_deterministic_and_carries_nothing_hidden() -> None:
 
 
 def test_published_risks_appear_only_when_the_case_has_them() -> None:
-    assert build_brief(CASES["helix-espionage"]).published_risks == []
-    risks = " ".join(build_brief(ADVERSE_CASES["helix-espionage-adverse"]).published_risks)
+    assert build_brief(PLAIN_CASES["helix-espionage"]).published_risks == []
+    risks = " ".join(build_brief(CASES["helix-espionage"]).published_risks)
     assert "10%" in risks and "15%" in risks and "65B" in risks
     assert build_brief(WITNESS_CASES["kestrel-av-witnesses"]).published_risks
 

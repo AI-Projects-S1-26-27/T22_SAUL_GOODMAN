@@ -259,6 +259,20 @@ class RuleSet(Frozen):
     no_show: float = Field(default=0.10, ge=0.0, le=1.0)
     missing_certificate: float = Field(default=0.15, ge=0.0, le=1.0)
     hostile: float = Field(default=0.10, ge=0.0, le=1.0)
+    # What a hostile witness's credibility is multiplied by, as an exact rational ("1/4"). A field, not a module
+    # constant, so a sweep can vary it in worker processes without patching anything.
+    hostile_credibility: str = Field(default="1/4", pattern=r"^\d{1,3}(/\d{1,3})?$")
+
+    @field_validator("hostile_credibility")
+    @classmethod
+    def _factor_in_unit_interval(cls, v: str) -> str:
+        try:
+            f = Fraction(v)
+        except (ValueError, ZeroDivisionError):
+            raise ValueError(f"hostile_credibility {v!r} is not a rational number") from None
+        if not Fraction(0) <= f <= Fraction(1):
+            raise ValueError("hostile_credibility must lie between 0 and 1")
+        return v
 
 
 class CaseFile(Frozen):

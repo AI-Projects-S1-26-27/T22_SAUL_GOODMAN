@@ -59,7 +59,10 @@ def _examine(actor: Side, witness: str) -> Action:
 
 
 def test_the_certified_library_has_no_witness_rules_and_the_variants_are_separate() -> None:
-    assert all(c.rules is None and not c.witness_examination for c in CASES.values())
+    assert all(not c.witness_examination for c in CASES.values())
+    from courtroom.cases import PLAIN_CASES
+
+    assert all(c.rules is None for c in PLAIN_CASES.values())
     assert not set(WITNESS_CASES) & set(CASES), "the variants must stay out of CASES, which the analysis iterates"
     assert all(c.witness_examination for c in WITNESS_CASES.values())
     assert get_case("kestrel-av-witnesses") is KESTREL

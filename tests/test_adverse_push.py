@@ -11,12 +11,13 @@ import itertools
 
 import pytest
 
-from courtroom.cases import ADVERSE_CASES, CASES
+from courtroom.cases import CASES, PLAIN_CASES
 from courtroom.contracts import AdversePush, EventKind
 from courtroom.engine import push_reaction, replay_trial, run_trial
 from courtroom.engine.audit import verify_chain
 
-HELIX = CASES["helix-espionage"]
+HELIX = PLAIN_CASES["helix-espionage"]  # pushes work on any case, flag or not; this one has no events of its own
+HELIX_EVENTS = CASES["helix-espionage"]
 
 
 def _offers(trial, item_id: str) -> bool:
@@ -139,7 +140,7 @@ def test_adaptive_records_the_survival_it_believed_in_its_own_rationale() -> Non
     """With published rates the expected-value lawyer logs the survival it priced in, so the belief is on the record."""
     seen = []
     for seed in range(3):
-        t = run_trial(ADVERSE_CASES["helix-espionage-adverse"], "adaptive", "adaptive", seed=seed)
+        t = run_trial(HELIX_EVENTS, "adaptive", "adaptive", seed=seed)
         seen += [e.action.rationale for e in t.events if e.action and "expected survival" in e.action.rationale]
     assert seen
     for r in seen:
@@ -174,7 +175,7 @@ def test_pushed_trials_replay_bit_for_bit(pairing: tuple[str, str]) -> None:
         AdversePush(at_seq=5, kind="missing_certificate", target="P-DLP"),
         AdversePush(at_seq=9, kind="hostile", target="W-HR"),
     ]
-    for case in (HELIX, ADVERSE_CASES["helix-espionage-adverse"]):
+    for case in (HELIX, HELIX_EVENTS):
         for seed in (0, 1):
             first = run_trial(case, *pairing, seed=seed, adverse_pushes=pushes)
             again = replay_trial(first, case)

@@ -1,0 +1,390 @@
+{
+  "strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "mixed:0.5"
+  ],
+  "n_seeds": 60,
+  "case_ids": [
+    "helix-espionage",
+    "aurora-defi",
+    "kestrel-av",
+    "edge-empty-docket",
+    "edge-mutual-exclusion",
+    "edge-poisoned-tree",
+    "edge-defense-only"
+  ],
+  "baseline": {
+    "helix-espionage": "mixed",
+    "aurora-defi": "dominance-solvable",
+    "kestrel-av": "dominance-solvable",
+    "edge-empty-docket": "pure",
+    "edge-mutual-exclusion": "pure",
+    "edge-poisoned-tree": "pure",
+    "edge-defense-only": "pure"
+  },
+  "baseline_win_rate": {
+    "helix-espionage": 0.2,
+    "aurora-defi": 0.096875,
+    "kestrel-av": 0.233333,
+    "edge-empty-docket": 0.0,
+    "edge-mutual-exclusion": 0.0,
+    "edge-poisoned-tree": 0.05625,
+    "edge-defense-only": 0.0
+  },
+  "variations": [
+    {
+      "parameter": "sanctions",
+      "setting": "-25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "mixed",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.204167,
+        "aurora-defi": 0.096875,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.072917,
+        "edge-defense-only": 0.0
+      },
+      "changed": [
+        "kestrel-av"
+      ]
+    },
+    {
+      "parameter": "costs",
+      "setting": "-25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.197917,
+        "aurora-defi": 0.096875,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.05625,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "LLR_SCALE",
+      "setting": "-25%",
+      "labels": {
+        "helix-espionage": "dominance-solvable",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.002083,
+        "aurora-defi": 0.019792,
+        "kestrel-av": 0.234375,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.011459,
+        "edge-defense-only": 0.0
+      },
+      "changed": [
+        "helix-espionage"
+      ]
+    },
+    {
+      "parameter": "PRIOR_DEFECT_RATE",
+      "setting": "-25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "mixed",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "dominance-solvable",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.2,
+        "aurora-defi": 0.173958,
+        "kestrel-av": 0.236458,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.255208,
+        "edge-defense-only": 0.0
+      },
+      "changed": [
+        "aurora-defi",
+        "edge-mutual-exclusion"
+      ]
+    },
+    {
+      "parameter": "standards_of_proof",
+      "setting": "-25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.246875,
+        "aurora-defi": 0.46875,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.058333,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "sanctions",
+      "setting": "+25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.2,
+        "aurora-defi": 0.096875,
+        "kestrel-av": 0.234375,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.058333,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "costs",
+      "setting": "+25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.214583,
+        "aurora-defi": 0.096875,
+        "kestrel-av": 0.197917,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.05625,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "LLR_SCALE",
+      "setting": "+25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.277083,
+        "aurora-defi": 0.502083,
+        "kestrel-av": 0.20625,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.059375,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "PRIOR_DEFECT_RATE",
+      "setting": "+25%",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.192708,
+        "aurora-defi": 0.096875,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.05625,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "standards_of_proof",
+      "setting": "+25%",
+      "labels": {
+        "helix-espionage": "dominance-solvable",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.008333,
+        "aurora-defi": 0.032292,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.036458,
+        "edge-defense-only": 0.0
+      },
+      "changed": [
+        "helix-espionage"
+      ]
+    },
+    {
+      "parameter": "beyond_reasonable_doubt",
+      "setting": "p=0.80",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.311458,
+        "aurora-defi": 0.525,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.055208,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "beyond_reasonable_doubt",
+      "setting": "p=0.85",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.246875,
+        "aurora-defi": 0.46875,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.05625,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "beyond_reasonable_doubt",
+      "setting": "p=0.90",
+      "labels": {
+        "helix-espionage": "mixed",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.2,
+        "aurora-defi": 0.096875,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.05625,
+        "edge-defense-only": 0.0
+      },
+      "changed": []
+    },
+    {
+      "parameter": "beyond_reasonable_doubt",
+      "setting": "p=0.95",
+      "labels": {
+        "helix-espionage": "dominance-solvable",
+        "aurora-defi": "dominance-solvable",
+        "kestrel-av": "dominance-solvable",
+        "edge-empty-docket": "pure",
+        "edge-mutual-exclusion": "pure",
+        "edge-poisoned-tree": "pure",
+        "edge-defense-only": "pure"
+      },
+      "prosecution_win_rate": {
+        "helix-espionage": 0.008333,
+        "aurora-defi": 0.032292,
+        "kestrel-av": 0.233333,
+        "edge-empty-docket": 0.0,
+        "edge-mutual-exclusion": 0.0,
+        "edge-poisoned-tree": 0.036458,
+        "edge-defense-only": 0.0
+      },
+      "changed": [
+        "helix-espionage"
+      ]
+    }
+  ],
+  "robust_cases": [
+    "edge-empty-docket",
+    "edge-poisoned-tree",
+    "edge-defense-only"
+  ],
+  "fragile_cases": [
+    "aurora-defi",
+    "edge-mutual-exclusion",
+    "helix-espionage",
+    "kestrel-av"
+  ],
+  "parameter_impact": {
+    "sanctions": 1,
+    "costs": 0,
+    "LLR_SCALE": 1,
+    "PRIOR_DEFECT_RATE": 2,
+    "standards_of_proof": 1,
+    "beyond_reasonable_doubt": 1
+  }
+}

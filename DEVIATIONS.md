@@ -340,6 +340,8 @@ still the certified 4x4; see `docs/DESIGN_WITNESS_POINTS.md` section 6 for what 
 
 ## D14 — `aurora-defi` and `kestrel-av` rebalanced (case data only; this IS result-driven case design)
 
+> **Superseded by D19 (calibration sweep).** The admission below stands as written: the values were chosen by measuring, after D3 had refused to. D19 replaces the process with a measured sweep, finds that with adverse events on neither case can be contested by either value, and leaves the values as they were.
+
 Requested after `docs/LEGAL_AND_BALANCE_AUDIT.md` showed both cases ended in a directed acquittal in all 960
 trials. D3 had refused to retune `kestrel-av` precisely because editing a case after measuring it is
 result-driven. That objection stands and is not answered: the values below were **chosen by measuring**, by trying
@@ -373,6 +375,8 @@ the bundle, regenerated deliberately. `results/*.json`, `RESULTS.md` sections 2 
 `README.md` still quotes older test counts.
 
 ## D15 — seeded adverse events behind `RuleSet.adverse_events`
+
+> **Partly superseded by D19.** "The certified library never has it" no longer holds: four library cases now ship with these events on, at the rates chosen by the sweep. The plain library is `PLAIN_CASES`. The `-adverse` variant registry and `results/adverse/` were removed because the shipped cases are those variants.
 
 Requested to give the strategies real risk: moves that can fail through no fault of the player. Three events, each
 drawn from a stream seeded `"<seed>:adverse"` and logged as an `ADVERSE` event in the hash chain:
@@ -547,6 +551,44 @@ A button on the Verdict tab writes a plain-language account of the verdict (`cou
   (`test_the_reason_for_ending_the_case_early_matches_the_rule_the_judge_fired`).
 * **Not done:** the explainer was exercised against stubs, not a live Ollama. The template runs long (it lists every point); a model's
   version is capped at about 120 words by its prompt.
+
+## D19 — adverse events ship on, at rates chosen by a measured sweep; the aurora and kestrel values are left as they were
+
+**Why.** D14 admitted that `aurora-defi` and `kestrel-av` were calibrated by trying configurations until they looked contested, and that this was
+result-driven design. It was also calibrated **without** adverse events, while D15 had added events whose rates (10%, 15%, 10%, credibility x1/4) were guesses. With events
+on, both cases became dominance-solvable. `docs/CALIBRATION_SWEEP.md` replaces the guesswork with a sweep.
+
+**What was measured** (`results/calibration/`, 200 seeds, 200 bootstrap resamples, all seven cases, strategy space frozen at 4x4): 21 settings of the four
+parameters (each alone, and the three rates together), recording equilibrium label, supports, label stability, support stability, and per-strategy payoff sd; then the
+two case values (`P-RECALL` strength, aurora defense-evidence scale) swept at the chosen rates, 30 values.
+
+**What was chosen:** no-show 10%, missing certificate 15%, hostile 10%, hostile credibility 1/4, by the rules set in advance (variance must rise where it was
+missing; at least 3 of 7 cases not dominance-solvable; every case holds label and support stability of 95% or better; then highest minimum stability). They are
+the values that had been guessed. By the letter of the rules a qualifying band exists (11 of 20 settings). **Counting only the four cases that are real contests, none does**:
+rule (b) is carried by structural fixtures, and rule (a) by the `edge-mutual-exclusion` tie fixture. Uncertainty flattens strategic depth here and nothing tried
+restores it. Both readings select the same setting.
+
+**What was left alone:** with events on, **no value** of either calibrated parameter makes its case anything but dominance-solvable (30 of 30 values). The rule was to
+leave such a case as it is and document it, not to tune it to taste, so `P-RECALL` stays at 0.15 and the aurora scale at 1.0. Both cases are contested in outcome
+(the prosecution wins 11 to 23% and 17.5 to 42%) but not in strategy.
+
+**What changed in what ships.**
+* `courtroom/cases/events.py`: `helix-espionage`, `aurora-defi`, `kestrel-av` and `edge-poisoned-tree` carry the chosen `RuleSet`. The three fixtures (an empty
+  docket, a defense-only docket, an exact tie) stay plain: each shows one rule, and a random event would blur it. `PLAIN_CASES` is the library as it was.
+* The hostile credibility factor became a `RuleSet` field (`hostile_credibility`, default "1/4") so the sweep can vary it in worker processes; at 1/4 nothing moves.
+* The recorded language-model exhibition was played on the plain rulebook and is replayed on it (`get_plain_case`); its baseline is self-contained and unchanged.
+  `LLM_EXHIBITION.md` and the exhibition banner now say so.
+* **Certified analysis regenerated once.** `aurora-defi` pure becomes dominance-solvable (stability 80.5% becomes 100.0% label, 99.0% support); `kestrel-av` mixed becomes
+  dominance-solvable (98.0% becomes 99.5%); `helix-espionage` stays mixed with a new mixture (837/1009 and 172/1009 for the prosecution) and 100% stability;
+  the others are unchanged. The sensitivity sweep and the proof-bar ladder were regenerated with them.
+* **Pinned digests.** 15 of 42 changed, all in the three cases whose trials events touched. Each was confirmed to trace to this edit before anything was regenerated:
+  with events off, the plain library reproduces all 42 old digests (`tests/golden/digests_plain.json`, never regenerated), and every moved digest belongs to a case that ships with
+  events (`test_every_shipped_digest_that_moved_is_a_case_that_ships_with_events`). `tests/golden/digests.json` was regenerated for the shipped cases.
+* **The certified `results/*.json` are now tracked.** They had been gitignored as "regenerable", which meant a fresh clone had nothing to compare a regeneration against and two tests would have failed there. They are 100 KB in total.
+* `results/adverse/` and the `-adverse` registry were removed: the shipped cases are those variants, and the sweep's `default` row supersedes the old analysis.
+
+**Open, stated plainly.** The rates are chosen, not observed. The plateau is narrow in the joint direction (all rates x1.5 fails the stability floor by half a point).
+`aurora-defi` sits 4% above a win-rate cliff (label unaffected). Conservative strategies that rarely offer an exposed exhibit stay flat. See section 7 of the sweep document.
 
 ## Corrections to claims made about the repo (no code or doc changed)
 

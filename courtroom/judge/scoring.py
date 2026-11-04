@@ -80,7 +80,8 @@ def credibility(item: EvidenceItem, case: CaseFile, impeachments: Mapping[str, i
         if impeachments.get(exposure_key(item.witness_id, ground), 0):
             value *= EXAM_FACTORS[ground]
     if impeachments.get(hostile_key(item.witness_id), 0):
-        value *= HOSTILE_FACTOR
+        # The case's own published factor when it has one; the module default otherwise (and for every case without events).
+        value *= Fraction(case.rules.hostile_credibility) if case.rules is not None else HOSTILE_FACTOR
     return value
 
 

@@ -15,6 +15,7 @@ from __future__ import annotations
 import math
 import random
 from collections.abc import Sequence
+from fractions import Fraction
 
 from courtroom.agents import Agent, Oracle, ScoreCache, make_agent, perceive, perceive_witnesses
 from courtroom.contracts import (
@@ -186,6 +187,7 @@ class Court:
                     "no_show": self.case.rules.no_show,  # type: ignore[union-attr]
                     "missing_certificate": self.case.rules.missing_certificate,  # type: ignore[union-attr]
                     "hostile": self.case.rules.hostile,  # type: ignore[union-attr]
+                    "hostile_factor": float(Fraction(self.case.rules.hostile_credibility)),  # type: ignore[union-attr]
                 }
                 if self.case.adverse_events
                 else {}

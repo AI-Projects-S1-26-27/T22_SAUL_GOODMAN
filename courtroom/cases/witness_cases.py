@@ -10,7 +10,7 @@ guessable through the noisy channel: a spouse is interested, an informant is inc
 
 from __future__ import annotations
 
-from courtroom.cases.library import CASES
+from courtroom.cases.library import PLAIN_CASES
 from courtroom.contracts import CaseFile, RuleSet
 
 # case id -> {witness id: flaws to set to False}
@@ -48,6 +48,6 @@ def _with_witness_rules(case: CaseFile, flaws: dict[str, tuple[str, ...]]) -> Ca
 
 
 WITNESS_CASES: dict[str, CaseFile] = {
-    f"{cid}-witnesses": CaseFile.model_validate(_with_witness_rules(CASES[cid], flaws).model_dump(mode="json"))
+    f"{cid}-witnesses": CaseFile.model_validate(_with_witness_rules(PLAIN_CASES[cid], flaws).model_dump(mode="json"))
     for cid, flaws in _FLAWS.items()
 }

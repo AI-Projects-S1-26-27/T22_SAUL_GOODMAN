@@ -3,7 +3,7 @@
 Everything below is something you can re-run. Each command says what a correct result looks like. Where a number below
 was measured on one machine, the machine is named. Where a claim cannot be reproduced from a clean checkout, it says so.
 
-Measured at commit `ff0ee71` plus the files in this change, on an Apple M3 Pro (18 GB, Python 3.14.7,
+Measured on the `calibration-sweep` branch (after `afba8fc`), on an Apple M3 Pro (18 GB, Python 3.14.7,
 4 worker processes). Needs Python 3.11 or newer.
 
 ```bash
@@ -19,7 +19,7 @@ pip install -e ".[dev]"
 | Claim | Command | A correct result |
 |---|---|---|
 | The same case, seeds and strategies always give the same verdict, event for event | `python -m courtroom verify` | Two identical digests, `bit-identical results: YES   hash chain valid: YES` |
-| The test suite passes | `python -m pytest` | `935 passed` (about 90 s) |
+| The test suite passes | `python -m pytest` | `1008 passed` (about 90 s) |
 | 42 pinned trials still hash to the digests recorded before the later features were built | `python -m pytest tests/test_golden.py` | 42 digests plus one size check pass. The file is `tests/golden/digests.json`; only the aurora and kestrel entries were ever regenerated, and only for a documented case change (D14) |
 | The engine survives random and illegal play | `python -m courtroom stress --cases 100` | `"trials": 2500`, `"crashes": 0`, `"invariant_failures": 0`, `"failures": []`, 250 deterministic replays |
 | The judge and every core package import nothing from the language-model layer | `python -m pytest tests -k "language_model_layer or only_reachable or reaches_nothing or do_not_import_the_llm"` | 5 pass; each parses the source of the core packages (`contracts judge procedure agents engine cases gametheory`) for an import of `courtroom.llm` |
@@ -34,16 +34,24 @@ python -m courtroom analysis --out /tmp/prov/analysis --workers 4
 for f in payoffs bootstrap sensitivity; do cmp results/$f.json /tmp/prov/analysis/$f.json && echo "$f identical"; done
 ```
 
-I ran exactly this on the commit above: all three files were byte-identical. Their SHA-256 hashes at this commit:
+The files are tracked in git (`results/payoffs.json`, `bootstrap.json`, `sensitivity.json`), so a fresh clone has them to compare against. Regenerating on the commit below gave byte-identical files. Their SHA-256 hashes at this commit:
 
 ```
-9e5e830ed003a8ecfdcedac7e9995be1be42689fcb508b00268c32a7273d3d79  results/payoffs.json
-94d7d8e2c3557ad8f8cfbacdd0e7fce7022631dd3641001996706e94ef750449  results/bootstrap.json
-956d58c8e8d2881911996df1bb8cd9bbee9b8426b6d48ed9be737b94c4001410  results/sensitivity.json
+91175dec19d4c5dd4530239270a27385d1c7250265a38caca2f7f6b325fb1608  results/payoffs.json
+cf27c8909a13bfcd85244c0163afa7f6f9020af5ba38dacb5284b8f4a28b5642  results/bootstrap.json
+b04b459d2f5b9265ee23dd0c1fc33a91424bfb9492aa064e34847aeb0cbec933  results/sensitivity.json
 ```
 
-The same command regenerates the opt-in analysis of the adverse-event variants (`--cases helix-espionage-adverse,...`, output
-under `results/adverse/`). Those are not part of the certified numbers.
+The calibration that chose the adverse-event rates is separate and also reproducible (about 22 minutes plus 8):
+
+```bash
+python scripts/calibration_sweep.py --out /tmp/events.jsonl --workers 4
+python scripts/calibration_cases.py --no-show 0.10 --missing-certificate 0.15 --hostile 0.10 --out /tmp/cases.jsonl
+python scripts/render_calibration.py          # the tables of docs/CALIBRATION_SWEEP.md
+```
+
+Compare each with `results/calibration/`; the figures are exact for the same seeds and code. `tests/test_shipped_events.py` checks that the shipped rates are the
+ones that data select.
 
 Then the static web bundle (about 6 minutes), which embeds the trials, games, proof-bar ladder, case briefs and verdict accounts:
 
@@ -52,7 +60,7 @@ python -m courtroom export --out /tmp/prov/export
 cmp /tmp/prov/export/bundle.js courtroom/viz/web/data/bundle.js && echo identical
 ```
 
-Byte-identical at this commit (`dac38cc3...b80c`). A previous version of this file was **not** identical: it had been patched by
+Byte-identical at this commit (`cd3f2642...011a`). A previous version of this file was **not** identical: it had been patched by
 hand, and was missing a field added to the trial record. It was regenerated with the command above as part of writing this page.
 
 ## 3. Replay the language-model exhibition from the cache (seconds, no key, no network)
@@ -97,7 +105,8 @@ Counted by `pytest --collect-only` at each commit (a throwaway checkout per comm
 | `c12a7ca` | case briefs | 892 | 318 | D1 to D16 |
 | `9cfad25` | Ollama provider | 914 | 337 | D1 to D17 |
 | `ff0ee71` | verdict explainer | 932 | 353 | D1 to D18 |
-| this change | this page and its hash test | 935 | 356 | D1 to D18 |
+| `afba8fc` | this page and its hash test | 935 | 356 | D1 to D18 |
+| this change | calibration sweep, events shipped on, instructor note | 1008 | 378 | D1 to D19 |
 
 The 483 matches what the repository's own README claimed on first receipt. To redo a row: `git worktree add /tmp/wt <commit>`, then
 `cd /tmp/wt && PYTHONPATH=. python -m pytest --collect-only -q`, and add up the per-file counts. Collected is not passed: the pass
@@ -112,7 +121,7 @@ D1 late disclosure observable · D2 relevance guard · D3 `kestrel-av` trivial a
 single-process · D5 alternating turns · D6 generator fix · D7 rebuttal can still add support (**known, not fixed**) · D8 optional
 Gemini layer · D9 proof bar as a parameter · D10 evidence injection · D11 cache-only exhibition mode · D12 top-4-facts cap ·
 D13 witness examination · D14 case rebalance (**result-driven, said so**) · D15 adverse events (seeded and pushed) · D16 case
-brief · D17 Ollama · D18 verdict explainer.
+brief · D17 Ollama · D18 verdict explainer · D19 adverse events ship on at measured rates, aurora and kestrel left as they were.
 
 ### 4.3 The top-4-facts cap (D12)
 
@@ -127,25 +136,25 @@ The proposal (Sec. 6) says the score uses "the four facts with the largest |v| p
 Check: `python -m pytest tests/test_fact_cap.py`. It also pins that setting `rules.MAX_FACTS_PER_SIDE = None` restores the old
 judge, and that no library trial changes either way.
 
-### 4.4 The sensitivity sweep and the proof-bar ladder
+### 4.4 The sensitivity sweeps and the proof-bar ladder
 
 `results/sensitivity.json` perturbs each parameter group by 25% and the criminal bar over 80 to 95%; `RESULTS.md` section 4 tables
-which case labels survive. Current figures, reproduced by section 2 above:
+which case labels survive. Current figures (adverse events on, D19), reproduced by section 2 above:
 
 | Case | Label | Survives | Breaks under |
 |---|---|---|---|
 | `helix-espionage` | mixed | 11 of 14 | `LLR_SCALE -25%`, `standards +25%`, bar 95% |
-| `aurora-defi` | pure | 12 of 14 | `sanctions -25%`, `PRIOR_DEFECT_RATE -25%` |
-| `kestrel-av` | mixed | 12 of 14 | `costs +25%`, `LLR_SCALE +25%` |
+| `aurora-defi` | dominance-solvable | 13 of 14 | `PRIOR_DEFECT_RATE -25%` |
+| `kestrel-av` | dominance-solvable | 13 of 14 | `sanctions -25%` |
 | `edge-mutual-exclusion` | pure | 13 of 14 | `PRIOR_DEFECT_RATE -25%` |
-| the other three fixtures | pure | 14 of 14 | none |
+| the other three | pure | 14 of 14 | none |
 
-Bootstrap label stability (200 resamples of 200 seeds): helix 100%, kestrel 98.0%, **aurora 80.5%**, the five others 100%.
+Bootstrap stability, label / support (200 resamples of 200 seeds): helix 100.0 / 100.0%, aurora 100.0 / 99.0%, kestrel 99.5 / 99.5%, the four others 100 / 100%.
 
-The two rebalanced cases were tuned by measurement, and the appendix of `docs/LEGAL_AND_BALANCE_AUDIT.md` publishes the sweep that
-justifies where the values sit: `kestrel-av` has a contested band for the clean exhibit's strength of about 0.075 to 0.25, a cliff
-to about 99% prosecution wins at 0.275, and is shipped at 0.15; `aurora-defi` has a contested band from a defense scale of 0.96
-upward and is shipped at 1.0, with label stability 80.5% across the band. **Neither case is a robust design**; the audit says so.
+The adverse-event rates themselves are swept in `docs/CALIBRATION_SWEEP.md` (21 settings x 7 cases, `results/calibration/events.jsonl`), and the two
+case values that depend on them in `results/calibration/cases.jsonl` (30 values). The finding there: with events on, **no value** of either case parameter makes
+`aurora-defi` or `kestrel-av` anything but dominance-solvable, so they were left as they were and documented, not tuned (D19). It also records that
+the selection rules are satisfied by the letter but not when only the four real contests are counted. **Neither rebalanced case is a robust design**; D14 and D19 say so.
 
 ### 4.5 Measurement bugs we found and fixed (and one we did not)
 
@@ -165,6 +174,10 @@ Listing these is the point: a result that looks perfect is the most suspicious o
 | The design document estimated regeneration at about 10 minutes; measured 13 min 56 s, and the estimate for a 6x6 space was low by about 3x | timing the real run | `docs/DESIGN_WITNESS_POINTS.md` section 6.3 |
 | A string splice into `app.js` deleted three functions the page still called | the page broke | `tests/ui_smoke.cjs` runs the real JavaScript in Node, with mutation tests that must go red |
 | The committed bundle files had been patched by hand and were missing a field | `cmp` against a fresh export while writing this page | regenerated (section 2 and 3) |
+| The three certified `results/*.json` files were **gitignored**, so they had never been committed; "byte-identical to the committed results" in an earlier version of this page was true only of files on one machine, and two tests that read them would have failed on a clean clone | checking what `git status` did not show after regenerating | `.gitignore` no longer excludes them, they are committed, and the fresh-clone check below now passes |
+| In the calibration tables, 99.5% printed as "100" (Python rounds half to even in `:.0f`), hiding a real half-point | a cross-check of the sweep against the certified bootstrap, which said 99.5 | tables print one decimal; `test_shipped_stability_figures_agree_with_the_certified_bootstrap` |
+| `HANDOFF.md` said the library "ships with events on" when it did not: the certified library was on the plain rulebook | tracing why the pinned digests would or would not change | corrected in `HANDOFF.md` and `docs/CALIBRATION_SWEEP.md`; D19 makes the statement true |
+| Selection rule (b) was satisfied by structural fixtures, so a "qualifying band" existed that said nothing about strategic depth | reading which five cases counted as contested | reported both ways in `docs/CALIBRATION_SWEEP.md`; pinned by `test_no_setting_qualifies_when_only_the_cases_that_are_real_contests_are_counted` |
 
 **Still wrong or unsettled, stated plainly:**
 
@@ -180,5 +193,5 @@ Listing these is the point: a result that looks perfect is the most suspicious o
   (`tests/test_ollama.py`); see `docs/OLLAMA.md`.
 * **Nothing here establishes legal accuracy.** `docs/LEGAL_AND_BALANCE_AUDIT.md` lists where the engine diverges from the Indian-procedure
   notes (for example, it excludes illegally obtained evidence, which the notes say Indian law does not).
-* **The witness-examination variants have not been solved as games.** Only the adverse-event variants have (`results/adverse/`).
+* **The witness-examination variants have not been solved as games.** The adverse-event rules have: they are now the shipped configuration of four cases, and `results/calibration/` is the sweep over their rates.
 * **The rebalanced cases were tuned after measuring**, which D3 had refused to do. D14 records that it was done and why.

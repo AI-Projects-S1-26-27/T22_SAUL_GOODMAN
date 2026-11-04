@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from courtroom.cases import CASES
+from courtroom.cases import CASES, get_plain_case
 from courtroom.engine import run_trial
 from courtroom.gametheory import estimate_payoffs
 from courtroom.gametheory.bootstrap import equilibrium_label
@@ -147,7 +147,7 @@ def test_exhibition_trials_replay_from_the_cache_with_no_network(exhibition, mon
     monkeypatch.setattr(LLMClient, "_sdk", boom)
     client = LLMClient(allow_network=False)
     meta = exhibition["meta"]
-    case = CASES[meta["case_id"]]
+    case = get_plain_case(meta["case_id"])  # the exhibition was recorded on the plain rulebook
     for side, opponent, seed in ((Side.PROSECUTION, "aggressive", 0), (Side.DEFENSE, "conservative", 3), (Side.PROSECUTION, "mixed:0.5", 4)):
         court, _ = build_court(case, side, opponent, seed, client)
         result = court.run()

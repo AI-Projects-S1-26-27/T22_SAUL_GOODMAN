@@ -306,11 +306,12 @@ class CounselAgent:
         if f"no_show:{item.id}" in known or f"missing_certificate:{item.id}" in known:
             return 0.0  # announced in court: the exhibit will fail when offered
         keep = 1.0
+        factor = view.adverse.get("hostile_factor", 0.25)
         if item.witness_id is not None and f"hostile:{item.witness_id}" in known:
-            keep *= 0.25
+            keep *= factor
         if view.adverse:
             if item.witness_id is not None:
-                keep *= (1.0 - view.adverse["no_show"]) * (1.0 - 0.75 * view.adverse["hostile"])
+                keep *= (1.0 - view.adverse["no_show"]) * (1.0 - (1.0 - factor) * view.adverse["hostile"])
             if item.kind is EvidenceKind.DIGITAL_LOG:
                 keep *= 1.0 - view.adverse["missing_certificate"]
         return keep

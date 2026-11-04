@@ -9,7 +9,7 @@ import pytest
 from pydantic import ValidationError
 
 from courtroom.agents import Oracle, ScoreCache
-from courtroom.cases import CASES
+from courtroom.cases import CASES, PLAIN_CASES
 from courtroom.contracts import CaseFile, StandardOfProof
 from courtroom.engine import run_trial
 from courtroom.judge.rules import (
@@ -21,7 +21,7 @@ from courtroom.judge.rules import (
     threshold_met,
 )
 
-HELIX = CASES["helix-espionage"]
+HELIX = PLAIN_CASES["helix-espionage"]  # these tests are about the proof bar, so they run on the plain rulebook
 
 
 def _with_bar(case: CaseFile, probability: float) -> CaseFile:

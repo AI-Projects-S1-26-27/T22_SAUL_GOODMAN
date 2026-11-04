@@ -26,6 +26,7 @@ exhibition from the committed cache needs no API key and spends nothing.
 | Model | `gemini-3.1-flash-lite` |
 | Temperature | 0.0 |
 | Case | `helix-espionage` |
+| Rulebook | the plain rulebook, **no adverse events** (the shipped library has them on since D19; this run predates that) |
 | Seeds per pairing | 5 (0, 1, 2, 3, 4) |
 | Opponents | `aggressive`, `conservative`, `adaptive`, `mixed:0.5` |
 | Trials completed | 40 of 40 |

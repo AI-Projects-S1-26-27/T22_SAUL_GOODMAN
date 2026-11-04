@@ -2,13 +2,13 @@
 
 Run locally for the full app: `python -m courtroom serve --port 8000`, then open <http://127.0.0.1:8000>.
 The static Vercel build shows the bundled data only; the case editor, injection and "recompute" buttons need the local server.
-Pick **helix-espionage** unless a step says otherwise. Aurora and kestrel are now contested too (D14). Tab names: Overview, Courtroom, Case file, Verdict, Strategy, The judge.
+Pick **helix-espionage** unless a step says otherwise. Helix, aurora, kestrel and the poisoned-tree case ship with adverse events on (D19). Aurora and kestrel are contested in outcome but dominance-solvable in strategy. Tab names: Overview, Courtroom, Case file, Verdict, Strategy, The judge.
 
 | # | Show | Do this | Point at |
 |---|---|---|---|
-| 1 | Verification | Terminal: `python -m pytest -q` then `python -m courtroom verify` | **935 passed**. Verify prints two identical digests, "bit-identical: YES, hash chain valid: YES" |
+| 1 | Verification | Terminal: `python -m pytest -q` then `python -m courtroom verify` | **1008 passed**. Verify prints two identical digests, "bit-identical: YES, hash chain valid: YES" |
 | 1c | Explain the verdict | Verdict tab, press **Explain this verdict in plain words** | Prose plus a table of the judge's own scores and bars. With Ollama running it is phrased by the local model and every figure is checked; without it, a template |
-| 2 | Strategy tab | Open **Strategy** | Payoff matrix and exact fractions. helix has **no dominant strategy**; prosecution plays Conservative 711/821, defense Adaptive 7870/8447. Bootstrap stability 100% |
+| 2 | Strategy tab | Open **Strategy** | Payoff matrix and exact fractions. helix has **no dominant strategy**; prosecution plays Conservative 837/1009 and Adaptive 172/1009, defense Conservative 5395/20224 and Adaptive 14829/20224. Bootstrap stability 100%. Aurora and kestrel are now dominance-solvable (Conservative), by measurement: see `docs/CALIBRATION_SWEEP.md` |
 | 3 | The judge + slider | Open **The judge**, drag the bar slider (`thr-slider`) from 90% to 95%, press **Replay the trial at this bar** | The verdict flips; at 95% the prosecution cannot win. 80 to 90% is the stable mixed band. Press **Recompute the equilibrium** to show the label change |
 | 4 | Case editor | In the **Case file** area find "Write your own case"; add a short case and run it | Judge's per-point breakdown; "not counted" rows now explain the top-4 cap |
 | 5 | Evidence injection | Find the injection panel ("Add it and replay from here"); add a defense exhibit mid-trial | Timeline gets an injection event; the hash chain commits to the exhibit; a defense exhibit that helps the prosecution is refused |
@@ -16,7 +16,8 @@ Pick **helix-espionage** unless a step says otherwise. Aurora and kestrel are no
 | 5b | Adverse event | In the Courtroom tab open "Push an adverse event mid-trial"; pick Adaptive for both sides, "A digital record has no section 65B certificate", target `P-VPN`, press **Push it and replay from here** | The panel shows the court being told, then each side's first changed decision: Adaptive drops `P-VPN` ("expected survival is 0.00"); switch the style to Aggressive and it offers it anyway and loses it |
 | 6 | Witness / cross-exam | **Terminal only** (variants are not in the web case list): `python -m courtroom run --case kestrel-av-witnesses -p aggressive -d aggressive --seed 0` | Events 17, 27, 28: "cross-examines W-ENG on qualifications: a real flaw", then "cross-examines W-EYE2 ... a real flaw" and "rehabilitated". Add `--narrate` for the Q and A lines. Try `helix-espionage-witnesses`: Conservative never cross-examines |
 | 7 | Gemini exhibition | Click **LLM exhibition** in the mode bar | Banner says "not certified / not equilibrium"; 40 replayed trials, no key and no network used; the matrix is replaced by the model's own results |
-| 8 | Close | Switch back to **Deterministic** | The page always opens certified; nothing above changed the certified results; the only certified change on this branch is the D14 rebalancing of aurora and kestrel |
+| 7b | Calibration | `docs/CALIBRATION_SWEEP.md` | 21 settings x 7 cases, stability of label and support, and why the aurora and kestrel values were left alone |
+| 8 | Close | Switch back to **Deterministic** | The page always opens certified; nothing above changed the certified results; the certified results changed once, in D19, when adverse events were switched on at the measured rates |
 
 ## Key numbers
 
