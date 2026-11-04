@@ -37,12 +37,12 @@ Measured against the current engine, in which **the two sides alternate turns** 
 
 | Check | Command | Result |
 |---|---|---|
-| Test suite | `python -m pytest` | **1010 passed, 0 failed** |
+| Test suite | `python -m pytest` | **1016 passed, 0 failed** |
 | Fuzz | `python -m courtroom stress --cases 100` | 2,500 trials, **0 crashes, 0 invariant failures** |
 | Replay determinism | `python -m courtroom verify` | 250/250 replays bit-identical; every case × pairing combination gives identical digests and valid hash chains |
 
-The suite is 380 test functions across 25 files, which `@pytest.mark.parametrize` expands into the **1010 test
-cases** pytest reports. 1010 is what the tool prints.
+The suite is 386 test functions across 25 files, which `@pytest.mark.parametrize` expands into the **1016 test
+cases** pytest reports. 1016 is what the tool prints.
 
 Fuzz verdict mix over 2,500 generated cases: 1,548 directed acquittal · 559 liable · 273 not
 guilty · 78 guilty · 42 not liable. The generator produces weak cases — **61.9% end at the
@@ -128,7 +128,7 @@ Each parameter group perturbed by ±25%, plus the criminal standard swept across
 | `edge-poisoned-tree` | **every variation** | — |
 | `edge-defense-only` | **every variation** | — |
 
-**3 of seven cases are completely parameter-independent** (the structural edge fixtures: their outcomes follow from
+**Three of seven cases are completely parameter-independent** (the structural edge fixtures: their outcomes follow from
 the rules, not from any tuned constant). The others are parameter-dependent, and the table says exactly which constant each depends on.
 No claim about them should be stated without that constant.
 

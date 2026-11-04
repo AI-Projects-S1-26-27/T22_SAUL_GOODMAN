@@ -18,7 +18,7 @@ pip install -e ".[dev]"
 | What | Command | Correct result |
 |---|---|---|
 | Determinism: same case, seeds and strategies give the same events and verdict | `python -m courtroom verify` | `bit-identical results: YES   hash chain valid: YES` |
-| The test suite | `python -m pytest` | 1010 passed, about 90 seconds |
+| The test suite | `python -m pytest` | 1016 passed, about 90 seconds |
 | 42 pinned trial digests | `python -m pytest tests/test_golden.py` | all pass; a failure means the certified engine changed |
 | Fuzz | `python -m courtroom stress --cases 100` | `"trials": 2500`, `"crashes": 0`, `"failures": []` |
 | The certified analysis regenerates exactly | `python -m courtroom analysis --out /tmp/a --workers 4` then `cmp results/payoffs.json /tmp/a/payoffs.json` (and the other two files) | byte-identical; about 14 minutes |
