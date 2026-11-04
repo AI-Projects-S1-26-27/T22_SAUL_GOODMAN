@@ -93,6 +93,8 @@ for it that I had not tested.
 **no language model**". It is recorded as deviation **D8** in [`DEVIATIONS.md`](DEVIATIONS.md) and
 is an *addition beside* the certified core, never a replacement for any part of it.
 
+**Instructor clearance: verbal, not written.** The instructor cleared the use of a language model verbally on 4 November 2026; there is no written record. This does not change how it is isolated: nothing in the core imports it, and nothing it writes reaches a verdict, a digest or a payoff matrix.
+
 **Why that model.** Flash-Lite is the cheapest tier on the key. A *pinned* version was chosen over
 the `gemini-flash-lite-latest` alias because an alias can silently change model underneath a
 committed cache, which would destroy the reproducibility the cache exists to provide. Two

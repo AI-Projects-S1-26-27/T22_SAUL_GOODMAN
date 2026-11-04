@@ -86,6 +86,8 @@ rebuttal. Alternating turns reduced the problem because most defense evidence is
 
 ## D8 — an optional LLM layer, beside the certified core
 
+**Instructor clearance: verbal, not written.** The instructor cleared the use of a language model in this project verbally on 4 November 2026 (this covers the Gemini and Ollama providers, narration, the exhibition and the verdict explainer). There is no written record of it. The isolation claims below are unchanged: the core imports nothing from `courtroom/llm`, and no model output reaches a verdict, a digest or a payoff matrix.
+
 **Provider: Google Gemini**, model `gemini-3.1-flash-lite`, temperature 0, via `google-genai`.
 The Anthropic client that this layer first used has been removed along with its dependency.
 
@@ -195,6 +197,8 @@ prosecution has rested changes nothing, and the page says so. It needs the local
 static demo has no engine to replay with.
 
 ## D11 — the LLM opponent mode is a cache-only replay, and the page never opens in it
+
+**Instructor clearance: verbal, not written.** The instructor cleared the use of a language model in this project verbally on 4 November 2026 (this covers the Gemini and Ollama providers, narration, the exhibition and the verdict explainer). There is no written record of it. The isolation claims below are unchanged: the core imports nothing from `courtroom/llm`, and no model output reaches a verdict, a digest or a payoff matrix.
 
 Requested: a deterministic-versus-LLM-exhibition toggle whose LLM mode "must use the cache only and
 show a clear 'exhibition, not equilibrium' label".
@@ -328,7 +332,7 @@ public ruling only. The prompt names the line of questioning and the outcome the
 never carries a witness's flaw flags (`test_examination_prompts_carry_the_public_record_and_never_a_hidden_flaw`),
 and no core package imports `courtroom.llm` (`test_no_core_package_imports_the_language_model_layer`).
 Template fallback with no key or cold cache. **This is a second narrated move type, not a new kind of
-language-model use**; the instructor check on the proposal's "no language model" line is still open.
+language-model use**; the instructor cleared the use of a language model verbally on 4 November 2026 (not in writing).
 
 **Not done.** The web case list does not offer the witness variants and the exhibition bundle contains no
 examination trials. The Gemini policy agent is not told about the new moves. The strategy space is
@@ -501,6 +505,8 @@ events). It is shown as the opening screen of the Courtroom tab and folds away o
 
 ## D17 — Ollama as a second language-model provider (exhibition only; no result changed)
 
+**Instructor clearance: verbal, not written.** The instructor cleared the use of a language model in this project verbally on 4 November 2026 (this covers the Gemini and Ollama providers, narration, the exhibition and the verdict explainer). There is no written record of it. The isolation claims below are unchanged: the core imports nothing from `courtroom/llm`, and no model output reaches a verdict, a digest or a payoff matrix.
+
 `courtroom/llm/ollama.py` adds `OllamaClient`, a subclass of the Gemini `LLMClient` that swaps only the transport (a local HTTP
 call to `/api/chat`). The cache, the per-trial and per-run caps, the usage counters and the never-raises rule are inherited.
 Selection is by `COURTROOM_LLM_PROVIDER` or `--provider`; `make_client` is the one place that decides.
@@ -520,6 +526,8 @@ Selection is by `COURTROOM_LLM_PROVIDER` or `--provider`; `make_client` is the o
   pre-demo check.
 
 ## D18 — "Why did it rule that way?": a verdict explainer that reads the record and cannot change it
+
+**Instructor clearance: verbal, not written.** The instructor cleared the use of a language model in this project verbally on 4 November 2026 (this covers the Gemini and Ollama providers, narration, the exhibition and the verdict explainer). There is no written record of it. The isolation claims below are unchanged: the core imports nothing from `courtroom/llm`, and no model output reaches a verdict, a digest or a payoff matrix.
 
 A button on the Verdict tab writes a plain-language account of the verdict (`courtroom/llm/explainer.py`, `POST /api/explain`).
 

@@ -104,10 +104,12 @@ recommended model (`qwen3:8b`) and all speed figures in `docs/OLLAMA.md` are unt
 exhibits in five places, has no final-argument phase, and the section 65B certificate is modelled only as a random event, not as an admissibility
 attribute with a cure. Civil cases use the labels "prosecution" and "defense" for the plaintiff and defendant.
 
-### 3.7 The instructor has not signed off on using a language model
+### 3.7 Instructor clearance for the language-model layer: verbal only
 The proposal says the contribution is a formal game with **no language model**. The optional Gemini and Ollama layers (D8, D11, D17), narration, the
-exhibition and the verdict explainer (D18) are an addition that has not been cleared. They are isolated so they can be deleted without moving a certified
-result, but until the instructor agrees, treat them as at risk. The decision to ask is the team's.
+exhibition and the verdict explainer (D18) are an addition to that. **The instructor cleared the use of a language model verbally on 4 November 2026.
+It was not given in writing and there is no record beyond this note.** If a written confirmation matters for marking, it still needs to be requested.
+The layer remains isolated exactly as before, so it can be deleted without moving a certified result: nothing in the core imports it and nothing it
+writes reaches a verdict, a digest or a payoff matrix.
 
 ### 3.8 Smaller things
 * D7: rebuttal evidence can still add support after the directed-verdict review. Pinned by `test_any_post_dv_rise_is_confined_to_rebuttal`, not fixed.
