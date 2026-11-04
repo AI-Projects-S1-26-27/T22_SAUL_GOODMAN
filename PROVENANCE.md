@@ -19,7 +19,7 @@ pip install -e ".[dev]"
 | Claim | Command | A correct result |
 |---|---|---|
 | The same case, seeds and strategies always give the same verdict, event for event | `python -m courtroom verify` | Two identical digests, `bit-identical results: YES   hash chain valid: YES` |
-| The test suite passes | `python -m pytest` | `1008 passed` (about 90 s) |
+| The test suite passes | `python -m pytest` | `1010 passed` (about 90 s) |
 | 42 pinned trials still hash to the digests recorded before the later features were built | `python -m pytest tests/test_golden.py` | 42 digests plus one size check pass. The file is `tests/golden/digests.json`; only the aurora and kestrel entries were ever regenerated, and only for a documented case change (D14) |
 | The engine survives random and illegal play | `python -m courtroom stress --cases 100` | `"trials": 2500`, `"crashes": 0`, `"invariant_failures": 0`, `"failures": []`, 250 deterministic replays |
 | The judge and every core package import nothing from the language-model layer | `python -m pytest tests -k "language_model_layer or only_reachable or reaches_nothing or do_not_import_the_llm"` | 5 pass; each parses the source of the core packages (`contracts judge procedure agents engine cases gametheory`) for an import of `courtroom.llm` |
@@ -106,7 +106,7 @@ Counted by `pytest --collect-only` at each commit (a throwaway checkout per comm
 | `9cfad25` | Ollama provider | 914 | 337 | D1 to D17 |
 | `ff0ee71` | verdict explainer | 932 | 353 | D1 to D18 |
 | `afba8fc` | this page and its hash test | 935 | 356 | D1 to D18 |
-| this change | calibration sweep, events shipped on, instructor note | 1008 | 378 | D1 to D19 |
+| this change | calibration sweep, events shipped on, instructor note | 1010 | 380 | D1 to D19 |
 
 The 483 matches what the repository's own README claimed on first receipt. To redo a row: `git worktree add /tmp/wt <commit>`, then
 `cd /tmp/wt && PYTHONPATH=. python -m pytest --collect-only -q`, and add up the per-file counts. Collected is not passed: the pass
@@ -152,7 +152,7 @@ which case labels survive. Current figures (adverse events on, D19), reproduced 
 Bootstrap stability, label / support (200 resamples of 200 seeds): helix 100.0 / 100.0%, aurora 100.0 / 99.0%, kestrel 99.5 / 99.5%, the four others 100 / 100%.
 
 The adverse-event rates themselves are swept in `docs/CALIBRATION_SWEEP.md` (21 settings x 7 cases, `results/calibration/events.jsonl`), and the two
-case values that depend on them in `results/calibration/cases.jsonl` (30 values). The finding there: with events on, **no value** of either case parameter makes
+case values that depend on them in `results/calibration/cases.jsonl` (32 values). The finding there: with events on, **no value** of either case parameter makes
 `aurora-defi` or `kestrel-av` anything but dominance-solvable, so they were left as they were and documented, not tuned (D19). It also records that
 the selection rules are satisfied by the letter but not when only the four real contests are counted. **Neither rebalanced case is a robust design**; D14 and D19 say so.
 

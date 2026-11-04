@@ -560,7 +560,7 @@ on, both cases became dominance-solvable. `docs/CALIBRATION_SWEEP.md` replaces t
 
 **What was measured** (`results/calibration/`, 200 seeds, 200 bootstrap resamples, all seven cases, strategy space frozen at 4x4): 21 settings of the four
 parameters (each alone, and the three rates together), recording equilibrium label, supports, label stability, support stability, and per-strategy payoff sd; then the
-two case values (`P-RECALL` strength, aurora defense-evidence scale) swept at the chosen rates, 30 values.
+two case values (`P-RECALL` strength, aurora defense-evidence scale) swept at the chosen rates, 32 values (including the exact +/-10% neighbours of each shipped value).
 
 **What was chosen:** no-show 10%, missing certificate 15%, hostile 10%, hostile credibility 1/4, by the rules set in advance (variance must rise where it was
 missing; at least 3 of 7 cases not dominance-solvable; every case holds label and support stability of 95% or better; then highest minimum stability). They are
@@ -568,7 +568,7 @@ the values that had been guessed. By the letter of the rules a qualifying band e
 rule (b) is carried by structural fixtures, and rule (a) by the `edge-mutual-exclusion` tie fixture. Uncertainty flattens strategic depth here and nothing tried
 restores it. Both readings select the same setting.
 
-**What was left alone:** with events on, **no value** of either calibrated parameter makes its case anything but dominance-solvable (30 of 30 values). The rule was to
+**What was left alone:** with events on, **no value** of either calibrated parameter makes its case anything but dominance-solvable (32 of 32 values). The rule was to
 leave such a case as it is and document it, not to tune it to taste, so `P-RECALL` stays at 0.15 and the aurora scale at 1.0. Both cases are contested in outcome
 (the prosecution wins 11 to 23% and 17.5 to 42%) but not in strategy.
 

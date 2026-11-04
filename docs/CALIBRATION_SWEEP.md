@@ -11,7 +11,7 @@ configuration stops being the one these data select.
 | Chosen adverse-event parameters | no-show **10%**, missing certificate **15%**, hostile **10%**, hostile credibility **x1/4**. These are the values that had been guessed; the sweep shows them inside a plateau, and no other tested setting scored better under the rules (two tied on minimum stability) |
 | Did a fully qualifying band exist? | **By the letter of rules (a) to (c): yes, 11 of 20 settings qualify.** Counting only the four cases that are real contests (not the three single-rule fixtures): **no setting qualifies**. That second reading is the one this document treats as the finding |
 | What was the finding | Adverse events raise payoff variance where it was missing and the stability stays high, but they make `aurora-defi` and `kestrel-av` **dominance-solvable** (Conservative against Conservative). Only `helix-espionage` keeps a mixed equilibrium. Uncertainty flattens strategic depth; nothing tried restores it |
-| Case values (`P-RECALL`, aurora defense scale) | **Left as they were.** With events on, no value of either parameter contests its case (every one of 30 values measured is dominance-solvable). Rule: document, do not tune |
+| Case values (`P-RECALL`, aurora defense scale) | **Left as they were.** With events on, no value of either parameter contests its case (every one of the 32 values measured is dominance-solvable). Rule: document, do not tune |
 | What shipped | the four cases with real play carry the events at the chosen rates; the three fixtures and the recorded exhibition stay on the plain rulebook |
 
 ### A correction to how this was framed
@@ -205,6 +205,8 @@ Bars show the prosecution's win-rate range across the 16 cells (`#` inside the r
   0.35 |.............................###        | 72.5-78.5%   domi 100.0/100.0
    0.4 |..............................###       | 73.0-82.0%   domi 100.0/100.0
    0.5 |...............................##       | 77.0-81.5%   domi 100.0/100.0
+ 0.135 |.......##########                       | 17.5-42.0%   domi 99.5/99.5
+ 0.165 |.......###########                      | 17.5-43.0%   domi 99.5/99.5
 ```
 
 | Value | Label | Label stab. | Support stab. | Win rate (min to max) |
@@ -224,6 +226,8 @@ Bars show the prosecution's win-rate range across the 16 cells (`#` inside the r
 | 0.35 | dominance-solvable | 100.0% | 100.0% | 72.5% to 78.5% |
 | 0.4 | dominance-solvable | 100.0% | 100.0% | 73.0% to 82.0% |
 | 0.5 | dominance-solvable | 100.0% | 100.0% | 77.0% to 81.5% |
+| 0.135 | dominance-solvable | 99.5% | 99.5% | 17.5% to 42.0% |
+| 0.165 | dominance-solvable | 99.5% | 99.5% | 17.5% to 43.0% |
 
 ### `aurora-defi`: scale on the three defense intent exhibits (shipped 1.0)
 
@@ -263,13 +267,14 @@ Bars show the prosecution's win-rate range across the 16 cells (`#` inside the r
 | 1.6 | dominance-solvable | 100.0% | 99.0% | 3.5% to 14.0% |
 | 1.8 | dominance-solvable | 100.0% | 99.0% | 3.5% to 13.5% |
 
-**No contested band exists.** Every one of the 30 values is **dominance-solvable**. The calibration rule was to choose from the middle of a contested
+**No contested band exists.** Every one of the 32 values is **dominance-solvable**. The calibration rule was to choose from the middle of a contested
 band and to leave a case as it is, documented as trivial, if none can be found without tuning to taste. None can, so both values were left unchanged.
 
 **Rejected values (instability).** `kestrel-av` at 0.20, 0.225 and 0.25 (label stability 93.5%, 89.5%, 84.0%); `aurora-defi` at 0.6 (support stability 65.5%).
 
-**The +/-10% check.** The rule rejects any value whose +/-10% neighbours flip the label. For the shipped values: the measured neighbours of `P-RECALL` 0.15 (0.125 and 0.175) and of aurora scale 1.0 (0.9 and 1.1) are all
-dominance-solvable, so **no value is rejected for flipping a label** (the exact +/-10% points, 0.135 and 0.165, were not measured; the points either side were). Two **outcome** cliffs do sit near the shipped values, and
+**The +/-10% check.** The rule rejects any value whose +/-10% neighbours flip the label. Both neighbours of each shipped value were measured exactly:
+`P-RECALL` 0.135 and 0.165 (around 0.15) and aurora scale 0.9 and 1.1 (around 1.0) are all dominance-solvable, with stability 99.5/99.5% and 100/99% respectively, so
+**no value is rejected for flipping a label**. Two **outcome** cliffs do sit near the shipped values, and
 the label rule does not see them: `kestrel-av`'s win rate jumps from 17.5 to 45.5% up to 70 to 76.5% between 0.25 and 0.275 (the shipped 0.15 is 0.10 below it);
 `aurora-defi`'s falls from 31 to 43% to 11 to 22.5% between 0.95 and 0.96, so the shipped 1.0 is **4% above a win-rate cliff**. Moving aurora to 1.15 would put it in
 the middle of that plateau. It was not moved, because doing so is the tuning the rule forbids.
@@ -280,6 +285,10 @@ the middle of that plateau. It was not moved, because doing so is the tuning the
 * **Certified analysis regenerated once.** Labels: `helix-espionage` mixed (unchanged, new mixture), `aurora-defi` pure to **dominance-solvable**,
   `kestrel-av` mixed to **dominance-solvable**, all others unchanged. Prosecution win-rate range: helix 0 to 100% becomes 0 to 68.5%; aurora 0 to 16.5% becomes
   11 to 23%; kestrel 0 to 42% becomes 17.5 to 42%.
+* **Exhibition baseline.** The recorded language-model exhibition was played on the plain rulebook, so its deterministic baseline (32 rows, 5 seeds) is kept on
+  the plain rulebook too, and was re-derived from a fresh run of the fixed strategies on `PLAIN_CASES`: all 32 rows match
+  (`test_the_exhibition_baseline_is_what_the_plain_rulebook_produces_now`). Mixing it with events-on figures would compare unlike games.
+* **Strategy tab.** It reads the regenerated bundle; its helix mixture (837/1009, 172/1009) is checked against `results/payoffs.json` by the bundle tests.
 * **Pinned digests:** 15 of 42 changed, all in the three cases whose trials events touched, and every one reproduces its old digest on the plain rulebook
   (`test_every_shipped_digest_that_moved_is_a_case_that_ships_with_events`). The plain rulebook still reproduces all 42 old digests.
 

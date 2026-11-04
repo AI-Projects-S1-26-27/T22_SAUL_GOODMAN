@@ -51,7 +51,7 @@ python -m courtroom serve
 Open <http://127.0.0.1:8000>. The local server runs the **live simulator**, so you can use any
 trial number, any pairing of styles (including a mixed strategy) and larger strategy games.
 
-Run the test suite (1008 tests):
+Run the test suite (1010 tests):
 
 ```bash
 python -m pytest
@@ -332,7 +332,7 @@ judge only through the read-only `Oracle`, and the visualisation layer can't inf
 - **Agent crashes:** caught at the fault barrier (`V-AGENT-FAULT`), including in `opening_statement()`.
 - **Demo infrastructure:** bundle fallback, works from `file://`, and `no-cache` headers.
 - **Verified:** a 2,500-trial fuzz run, including the Chaotic agent, had 0 crashes and 0 invariant
-  violations, and 250/250 replays were bit-identical. All 1008 tests pass (378 test functions,
+  violations, and 250/250 replays were bit-identical. All 1010 tests pass (380 test functions,
   parametrised). Measured figures and what they depend on are in [`RESULTS.md`](RESULTS.md).
 
 ---
@@ -383,7 +383,7 @@ RESULTS.md     measured equilibria, bootstrap stability, sensitivity sweep (curr
 docs/archive/  the earlier analysis write-up, kept on record and marked superseded
 docs/LLM_COST.md  what the Gemini exhibition cost, from Google's published rates
 DEVIATIONS.md  every intentional divergence from the proposal, with reasons
-tests/         378 test functions -> 1008 parametrised cases
+tests/         380 test functions -> 1010 parametrised cases
 ```
 
 ---

@@ -91,3 +91,30 @@ def test_shipped_stability_figures_agree_with_the_certified_bootstrap() -> None:
         measured = default[cid] if cid in EVENT_CASES else BASELINE["cases"][cid]
         assert measured["label_stability"] == certified[cid]["stability"], cid
         assert measured["label"] == certified[cid]["baseline_label"], cid
+
+
+def test_the_exact_plus_and_minus_ten_percent_neighbours_of_the_shipped_values_were_measured() -> None:
+    kestrel = {r["value"]: r for r in CASES_SWEEP if r["case"] == "kestrel-av"}
+    aurora = {r["value"]: r for r in CASES_SWEEP if r["case"] == "aurora-defi"}
+    for value in (0.135, 0.15, 0.165):
+        assert kestrel[value]["label"] == "dominance-solvable"
+    for value in (0.9, 1.0, 1.1):
+        assert aurora[value]["label"] == "dominance-solvable"
+    assert len(CASES_SWEEP) == 32
+
+
+def test_the_exhibition_baseline_is_what_the_plain_rulebook_produces_now() -> None:
+    """The recorded exhibition was played on the plain rulebook; its fixed-strategy baseline must still be that rulebook's output."""
+    from courtroom.contracts import Side
+    from courtroom.engine import run_trial
+
+    recorded = json.loads((ROOT / "results" / "llm_exhibition.json").read_text(encoding="utf-8"))
+    case = get_plain_case(recorded["case_id"])
+    assert len(recorded["deterministic_baseline"]) == 32
+    for row in recorded["deterministic_baseline"]:
+        side = Side(row["side"])
+        wins = 0
+        for seed in recorded["seeds"]:
+            pair = (row["strategy"], row["opponent"]) if side is Side.PROSECUTION else (row["opponent"], row["strategy"])
+            wins += run_trial(case, *pair, seed=seed).verdict.outcome.favours is side
+        assert wins / len(recorded["seeds"]) == row["win_rate"], row

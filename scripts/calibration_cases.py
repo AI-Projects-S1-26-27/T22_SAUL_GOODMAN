@@ -17,7 +17,7 @@ from pathlib import Path
 from courtroom.cases import PLAIN_CASES
 from courtroom.gametheory.calibration import measure_case, run_cells, with_events
 
-KESTREL = [0.0, 0.05, 0.075, 0.10, 0.125, 0.15, 0.175, 0.20, 0.225, 0.25, 0.275, 0.30, 0.35, 0.40, 0.50]
+KESTREL = [0.0, 0.05, 0.075, 0.10, 0.125, 0.135, 0.15, 0.165, 0.175, 0.20, 0.225, 0.25, 0.275, 0.30, 0.35, 0.40, 0.50]
 AURORA = [0.6, 0.7, 0.8, 0.9, 0.95, 0.96, 1.0, 1.05, 1.1, 1.15, 1.2, 1.3, 1.4, 1.6, 1.8]
 #: The defense intent exhibits as first shipped (D14); a scale of 1.0 means these values.
 AURORA_BASE = {"D-BOUNTY": -0.42, "D-RETURN": -0.45, "D-ZHAO": -0.45}
