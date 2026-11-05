@@ -6,7 +6,7 @@ Pick **helix-espionage** unless a step says otherwise. Helix, aurora, kestrel an
 
 | # | Show | Do this | Point at |
 |---|---|---|---|
-| 1 | Verification | Terminal: `python -m pytest -q` then `python -m courtroom verify` | **1016 passed**. Verify prints two identical digests, "bit-identical: YES, hash chain valid: YES" |
+| 1 | Verification | Terminal: `python -m pytest -q` then `python -m courtroom verify` | **1019 passed**. Verify prints two identical digests, "bit-identical: YES, hash chain valid: YES" |
 | 1c | Explain the verdict | Verdict tab, press **Explain this verdict in plain words** | Prose plus a table of the judge's own scores and bars. With Ollama running it is phrased by the local model and every figure is checked; without it, a template |
 | 2 | Strategy tab | Open **Strategy** | Payoff matrix and exact fractions. helix has **no dominant strategy**; prosecution plays Conservative 837/1009 and Adaptive 172/1009, defense Conservative 5395/20224 and Adaptive 14829/20224. Bootstrap stability 100%. Aurora and kestrel are now dominance-solvable (Conservative), by measurement: see `docs/CALIBRATION_SWEEP.md` |
 | 3 | The judge + slider | Open **The judge**, drag the bar slider (`thr-slider`) from 90% to 95%, press **Replay the trial at this bar** | The verdict flips; at 95% the prosecution cannot win. 80 to 90% is the stable mixed band. Press **Recompute the equilibrium** to show the label change |

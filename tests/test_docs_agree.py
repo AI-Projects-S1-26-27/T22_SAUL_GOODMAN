@@ -30,18 +30,18 @@ def test_the_results_table_quotes_the_stabilities_in_the_data() -> None:
 
 
 def test_handoff_quotes_the_same_stabilities_as_results() -> None:
-    quoted = dict(re.findall(r"(helix|aurora|kestrel) ([\d.]+/[\d.]+)%", HANDOFF.split("### 3.3")[1].split("### 3.4")[0]))
+    quoted = dict(re.findall(r"(helix|aurora|kestrel) ([\d.]+/[\d.]+)", HANDOFF.split("### 3.1")[1].split("### 3.2")[0]))
     expected = {
         "helix": "helix-espionage", "aurora": "aurora-defi", "kestrel": "kestrel-av",
     }
     assert set(quoted) == set(expected)
     for short, cid in expected.items():
         assert quoted[short] == f"{100 * BOOT[cid]['stability']:.1f}/{100 * _support(cid):.1f}", short
-    assert "100/100 (label/support)" in HANDOFF
+    assert "the other four cases 100.0/100.0" in HANDOFF
 
 
 def test_handoff_says_every_calibrated_case_holds_99_percent_and_that_is_true() -> None:
-    assert "holds stability of 99% or better" in HANDOFF
+    assert "Stability is 99% or better for every case" in HANDOFF
     for cid in ("aurora-defi", "kestrel-av", "helix-espionage"):
         assert min(BOOT[cid]["stability"], _support(cid)) >= 0.99, cid
 
@@ -66,3 +66,19 @@ def test_the_sweep_document_quotes_the_shipped_figures() -> None:
         label = EVENTS["default"]["cases"][cid]["label"]
         assert label == "dominance-solvable"
     assert f"{100 * EVENTS['default']['cases']['aurora-defi']['support_stability']:.1f}%" in HANDOFF + RESULTS
+
+
+def test_handoff_separates_what_is_resolved_from_what_is_not_for_each_known_issue() -> None:
+    for start, end in (("### 3.1", "### 3.2"), ("### 3.2", "### 3.3"), ("### 3.3", "### 3.4")):
+        section = HANDOFF.split(start)[1].split(end)[0]
+        assert "**Resolved.**" in section and "**Not resolved.**" in section, start
+        assert section.index("**Resolved.**") < section.index("**Not resolved.**"), start
+
+
+def test_the_counts_handoff_quotes_are_the_counts_in_the_data() -> None:
+    events = (ROOT / "results" / "calibration" / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    cases = (ROOT / "results" / "calibration" / "cases.jsonl").read_text(encoding="utf-8").splitlines()
+    assert f"{len(events)} settings" in HANDOFF and f"{len(cases)} values" in HANDOFF
+    assert "11 of 20 settings" in HANDOFF and "x1.5" in HANDOFF and "99% or better" in HANDOFF
+    cases_json = [json.loads(line) for line in cases]
+    assert all(r["label"] == "dominance-solvable" for r in cases_json)  # "all 32 are dominance-solvable"

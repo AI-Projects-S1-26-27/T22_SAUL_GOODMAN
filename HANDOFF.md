@@ -18,7 +18,7 @@ pip install -e ".[dev]"
 | What | Command | Correct result |
 |---|---|---|
 | Determinism: same case, seeds and strategies give the same events and verdict | `python -m courtroom verify` | `bit-identical results: YES   hash chain valid: YES` |
-| The test suite | `python -m pytest` | 1016 passed, about 90 seconds |
+| The test suite | `python -m pytest` | 1019 passed, about 90 seconds |
 | 42 pinned trial digests | `python -m pytest tests/test_golden.py` | all pass; a failure means the certified engine changed |
 | Fuzz | `python -m courtroom stress --cases 100` | `"trials": 2500`, `"crashes": 0`, `"failures": []` |
 | The certified analysis regenerates exactly | `python -m courtroom analysis --out /tmp/a --workers 4` then `cmp results/payoffs.json /tmp/a/payoffs.json` (and the other two files) | byte-identical; about 14 minutes |
@@ -70,25 +70,45 @@ Each is enforced by a test that fails loudly. If you need to break one, write a 
 
 ## 3. Known issues, stated plainly
 
-### 3.1 The aurora and kestrel calibration: resolved by measurement, and the answer is "dominance-solvable" (D19)
-The values were first chosen without adverse events, and the events' rates were guesses. That is now measured (`docs/CALIBRATION_SWEEP.md`, 21 settings,
-all seven cases, 200 seeds, 200 resamples). Four library cases ship with events on, at the rates the sweep selected. Re-running the case calibration at those rates
-found **no value** of either parameter that makes `aurora-defi` or `kestrel-av` anything but dominance-solvable (Conservative against Conservative), so the values were
-**left as they were and documented, not tuned**. Both are still contested in outcome (the prosecution wins 11 to 23% and 17.5 to 42%) but have one best strategy, and each
-holds stability of 99% or better. `helix-espionage` keeps its mixed equilibrium (100% label and support stability). *Correction:* earlier versions of this note said the
-library "ships with events on". It did not; it was on the plain rulebook until D19 made events the shipped configuration.
+### 3.1 The aurora and kestrel calibration (D19)
+The values were first chosen without adverse events, and the events' rates were guesses. *Correction:* earlier versions of this note said the library "ships with events on".
+It did not; it was on the plain rulebook until D19 made events the shipped configuration for four cases.
 
-### 3.2 Adverse events raised risk and removed strategic depth; the finding stands
-Payoff variance rose where it was missing (kestrel Conservative prosecution sd 0.00 to 3.85, aurora Conservative 0.31 to 3.34). The rates are now swept (no-show 0 to 30%,
-missing certificate 0 to 35%, hostile 0 to 30%, credibility 1/8 to 3/4, and all together x0.5 to x3). **By the letter of the selection rules a qualifying band exists; counting only the four cases that
-are real contests, none does**: only `helix-espionage` keeps a mixed equilibrium anywhere in the band. Still unresolved: the rates are chosen, not observed; the plateau is narrow in the joint
-direction (all rates x1.5 fails the 95% stability floor by half a point); Conservative strategies that rarely offer an exposed exhibit stay flat.
+**Resolved.**
+- The rates are swept: 21 settings, all seven cases, 200 seeds, 200 resamples (`docs/CALIBRATION_SWEEP.md`, `results/calibration/events.jsonl`).
+- The two case values are re-calibrated with events on: 32 values of `P-RECALL` strength and aurora defense scale, including the exact +/-10% neighbours of each shipped value.
+- **No value contests either case**: all 32 are dominance-solvable (Conservative against Conservative), so the values were left as they were and documented, not tuned.
+- Stability is 99% or better for every case (label/support: helix 100.0/100.0, aurora 100.0/99.0, kestrel 99.5/99.5, the other four cases 100.0/100.0), the same figures `RESULTS.md` quotes, and `helix-espionage` keeps its mixed equilibrium.
 
-### 3.3 The cases were tuned after measuring (D14) and this is now documented, not repeated
-D14's admission stands. D19 supersedes the process: the sweep is published, the shipped values are inside measured plateaus, no value was moved to taste, and the rule that
-a case which cannot be contested is documented as such was followed. **Still true:** `aurora-defi` sits 4% above a win-rate cliff (its label is unaffected); `kestrel-av`'s
-`P-RECALL` has a second regime above 0.275. Stability figures: helix 100.0/100.0%, aurora 100.0/99.0%, kestrel 99.5/99.5%, poisoned-tree and the three fixtures 100/100 (label/support),
-the same numbers `RESULTS.md` quotes.
+**Not resolved.**
+- `aurora-defi` and `kestrel-av` still have one best strategy. They are contested in outcome (the prosecution wins 11 to 23% and 17.5 to 42%) but not in strategy. Making them strategic again needs a different case design, not another parameter value.
+- `aurora-defi` sits 4% above a win-rate cliff (its label is unaffected).
+
+### 3.2 Adverse events raised risk and removed strategic depth
+Payoff variance rose where it was missing (kestrel Conservative prosecution sd 0.00 to 3.85, aurora Conservative 0.31 to 3.34).
+
+**Resolved.**
+- The rates are swept: no-show 0 to 30%, missing certificate 0 to 35%, hostile 0 to 30%, credibility 1/8 to 3/4, and all rates together x0.5 to x3.
+- The selection rules were applied and both readings published. **By the letter of the rules a qualifying band exists (11 of 20 settings); counting only the four cases that are real contests, none does.** Both select the same setting.
+
+**Not resolved.**
+- The rates are chosen, not observed: nothing in the evidence says real trials have these frequencies.
+- The plateau is narrow in the joint direction: all rates x1.5 fails the 95% stability floor by half a point.
+- Conservative strategies that rarely offer an exposed exhibit stay flat (helix Conservative sd 0.08).
+- Rule (b) as worded lets structural fixtures carry it.
+
+### 3.3 The cases were tuned after measuring (D14); the process is replaced, not erased
+D14's admission stands unedited. D19 supersedes the process.
+
+**Resolved.**
+- The sweep is published and the shipped values sit inside measured plateaus.
+- No value was moved to taste, and the rule that a case which cannot be contested is documented as such was followed.
+- Every stability figure here is the one `RESULTS.md` quotes, and `tests/test_docs_agree.py` fails if either drifts from `results/`.
+
+**Not resolved.**
+- Both cases are still tuned values: `kestrel-av`'s `P-RECALL` has a second regime above 0.275 (the prosecution wins 70 to 76%), and `aurora-defi` has the win-rate cliff noted above.
+- The selection rules were written after D14, so they are a better process, not an independent one.
+- Three structural fixtures (and the recorded exhibition) stay on the plain rulebook by choice, so they were not tuned and are not covered by the events sweep's conclusions.
 
 ### 3.4 The Ollama provider has never run against a real Ollama server
 It follows Ollama's documented API and is tested against a stub only (`tests/test_ollama.py`). Ollama is not installed on the development machine, so the

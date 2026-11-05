@@ -118,3 +118,14 @@ def test_the_exhibition_baseline_is_what_the_plain_rulebook_produces_now() -> No
             pair = (row["strategy"], row["opponent"]) if side is Side.PROSECUTION else (row["opponent"], row["strategy"])
             wins += run_trial(case, *pair, seed=seed).verdict.outcome.favours is side
         assert wins / len(recorded["seeds"]) == row["win_rate"], row
+
+
+def test_the_exhibition_baseline_regenerates_field_for_field_on_the_plain_rulebook_and_not_on_the_shipped_one() -> None:
+    from courtroom.llm.exhibition import _deterministic_baseline
+
+    recorded = json.loads((ROOT / "results" / "llm_exhibition.json").read_text(encoding="utf-8"))
+    args = (recorded["seeds"], recorded["opponents"])
+    plain = json.loads(json.dumps(_deterministic_baseline(get_plain_case(recorded["case_id"]), *args)))
+    assert plain == recorded["deterministic_baseline"]
+    shipped = json.loads(json.dumps(_deterministic_baseline(CASES[recorded["case_id"]], *args)))
+    assert shipped != recorded["deterministic_baseline"], "events-on helix would have changed the baseline: that is why it stays plain"
