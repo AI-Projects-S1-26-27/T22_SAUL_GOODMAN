@@ -82,3 +82,70 @@ def test_the_counts_handoff_quotes_are_the_counts_in_the_data() -> None:
     assert "11 of 20 settings" in HANDOFF and "x1.5" in HANDOFF and "99% or better" in HANDOFF
     cases_json = [json.loads(line) for line in cases]
     assert all(r["label"] == "dominance-solvable" for r in cases_json)  # "all 32 are dominance-solvable"
+
+
+# ----------------------------------------------------------------------- DEVIATIONS D19 and the rewritten RESULTS tables, against the data
+
+DEVIATIONS = (ROOT / "DEVIATIONS.md").read_text(encoding="utf-8")
+D19 = DEVIATIONS.split("## D19 ")[1].split("## Corrections to claims made about the repo")[0]
+BUNDLE = json.loads(
+    (ROOT / "courtroom" / "viz" / "web" / "data" / "bundle.js").read_text(encoding="utf-8")[len("window.COURTROOM_BUNDLE = ") :].rstrip().rstrip(";")
+)
+
+
+def test_d19_quotes_figures_that_are_in_the_data() -> None:
+    from courtroom.cases import CASES, PLAIN_CASES
+    from courtroom.engine import run_trial
+
+    events = (ROOT / "results" / "calibration" / "events.jsonl").read_text(encoding="utf-8").splitlines()
+    cases = (ROOT / "results" / "calibration" / "cases.jsonl").read_text(encoding="utf-8").splitlines()
+    assert f"{len(events)} settings" in D19 and f"{len(cases)} values" in D19 and f"({len(cases)} of {len(cases)} values)" in D19
+    assert "11 of 20 settings" in D19
+    old = json.loads((ROOT / "tests" / "golden" / "digests_plain.json").read_text(encoding="utf-8"))
+    new = json.loads((ROOT / "tests" / "golden" / "digests.json").read_text(encoding="utf-8"))
+    moved = sum(1 for k in old if old[k]["digest"] != new[k]["digest"])
+    assert f"{moved} of 42 changed" in D19, moved
+    helix = PAYOFFS["helix-espionage"]["analysis"]["equilibria"][0]["row_mix_exact"]
+    assert f"({helix['conservative']} and {helix['adaptive']} for the prosecution)" in D19
+    for cid in ("aurora-defi", "kestrel-av"):
+        assert BOOT[cid]["baseline_label"] == "dominance-solvable"
+    assert "stability 80.5% becomes 100.0% label, 99.0% support" in D19 and BOOT["aurora-defi"]["stability"] == 1.0
+    assert "98.0% becomes 99.5%" in D19 and BOOT["kestrel-av"]["stability"] == 0.995
+    assert {cid for cid, c in CASES.items() if c.adverse_events} == {"helix-espionage", "aurora-defi", "kestrel-av", "edge-poisoned-tree"}
+    assert run_trial(CASES["edge-mutual-exclusion"], "aggressive", "aggressive", seed=0).digest == run_trial(PLAIN_CASES["edge-mutual-exclusion"], "aggressive", "aggressive", seed=0).digest
+
+
+def test_d14_is_still_there_and_still_says_what_it_said() -> None:
+    d14 = DEVIATIONS.split("## D14 ")[1].split("## D15 ")[0]
+    assert "this IS result-driven case design" in DEVIATIONS.split("## D14")[1].split("\n")[0]
+    assert "Superseded by D19" in d14 and "the values were chosen by measuring, after D3 had refused to" in d14
+    assert "about 20 configurations" in d14 and "narrow band, not a robust design" in d14
+
+
+def test_results_ladder_is_the_ladder_in_the_bundle_built_from_the_certified_run() -> None:
+    rows = re.findall(r"^\| (\d+)%(?: \(own\))? \| ([a-z-]+) \| .*? \| ([\d.]+)% \|$", RESULTS.split("`helix-espionage`:")[1].split("Read it as a shape")[0], flags=re.M)
+    bars = BUNDLE["analysis"]["threshold_grid"]["helix-espionage"]["bars"]
+    assert len(rows) == len(bars) == 7
+    for (pct, label, win), bar in zip(rows, bars, strict=True):
+        assert int(pct) == round(100 * bar["bar"]) and label == bar["label"], pct
+        assert float(win) == round(100 * bar["prosecution_win_rate_at_equilibrium"], 1), pct
+
+
+def test_results_sensitivity_table_is_the_one_in_the_data() -> None:
+    sens = json.loads((ROOT / "results" / "sensitivity.json").read_text(encoding="utf-8"))
+    base = sens["baseline"]
+    for cid in sens["case_ids"]:
+        survives = sum(1 for v in sens["variations"] if v["labels"][cid] == base[cid])
+        line = next(x for x in RESULTS.splitlines() if x.startswith(f"| `{cid}` | ") and ("of 14" in x or "every variation" in x))
+        assert ("**every variation**" in line) == (survives == 14), cid
+        if survives != 14:
+            assert f"| {survives} of 14 |" in line, cid
+
+
+def test_results_standard_of_proof_table_is_the_one_in_the_data() -> None:
+    sens = json.loads((ROOT / "results" / "sensitivity.json").read_text(encoding="utf-8"))
+    for v in sens["variations"]:
+        if v["parameter"] == "beyond_reasonable_doubt":
+            pct = round(100 * float(v["setting"].split("=")[1]))
+            win = f"{v['prosecution_win_rate']['helix-espionage']:.3f}"
+            assert re.search(rf"^\| (?:\*\*)?{pct}%.*\| \*?\*?{win}\*?\*? \|$", RESULTS, flags=re.M), (pct, win)
