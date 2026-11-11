@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Strategy Lab · Saul Goodman Courtroom</title>
+  <meta name="description" content="A guided, plain-language walk through the game theory of every case: payoffs, best replies, Nash equilibria and what happens when the rules change.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="lab.css?v=11">
+</head>
+<body class="lab-page">
+  <a class="skip" href="#lab-root">Skip to the lab</a>
+
+  <header class="nav solid" id="nav">
+    <a class="brand" href="index.html">Saul Goodman Courtroom</a>
+    <nav aria-label="Sections">
+      <a href="index.html#how">How a trial works</a>
+      <a href="index.html#docket">The cases</a>
+      <a class="nav-cta" href="index.html#docket">Back to the courtroom</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="lab-hero">
+      <div class="wrap">
+        <p class="eyebrow">The strategy lab</p>
+        <h1>Why does one style of lawyer beat another?</h1>
+        <p class="lab-hero-sub">A trial is a game: each lawyer's best move depends on what the other one does. This page works that game out for any case, one small step at a time. You don't need any maths to follow it. Every idea is explained in plain words first, and the working is there if you want it.</p>
+        <ul class="lab-hero-points">
+          <li><b>Read it top to bottom.</b> Each chapter builds on the one before.</li>
+          <li><b>Everything is live.</b> Pick another case or change the rules and every chart and sentence updates.</li>
+          <li><b>Nothing is made up.</b> Every number comes from real trials run by the courtroom engine.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="wrap" id="lab-root"></div>
+  </main>
+
+  <footer class="foot">
+    <p>Every person, company and case here is made up. The judge is a fixed rulebook, so you can always check the results.</p>
+    <p class="muted">Team Saul Goodman · Agents and game theory</p>
+  </footer>
+
+  <noscript><p class="noscript">This page needs JavaScript to work out the game.</p></noscript>
+
+  <script src="data/bundle.js?v=11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="lab-math.js?v=11"></script>
+  <script src="lab.js?v=11"></script>
+</body>
+</html>

@@ -60,3 +60,45 @@ def test_ui_is_served(client: TestClient) -> None:
     html = client.get("/").text
     assert "Courtroom" in html and "app.js" in html
     assert client.get("/app.js").status_code == 200
+
+
+def test_analyst_forwards_to_a_backend(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    from courtroom.api import analyst
+
+    seen: dict[str, object] = {}
+
+    def fake_chat(base: str, model: str, key: str | None, messages: list[dict[str, str]]) -> str:
+        seen.update(base=base, key=key, messages=messages)
+        return "Careful wins here."
+
+    monkeypatch.setattr(analyst, "load_env", lambda: None)
+    monkeypatch.setenv("OLLAMA_API_KEY", "test-key")
+    monkeypatch.setattr(analyst, "_chat", fake_chat)
+    r = client.post("/api/analyst", json={"question": "Who wins?", "context": "A=[[1,2],[3,4]]"})
+    assert r.status_code == 200
+    assert r.json()["reply"] == "Careful wins here."
+    assert r.json()["source"] == "cloud"
+    assert seen["key"] == "test-key"
+    assert "test-key" not in r.text
+    messages = seen["messages"]
+    assert isinstance(messages, list)
+    assert "A=[[1,2],[3,4]]" in messages[0]["content"]
+    assert messages[-1]["content"] == "Who wins?"
+
+
+def test_analyst_reports_unavailable_and_bounds_input(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    from courtroom.api import analyst
+
+    def down(*_: object) -> str:
+        raise RuntimeError("Add usage credits")
+
+    monkeypatch.setattr(analyst, "load_env", lambda: None)
+    monkeypatch.setenv("OLLAMA_API_KEY", "test-key")
+    monkeypatch.setattr(analyst, "_chat", down)
+    monkeypatch.setattr(analyst, "_local_model", lambda: None)
+    r = client.post("/api/analyst", json={"question": "Who wins?"})
+    assert r.status_code == 503
+    assert any("Add usage credits" in x for x in r.json()["reasons"])
+    assert "test-key" not in r.text
+    assert client.post("/api/analyst", json={"question": "x" * 601}).status_code == 422
+    assert client.post("/api/analyst", json={"question": ""}).status_code == 422

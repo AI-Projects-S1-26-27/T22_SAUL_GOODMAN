@@ -25,6 +25,8 @@ The project has two halves:
 | The 3D room, people, camera shots | `courtroom/viz/web/courtroom3d.js` | §6 check |
 | Music and sound effects | `courtroom/viz/web/sound.js` | §5 levels |
 | Page layout and colours | `courtroom/viz/web/index.html`, `styles.css` | §6 check |
+| The strategy lab page (game theory chapters, charts, analyst chat) | `courtroom/viz/web/lab.html`, `lab.js`, `lab-math.js`, `lab.css` | §7 |
+| The analyst's Ollama backend | `courtroom/api/analyst.py` | §7 |
 
 Every spoken line is built from the trial events plus `story.js`. **If a line's text changes in any way,
 even one comma, its recording no longer matches and must be re-recorded** (§4).
@@ -163,3 +165,37 @@ node --check courtroom/viz/web/*.js
   (`vercel.json` serves `courtroom/viz/web`), usually within a minute. Confirm with
   `curl -s https://ai-project-weld-omega.vercel.app/ | grep app.js`.
 - Never force-push `main` without first saving the remote `main` to a backup branch.
+
+---
+
+## 7. The strategy lab
+
+The lab is its own page, `courtroom/viz/web/lab.html`, linked from the home page's nav and from the "Want to
+know why?" card. It has its own light "casebook" theme (`lab.css` flips the colour tokens for `body.lab-page`).
+It does not change the courtroom, the trial player, the bundle or any spoken line, so it never needs a voice
+re-record.
+
+- **Every chapter has the same five parts**, built by `chapter()` in `lab.js`: a plain-language lead, "How to
+  read it", the chart, "What it says for this case" (written from the live numbers by `says()`), and "Show the
+  working". Keep that shape when adding a chapter, and follow §3's writing rules: plain words first, every
+  game theory term explained where it first appears and listed in the glossary chapter.
+- **Numbers come from trials, never from the model.** `lab-math.js` builds the 4x4 payoff table from trial
+  ledgers and solves it (best replies, dominance, Nash equilibria, replicator dynamics). After changing it:
+
+  ```bash
+  node scripts/check_lab_math.cjs    # compares it with the engine's exact results in the bundle
+  ```
+
+- **Data.** Offline and on the deployed site the lab uses the one bundled trial per pairing (seed 0). With the
+  local server running, "Run fresh trials" calls `/api/trial` for several seeds and averages them.
+- **Chart colours** are set at the top of `lab.js`. They were checked for colour-blind separation on the
+  paper background; re-check any new colour before using it for a series.
+- **"Watch this trial in the courtroom"** links to `index.html#watch=<case>|<accuser>|<defender>`.
+  `handoff.js` on the home page reads that and selects the case and styles.
+- **The analyst.** The chat box posts to `/api/analyst` on the local server, which forwards to Ollama Cloud
+  and then to a local Ollama (`http://localhost:11434`). If neither answers, the page's built-in analyst
+  replies from the same numbers, so the chat always works.
+- **The API key lives in `.env` at the repo root** (`OLLAMA_API_KEY=...`, optional `OLLAMA_MODEL`,
+  `OLLAMA_LOCAL_MODEL`). `.env` is git-ignored. Never put the key in any file under `courtroom/viz/web/`:
+  that folder is published as-is. The deployed site has no analyst route yet, so it uses the built-in analyst.
+- **Cache-busting** (§6) applies to `lab.html` too: bump its `?v=N` along with `index.html`.

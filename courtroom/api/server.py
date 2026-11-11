@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from courtroom import __version__
 from courtroom.agents import describe_strategies, make_agent
+from courtroom.api import analyst
 from courtroom.cases import CASES, generate_case, get_case
 from courtroom.contracts import CaseFile, TrialResult
 from courtroom.engine import run_trial
@@ -108,6 +109,14 @@ def create_app() -> FastAPI:
         body = table.model_dump(mode="json")
         body["dynamics"] = [{"x": x, "y": y} for x, y in traj[::5]]
         return JSONResponse(body)
+
+    @app.post("/api/analyst")
+    def ask_analyst(req: analyst.AnalystRequest) -> JSONResponse:
+        # The strategy lab's chat box. A 503 tells the page to fall back to its built-in analyst.
+        try:
+            return JSONResponse(analyst.ask(req))
+        except analyst.AnalystUnavailable as exc:
+            return JSONResponse({"detail": "analyst unavailable", "reasons": exc.reasons}, status_code=503)
 
     if WEB_DIR.exists():  # mounted last so /api/* routes take precedence
         app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="ui")
