@@ -166,3 +166,21 @@ def test_the_analyst_falls_back_to_gemini_as_a_third_backend(monkeypatch):
     monkeypatch.setattr(backends.GeminiBackend, "chat", lambda self, system, prompt, **kw: "Gemini says hi")
     r = client.post("/api/analyst", json={"question": "Who wins?"})
     assert r.status_code == 200 and r.json()["source"] == "gemini" and r.json()["reply"] == "Gemini says hi"
+
+
+def test_the_exhibition_harness_runs_against_a_stub_and_is_labelled_not_certified(tmp_path):
+    from courtroom.llm.exhibition import run_exhibition
+
+    c, _ = stub_client(tmp_path)
+    t = run_exhibition([CASES["cookie-jar"]], c, seeds=(0, 1), styles=("aggressive", "adaptive"))
+    assert t.label == "exhibition, not certified" and len(t.cells) == 2 * 2  # two sides, two styles
+    assert all(0 <= x.fallback_rate <= 1 and 0 <= x.ai_win_rate <= 1 for x in t.cells)
+
+
+def test_the_exhibition_command_refuses_to_run_without_a_model(monkeypatch, capsys):
+    from courtroom import cli
+    from courtroom.llm import LLMClient, client
+
+    monkeypatch.setattr(client, "default_client", lambda *a, **k: LLMClient(backends=[]))
+    monkeypatch.setattr("courtroom.llm.default_client", lambda *a, **k: LLMClient(backends=[]))
+    assert cli.main(["exhibition", "--seeds", "1"]) == 3

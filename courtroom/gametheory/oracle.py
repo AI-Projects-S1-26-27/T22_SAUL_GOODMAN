@@ -257,6 +257,10 @@ class Candidate(BaseModel):
     standard_error: float
     z: float
     accepted: bool
+    # For a kept profile: the same comparison against the ORIGINAL equilibrium on a third set of seeds, used neither to search nor to accept.
+    confirm_difference: float | None = None
+    confirm_z: float | None = None
+    confirmed: bool | None = None
 
 
 class OracleReport(BaseModel):
@@ -265,6 +269,7 @@ class OracleReport(BaseModel):
     surprises: bool
     train_seeds: list[int]
     heldout_seeds: list[int]
+    confirm_seeds: list[int]
     budget: int
     rng_seed: int
     max_rounds: int
@@ -316,6 +321,7 @@ def run_oracle(
     surprises: Surprises | None = None,
     train: Sequence[int] = tuple(range(6)),
     heldout: Sequence[int] = tuple(range(100, 112)),
+    confirm: Sequence[int] = tuple(range(200, 224)),
     rng_seed: int = 0,
     workers: int = 1,
     max_rounds: int = MAX_ROUNDS,
@@ -326,6 +332,7 @@ def run_oracle(
     all_seeds = [*train, *heldout]
     pop = {"prosecution": [named(n) for n in START], "defense": [named(n) for n in START]}
     candidates: list[Candidate] = []
+    specs: dict[str, Spec] = {}
     try:
         A, B = cache.mean_matrix(pop["prosecution"], pop["defense"], all_seeds)
         an = analyze([s.name for s in pop["prosecution"]], [s.name for s in pop["defense"]], A, B)
@@ -368,6 +375,7 @@ def run_oracle(
                 )
                 if ok:
                     kept[side] = cand
+                    specs[name] = cand
             if not kept:
                 stopped = f"round {rnd}: neither side found a profile that beat the current equilibrium by more than {ACCEPT_SE:g} standard errors"
                 break
@@ -395,9 +403,25 @@ def run_oracle(
                 "gain": round(max(0.0, value(top) - eq_value), 4),
                 "found_better": top.profile is not None and value(top) > eq_value + 1e-9,
             }
+        # confirmation: does each kept profile still beat the ORIGINAL equilibrium on seeds nobody has looked at?
+        for i, c in enumerate(candidates):
+            if not c.accepted:
+                continue
+            side = c.side
+            theirs, opp_mix, base_pop, own_mix = (start_cols, start_y, start_rows, start_x) if side == "prosecution" else (start_rows, start_x, start_cols, start_y)
+            got = cache.vs_mix(side, specs[c.name], theirs, opp_mix, confirm)
+            cur = [0.0] * len(confirm)
+            for spec, w in zip(base_pop, own_mix, strict=True):
+                if w > 1e-9:
+                    cur = [a + w * b for a, b in zip(cur, cache.vs_mix(side, spec, theirs, opp_mix, confirm), strict=True)]
+            diffs = [g - k for g, k in zip(got, cur, strict=True)]
+            md = statistics.fmean(diffs)
+            se = statistics.stdev(diffs) / len(diffs) ** 0.5 if len(diffs) > 1 else 0.0
+            z = md / se if se > 0 else (float("inf") if md > 0 else 0.0)
+            candidates[i] = c.model_copy(update={"confirm_difference": round(md, 4), "confirm_z": round(min(z, 99.0), 2), "confirmed": md > 0 and z > ACCEPT_SE})
         final_eq = _eq_summary(eq, pop["prosecution"], pop["defense"])
         report = OracleReport(
-            case_id=case.id, surprises=surprises is not None, train_seeds=list(train), heldout_seeds=list(heldout), budget=budget, rng_seed=rng_seed,
+            case_id=case.id, surprises=surprises is not None, train_seeds=list(train), heldout_seeds=list(heldout), confirm_seeds=list(confirm), budget=budget, rng_seed=rng_seed,
             max_rounds=max_rounds, rounds_run=rounds, stopped=stopped, start_strategies=list(START), start_equilibrium=start_eq,
             candidates=candidates,
             final_prosecution=[{"name": s.name, "plain": describe(s), "searched": s.profile is not None} for s in pop["prosecution"]],
@@ -416,7 +440,8 @@ def headline(r: OracleReport) -> str:
         return (f"No better lawyer was found: in {r.rounds_run} round(s) and {sum(c.tried for c in r.candidates)} candidate profiles, none beat the "
                 f"current equilibrium by more than {ACCEPT_SE:g} standard errors on held-out seeds.")
     sides = sorted({c.side for c in acc})
+    conf = sum(1 for c in acc if c.confirmed)
     gains = {s: r.exploitability[s]["gain"] for s in sides}
     where = " and ".join(f"the {s} (gain {gains[s]:.2f} per trial)" for s in sides)
     return (f"The hand-written styles could be beaten: {len(acc)} better profile(s) were found for {where}, then the game was solved again "
-            f"with them.")
+            f"with them. {conf} of {len(acc)} also beat the original equilibrium on a third set of seeds nobody had looked at.")

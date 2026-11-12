@@ -1,0 +1,281 @@
+{
+ "budget": 60,
+ "candidates": [
+  {
+   "accepted": true,
+   "confirm_difference": 2.8272,
+   "confirm_z": 3.25,
+   "confirmed": true,
+   "difference": 1.9882,
+   "heldout_candidate": 2.6494,
+   "heldout_current": 0.6613,
+   "name": "best-pro-1",
+   "params": {
+    "max_known_defects": 1.0,
+    "min_gain": 0.08,
+    "objection_belief": 0.64,
+    "objection_min_impact": 1.22,
+    "reserve_fraction": 0.31
+   },
+   "plain": "shows evidence even with up to 1 known problem; spends a turn only if it moves the judge by at least 0.08; objects only when it is 64% sure of a flaw; and only if the exhibit would matter by 1.22 or more; holds back 31% of its budget for objections",
+   "side": "prosecution",
+   "standard_error": 0.9706,
+   "train_payoff": 1.6603,
+   "tried": 60,
+   "z": 2.05
+  },
+  {
+   "accepted": false,
+   "confirm_difference": null,
+   "confirm_z": null,
+   "confirmed": null,
+   "difference": -0.1587,
+   "heldout_candidate": 2.7227,
+   "heldout_current": 2.8814,
+   "name": "best-def-1",
+   "params": {
+    "max_known_defects": 0.0,
+    "min_gain": 0.42,
+    "objection_belief": 0.41,
+    "objection_min_impact": 0.19,
+    "reserve_fraction": 0.0
+   },
+   "plain": "shows only clean evidence; spends a turn only if it moves the judge by at least 0.42; objects only when it is 41% sure of a flaw; and only if the exhibit would matter by 0.19 or more; keeps nothing back for objections (always asks for the trial to end early, objects to anything big whatever it suspects)",
+   "side": "defense",
+   "standard_error": 0.3814,
+   "train_payoff": 2.0835,
+   "tried": 60,
+   "z": -0.42
+  },
+  {
+   "accepted": false,
+   "confirm_difference": null,
+   "confirm_z": null,
+   "confirmed": null,
+   "difference": -1.1687,
+   "heldout_candidate": 1.1167,
+   "heldout_current": 2.2854,
+   "name": "best-pro-2",
+   "params": {
+    "max_known_defects": 3.0,
+    "min_gain": 0.08,
+    "objection_belief": 0.73,
+    "objection_min_impact": 1.1,
+    "reserve_fraction": 0.44
+   },
+   "plain": "shows evidence even with up to 3 known problems; spends a turn only if it moves the judge by at least 0.08; objects only when it is 73% sure of a flaw; and only if the exhibit would matter by 1.10 or more; holds back 44% of its budget for objections",
+   "side": "prosecution",
+   "standard_error": 0.6843,
+   "train_payoff": 1.0,
+   "tried": 60,
+   "z": -1.71
+  },
+  {
+   "accepted": false,
+   "confirm_difference": null,
+   "confirm_z": null,
+   "confirmed": null,
+   "difference": -0.95,
+   "heldout_candidate": 1.7604,
+   "heldout_current": 2.7104,
+   "name": "best-def-2",
+   "params": {
+    "max_known_defects": 3.0,
+    "min_gain": 0.62,
+    "objection_belief": 0.3,
+    "objection_min_impact": 0.28,
+    "reserve_fraction": 0.0
+   },
+   "plain": "shows evidence even with up to 3 known problems; spends a turn only if it moves the judge by at least 0.62; objects only when it is 30% sure of a flaw; and only if the exhibit would matter by 0.28 or more; keeps nothing back for objections (always asks for the trial to end early, objects to anything big whatever it suspects)",
+   "side": "defense",
+   "standard_error": 0.669,
+   "train_payoff": 4.2687,
+   "tried": 60,
+   "z": -1.42
+  }
+ ],
+ "case_id": "kestrel-av",
+ "confirm_seeds": [
+  200,
+  201,
+  202,
+  203,
+  204,
+  205,
+  206,
+  207,
+  208,
+  209,
+  210,
+  211,
+  212,
+  213,
+  214,
+  215,
+  216,
+  217,
+  218,
+  219,
+  220,
+  221,
+  222,
+  223
+ ],
+ "exploitability": {
+  "defense": {
+   "best_found": "aggressive",
+   "best_found_payoff": 2.5575,
+   "equilibrium_payoff": 2.5575,
+   "found_better": false,
+   "gain": 0.0
+  },
+  "prosecution": {
+   "best_found": "best-pro-1",
+   "best_found_payoff": 2.4022,
+   "equilibrium_payoff": 1.1778,
+   "found_better": true,
+   "gain": 1.2244
+  }
+ },
+ "final_defense": [
+  {
+   "name": "aggressive",
+   "plain": "aggressive",
+   "searched": false
+  },
+  {
+   "name": "conservative",
+   "plain": "conservative",
+   "searched": false
+  },
+  {
+   "name": "adaptive",
+   "plain": "adaptive",
+   "searched": false
+  },
+  {
+   "name": "reckless",
+   "plain": "reckless",
+   "searched": false
+  }
+ ],
+ "final_equilibrium": {
+  "defense_mix": {
+   "aggressive": 1.0
+  },
+  "defense_mix_exact": {
+   "aggressive": "1"
+  },
+  "defense_payoff": 3.0063,
+  "found": true,
+  "prosecution_mix": {
+   "best-pro-1": 1.0
+  },
+  "prosecution_mix_exact": {
+   "best-pro-1": "1"
+  },
+  "prosecution_payoff": 1.9406,
+  "pure": true,
+  "verified": true
+ },
+ "final_prosecution": [
+  {
+   "name": "aggressive",
+   "plain": "aggressive",
+   "searched": false
+  },
+  {
+   "name": "conservative",
+   "plain": "conservative",
+   "searched": false
+  },
+  {
+   "name": "adaptive",
+   "plain": "adaptive",
+   "searched": false
+  },
+  {
+   "name": "reckless",
+   "plain": "reckless",
+   "searched": false
+  },
+  {
+   "name": "best-pro-1",
+   "plain": "shows evidence even with up to 1 known problem; spends a turn only if it moves the judge by at least 0.08; objects only when it is 64% sure of a flaw; and only if the exhibit would matter by 1.22 or more; holds back 31% of its budget for objections",
+   "searched": true
+  }
+ ],
+ "headline": "The hand-written styles could be beaten: 1 better profile(s) were found for the prosecution (gain 1.22 per trial), then the game was solved again with them. 1 of 1 also beat the original equilibrium on a third set of seeds nobody had looked at.",
+ "heldout_seeds": [
+  100,
+  101,
+  102,
+  103,
+  104,
+  105,
+  106,
+  107,
+  108,
+  109,
+  110,
+  111,
+  112,
+  113,
+  114,
+  115,
+  116,
+  117,
+  118,
+  119,
+  120,
+  121,
+  122,
+  123
+ ],
+ "max_rounds": 4,
+ "rng_seed": 0,
+ "rounds_run": 2,
+ "seconds": 11.0,
+ "start_equilibrium": {
+  "defense_mix": {
+   "aggressive": 0.8995,
+   "conservative": 0.1005
+  },
+  "defense_mix_exact": {
+   "aggressive": "2879687/3201562",
+   "conservative": "321875/3201562"
+  },
+  "defense_payoff": 2.5575,
+  "found": true,
+  "prosecution_mix": {
+   "aggressive": 0.3028,
+   "reckless": 0.6972
+  },
+  "prosecution_mix_exact": {
+   "aggressive": "271/895",
+   "reckless": "624/895"
+  },
+  "prosecution_payoff": 1.1778,
+  "pure": false,
+  "verified": true
+ },
+ "start_strategies": [
+  "aggressive",
+  "conservative",
+  "adaptive",
+  "reckless"
+ ],
+ "stopped": "round 2: neither side found a profile that beat the current equilibrium by more than 2 standard errors",
+ "surprises": true,
+ "train_seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7
+ ],
+ "trials": 3552
+}

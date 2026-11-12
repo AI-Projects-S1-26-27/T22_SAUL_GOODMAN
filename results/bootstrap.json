@@ -1,0 +1,1400 @@
+{
+ "cases": {
+  "aurora-defi": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": -6.718,
+     "low": -7.278,
+     "mean": -6.978,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": -6.61,
+     "low": -7.184,
+     "mean": -6.922,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": -6.656,
+     "low": -7.254,
+     "mean": -6.978,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": -2.964,
+     "low": -3.296,
+     "mean": -3.136,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.616,
+     "low": -1.752,
+     "mean": -1.68,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": -1.616,
+     "low": -1.76,
+     "mean": -1.68,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.6,
+     "low": -1.748,
+     "mean": -1.68,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": -1.572,
+     "low": -1.724,
+     "mean": -1.648,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.96,
+     "low": -2.092,
+     "mean": -2.02,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": -4.1015,
+     "low": -4.842,
+     "mean": -4.4855,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": -4.0235,
+     "low": -4.852,
+     "mean": -4.5015,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": -2.475,
+     "low": -2.8035,
+     "mean": -2.6285,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -6.1305,
+     "low": -6.7615,
+     "mean": -6.419,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -5.8445,
+     "low": -6.5765,
+     "mean": -6.207,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -5.8185,
+     "low": -6.6065,
+     "mean": -6.2405,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": -4.353,
+     "low": -4.795,
+     "mean": -4.5315,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 2,
+   "baseline_label": "pure",
+   "case_id": "aurora-defi",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "pure": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "broken-bike": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": 8.725,
+     "low": 8.599,
+     "mean": 8.662,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": 8.734,
+     "low": 8.59,
+     "mean": 8.662,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": 8.725,
+     "low": 8.599,
+     "mean": 8.662,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": 8.8555,
+     "low": 8.7005,
+     "mean": 8.7795,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": 7.4715,
+     "low": 5.8515,
+     "mean": 6.6635,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": 9.344,
+     "low": 9.28,
+     "mean": 9.312,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": 9.34,
+     "low": 9.28,
+     "mean": 9.312,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": 7.1595,
+     "low": 5.5165,
+     "mean": 6.245,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": 7.5065,
+     "low": 5.591,
+     "mean": 6.5135,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": 9.344,
+     "low": 9.284,
+     "mean": 9.312,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": 9.34,
+     "low": 9.28,
+     "mean": 9.312,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": 6.972,
+     "low": 5.3505,
+     "mean": 6.1655,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": 7.784,
+     "low": 7.016,
+     "mean": 7.421,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": 7.816,
+     "low": 6.97,
+     "mean": 7.421,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": 7.836,
+     "low": 6.991,
+     "mean": 7.421,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": 6.837,
+     "low": 6.0125,
+     "mean": 6.4355,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 4,
+   "baseline_label": "pure",
+   "case_id": "broken-bike",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "mixed": 130,
+    "pure": 70
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 0.35,
+   "surprises": false
+  },
+  "cookie-jar": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": -2.368,
+     "low": -2.432,
+     "mean": -2.4,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": -2.368,
+     "low": -2.436,
+     "mean": -2.4,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": -2.364,
+     "low": -2.436,
+     "mean": -2.4,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": -1.256,
+     "low": -2.228,
+     "mean": -1.784,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.27,
+     "low": -1.366,
+     "mean": -1.318,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": -1.274,
+     "low": -1.374,
+     "mean": -1.318,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.27,
+     "low": -1.374,
+     "mean": -1.318,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": -1.198,
+     "low": -1.298,
+     "mean": -1.25,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.764,
+     "low": -1.868,
+     "mean": -1.816,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": -1.756,
+     "low": -1.872,
+     "mean": -1.816,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.752,
+     "low": -1.88,
+     "mean": -1.816,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": -0.808,
+     "low": -1.668,
+     "mean": -1.256,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -2.9835,
+     "low": -3.37,
+     "mean": -3.192,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -2.9805,
+     "low": -3.4015,
+     "mean": -3.192,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -3.0285,
+     "low": -3.3875,
+     "mean": -3.192,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": -2.3295,
+     "low": -3.1445,
+     "mean": -2.7935,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 2,
+   "baseline_label": "pure",
+   "case_id": "cookie-jar",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "pure": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "edge-defense-only": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.489,
+     "low": -0.723,
+     "mean": -0.606,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -0.495,
+     "low": -0.72,
+     "mean": -0.606,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.479,
+     "low": -0.737,
+     "mean": -0.606,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": -0.502,
+     "low": -0.729,
+     "mean": -0.606,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 3,
+   "baseline_label": "pure",
+   "case_id": "edge-defense-only",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "pure": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "edge-empty-docket": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.091,
+     "low": -0.286,
+     "mean": -0.169,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -0.078,
+     "low": -0.273,
+     "mean": -0.169,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.091,
+     "low": -0.286,
+     "mean": -0.169,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": -0.091,
+     "low": -0.299,
+     "mean": -0.169,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 3,
+   "baseline_label": "pure",
+   "case_id": "edge-empty-docket",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "pure": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "edge-mutual-exclusion": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": -0.85,
+     "low": -0.85,
+     "mean": -0.85,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": -0.85,
+     "low": -0.85,
+     "mean": -0.85,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.85,
+     "low": -0.85,
+     "mean": -0.85,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": -0.33,
+     "low": -0.85,
+     "mean": -0.642,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.494,
+     "low": -0.554,
+     "mean": -0.526,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": -0.498,
+     "low": -0.554,
+     "mean": -0.526,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.498,
+     "low": -0.558,
+     "mean": -0.526,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": -0.01,
+     "low": -0.534,
+     "mean": -0.322,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.498,
+     "low": -0.562,
+     "mean": -0.526,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": -0.494,
+     "low": -0.558,
+     "mean": -0.526,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.498,
+     "low": -0.55,
+     "mean": -0.526,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": -0.03,
+     "low": -0.518,
+     "mean": -0.322,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.066,
+     "low": -1.3365,
+     "mean": -1.206,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -1.043,
+     "low": -1.3445,
+     "mean": -1.206,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.0555,
+     "low": -1.3665,
+     "mean": -1.206,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": -0.596,
+     "low": -1.2675,
+     "mean": -1.006,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 4,
+   "baseline_label": "pure",
+   "case_id": "edge-mutual-exclusion",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "pure": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "edge-poisoned-tree": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": -4.57,
+     "low": -5.85,
+     "mean": -5.31,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": -4.049,
+     "low": -5.701,
+     "mean": -4.955,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": -4.163,
+     "low": -5.618,
+     "mean": -4.955,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": 8.31,
+     "low": 7.431,
+     "mean": 7.909,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": 0.0,
+     "low": 0.0,
+     "mean": 0.0,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.545,
+     "low": -1.1625,
+     "mean": -0.88,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": -0.083,
+     "low": -0.965,
+     "mean": -0.498,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": 0.0025,
+     "low": -1.016,
+     "mean": -0.498,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": 8.293,
+     "low": 6.922,
+     "mean": 7.705,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -4.9205,
+     "low": -6.4035,
+     "mean": -5.7885,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -4.599,
+     "low": -6.308,
+     "mean": -5.5685,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -4.7065,
+     "low": -6.3925,
+     "mean": -5.5685,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": 6.895,
+     "low": 5.882,
+     "mean": 6.4485,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 1,
+   "baseline_label": "mixed",
+   "case_id": "edge-poisoned-tree",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "mixed": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "garden-dog": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": -1.116,
+     "low": -1.196,
+     "mean": -1.156,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": -1.12,
+     "low": -1.192,
+     "mean": -1.156,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.108,
+     "low": -1.192,
+     "mean": -1.156,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": -0.652,
+     "low": -1.288,
+     "mean": -0.968,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.788,
+     "low": -0.892,
+     "mean": -0.844,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": -0.788,
+     "low": -0.892,
+     "mean": -0.844,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.788,
+     "low": -0.904,
+     "mean": -0.844,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": -0.028,
+     "low": -0.824,
+     "mean": -0.512,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -0.784,
+     "low": -0.892,
+     "mean": -0.844,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": -0.792,
+     "low": -0.896,
+     "mean": -0.844,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.788,
+     "low": -0.892,
+     "mean": -0.844,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": -0.12,
+     "low": -0.776,
+     "mean": -0.512,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -2.2945,
+     "low": -2.579,
+     "mean": -2.448,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": -2.257,
+     "low": -2.604,
+     "mean": -2.448,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -2.2995,
+     "low": -2.5975,
+     "mean": -2.448,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": -0.8715,
+     "low": -2.3455,
+     "mean": -1.6365,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 4,
+   "baseline_label": "pure",
+   "case_id": "garden-dog",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "pure": 200
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 1.0,
+   "surprises": false
+  },
+  "helix-espionage": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": -2.5335,
+     "low": -4.2125,
+     "mean": -3.4495,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": 7.76,
+     "low": 7.676,
+     "mean": 7.724,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": -2.1995,
+     "low": -3.919,
+     "mean": -3.068,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": 2.7505,
+     "low": 0.5945,
+     "mean": 1.705,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.95,
+     "low": -1.95,
+     "mean": -1.95,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": -1.95,
+     "low": -1.95,
+     "mean": -1.95,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.95,
+     "low": -1.95,
+     "mean": -1.95,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": -2.142,
+     "low": -2.19,
+     "mean": -2.169,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -3.0455,
+     "low": -3.1865,
+     "mean": -3.113,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": 7.614,
+     "low": 7.542,
+     "mean": 7.574,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": -0.7655,
+     "low": -2.596,
+     "mean": -1.695,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": 2.8845,
+     "low": 1.1355,
+     "mean": 1.968,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": -5.3495,
+     "low": -6.4655,
+     "mean": -5.9555,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": 3.545,
+     "low": 1.792,
+     "mean": 2.7285,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": -4.314,
+     "low": -5.913,
+     "mean": -5.064,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": 2.1135,
+     "low": 0.199,
+     "mean": 1.1985,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 1,
+   "baseline_label": "mixed",
+   "case_id": "helix-espionage",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "dominance-solvable": 1,
+    "mixed": 199
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 0.995,
+   "surprises": false
+  },
+  "kestrel-av": {
+   "accuser_payoff_intervals": [
+    {
+     "col": "aggressive",
+     "high": 3.8085,
+     "low": 1.158,
+     "mean": 2.4705,
+     "row": "aggressive"
+    },
+    {
+     "col": "conservative",
+     "high": 7.874,
+     "low": 7.814,
+     "mean": 7.846,
+     "row": "aggressive"
+    },
+    {
+     "col": "adaptive",
+     "high": 7.882,
+     "low": 7.818,
+     "mean": 7.846,
+     "row": "aggressive"
+    },
+    {
+     "col": "reckless",
+     "high": 6.999,
+     "low": 5.6445,
+     "mean": 6.3755,
+     "row": "aggressive"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.8,
+     "low": -1.8,
+     "mean": -1.8,
+     "row": "conservative"
+    },
+    {
+     "col": "conservative",
+     "high": -1.8,
+     "low": -1.8,
+     "mean": -1.8,
+     "row": "conservative"
+    },
+    {
+     "col": "adaptive",
+     "high": -1.8,
+     "low": -1.8,
+     "mean": -1.8,
+     "row": "conservative"
+    },
+    {
+     "col": "reckless",
+     "high": 2.499,
+     "low": 0.572,
+     "mean": 1.3945,
+     "row": "conservative"
+    },
+    {
+     "col": "aggressive",
+     "high": -1.878,
+     "low": -2.022,
+     "mean": -1.946,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
+     "high": -2.19,
+     "low": -2.37,
+     "mean": -2.278,
+     "row": "adaptive"
+    },
+    {
+     "col": "adaptive",
+     "high": -2.004,
+     "low": -2.17,
+     "mean": -2.092,
+     "row": "adaptive"
+    },
+    {
+     "col": "reckless",
+     "high": -1.408,
+     "low": -2.027,
+     "mean": -1.7735,
+     "row": "adaptive"
+    },
+    {
+     "col": "aggressive",
+     "high": 3.5495,
+     "low": 1.751,
+     "mean": 2.587,
+     "row": "reckless"
+    },
+    {
+     "col": "conservative",
+     "high": 4.8525,
+     "low": 2.7585,
+     "mean": 3.961,
+     "row": "reckless"
+    },
+    {
+     "col": "adaptive",
+     "high": 4.278,
+     "low": 2.5485,
+     "mean": 3.453,
+     "row": "reckless"
+    },
+    {
+     "col": "reckless",
+     "high": 4.821,
+     "low": 3.4915,
+     "mean": 4.162,
+     "row": "reckless"
+    }
+   ],
+   "baseline_equilibria": 1,
+   "baseline_label": "mixed",
+   "case_id": "kestrel-av",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "dominance-solvable": 93,
+    "mixed": 107
+   },
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "rng_seed": 0,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "stability": 0.535,
+   "surprises": false
+  }
+ },
+ "n_resamples": 200,
+ "n_seeds": 100,
+ "surprises": false
+}

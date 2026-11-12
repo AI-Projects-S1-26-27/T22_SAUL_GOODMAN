@@ -123,3 +123,21 @@ def test_bootstrap_endpoint_and_results_listing():
     assert r["n_seeds"] == 5 and r["baseline_label"]
     assert http.post("/api/bootstrap", json={"case_id": "cookie-jar", "seeds": 5000}).status_code == 422
     assert isinstance(http.get("/api/results").json(), dict)
+
+
+def test_every_kept_profile_is_checked_again_on_seeds_nobody_looked_at():
+    r = O.run_oracle(CASES["kestrel-av"], budget=6, train=(0, 1, 2), heldout=tuple(range(100, 108)), max_rounds=2)
+    assert not set(r.confirm_seeds) & (set(r.train_seeds) | set(r.heldout_seeds))
+    for c in r.candidates:
+        assert (c.confirmed is not None) == c.accepted
+
+
+def test_the_lab_data_file_is_generated_from_results_and_up_to_date():
+    import importlib.util
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    spec = importlib.util.spec_from_file_location("build_analysis_js", root / "scripts" / "build_analysis_js.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert (root / "courtroom/viz/web/data/analysis.js").read_text(encoding="utf-8") == mod.build(), "run scripts/build_analysis_js.py"

@@ -145,6 +145,25 @@ def cmd_oracle(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_exhibition(a: argparse.Namespace) -> int:
+    """The AI lawyer against the four styles: an exhibition, never certified. Runs only if a model backend answers."""
+    from courtroom.llm import default_client
+    from courtroom.llm.exhibition import run_exhibition
+
+    client = default_client()
+    if not client.available():
+        console.print("[red]no language model answers[/] (set OLLAMA_API_KEY or GEMINI_API_KEY in .env, or start `ollama serve`). Nothing was run.")
+        return 3
+    table = run_exhibition([_case(c) for c in a.cases.split(",")], client, seeds=range(a.seeds), surprises=_surprises(a))
+    console.print(f"[bold]{table.label}[/]  model {table.model} via {table.provider}")
+    for c in table.cells:
+        console.print(f"  {c.case_id:18s} AI as {c.ai_side:11s} v {c.style:12s} wins {c.ai_win_rate:4.0%} (Smart in its seat {c.smart_reference_win_rate:4.0%})  fell back {c.fallback_rate:4.0%}")
+    if a.json:
+        Path(a.json).write_text(table.model_dump_json(indent=1), encoding="utf-8")
+        console.print(f"wrote {a.json}")
+    return 0
+
+
 def cmd_export(a: argparse.Namespace) -> int:
     """Pre-compute a static bundle so the web UI works with no server (demo fallback)."""
     from courtroom.agents import describe_strategies
@@ -236,6 +255,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--json")
     surprise_arg(p)
     p.set_defaults(fn=cmd_oracle)
+
+    p = sub.add_parser("exhibition", help="the AI lawyer against the four styles (needs a model backend; never certified)")
+    p.add_argument("--cases", default="helix-espionage,kestrel-av")
+    p.add_argument("--seeds", type=int, default=3)
+    p.add_argument("--json")
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_exhibition)
 
     p = sub.add_parser("find", help="search generated cases for contested ones")
     p.add_argument("--start", type=int, default=0)
