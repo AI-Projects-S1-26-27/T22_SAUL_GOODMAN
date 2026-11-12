@@ -261,3 +261,35 @@ def test_status_says_whether_a_backend_answers(tmp_path):
     client, _ = stub_client(tmp_path)
     assert client.status()["available"] is True and client.status()["backend"] == "local"
     assert LLMClient(backends=[], cache_path=tmp_path / "x.json").status()["available"] is False
+
+
+def test_saving_the_cache_from_many_threads_at_once_is_safe(tmp_path):
+    import threading
+
+    client, _ = stub_client(tmp_path)
+    for i in range(6):
+        client.complete("s", f"p{i}")
+    errors: list[Exception] = []
+
+    def go():
+        try:
+            for _ in range(30):
+                client._dirty = True
+                client.save()
+        except Exception as exc:
+            errors.append(exc)
+
+    threads = [threading.Thread(target=go) for _ in range(8)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    assert not errors and json.loads((tmp_path / "cache.json").read_text())["entries"]
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_a_cache_that_cannot_be_written_does_not_break_the_caller(tmp_path):
+    client, _ = stub_client(tmp_path)
+    client.complete("s", "p")
+    client.cache_path = tmp_path / "missing" / "deeper" / "c.json"
+    (tmp_path / "missing").write_text("a file where a folder should be")
+    client.save()  # must not raise
+    assert client.last_error and "could not save" in client.last_error

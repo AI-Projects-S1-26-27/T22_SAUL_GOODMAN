@@ -114,13 +114,21 @@ class LLMClient:
     # ------------------------------------------------------------------ cache
 
     def save(self) -> None:
-        if not self._dirty:
-            return
-        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = self.cache_path.with_suffix(".tmp")
-        tmp.write_text(json.dumps({"_models": sorted(set(self._models_seen)), "entries": self._entries}, indent=1, sort_keys=True), encoding="utf-8")
-        tmp.replace(self.cache_path)
-        self._dirty = False
+        """Write the cache to disk. Safe to call from several requests at once; a write that fails never breaks a caller."""
+        with self._lock:
+            if not self._dirty:
+                return
+            payload = json.dumps({"_models": sorted(set(self._models_seen)), "entries": self._entries}, indent=1, sort_keys=True)
+            tmp = self.cache_path.with_name(f"{self.cache_path.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+            try:
+                self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+                tmp.write_text(payload, encoding="utf-8")
+                tmp.replace(self.cache_path)
+                self._dirty = False
+            except OSError as exc:
+                self.last_error = f"could not save the cache: {exc}"
+                with contextlib.suppress(OSError):
+                    tmp.unlink()
 
     def _candidate_models(self) -> list[str]:
         names = [b.model for b in self.backends if b.model]

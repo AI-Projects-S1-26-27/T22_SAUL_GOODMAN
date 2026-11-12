@@ -84,7 +84,7 @@ table.ed .check.bad span::after { content: ""; }
 .flip-note { color: var(--brass); font-weight: 600; }
 
 /* the badge is taller than the old two-line header, so the meters sit lower */
-.court .hud-meters { top: 176px; }
+.court .hud-meters { top: 190px; }
 .live-badge { max-width: min(560px, 60vw); }
 
 /* lab chapters that need the server */
@@ -96,3 +96,19 @@ body.lab-page .matter-tag.moves { background: #a87a12; color: #fff; }
 body.lab-page .matter-tag.some { background: #c9a55a; color: #2a1d10; }
 body.lab-page .matter-tag.luck { background: #0e8f85; color: #fff; }
 body.lab-page .ed-scroll { overflow-x: auto; }
+
+/* the AI lawyer's thinking, drafting box, editor extras */
+.thinking { margin: 0 0 8px; padding: 6px 12px; border-radius: 6px; background: rgba(255, 255, 255, .07); border-left: 4px solid var(--d); color: var(--bone-2); font: italic 500 16px/1.4 var(--serif); }
+.thinking.p { border-left-color: var(--p); } .thinking.fb { border-left-color: var(--quiet); }
+.ai-line { margin: 0 0 10px; font-size: 14px; }
+#ai-box { padding: 14px 16px; border-radius: 8px; background: var(--ink); }
+#ai-box textarea { width: 100%; min-height: 76px; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--quiet); background: var(--ink-2); color: var(--bone); font: inherit; resize: vertical; margin: 8px 0; }
+#ai-box label { display: flex; gap: 10px; align-items: center; }
+.draft-note { padding: 10px 14px; border-radius: 8px; background: rgba(69, 179, 170, .15); border-left: 4px solid var(--d); margin: 12px 0; }
+table.ed input[type="text"], table.ed input:not([type]), table.ed select, .ed-top input[type="text"], .ed-top input:not([type]) { min-height: 38px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--quiet); background: var(--ink); color: var(--bone); max-width: 100%; }
+table.ed select { padding: 6px; }
+table.ed .pair { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+table.ed .supports { display: grid; gap: 4px; }
+table.ed .supp { display: flex; align-items: center; gap: 6px; font-weight: 400; margin: 0; }
+table.ed .supp small { color: var(--quiet); min-width: 6em; }
+table.ed input[type="number"] { width: 5.5em; }

@@ -509,6 +509,7 @@ function leaveCourt() {
   window.Sound?.stopScore();
   window.Scene?.resume?.();
   $("#court").hidden = true;
+  $("#thinking")?.setAttribute("hidden", "");
   $(".doors").hidden = false;
   Exhibit.hide(false);
   document.body.style.overflow = "";
@@ -700,6 +701,7 @@ async function present(i, forward = true) {
   $("#verdict").hidden = true;
   $("#caption").hidden = false;
   const ev = evs[S.idx], n = narrate(ev);
+  window.Live?.thinking?.(ev);
   syncState(S.idx, forward);
   const pace = +$("#speed").value;
   if (!n.beats.some((b) => b.exhibit)) Exhibit.hide(forward);
