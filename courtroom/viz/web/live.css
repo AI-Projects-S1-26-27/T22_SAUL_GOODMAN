@@ -86,3 +86,13 @@ table.ed .check.bad span::after { content: ""; }
 /* the badge is taller than the old two-line header, so the meters sit lower */
 .court .hud-meters { top: 176px; }
 .live-badge { max-width: min(560px, 60vw); }
+
+/* lab chapters that need the server */
+.lab-table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 12px 0; }
+.lab-table th, .lab-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(0, 0, 0, .12); }
+.lab-table tr.current { background: rgba(168, 122, 18, .14); }
+body.lab-page .matter-tag.flat { background: #e4ddd0; color: #5a4e3c; }
+body.lab-page .matter-tag.moves { background: #a87a12; color: #fff; }
+body.lab-page .matter-tag.some { background: #c9a55a; color: #2a1d10; }
+body.lab-page .matter-tag.luck { background: #0e8f85; color: #fff; }
+body.lab-page .ed-scroll { overflow-x: auto; }

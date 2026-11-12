@@ -1005,6 +1005,7 @@
     $("#lab-source").textContent = L.source === "live" ? `Averaged over ${L.runs} fresh trials per pairing, run on this computer.`
       : `Using one recorded trial per pairing${L.live ? ". Run fresh trials for steadier averages." : "."}`;
     renderKpis(); renderLedger(); renderMatrix(); renderSolve(); renderBR(); renderLandSays(); renderWhatIf(); renderEvo(); renderBelief(); Land.update();
+    window.dispatchEvent(new CustomEvent("lab-refresh", { detail: { caseId: L.caseId, live: L.live } })); // lab-extra.js listens
   }
 
   $("#lab-case").addEventListener("change", (e) => setCase(e.target.value));

@@ -13,7 +13,7 @@ from pathlib import Path
 from rich.console import Console
 
 from courtroom.cases import CASES, generate_case, get_case
-from courtroom.contracts import CaseFile
+from courtroom.contracts import CaseFile, Surprises
 from courtroom.engine import run_trial, verify_chain
 
 # Windows consoles default to cp1252; never let a glyph crash a live demo.
@@ -29,6 +29,10 @@ def _case(case_id: str) -> CaseFile:
     return generate_case(int(case_id[4:])) if case_id.startswith("gen-") else get_case(case_id)
 
 
+def _surprises(a: argparse.Namespace) -> Surprises | None:
+    return Surprises() if getattr(a, "surprises", False) else None
+
+
 def cmd_cases(_: argparse.Namespace) -> int:
     for c in CASES.values():
         console.print(f"[bold]{c.id:24s}[/] {c.case_type.value:8s} {c.standard.value:24s} {c.title}")
@@ -40,7 +44,7 @@ def cmd_cases(_: argparse.Namespace) -> int:
 def cmd_run(a: argparse.Namespace) -> int:
     from courtroom.viz.terminal import print_summary, replay
 
-    result = run_trial(_case(a.case), a.prosecution, a.defense, a.seed)
+    result = run_trial(_case(a.case), a.prosecution, a.defense, a.seed, _surprises(a))
     if a.json:
         Path(a.json).write_text(result.model_dump_json(indent=2), encoding="utf-8")
         console.print(f"wrote {a.json}")
@@ -60,7 +64,7 @@ def cmd_game(a: argparse.Namespace) -> int:
     from courtroom.gametheory import estimate_payoffs
     from courtroom.viz.terminal import print_game
 
-    table = estimate_payoffs(_case(a.case), a.strategies.split(","), seeds=range(a.seeds), workers=a.workers)
+    table = estimate_payoffs(_case(a.case), a.strategies.split(","), seeds=range(a.seeds), workers=a.workers, surprises=_surprises(a))
     print_game(table, console)
     if a.json:
         Path(a.json).write_text(table.model_dump_json(indent=2), encoding="utf-8")
@@ -87,8 +91,8 @@ def cmd_stress(a: argparse.Namespace) -> int:
 
 def cmd_verify(a: argparse.Namespace) -> int:
     case = _case(a.case)
-    first = run_trial(case, a.prosecution, a.defense, a.seed)
-    second = run_trial(case, a.prosecution, a.defense, a.seed)
+    first = run_trial(case, a.prosecution, a.defense, a.seed, _surprises(a))
+    second = run_trial(case, a.prosecution, a.defense, a.seed, _surprises(a))
     same = first.digest == second.digest and first.model_dump_json() == second.model_dump_json()
     chain_ok = verify_chain(first.events)
     console.print(f"digest run 1: {first.digest}\ndigest run 2: {second.digest}")
@@ -96,6 +100,31 @@ def cmd_verify(a: argparse.Namespace) -> int:
         f"bit-identical results: {'[green]YES' if same else '[red]NO'}[/]   hash chain valid: {'[green]YES' if chain_ok else '[red]NO'}[/]"
     )
     return 0 if same and chain_ok else 1
+
+
+def cmd_matters(a: argparse.Namespace) -> int:
+    """Does strategy matter in this case? Measured from fresh runs of every pairing of Bold, Careful and Smart."""
+    from courtroom.gametheory.matters import measure
+
+    ids = [a.case] if a.case else list(CASES)
+    for cid in ids:
+        m = measure(_case(cid), seeds=tuple(range(a.seeds)), surprises=_surprises(a))
+        console.print(f"[bold]{cid:24s}[/] {m.label:28s} spread {m.pairing_spread:4.0%}  seed noise {m.seed_noise:4.0%}  accuser wins {m.overall_win_rate:4.0%}")
+    return 0
+
+
+def cmd_find(a: argparse.Namespace) -> int:
+    """Search generated cases (gen-<seed>) for contested ones: the lawyers or the seed really move the verdict."""
+    from courtroom.gametheory.finder import find_contested
+
+    report = find_contested(a.start, a.count, a.top, surprises=_surprises(a))
+    console.print(f"[grey50]{report.note} ({report.seconds}s)[/]")
+    for f in report.found:
+        dom = {True: "no dominant strategy", False: "one style simply wins", None: "game not solved"}[f.no_dominant_strategy]
+        console.print(f"[bold]{f.case_id:10s}[/] score {f.score:5.2f}  {f.mattering.label:26s} {dom} ({f.equilibrium_kind})")
+    if a.json:
+        Path(a.json).write_text(report.model_dump_json(indent=2), encoding="utf-8")
+    return 0
 
 
 def cmd_export(a: argparse.Namespace) -> int:
@@ -144,11 +173,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("cases", help="list the synthetic case library").set_defaults(fn=cmd_cases)
 
+    def surprise_arg(p: argparse.ArgumentParser) -> None:
+        p.add_argument("--surprises", action="store_true", help="switch on courtroom surprises (no-show, missing certificate, hostile witness)")
+
     def trial_args(p: argparse.ArgumentParser) -> None:
         p.add_argument("--case", default="helix-espionage")
         p.add_argument("-p", "--prosecution", default="aggressive")
         p.add_argument("-d", "--defense", default="conservative")
         p.add_argument("--seed", type=int, default=0)
+        surprise_arg(p)
 
     p = sub.add_parser("run", help="run one trial")
     trial_args(p)
@@ -167,7 +200,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seeds", type=int, default=40)
     p.add_argument("--workers", type=int, default=1)
     p.add_argument("--json")
+    surprise_arg(p)
     p.set_defaults(fn=cmd_game)
+
+    p = sub.add_parser("matters", help="does strategy matter? measured from fresh runs of every pairing")
+    p.add_argument("--case", help="one case id (default: the whole library)")
+    p.add_argument("--seeds", type=int, default=5)
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_matters)
+
+    p = sub.add_parser("find", help="search generated cases for contested ones")
+    p.add_argument("--start", type=int, default=0)
+    p.add_argument("--count", type=int, default=40)
+    p.add_argument("--top", type=int, default=5)
+    p.add_argument("--json")
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_find)
 
     p = sub.add_parser("tournament", help="game analysis across the whole library")
     p.add_argument("--strategies", default="aggressive,conservative")
