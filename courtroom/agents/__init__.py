@@ -11,7 +11,7 @@ from courtroom.agents.policies import (
     MixedAgent,
     StrategyProfile,
 )
-from courtroom.agents.registry import STRATEGY_NAMES, describe_strategies, make_agent
+from courtroom.agents.registry import STRATEGY_NAMES, describe_strategies, make_agent, register_strategy
 
 __all__ = [
     "ADAPTIVE",
@@ -31,4 +31,5 @@ __all__ = [
     "describe_strategies",
     "make_agent",
     "perceive",
+    "register_strategy",
 ]

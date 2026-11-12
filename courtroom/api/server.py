@@ -19,12 +19,18 @@ from courtroom.agents import describe_strategies, make_agent
 from courtroom.api import analyst
 from courtroom.cases import CASES, generate_case, get_case
 from courtroom.contracts import CaseFile, Surprises, TrialResult
-from courtroom.engine import run_trial, verify_chain
+from courtroom.engine import run_trial, run_with_agents, verify_chain
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
 from courtroom.gametheory.finder import find_contested
 from courtroom.gametheory.matters import measure
 from courtroom.judge.explain import build_facts, template_text
 from courtroom.judge.tipping import tipping_points
+from courtroom.llm import default_client
+from courtroom.llm import register as _register_ai  # noqa: F401  (registers the 'llm' strategy; the core never imports this)
+from courtroom.llm.draft import MAX_TEXT, draft_case
+from courtroom.llm.explainer import explain_in_words
+from courtroom.llm.narrator import narrate_case
+from courtroom.llm.policy import LLMAgent
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "viz" / "web"
 
@@ -51,6 +57,19 @@ class TrialRequest(BaseModel):
 
         make_agent(v, random.Random(0))  # raises ValueError on unknown names
         return v
+
+
+class ExplainRequest(TrialRequest):
+    words: bool = False  # ask the model to word the explanation (checked against the judge's figures)
+
+
+class DraftRequest(BaseModel):
+    text: str = Field(min_length=10, max_length=MAX_TEXT)
+
+
+class NarrateRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
 
 
 class GameRequest(BaseModel):
@@ -106,6 +125,29 @@ def _pick_case(case_id: str, inline: CaseFile | None) -> CaseFile:
     return inline
 
 
+def _run(req: TrialRequest, case: CaseFile | None = None) -> TrialResult:
+    """Run a trial. A language-model lawyer goes through its own path so its fallback counts can be reported."""
+    case = case or _pick_case(req.case_id, req.case)
+    sur = _surprises(req.surprises)
+    if "llm" not in (req.prosecution, req.defense):
+        return run_trial(case, req.prosecution, req.defense, req.seed, sur)
+    import random
+
+    client = default_client()
+    client.start_trial()
+    agents: dict[str, LLMAgent] = {}
+    built = {}
+    for side, name in (("prosecution", req.prosecution), ("defense", req.defense)):
+        if name == "llm":
+            agents[side] = built[side] = LLMAgent(client, random.Random(f"{req.seed}:agent:{side}"))
+        else:
+            built[side] = make_agent(name, random.Random(f"{req.seed}:agent:{side}"))
+    result = run_with_agents(case, built["prosecution"], built["defense"], req.seed, sur, req.prosecution, req.defense)
+    client.save()
+    reports = {side: a.report() for side, a in agents.items()}
+    return result.model_copy(update={"certified": False, "ai": {"sides": reports, "fallback_rate": max(r["fallback_rate"] for r in reports.values())}})
+
+
 def create_app() -> FastAPI:
     app = FastAPI(title="Saul Goodman Courtroom", version=__version__)
 
@@ -144,18 +186,22 @@ def create_app() -> FastAPI:
 
     @app.post("/api/trial", response_model=TrialResult)
     def trial(req: TrialRequest) -> TrialResult:
-        return run_trial(_pick_case(req.case_id, req.case), req.prosecution, req.defense, req.seed, _surprises(req.surprises))
+        return _run(req)
+
+    @app.get("/api/ai")
+    def ai_status() -> dict[str, object]:
+        """Does a language-model backend answer right now? The page offers the AI lawyer and case drafting only if so."""
+        return default_client().status()
 
     @app.post("/api/verify")
     def verify(req: TrialRequest) -> dict[str, object]:
         """Run the same trial twice and compare: the digests must match and the hash chain must hold."""
-        case, sur = _pick_case(req.case_id, req.case), _surprises(req.surprises)
-        first = run_trial(case, req.prosecution, req.defense, req.seed, sur)
-        second = run_trial(case, req.prosecution, req.defense, req.seed, sur)
+        case = _pick_case(req.case_id, req.case)
+        first, second = _run(req, case), _run(req, case)
         return {
             "digest_first": first.digest,
             "digest_second": second.digest,
-            "identical": first.digest == second.digest and first.model_dump_json() == second.model_dump_json(),
+            "identical": first.digest == second.digest and first.model_dump_json(exclude={"ai"}) == second.model_dump_json(exclude={"ai"}),
             "chain_valid": verify_chain(first.events) and verify_chain(second.events),
             "events": len(first.events),
         }
@@ -173,22 +219,49 @@ def create_app() -> FastAPI:
         return JSONResponse(report.model_dump(mode="json"))
 
     @app.post("/api/explain")
-    def explain(req: TrialRequest) -> JSONResponse:
+    def explain(req: ExplainRequest) -> JSONResponse:
         """Why this verdict (the judge's own numbers in plain words) and the smallest single change that would flip it."""
         case = _pick_case(req.case_id, req.case)
-        result = run_trial(case, req.prosecution, req.defense, req.seed, _surprises(req.surprises))
+        result = _run(req, case)
         facts = build_facts(result, case)
+        said = explain_in_words(facts, default_client()) if req.words and default_client().available() else None
         return JSONResponse(
             {
                 "digest": result.digest,
-                "text": template_text(facts),
+                "text": said["text"] if said else template_text(facts),
+                "text_source": said["source"] if said else "template",
+                "text_note": said["note"] if said else None,
                 "facts": facts.model_dump(mode="json"),
                 "tipping": [t.model_dump(mode="json") for t in tipping_points(case, result)],
             }
         )
 
+    @app.post("/api/case/draft")
+    def draft(req: DraftRequest) -> JSONResponse:
+        """A case written from plain English by the model, validated by the contracts. The page puts it in the editor."""
+        client = default_client()
+        if not client.available():
+            return JSONResponse({"detail": "no language model answers", "reason": client.last_error}, status_code=503)
+        result = draft_case(req.text, client)
+        client.save()
+        if result.case is None:
+            return JSONResponse({"detail": result.error, "problems": result.problems, "repairs": result.repairs}, status_code=422)
+        return JSONResponse(
+            {"case": result.case.model_dump(mode="json"), "repairs": result.repairs, "notes": result.notes, "model": client.last_model, "backend": client.last_source}
+        )
+
+    @app.post("/api/narrate")
+    def narrate(req: NarrateRequest) -> JSONResponse:
+        """Model-worded spoken lines for a case with no script. Lines that add any fact are refused."""
+        client = default_client()
+        if not client.available():
+            return JSONResponse({"detail": "no language model answers", "reason": client.last_error}, status_code=503)
+        return JSONResponse(narrate_case(_pick_case(req.case_id, req.case), client))
+
     @app.post("/api/game")
     def game(req: GameRequest) -> JSONResponse:
+        if "llm" in req.strategies:
+            raise HTTPException(422, "the AI lawyer is an exhibition, not a certified strategy; it cannot enter a payoff table")
         if "chaos" in req.strategies:
             raise HTTPException(422, "chaos is a fuzzing agent, not a strategy for equilibrium analysis")
         table: PayoffTable = estimate_payoffs(

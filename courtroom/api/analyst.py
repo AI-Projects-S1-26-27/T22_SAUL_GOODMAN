@@ -1,10 +1,12 @@
 """The strategy lab's "ask the analyst" backend: forwards a question to an Ollama model.
 
 The browser never sees the API key. It is read from the environment (or a git-ignored ``.env`` file at the
-repo root) and used only here. Two backends are tried in order:
+repo root) and used only here. Three backends are tried in order, the same ones the rest of the model layer uses
+(``courtroom.llm.backends``):
 
 1. Ollama Cloud (``https://ollama.com``) with ``OLLAMA_API_KEY``.
 2. A local Ollama server (``http://localhost:11434``), which needs no key.
+3. Gemini, if ``GEMINI_API_KEY`` is set.
 
 The model explains numbers the lab has already computed; it is told never to invent its own.
 """
@@ -16,11 +18,12 @@ import json
 import os
 import urllib.error
 import urllib.request
-from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+from courtroom.llm.backends import BackendError, GeminiBackend
+from courtroom.llm.env import load_env
+
 CLOUD_URL = "https://ollama.com"
 DEFAULT_CLOUD_MODEL = "gpt-oss:120b"
 
@@ -63,19 +66,6 @@ class AnalystUnavailable(Exception):
     def __init__(self, reasons: list[str]) -> None:
         super().__init__("; ".join(reasons))
         self.reasons = reasons
-
-
-def load_env(path: Path | None = None) -> None:
-    """Read KEY=VALUE lines from ``.env`` into the environment without overriding what is already set."""
-    path = path or REPO_ROOT / ".env"
-    if not path.is_file():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 
 def _local_url() -> str:
@@ -145,4 +135,16 @@ def ask(req: AnalystRequest) -> dict[str, str]:
             return {"reply": _chat(_local_url(), local, None, messages), "source": "local", "model": local}
     except RuntimeError as exc:
         reasons.append(f"Local Ollama: {exc}")
+
+    gem_key = os.environ.get("GEMINI_API_KEY")
+    if gem_key:
+        gem = GeminiBackend(gem_key, os.environ.get("COURTROOM_GEMINI_MODEL", "gemini-3.1-flash-lite"))
+        history = "\n".join(f"{m['role']}: {m['content']}" for m in messages[1:])
+        try:
+            reply = gem.chat(messages[0]["content"], history, temperature=0.3, max_tokens=500, schema=None)
+            return {"reply": reply, "source": "gemini", "model": gem.model}
+        except BackendError as exc:
+            reasons.append(f"Gemini: {exc}")
+    else:
+        reasons.append("Gemini: no GEMINI_API_KEY set")
     raise AnalystUnavailable(reasons)

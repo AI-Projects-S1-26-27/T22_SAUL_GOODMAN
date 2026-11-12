@@ -3,7 +3,7 @@
 ``build_facts`` reads a *finished* ``TrialResult`` (its event log and the judge's own computed snapshot) and lays out what
 the judge decided and why. It runs no agent and recomputes nothing: every number in it was produced by the judge and is
 copied out. ``template_text`` turns those facts into plain sentences with no model involved, so the explanation always
-exists, offline, with no key. The model layer (``courtroom.llm.explainer``) may rephrase it but is checked against the same
+exists, offline, with no key. The optional model layer (outside this package) may rephrase it but is checked against the same
 facts, using ``allowed_numbers`` and ``check_text`` below.
 
 It reads only the public record: exhibit titles and ids, the rulings and grounds argued, the credibility events and the

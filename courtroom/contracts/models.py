@@ -461,3 +461,5 @@ class TrialResult(Frozen):
     digest: str
     graph: EvidenceGraph
     surprises: Surprises | None = None  # None: the plain rulebook (every recorded trial)
+    certified: bool = True  # False when a language model played: an exhibition, never part of certified analysis
+    ai: dict[str, object] | None = None  # for such a trial: which model, how often it really chose, why it fell back
