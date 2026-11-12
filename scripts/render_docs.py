@@ -161,7 +161,7 @@ def sensitivity_findings() -> str:
 def oracle() -> str:
     names = case_names()
     rows = []
-    for key, r in sorted(load_oracle().items()):
+    for _, r in sorted(load_oracle().items()):
         kept = [c for c in r["candidates"] if c["accepted"]]
         conf = sum(1 for c in kept if c.get("confirmed"))
         gains = ", ".join(f"{s}: +{r['exploitability'][s]['gain']:.2f}" for s in ("prosecution", "defense") if r["exploitability"][s]["found_better"]) or "none"
@@ -180,7 +180,7 @@ def oracle_findings() -> str:
         return ""
     names = case_names()
     lines = []
-    for key, r in sorted(res.items()):
+    for _, r in sorted(res.items()):
         lines.append(f"- **{names[r['case_id']]}**, surprises {'on' if r['surprises'] else 'off'}: {r['headline']}")
         for c in r["candidates"]:
             if c["accepted"]:
@@ -209,7 +209,6 @@ def files() -> str:
 
 
 def demo_cases() -> str:
-    names = case_names()
     off = load("matters").get("cases", {})
     if not off:
         return ""
