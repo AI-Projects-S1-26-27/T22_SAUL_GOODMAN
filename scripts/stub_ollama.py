@@ -54,10 +54,10 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def do_GET(self) -> None:  # noqa: N802
+    def do_GET(self) -> None:
         self._send({"models": [{"name": "stub-model"}]} if self.path.startswith("/api/tags") else {})
 
-    def do_POST(self) -> None:  # noqa: N802
+    def do_POST(self) -> None:
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
         self._send({"message": {"role": "assistant", "content": reply(body)}})
 

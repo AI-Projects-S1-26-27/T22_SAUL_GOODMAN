@@ -127,6 +127,24 @@ def cmd_find(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_oracle(a: argparse.Namespace) -> int:
+    """Can the four hand-written lawyer styles be beaten? A double-oracle search over lawyer profiles."""
+    from courtroom.gametheory.oracle import run_oracle
+
+    r = run_oracle(_case(a.case), budget=a.budget, surprises=_surprises(a), workers=a.workers, rng_seed=a.rng_seed, max_rounds=a.rounds)
+    console.print(f"[bold]{r.case_id}[/]  surprises {'on' if r.surprises else 'off'}  {r.trials} trials in {r.seconds}s")
+    console.print(r.headline)
+    for c in r.candidates:
+        verdict = "[green]kept[/]" if c.accepted else "[grey50]dropped[/]"
+        console.print(f"  {c.name:14s} {verdict}  beats the equilibrium by {c.difference:+.2f} (z {c.z:+.1f})  {c.plain}")
+    console.print(f"  stopped: {r.stopped}")
+    console.print(f"  final equilibrium: Accuser {r.final_equilibrium.get('prosecution_mix')}  Defender {r.final_equilibrium.get('defense_mix')}")
+    if a.json:
+        Path(a.json).write_text(r.model_dump_json(indent=1), encoding="utf-8")
+        console.print(f"wrote {a.json}")
+    return 0
+
+
 def cmd_export(a: argparse.Namespace) -> int:
     """Pre-compute a static bundle so the web UI works with no server (demo fallback)."""
     from courtroom.agents import describe_strategies
@@ -208,6 +226,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seeds", type=int, default=5)
     surprise_arg(p)
     p.set_defaults(fn=cmd_matters)
+
+    p = sub.add_parser("oracle", help="best-response search: can the four hand-written styles be beaten?")
+    p.add_argument("--case", default="helix-espionage")
+    p.add_argument("--budget", type=int, default=40, help="candidate profiles tried per side per round")
+    p.add_argument("--rounds", type=int, default=4)
+    p.add_argument("--rng-seed", type=int, default=0)
+    p.add_argument("--workers", type=int, default=1)
+    p.add_argument("--json")
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_oracle)
 
     p = sub.add_parser("find", help="search generated cases for contested ones")
     p.add_argument("--start", type=int, default=0)

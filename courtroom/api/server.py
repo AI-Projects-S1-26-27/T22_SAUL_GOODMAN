@@ -6,6 +6,7 @@ Input sizes are bounded so a demo audience can't hang the server.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
@@ -21,8 +22,10 @@ from courtroom.cases import CASES, generate_case, get_case
 from courtroom.contracts import CaseFile, Surprises, TrialResult
 from courtroom.engine import run_trial, run_with_agents, verify_chain
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
+from courtroom.gametheory.bootstrap import bootstrap_case
 from courtroom.gametheory.finder import find_contested
 from courtroom.gametheory.matters import measure
+from courtroom.gametheory.oracle import run_oracle
 from courtroom.judge.explain import build_facts, template_text
 from courtroom.judge.tipping import tipping_points
 from courtroom.llm import default_client
@@ -33,6 +36,7 @@ from courtroom.llm.narrator import narrate_case
 from courtroom.llm.policy import LLMAgent
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "viz" / "web"
+RESULTS_DIR = Path(__file__).resolve().parent.parent.parent / "results"
 
 
 # An inline case (the what-if editor, a drafted case) is bounded so a visitor cannot hang the server with a huge one.
@@ -70,6 +74,22 @@ class DraftRequest(BaseModel):
 class NarrateRequest(BaseModel):
     case_id: str = ""
     case: CaseFile | None = None
+
+
+class BootstrapRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
+    seeds: int = Field(default=20, ge=5, le=40)
+    resamples: int = Field(default=200, ge=20, le=400)
+    surprises: Surprises | bool | None = None
+
+
+class OracleRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
+    budget: int = Field(default=12, ge=2, le=30)
+    rounds: int = Field(default=2, ge=1, le=4)
+    surprises: Surprises | bool | None = None
 
 
 class GameRequest(BaseModel):
@@ -257,6 +277,31 @@ def create_app() -> FastAPI:
         if not client.available():
             return JSONResponse({"detail": "no language model answers", "reason": client.last_error}, status_code=503)
         return JSONResponse(narrate_case(_pick_case(req.case_id, req.case), client))
+
+    @app.post("/api/bootstrap")
+    def bootstrap(req: BootstrapRequest) -> JSONResponse:
+        """How often the equilibrium label survives resampling the seeds (bounded: 40 seeds at most)."""
+        case = _pick_case(req.case_id, req.case)
+        res = bootstrap_case(case, seeds=tuple(range(req.seeds)), n_resamples=req.resamples, workers=1, surprises=_surprises(req.surprises))
+        return JSONResponse(res.model_dump(mode="json"))
+
+    @app.post("/api/oracle")
+    def oracle(req: OracleRequest) -> JSONResponse:
+        """A small, bounded best-response search run live. The committed results use a larger budget (see /api/results)."""
+        case = _pick_case(req.case_id, req.case)
+        rep = run_oracle(case, budget=req.budget, surprises=_surprises(req.surprises), train=tuple(range(4)), heldout=tuple(range(100, 108)), workers=4, max_rounds=req.rounds)
+        return JSONResponse(rep.model_dump(mode="json"))
+
+    @app.get("/api/results")
+    def results() -> dict[str, object]:
+        """The certified results committed under results/ (bootstrap, sensitivity, best-response), for the lab."""
+        out: dict[str, object] = {}
+        for path in sorted(RESULTS_DIR.glob("*.json")):
+            out[path.stem] = json.loads(path.read_text(encoding="utf-8"))
+        oracle_dir = RESULTS_DIR / "oracle"
+        if oracle_dir.is_dir():
+            out["oracle"] = {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in sorted(oracle_dir.glob("*.json"))}
+        return out
 
     @app.post("/api/game")
     def game(req: GameRequest) -> JSONResponse:
