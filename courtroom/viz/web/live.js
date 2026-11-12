@@ -182,12 +182,12 @@ window.Live = (() => {
     if (S.source !== "live") { box.replaceChildren(el("p", { class: "muted small" }, "Recorded trial. Run the local server to see why it ended this way and what would flip it.")); return; }
     box.replaceChildren(el("p", { class: "muted small" }, "Working out why…"));
     try {
-      const r = await post("/explain", S.request);
+      const r = await post("/explain", { ...S.request, words: !!S.ai?.available });
       if (r.digest !== S.trial.digest) return;
       const tips = r.tipping.slice(0, 3);
       box.replaceChildren(
         S.trial.ai ? el("p", { class: "ai-line" }, el("b", {}, "AI lawyer, not certified. "), aiSummary(S.trial.ai)) : null,
-        el("details", { class: "why" }, el("summary", {}, "Why this verdict?"), el("p", {}, r.text)),
+        el("details", { class: "why" }, el("summary", {}, "Why this verdict?"), el("p", {}, r.text), el("p", { class: "muted small" }, r.text_source === "model" ? "Worded by the model, then checked: every number and exhibit in it is one the judge produced." : "Written straight from the judge's own numbers.")),
         el("div", { class: "flip" },
           el("b", {}, "What would flip it?"),
           tips.length
