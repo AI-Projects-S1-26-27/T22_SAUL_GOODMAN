@@ -22,6 +22,8 @@ from courtroom.contracts import (
     CaseFile,
     EventKind,
     EvidenceGraph,
+    EvidenceItem,
+    EvidenceKind,
     GraphEdge,
     GraphNode,
     PartyView,
@@ -29,6 +31,7 @@ from courtroom.contracts import (
     Phase,
     RuleFiring,
     Side,
+    Surprises,
     TrialEvent,
     TrialResult,
     Verdict,
@@ -41,6 +44,7 @@ from courtroom.judge.admissibility import BAD_FAITH_GROUNDS
 from courtroom.judge.rules import (
     CONTEMPT_VIOLATIONS,
     FINE_VIOLATION,
+    HOSTILE_PREFIX,
     IMPEACHMENT_COST,
     MOTION_COST,
     OBJECTION_COST,
@@ -69,6 +73,7 @@ class Court:
         seed: int = 0,
         prosecution_strategy: str | None = None,
         defense_strategy: str | None = None,
+        surprises: Surprises | None = None,
     ) -> None:
         self.case = case
         self.agents: dict[Side, Agent] = {Side.PROSECUTION: prosecution, Side.DEFENSE: defense}
@@ -84,6 +89,11 @@ class Court:
         self._perceived: PerceivedItem | None = None
         self._events: list[TrialEvent] = []
         self._last_hash = GENESIS
+        # Courtroom surprises draw from their own seeded stream and only when switched on, so a trial without
+        # them consumes exactly the randomness it always did and its digest cannot move.
+        self.surprises = surprises
+        self._adverse_rng = random.Random(f"{seed}:adverse")
+        self._hostile: set[str] = set()
 
     # ------------------------------------------------------------------ event plumbing
 
@@ -251,6 +261,14 @@ class Court:
                 ledger.charge(item.presentation_cost)
                 ledger.presented += 1
                 st.presented.append(item.id)
+                failure = self._roll_offer(item)
+                if failure is not None:
+                    st.consume_primary_turn()
+                    st.consecutive_passes = 0
+                    st.excluded.append(item.id)
+                    ledger.excluded += 1
+                    self._emit_offer_failure(side, action, item, failure)
+                    return
                 st.pending = item.id
                 st.consume_primary_turn()
                 st.consecutive_passes = 0
@@ -358,6 +376,8 @@ class Court:
             subject=item.id,
             status="excluded" if sustained else "admitted",
         )
+        if not sustained:
+            self._after_admission(item)
 
     def _admit_pending(self, waived: bool) -> None:
         st = self.state
@@ -375,6 +395,52 @@ class Court:
             rules=[RuleFiring(rule_id="ADM-WAIVER", detail=f"No (valid) objection to {item.id}; any defect is waived.")],
             subject=item.id,
             status="admitted",
+        )
+        self._after_admission(item)
+
+    # ------------------------------------------------------------------ courtroom surprises (off unless asked for)
+
+    def _roll_offer(self, item: EvidenceItem) -> str | None:
+        """Whether offering ``item`` fails outright. Draws only for the surprises the item is exposed to."""
+        if self.surprises is None:
+            return None
+        if item.witness_id is not None and self._adverse_rng.random() < self.surprises.no_show:
+            return "no_show"
+        if item.kind is EvidenceKind.DIGITAL_LOG and self._adverse_rng.random() < self.surprises.missing_certificate:
+            return "no_certificate"
+        return None
+
+    def _emit_offer_failure(self, side: Side, action: Action, item: EvidenceItem, failure: str) -> None:
+        if failure == "no_show":
+            witness = self.case.witness(item.witness_id) if item.witness_id else None
+            who = witness.name if witness else str(item.witness_id)
+            summary = f"{side.value} offers {item.id}, but the witness, {who}, does not appear. The testimony is lost."
+            rule = RuleFiring(rule_id="ADV-1", detail=f"Witness no-show for {item.id}; the exhibit is excluded and its cost is not refunded.")
+        else:
+            summary = f"{side.value} offers {item.id}, but it has no section 65B certificate. The court excludes it."
+            rule = RuleFiring(
+                rule_id="ADV-2",
+                detail=f"Electronic record {item.id} lacks a certificate of authenticity; excluded without objection, no bad-faith sanction.",
+            )
+        self._emit(EventKind.ADVERSE, summary, side, action, [rule], subject=item.id, status=failure)  # type: ignore[arg-type]
+
+    def _after_admission(self, item: EvidenceItem) -> None:
+        """A witness whose testimony has just been admitted may turn hostile (once per witness)."""
+        if self.surprises is None or item.witness_id is None or item.witness_id in self._hostile:
+            return
+        if self._adverse_rng.random() >= self.surprises.hostile:
+            return
+        wid = item.witness_id
+        self._hostile.add(wid)
+        self.state.impeachments[HOSTILE_PREFIX + wid] = 1
+        witness = self.case.witness(wid)
+        who = witness.name if witness else wid
+        self._emit(
+            EventKind.ADVERSE,
+            f"{who} turns hostile on the stand; the testimony of {wid} now carries a quarter of its weight.",
+            subject=wid,
+            status="hostile",
+            rules=[RuleFiring(rule_id="ADV-3", detail=f"Witness {wid} turned hostile after {item.id}; credibility x1/4.")],
         )
 
     def _rest(self, side: Side, forced: RuleFiring | None) -> None:
@@ -423,6 +489,7 @@ class Court:
             utilities=utilities(verdict.outcome, ledgers),
             digest=self._last_hash,
             graph=self._graph(verdict),
+            surprises=self.surprises,
         )
 
     def _graph(self, verdict: Verdict) -> EvidenceGraph:
@@ -457,11 +524,33 @@ class Court:
         return EvidenceGraph(nodes=nodes, edges=tuple(edges))
 
 
-def run_trial(case: CaseFile, prosecution: str, defense: str, seed: int = 0) -> TrialResult:
-    """Convenience entry point used by the CLI, API, and tournament."""
+def run_trial(
+    case: CaseFile, prosecution: str, defense: str, seed: int = 0, surprises: Surprises | None = None
+) -> TrialResult:
+    """Convenience entry point used by the CLI, API, and tournament.
+
+    ``surprises`` switches on the three courtroom surprises; ``None`` (the default) is the plain rulebook.
+    """
     p_agent = make_agent(prosecution, random.Random(f"{seed}:agent:prosecution"))
     d_agent = make_agent(defense, random.Random(f"{seed}:agent:defense"))
-    return Court(case, p_agent, d_agent, seed, prosecution, defense).run()
+    return Court(case, p_agent, d_agent, seed, prosecution, defense, surprises).run()
+
+
+def run_with_agents(
+    case: CaseFile,
+    prosecution: Agent,
+    defense: Agent,
+    seed: int = 0,
+    surprises: Surprises | None = None,
+    prosecution_name: str | None = None,
+    defense_name: str | None = None,
+) -> TrialResult:
+    """Run a trial between agent objects (for example custom ``StrategyProfile`` counsel).
+
+    Named runs go through ``run_trial``; this adds a way in for agents that have no name in the registry,
+    without touching how named runs behave.
+    """
+    return Court(case, prosecution, defense, seed, prosecution_name, defense_name, surprises).run()
 
 
 def threshold_probability(case: CaseFile) -> float:

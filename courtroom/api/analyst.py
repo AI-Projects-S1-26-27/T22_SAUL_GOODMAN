@@ -11,6 +11,7 @@ The model explains numbers the lab has already computed; it is told never to inv
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import urllib.error
@@ -92,10 +93,8 @@ def _request(url: str, body: dict[str, object] | None, key: str | None, timeout:
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as exc:
         text = exc.read().decode(errors="replace")
-        try:
+        with contextlib.suppress(ValueError, AttributeError):
             text = str(json.loads(text).get("error", text))
-        except (ValueError, AttributeError):
-            pass
         raise RuntimeError(text[:200] or f"HTTP {exc.code}") from None
     except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
         raise RuntimeError(str(getattr(exc, "reason", exc))[:200]) from None

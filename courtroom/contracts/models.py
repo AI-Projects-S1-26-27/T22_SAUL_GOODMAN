@@ -39,6 +39,7 @@ __all__ = [
     "ScoreSnapshot",
     "Side",
     "StandardOfProof",
+    "Surprises",
     "TrialEvent",
     "TrialResult",
     "Verdict",
@@ -121,6 +122,7 @@ class EventKind(StrEnum):
     VIOLATION = "violation"
     DIRECTED_VERDICT = "directed_verdict"
     WATCHDOG = "watchdog"
+    ADVERSE = "adverse"  # a courtroom surprise (only when surprises are switched on)
     VERDICT = "verdict"
 
 
@@ -375,6 +377,22 @@ class PartyView(Frozen):
     opponent_response_windows: int
 
 
+# --------------------------------------------------------------------------- courtroom surprises
+
+
+class Surprises(Frozen):
+    """Chances of the three courtroom surprises. Off by default; a trial without this has none of them.
+
+    ``no_show``: each witness exhibit, when offered, fails to appear with this chance.
+    ``missing_certificate``: each digital record, when offered, lacks its authenticity certificate.
+    ``hostile``: each witness whose testimony is admitted turns hostile with this chance (credibility x1/4).
+    """
+
+    no_show: float = Field(default=0.10, ge=0.0, le=1.0)
+    missing_certificate: float = Field(default=0.15, ge=0.0, le=1.0)
+    hostile: float = Field(default=0.10, ge=0.0, le=1.0)
+
+
 # --------------------------------------------------------------------------- trial record
 
 
@@ -402,7 +420,7 @@ class TrialEvent(Frozen):
     action: Action | None = None
     summary: str
     subject: str | None = None  # evidence id this event is about, if any
-    status: Literal["offered", "admitted", "excluded", "impeached"] | None = None
+    status: Literal["offered", "admitted", "excluded", "impeached", "no_show", "no_certificate", "hostile"] | None = None
     rules: tuple[RuleFiring, ...] = ()
     burden_index: float | None = None
     element_probabilities: dict[str, float] = Field(default_factory=dict)
@@ -442,3 +460,4 @@ class TrialResult(Frozen):
     utilities: dict[Side, float]
     digest: str
     graph: EvidenceGraph
+    surprises: Surprises | None = None  # None: the plain rulebook (every recorded trial)

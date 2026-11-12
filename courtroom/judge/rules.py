@@ -22,6 +22,8 @@ CORROBORATION_ALPHA = Fraction(1, 2)  # alpha: max corroboration bonus (+50 %)
 CONTRADICTION_BETA = Fraction(4, 5)  # beta: pairwise contradiction pressure
 MAX_CONTRADICTION_DISCOUNT = Fraction(9, 10)
 IMPEACHMENT_FACTOR = Fraction(1, 2)  # credibility halves per successful impeachment
+HOSTILE_FACTOR = Fraction(1, 4)  # a hostile witness keeps a quarter of their credibility
+HOSTILE_PREFIX = "hostile:"  # impeachment-map key marking a hostile witness
 RELEVANCE_FLOOR = Fraction(1, 20)
 DIRECTED_VERDICT_THRESHOLD = ZERO  # DV-1: any element with L_e < 0
 

@@ -23,6 +23,8 @@ from courtroom.contracts import (
 from courtroom.judge.rules import (
     CONTRADICTION_BETA,
     CORROBORATION_ALPHA,
+    HOSTILE_FACTOR,
+    HOSTILE_PREFIX,
     IMPEACHMENT_FACTOR,
     LLR_SCALE,
     MAX_CONTRADICTION_DISCOUNT,
@@ -50,7 +52,8 @@ def credibility(item: EvidenceItem, case: CaseFile, impeachments: Mapping[str, i
         return ONE
     witness = case.witness(item.witness_id)
     base = q(witness.credibility) if witness is not None else ONE
-    return base * IMPEACHMENT_FACTOR ** impeachments.get(item.witness_id, 0)
+    hostile = HOSTILE_FACTOR if impeachments.get(HOSTILE_PREFIX + item.witness_id, 0) else ONE
+    return base * IMPEACHMENT_FACTOR ** impeachments.get(item.witness_id, 0) * hostile
 
 
 def _sign(x: Fraction) -> int:
