@@ -47,13 +47,15 @@ window.Live = (() => {
   /* ---------------------------------------------------------------- "does strategy matter here?" */
 
   const matters = new Map(); // key -> result (computed fresh from the engine, cached for this page visit)
-  const mattersKey = (id) => `${id}|${S.surprises ? "s" : "p"}${S.inline?.id === id ? "|inline" : ""}`;
+  const isCustom = (id) => !!caseById(id)?.tags?.includes("custom");
+  // an edited or drafted case is not in the server's library, so it is measured by sending its own JSON; its key changes when it does
+  const mattersKey = (id) => `${id}|${S.surprises ? "s" : "p"}${isCustom(id) ? `|custom${JSON.stringify(caseById(id)).length}` : ""}`;
 
   async function getMatters(id) {
     const key = mattersKey(id);
     if (matters.has(key)) return matters.get(key);
     const body = { seeds: 8, surprises: surprisesBody() };
-    if (S.inline?.id === id) body.case = S.inline; else body.case_id = id;
+    if (isCustom(id)) body.case = caseById(id); else body.case_id = id;
     const m = await post("/matters", body);
     matters.set(key, m);
     return m;
@@ -186,7 +188,7 @@ window.Live = (() => {
       if (r.digest !== S.trial.digest) return;
       const tips = r.tipping.slice(0, 3);
       box.replaceChildren(
-        S.trial.ai ? el("p", { class: "ai-line" }, el("b", {}, "AI lawyer, not certified. "), aiSummary(S.trial.ai)) : null,
+        ...(S.trial.ai ? [el("p", { class: "ai-line" }, el("b", {}, "AI lawyer, not certified. "), aiSummary(S.trial.ai))] : []),
         el("details", { class: "why" }, el("summary", {}, "Why this verdict?"), el("p", {}, r.text), el("p", { class: "muted small" }, r.text_source === "model" ? "Worded by the model, then checked: every number and exhibit in it is one the judge produced." : "Written straight from the judge's own numbers.")),
         el("div", { class: "flip" },
           el("b", {}, "What would flip it?"),
