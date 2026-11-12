@@ -7,10 +7,10 @@ from fastapi.testclient import TestClient
 
 from courtroom.api.server import app
 from courtroom.cases import CASES
+from courtroom.engine import run_trial
 from courtroom.gametheory.finder import find_contested
 from courtroom.gametheory.matters import measure
 from courtroom.judge.tipping import prosecution_wins, record_of, tipping_points
-from courtroom.engine import run_trial
 
 client = TestClient(app)
 BODY = {"case_id": "helix-espionage", "prosecution": "aggressive", "defense": "conservative", "seed": 0}
