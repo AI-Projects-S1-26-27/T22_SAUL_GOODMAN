@@ -60,7 +60,7 @@ _TEXT = {
 
 def measure(
     case: CaseFile,
-    seeds: Sequence[int] = (0, 1, 2, 3, 4),
+    seeds: Sequence[int] = tuple(range(8)),
     styles: Sequence[str] = STYLES,
     surprises: Surprises | None = None,
 ) -> Mattering:

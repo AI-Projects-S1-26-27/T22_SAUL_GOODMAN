@@ -103,7 +103,7 @@ class GameRequest(BaseModel):
 class MattersRequest(BaseModel):
     case_id: str = ""
     case: CaseFile | None = None
-    seeds: int = Field(default=5, ge=1, le=8)
+    seeds: int = Field(default=8, ge=1, le=8)
     surprises: Surprises | bool | None = None
 
 

@@ -242,7 +242,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("matters", help="does strategy matter? measured from fresh runs of every pairing")
     p.add_argument("--case", help="one case id (default: the whole library)")
-    p.add_argument("--seeds", type=int, default=5)
+    p.add_argument("--seeds", type=int, default=8)
     surprise_arg(p)
     p.set_defaults(fn=cmd_matters)
 

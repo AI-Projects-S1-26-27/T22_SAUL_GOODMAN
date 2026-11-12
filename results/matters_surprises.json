@@ -1,0 +1,436 @@
+{
+ "cases": {
+  "aurora-defi": {
+   "case_id": "aurora-defi",
+   "explanation": "Whoever the lawyers are and whatever the seed, the verdict comes out the same. The exhibits decide this one.",
+   "label": "Decided by the evidence",
+   "overall_win_rate": 0.0,
+   "pairing_spread": 0.0,
+   "seed_noise": 0.0,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "evidence",
+   "win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "broken-bike": {
+   "case_id": "broken-bike",
+   "explanation": "Some pairings tip the result, but most do not. Style matters a little here.",
+   "label": "Partly the lawyers",
+   "overall_win_rate": 0.9167,
+   "pairing_spread": 0.375,
+   "seed_noise": 0.1667,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "partly_lawyers",
+   "win_rate": [
+    [
+     1.0,
+     1.0,
+     1.0
+    ],
+    [
+     0.625,
+     1.0,
+     1.0
+    ],
+    [
+     0.625,
+     1.0,
+     1.0
+    ]
+   ]
+  },
+  "cookie-jar": {
+   "case_id": "cookie-jar",
+   "explanation": "Whoever the lawyers are and whatever the seed, the verdict comes out the same. The exhibits decide this one.",
+   "label": "Decided by the evidence",
+   "overall_win_rate": 0.0,
+   "pairing_spread": 0.0,
+   "seed_noise": 0.0,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "evidence",
+   "win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "edge-defense-only": {
+   "case_id": "edge-defense-only",
+   "explanation": "Whoever the lawyers are and whatever the seed, the verdict comes out the same. The exhibits decide this one.",
+   "label": "Decided by the evidence",
+   "overall_win_rate": 0.0,
+   "pairing_spread": 0.0,
+   "seed_noise": 0.0,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "evidence",
+   "win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "edge-empty-docket": {
+   "case_id": "edge-empty-docket",
+   "explanation": "Whoever the lawyers are and whatever the seed, the verdict comes out the same. The exhibits decide this one.",
+   "label": "Decided by the evidence",
+   "overall_win_rate": 0.0,
+   "pairing_spread": 0.0,
+   "seed_noise": 0.0,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "evidence",
+   "win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "edge-mutual-exclusion": {
+   "case_id": "edge-mutual-exclusion",
+   "explanation": "Whoever the lawyers are and whatever the seed, the verdict comes out the same. The exhibits decide this one.",
+   "label": "Decided by the evidence",
+   "overall_win_rate": 0.0,
+   "pairing_spread": 0.0,
+   "seed_noise": 0.0,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "evidence",
+   "win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "edge-poisoned-tree": {
+   "case_id": "edge-poisoned-tree",
+   "explanation": "Some pairings tip the result, but most do not. Style matters a little here.",
+   "label": "Partly the lawyers",
+   "overall_win_rate": 0.0833,
+   "pairing_spread": 0.25,
+   "seed_noise": 0.1667,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "partly_lawyers",
+   "win_rate": [
+    [
+     0.25,
+     0.25,
+     0.25
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "garden-dog": {
+   "case_id": "garden-dog",
+   "explanation": "Whoever the lawyers are and whatever the seed, the verdict comes out the same. The exhibits decide this one.",
+   "label": "Decided by the evidence",
+   "overall_win_rate": 0.0,
+   "pairing_spread": 0.0,
+   "seed_noise": 0.0,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "evidence",
+   "win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ]
+  },
+  "helix-espionage": {
+   "case_id": "helix-espionage",
+   "explanation": "Changing the lawyers' styles flips the verdict. This is a case where strategy matters.",
+   "label": "Decided by the lawyers",
+   "overall_win_rate": 0.2778,
+   "pairing_spread": 0.875,
+   "seed_noise": 0.2222,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "lawyers",
+   "win_rate": [
+    [
+     0.25,
+     0.875,
+     0.25
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.875,
+     0.25
+    ]
+   ]
+  },
+  "kestrel-av": {
+   "case_id": "kestrel-av",
+   "explanation": "Changing the lawyers' styles flips the verdict. This is a case where strategy matters.",
+   "label": "Decided by the lawyers",
+   "overall_win_rate": 0.2917,
+   "pairing_spread": 1.0,
+   "seed_noise": 0.1389,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "styles": [
+    "aggressive",
+    "conservative",
+    "adaptive"
+   ],
+   "surprises": true,
+   "trials": 72,
+   "verdict": "lawyers",
+   "win_rate": [
+    [
+     0.375,
+     1.0,
+     1.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.125,
+     0.125
+    ]
+   ]
+  }
+ },
+ "n_seeds": 8,
+ "surprises": true
+}

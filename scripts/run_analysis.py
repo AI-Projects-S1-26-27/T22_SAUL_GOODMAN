@@ -2,6 +2,7 @@
 
     python scripts/run_analysis.py bootstrap [--surprises] [--workers 4]
     python scripts/run_analysis.py sensitivity [--surprises]
+    python scripts/run_analysis.py matters [--surprises]
 
 Only the deterministic styles and the exact judge are used here; no language model is involved.
 """
@@ -16,6 +17,7 @@ from pathlib import Path
 from courtroom.cases import CASES
 from courtroom.contracts import Surprises
 from courtroom.gametheory.bootstrap import bootstrap_library
+from courtroom.gametheory.matters import measure
 from courtroom.gametheory.sensitivity import sweep
 
 RESULTS = Path(__file__).resolve().parent.parent / "results"
@@ -23,7 +25,7 @@ RESULTS = Path(__file__).resolve().parent.parent / "results"
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=("bootstrap", "sensitivity"))
+    ap.add_argument("what", choices=("bootstrap", "sensitivity", "matters"))
     ap.add_argument("--surprises", action="store_true")
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--seeds", type=int, default=0, help="seeds per cell (default: 100 bootstrap, 16 sensitivity)")
@@ -37,6 +39,9 @@ def main() -> None:
         seeds = tuple(range(a.seeds or 100))
         rows = bootstrap_library(list(CASES), seeds=seeds, n_resamples=a.resamples, workers=a.workers, surprises=sur)
         out = {"surprises": a.surprises, "n_seeds": len(seeds), "n_resamples": a.resamples, "cases": {r.case_id: json.loads(r.model_dump_json()) for r in rows}}
+    elif a.what == "matters":
+        seeds = tuple(range(a.seeds or 8))
+        out = {"surprises": a.surprises, "n_seeds": len(seeds), "cases": {cid: json.loads(measure(c, seeds=seeds, surprises=sur).model_dump_json()) for cid, c in CASES.items()}}
     else:
         seeds = tuple(range(a.seeds or 16))
         out = json.loads(sweep(list(CASES), seeds=seeds, surprises=sur).model_dump_json())

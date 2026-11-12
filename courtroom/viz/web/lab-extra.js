@@ -57,47 +57,38 @@
   const mattersCache = new Map();
   const getMatters = async (id) => {
     const key = `${id}|${surprises}`;
-    if (!mattersCache.has(key)) mattersCache.set(key, await post("/matters", { case_id: id, seeds: 5, surprises }));
+    if (!mattersCache.has(key)) mattersCache.set(key, await post("/matters", { case_id: id, seeds: 8, surprises }));
     return mattersCache.get(key);
   };
   const TONE = { evidence: "flat", lawyers: "moves", partly_lawyers: "some", seeds: "luck" };
 
-  /* what the recorded bundle can say with one trial per pairing: whether any pairing changes the verdict */
-  function recordedMatters(c) {
-    const styles = ["aggressive", "conservative", "adaptive"];
-    const wins = styles.flatMap((p) => styles.map((d) => ["guilty", "liable"].includes(B.trials[`${c.id}|${p}|${d}|0`]?.verdict.outcome)));
-    const any = wins.some(Boolean), all = wins.every(Boolean);
-    return { label: !any || all ? "Decided by the evidence" : "Decided by the lawyers", verdict: !any || all ? "evidence" : "lawyers", explanation: "From one recorded trial per pairing, so this cannot tell luck from skill.", pairing_spread: any && !all ? 1 : 0, seed_noise: null };
-  }
-
   async function renderMatters() {
-    const c = B.cases.find((x) => x.id === caseId);
-    const body = $("#matters-fig");
+    const c = B.cases.find((x) => x.id === caseId), body = $("#matters-fig");
     if (!c || !body) return;
-    if (!live) {
-      body.replaceChildren(needServer("Measuring this with fresh runs"), h("p", {}, "From the recorded trials only: ", h("b", {}, recordedMatters(c).label), ". ", recordedMatters(c).explanation));
-      says("matters", h("p", {}, `${caseName(c)}: ${recordedMatters(c).label.toLowerCase()} (recorded trials only).`));
-      return;
-    }
-    body.replaceChildren(h("p", { class: "muted" }, "Measuring every case from fresh runs…"));
-    const rows = [];
-    for (const k of B.cases) {
-      try {
-        const m = await getMatters(k.id);
-        rows.push(h("tr", { class: k.id === caseId ? "current" : null },
-          h("th", { scope: "row" }, caseName(k)),
-          h("td", {}, h("span", { class: `matter-tag ${TONE[m.verdict]}` }, m.label)),
-          h("td", {}, pct(m.pairing_spread)), h("td", {}, pct(m.seed_noise)), h("td", {}, pct(m.overall_win_rate))));
-      } catch { /* leave the row out */ }
-      if (caseId !== c.id) return;
-    }
+    const stored = (sur) => (window.COURTROOM_ANALYSIS ?? {})[sur ? "matters_surprises" : "matters"]?.cases;
+    const row = (k, m) => h("tr", { class: k.id === caseId ? "current" : null },
+      h("th", { scope: "row" }, caseName(k)), h("td", {}, h("span", { class: `matter-tag ${TONE[m.verdict]}` }, m.label)),
+      h("td", {}, pct(m.pairing_spread)), h("td", {}, pct(m.seed_noise)), h("td", {}, pct(m.overall_win_rate)));
     const sw = h("label", { class: "check small" }, h("input", { type: "checkbox", checked: surprises, onchange: (e) => { surprises = e.target.checked; renderMatters(); } }), h("span", {}, " Courtroom surprises on (a witness may not appear, a record may lack its certificate, a witness may turn hostile)"));
-    body.replaceChildren(sw, h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
-      h("thead", {}, h("tr", {}, ["Case", "Verdict", "Lawyers move it by", "Seed coin-flip", "Accuser wins overall"].map((t) => h("th", {}, t)))),
-      h("tbody", {}, rows))),
-      note("Every number is measured now: all 9 pairings of Bold, Careful and Smart over 5 seeds (45 fresh trials per case)."));
-    const m = await getMatters(caseId);
-    says("matters", h("p", {}, h("b", {}, caseName(c)), `: ${m.label.toLowerCase()}. ${m.explanation} The best pairing and the worst differ by ${pct(m.pairing_spread)} in how often the Accuser wins, and in the average pairing the seed alone moves the result ${pct(m.seed_noise)} of the way to a coin flip.`));
+    const table = (rows, caption) => [sw, h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+      h("thead", {}, h("tr", {}, ["Case", "Verdict", "Lawyers move it by", "Seed coin-flip", "Accuser wins overall"].map((t) => h("th", {}, t)))), h("tbody", {}, rows))), note(caption)];
+    let m;
+    if (!live) {
+      const all = stored(surprises);
+      if (!all) { body.replaceChildren(needServer("Measuring this with fresh runs")); return; }
+      body.replaceChildren(...table(B.cases.filter((k) => all[k.id]).map((k) => row(k, all[k.id])), "Stored measurement: all 9 pairings of Bold, Careful and Smart over 8 seeds each, run by the engine and saved with the results. Run the local server to measure it again, live."));
+      m = all[caseId];
+    } else {
+      body.replaceChildren(h("p", { class: "muted" }, "Measuring every case from fresh runs…"));
+      const rows = [];
+      for (const k of B.cases) {
+        try { rows.push(row(k, await getMatters(k.id))); } catch { /* leave the row out */ }
+        if (caseId !== c.id) return;
+      }
+      body.replaceChildren(...table(rows, "Every number is measured now: all 9 pairings of Bold, Careful and Smart over 8 seeds (72 fresh trials per case)."));
+      m = await getMatters(caseId);
+    }
+    if (m) says("matters", h("p", {}, h("b", {}, caseName(c)), `: ${m.label.toLowerCase()}. ${m.explanation} The best pairing and the worst differ by ${pct(m.pairing_spread)} in how often the Accuser wins, and in the average pairing the seed alone moves the result ${pct(m.seed_noise)} of the way to a coin flip.`));
   }
 
   registry.push({

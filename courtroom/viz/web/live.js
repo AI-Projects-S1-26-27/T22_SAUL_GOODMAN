@@ -52,7 +52,7 @@ window.Live = (() => {
   async function getMatters(id) {
     const key = mattersKey(id);
     if (matters.has(key)) return matters.get(key);
-    const body = { seeds: 5, surprises: surprisesBody() };
+    const body = { seeds: 8, surprises: surprisesBody() };
     if (S.inline?.id === id) body.case = S.inline; else body.case_id = id;
     const m = await post("/matters", body);
     matters.set(key, m);
