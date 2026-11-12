@@ -64,3 +64,20 @@ def simple_case() -> CaseFile:
             item("D1", Side.DEFENSE, support={"e1": -0.5}, reliability=0.9, contradicts=("P1",)),
         )
     )
+
+
+@pytest.fixture(autouse=True)
+def _no_network(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The whole suite must pass with no key, no Ollama and no network, so any real HTTP request fails loudly as unreachable.
+
+    Tests that need a model use ``tests/llm_stub.py``; tests that check how a failure is reported replace ``urlopen`` themselves.
+    """
+    import urllib.error
+    import urllib.request
+
+    def blocked(*args: object, **kwargs: object) -> None:
+        raise urllib.error.URLError("network blocked by the test suite")
+
+    monkeypatch.setattr(urllib.request, "urlopen", blocked)
+    for key in ("OLLAMA_API_KEY", "GEMINI_API_KEY", "OLLAMA_LOCAL_MODEL"):
+        monkeypatch.delenv(key, raising=False)
