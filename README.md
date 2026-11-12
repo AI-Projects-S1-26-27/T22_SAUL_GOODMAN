@@ -23,6 +23,7 @@ question the demo is built around: *should a lawyer go on the attack or play it 
 ## Contents
 
 - [Quick start](#quick-start)
+- [Live controls, the AI layer and the best-response search](#live-controls-the-ai-layer-and-the-best-response-search)
 - [The web app](#the-web-app)
 - [How a trial works](#how-a-trial-works)
 - [The four playing styles](#the-four-playing-styles)
@@ -51,10 +52,47 @@ python -m courtroom serve
 Open <http://127.0.0.1:8000>. The local server runs the **live simulator**, so you can use any
 trial number, any pairing of styles (including a mixed strategy) and larger strategy games.
 
-Run the test suite (483 tests):
+Run the test suite:
 
 ```bash
 python -m pytest
+```
+
+---
+
+## Live controls, the AI layer and the best-response search
+
+The deployed site replays trials recorded earlier. The **local server computes**: with `python -m courtroom serve` the page shows
+a green **LIVE** badge and everything below is worked out in front of you by the exact judge. Without it the page says **RECORDED**.
+
+- **Seed box, digest, "Run it again and compare".** Pick a seed, run the trial, then run it twice more: both digests and the hash
+  chain are checked.
+- **Does strategy matter here?** Measured for every case from fresh runs of every pairing of Bold, Careful and Smart, and shown on the
+  docket and in the lab: decided by the evidence, by the lawyers, or a coin-flip between seeds. In many of the hand-written cases the
+  evidence alone decides, and the page says so.
+- **Surprise me.** Searches generated cases (`gen-<seed>`) for one where the lawyers really change the verdict and plays it in the 3D
+  room. `python -m courtroom find` does the same from the command line.
+- **Courtroom surprises.** A witness may not appear, a digital record may lack its certificate, a witness may turn hostile. Off by
+  default and off for every recorded trial; a toggle in live mode (`--surprises` on the command line).
+- **Change the case.** Edit an exhibit's reliability, a witness's credibility, a flag, the standard of proof or the budget, add or
+  remove exhibits and witnesses, then run it and see the verdict and the log-odds move. Cases can also be written from scratch.
+- **Why this verdict, and what would flip it.** The judge's own numbers in plain words, and the smallest single change to one exhibit or
+  witness that would have flipped the verdict. "Try it" plays the whole trial again with that change.
+- **The AI lawyer, case drafting and spoken lines** (optional). With a key in `.env` (`OLLAMA_API_KEY` or `GEMINI_API_KEY`) or a local
+  Ollama running, an "AI lawyer" style appears, a case can be drafted from plain English (validated, then handed to the editor), and
+  unscripted cases get model-worded lines. The model never decides a verdict or enters a certified result. See `docs/LLM_ROLE.md`.
+- **Strategy lab chapters** "How sure are we?" (bootstrap stability and sensitivity to the rulebook's constants) and "Can a better
+  lawyer be found?" (a double-oracle search over lawyer profiles, with `python -m courtroom oracle`), each with surprises off and on.
+
+Documents: `REPORT.md` (the write-up), `PROVENANCE.md` (one command per claim), `DEMO_SCRIPT.md` (a five-minute run), `AGENTS.md` (how to
+change things safely). Numbers in those documents are generated from `results/` by `python scripts/render_docs.py`.
+
+```bash
+python -m courtroom matters                      # does strategy matter, case by case
+python -m courtroom find --count 40              # search generated cases for contested ones
+python -m courtroom oracle --case helix-espionage --budget 60 --workers 4
+python -m courtroom verify --case helix-espionage --seed 6 -p adaptive -d aggressive --surprises
+python scripts/stub_ollama.py                    # a stand-in model server, to try the AI features with no key
 ```
 
 ---

@@ -199,3 +199,36 @@ re-record.
   `OLLAMA_LOCAL_MODEL`). `.env` is git-ignored. Never put the key in any file under `courtroom/viz/web/`:
   that folder is published as-is. The deployed site has no analyst route yet, so it uses the built-in analyst.
 - **Cache-busting** (§6) applies to `lab.html` too: bump its `?v=N` along with `index.html`.
+
+
+---
+
+## 8. Live controls, the language-model layer and the analysis results
+
+These parts were added later and have their own rules. None of them may change a recorded trial or a spoken line.
+
+**The invariant that guards everything.** `tests/golden/bundle_digests.json` pins the digest of every trial in `data/bundle.js` and
+`tests/golden/lines_baseline.json` pins every spoken line. `python -m pytest tests/test_bundle_digests.py` re-runs them. If either
+moves, you changed a recorded trial or a line and the voices are stale: stop and find out why before going on. New engine behaviour
+goes behind a flag that defaults to today's rules (see `Surprises`).
+
+| You want to change | Edit | Then also |
+|---|---|---|
+| Courtroom surprises (what they do, their chances) | `Court` in `courtroom/engine/trial.py`, `Surprises` in `courtroom/contracts/models.py` | `tests/test_surprises.py`; the pinned digests must not move |
+| Live controls on the home page (seed, badge, editor, Surprise me, tipping, explainer, AI box) | `courtroom/viz/web/live.js`, `live.css`, hooks in `app.js` | bump `?v=N` in `index.html`; `node --check`; step through in the browser with the server on |
+| Spoken lines for a new kind of event | `narrate()` in `app.js`. New lines have no recording, so the browser's own voice speaks them | do not change an existing line |
+| Lab chapters that need the server or the results | `courtroom/viz/web/lab-extra.js` | `python scripts/build_analysis_js.py` after any change in `results/`; bump `?v=N` in `lab.html` |
+| Anything a model does | `courtroom/llm/` | nothing in the core may import it (a test checks); add a stub test; read `docs/LLM_ROLE.md` |
+| A certified result | run `scripts/run_analysis.py` or `scripts/run_oracle_results.py`, which write `results/` | then `python scripts/build_analysis_js.py` and `python scripts/render_docs.py` |
+| Numbers in `REPORT.md`, `PROVENANCE.md`, `DEMO_SCRIPT.md` | never by hand: edit `scripts/render_docs.py` | `python scripts/render_docs.py --check` (a test runs it) |
+
+**Rules for the model layer.**
+
+- Keys come only from `.env` or the environment. Never print one, commit one or put one under `courtroom/viz/web/`. `.env` is git-ignored.
+- Every model answer is cached on disk (`courtroom/llm/cache/`). Run live features against the stub (`scripts/stub_ollama.py`, or
+  `COURTROOM_LLM_CACHE=/tmp/x.json` so a stub's answers do not land in the repo's cache), and never commit a cache or a result produced by a stub.
+- A trial a model played is `certified: false` and must never be averaged into a payoff table, bootstrap, sensitivity run or search.
+- Tests never touch a network: use `tests/llm_stub.py`.
+
+**Rules for results.** A search result is whatever it found. Do not change a case, a parameter or a seed after seeing a result to make it
+look better; if the method changes, re-run everything and say so.
