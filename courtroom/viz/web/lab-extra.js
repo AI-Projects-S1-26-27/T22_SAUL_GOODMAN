@@ -114,6 +114,148 @@
     refresh: renderMatters,
   });
 
+  /* ---------------------------------------------------------------- shared helpers for the certified-results chapters */
+
+  const A = window.COURTROOM_ANALYSIS ?? {};
+  const STYLE_NAME = { aggressive: "Bold", conservative: "Careful", adaptive: "Smart", reckless: "Wild" };
+  const nameOf = (n) => STYLE_NAME[n] ?? (/^best-pro-(\d+)/.test(n) ? `Found Accuser ${n.match(/(\d+)$/)[1]}` : /^best-def-(\d+)/.test(n) ? `Found Defender ${n.match(/(\d+)$/)[1]}` : n);
+  const mixText = (mix) => Object.entries(mix ?? {}).sort((x, y) => y[1] - x[1]).map(([k, v]) => (v > 0.995 ? nameOf(k) : `${pct(v)} ${nameOf(k)}`)).join(", ") || "none";
+  const num2 = (v) => (Math.abs(v) < 5e-3 ? 0 : v).toFixed(2).replace("-", "−");
+  const toggle = (checked, onchange) => h("label", { class: "check small" }, h("input", { type: "checkbox", checked, onchange: (e) => onchange(e.target.checked) }), h("span", {}, " Courtroom surprises on"));
+  const LABEL_WORDS = { pure: "one clear best pair of styles", mixed: "no single best style: each lawyer mixes", "dominance-solvable": "one style simply wins for each side", "no-equilibrium-found": "no equilibrium found" };
+
+  /* ---------------------------------------------------------------- chapter: how sure are we? */
+
+  let sureSur = false;
+  let sureLive = null;
+
+  function sureCase(id, sur, fresh) {
+    const b = fresh ?? A[sur ? "bootstrap_surprises" : "bootstrap"]?.cases?.[id];
+    const sens = A[sur ? "sensitivity_surprises" : "sensitivity"];
+    return { b, sens };
+  }
+
+  function renderSure() {
+    const c = B.cases.find((x) => x.id === caseId), body = $("#sure-fig");
+    if (!c || !body) return;
+    const { b, sens } = sureCase(c.id, sureSur, sureLive?.case_id === c.id && sureLive.surprises === sureSur ? sureLive : null);
+    const kids = [toggle(sureSur, (v) => { sureSur = v; sureLive = null; renderSure(); })];
+    if (!b) { body.replaceChildren(...kids, note("No resampling result is stored for this case.")); return; }
+    const stab = b.stability;
+    kids.push(
+      h("div", { class: "stab" }, h("div", { class: "stab-label" }, h("b", {}, `Label: ${b.baseline_label}`), ` (${LABEL_WORDS[b.baseline_label] ?? ""})`),
+        h("div", { class: "stab-bar", role: "img", "aria-label": `The same label came back in ${pct(stab)} of ${b.n_resamples} resamples` }, h("span", { style: `width:${stab * 100}%` }), h("em", {}, `${(stab * 100).toFixed(1)}%`)),
+        h("p", { class: "muted small" }, `In ${(stab * 100).toFixed(1)}% of ${b.n_resamples} resamples of the ${b.n_seeds} seeds, the game came out with the same label. The others: ${Object.entries(b.label_counts).filter(([k]) => k !== b.baseline_label).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}.`)));
+    // payoff intervals
+    const cells = Object.fromEntries(b.accuser_payoff_intervals.map((x) => [`${x.row}|${x.col}`, x]));
+    kids.push(h("h3", {}, "The Accuser's payoff, and how far it could move"),
+      h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+        h("thead", {}, h("tr", {}, h("th", {}, ""), ...b.col_strategies.map((d) => h("th", {}, `${nameOf(d)} Defender`)))),
+        h("tbody", {}, b.row_strategies.map((r) => h("tr", {}, h("th", { scope: "row" }, `${nameOf(r)} Accuser`), b.col_strategies.map((d) => { const x = cells[`${r}|${d}`]; return h("td", { title: `95% of resamples fall between ${num2(x.low)} and ${num2(x.high)}` }, h("b", {}, num2(x.mean)), h("small", {}, ` (${num2(x.low)} to ${num2(x.high)})`)); })))))),
+      note("Each cell is the average over the seeds; the range in brackets holds 95% of the averages when the seeds are resampled."));
+    // sensitivity
+    if (sens) {
+      const base = sens.baseline[c.id];
+      const rows = sens.variations.map((v) => { const lab = v.labels[c.id]; return h("tr", { class: lab !== base ? "changed" : null }, h("td", {}, v.parameter.replaceAll("_", " ")), h("td", {}, v.setting), h("td", {}, lab), h("td", {}, pct(v.prosecution_win_rate[c.id]))); });
+      const robust = sens.robust_cases.includes(c.id);
+      kids.push(h("h3", {}, "If the rulebook's own numbers were different"),
+        h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" }, h("thead", {}, h("tr", {}, ["Constant changed", "By", "Label then", "Accuser wins"].map((t) => h("th", {}, t)))), h("tbody", {}, rows))),
+        note(`Costs, sanctions, the weight of evidence and the standards of proof were moved by 25% each way (and the "almost certain" bar from 80% to 95%). Highlighted rows changed the label from "${base}". Over the whole library: ${sens.robust_cases.length} case(s) never changed (${sens.robust_cases.join(", ") || "none"}); ${sens.fragile_cases.length} changed under at least one setting.`));
+      says("sure", h("p", {}, h("b", {}, caseName(c)), `: the label "${b.baseline_label}" survived ${(stab * 100).toFixed(0)}% of resamples${stab < 0.8 ? ", so treat it as shaky" : ""}. ${robust ? "It also never changed when the rulebook's constants moved by 25%." : `Under the constant changes it changed ${sens.variations.filter((v) => v.labels[c.id] !== base).length} time(s) out of ${sens.variations.length}, so the conclusion depends on the rulebook's numbers.`}${sureSur ? " (With courtroom surprises on.)" : ""}`));
+    }
+    if (live) {
+      const btn = h("button", { class: "btn ghost sm", type: "button" }, "Re-measure with fresh seeds (about 20 seconds)");
+      btn.addEventListener("click", async () => {
+        btn.disabled = true; btn.textContent = "Resampling…";
+        try { sureLive = await post("/bootstrap", { case_id: c.id, seeds: 20, resamples: 200, surprises: sureSur }); sureLive.case_id = c.id; sureLive.surprises = sureSur; renderSure(); } catch { btn.textContent = "Could not run it"; }
+      });
+      kids.push(h("p", {}, btn, sureLive?.case_id === c.id ? h("span", { class: "muted small" }, " Showing the fresh run (20 seeds) instead of the stored one (100 seeds).") : null));
+    }
+    body.replaceChildren(...kids);
+  }
+
+  registry.push({
+    id: "sure",
+    build: () => chapter("sure", "How sure are we?", {
+      lead: [
+        h("p", {}, "Every number in this lab comes from a limited number of trials. Run the trials again with different seeds and each average moves a little, so the conclusion (\"Careful is best\", \"nobody has a best style\") could be an accident of which seeds we happened to use."),
+        h("p", {}, "Two checks. First, a ", h("dfn", {}, "bootstrap"), ": we reshuffle the same trials many times, draw new sets of seeds from them, and solve the game again each time. The ", h("dfn", {}, "stability"), " is how often the same conclusion comes back. Second, we change the rulebook's own constants (what an objection costs, how heavily evidence weighs, how sure the judge must be) by 25% either way and see whether the conclusion survives. The constants are fixed by design, but a conclusion that only holds at one setting is not much of a result."),
+      ],
+      read: ["A stability near 100% means the conclusion does not depend on which seeds were drawn. Below about 80%, treat it as shaky.", "In the payoff table, a wide range means that number is not pinned down.", "Highlighted rows in the last table are settings where the conclusion changed."],
+      fig: h("div", { id: "sure-fig" }),
+      maths: h("p", {}, "The label is “dominance-solvable” if iterated elimination of strictly dominated strategies leaves one pair, else “pure” if some equilibrium is a single pair, else “mixed”. Each resample draws as many seeds as the original, with replacement, takes the mean payoffs of the drawn seeds and re-solves exactly. The sensitivity run re-estimates the whole library at each setting; it does not change the judge's arithmetic, only the named constants, and restores them afterwards."),
+    }),
+    refresh: renderSure,
+  });
+
+  /* ---------------------------------------------------------------- chapter: can a better lawyer be found? */
+
+  let betterSur = false;
+  let betterLive = null;
+
+  function oracleView(r, fresh) {
+    const kids = [];
+    kids.push(h("p", { class: "headline" }, r.headline));
+    kids.push(h("p", { class: "muted small" }, `${fresh ? "A quick live search: " : ""}${r.rounds_run} round(s) of at most ${r.max_rounds}; ${r.budget} candidate profiles tried per side per round; searched on ${r.train_seeds.length} seeds, accepted on ${r.heldout_seeds.length} different ones${r.confirm_seeds?.length ? `, confirmed on ${r.confirm_seeds.length} more` : ""}. ${r.trials} trials, ${r.seconds}s. Stopped: ${r.stopped}.`));
+    const kept = r.candidates.filter((c) => c.accepted);
+    if (kept.length) {
+      kids.push(h("h3", {}, "The better lawyers it found"),
+        h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+          h("thead", {}, h("tr", {}, ["Side", "How it plays", "Beats the old equilibrium by", "Confirmed on fresh seeds"].map((t) => h("th", {}, t)))),
+          h("tbody", {}, kept.map((c) => h("tr", {}, h("td", {}, c.side === "prosecution" ? "Accuser" : "Defender"), h("td", {}, c.plain), h("td", {}, `${num2(c.difference)} per trial (±${num2(c.standard_error)}, z ${c.z})`), h("td", {}, c.confirmed == null ? "–" : c.confirmed ? `yes (z ${c.confirm_z})` : `no (z ${c.confirm_z})`)))))));
+    } else kids.push(h("p", {}, "Every candidate it tried lost to the equilibrium of the four hand-written styles."));
+    const dropped = r.candidates.length - kept.length;
+    if (dropped) kids.push(note(`${dropped} other candidate profile(s) were the best of their round's search but did not beat the equilibrium by more than 2 standard errors on held-out seeds, so they were dropped.`));
+    kids.push(h("h3", {}, "Before and after"),
+      h("p", {}, h("b", {}, "Four hand-written styles: "), `Accuser ${mixText(r.start_equilibrium.prosecution_mix)}; Defender ${mixText(r.start_equilibrium.defense_mix)}.`),
+      h("p", {}, h("b", {}, "With what was found: "), `Accuser ${mixText(r.final_equilibrium.prosecution_mix)}; Defender ${mixText(r.final_equilibrium.defense_mix)}.`),
+      h("p", { class: "muted small" }, ["prosecution", "defense"].map((s) => { const x = r.exploitability[s]; return `${s === "prosecution" ? "Accuser" : "Defender"}: the old equilibrium earned ${num2(x.equilibrium_payoff)}; the best profile found earns ${num2(x.best_found_payoff)} against the same opponent (${x.found_better ? `+${num2(x.gain)}` : "no gain"}). `; }).join("")));
+    return kids;
+  }
+
+  function renderBetter() {
+    const c = B.cases.find((x) => x.id === caseId), body = $("#better-fig");
+    if (!c || !body) return;
+    const stored = A.oracle?.[`${c.id}${betterSur ? "_surprises" : ""}`];
+    const r = betterLive?.case_id === c.id && betterLive.surprises === betterSur ? betterLive : stored;
+    const kids = [toggle(betterSur, (v) => { betterSur = v; betterLive = null; renderBetter(); })];
+    if (r) kids.push(...oracleView(r, r === betterLive));
+    else kids.push(h("p", {}, `The full search was run for the cases where strategy was measured to matter (${Object.keys(A.oracle ?? {}).filter((k) => !k.endsWith("_surprises")).join(", ") || "none stored"}). It has not been run for ${caseName(c)}.`));
+    if (live) {
+      const btn = h("button", { class: "btn ghost sm", type: "button" }, "Run a quick search now (about 20 seconds)");
+      btn.addEventListener("click", async () => {
+        btn.disabled = true; btn.textContent = "Searching…";
+        try { betterLive = await post("/oracle", { case_id: c.id, budget: 12, rounds: 2, surprises: betterSur }); betterLive.case_id = c.id; betterLive.surprises = betterSur; renderBetter(); } catch { btn.textContent = "Could not run it"; }
+      });
+      kids.push(h("p", {}, btn, h("span", { class: "muted small" }, " A smaller budget than the stored results, so it may find less.")));
+    } else kids.push(needServer("Running a search yourself"));
+    const kept = r?.candidates?.filter((x) => x.accepted).length ?? 0;
+    says("better", r ? h("p", {}, h("b", {}, caseName(c)), `${betterSur ? " (surprises on)" : ""}: ${kept ? `${kept} better profile(s) found; the styles were not unbeatable.` : "no better profile found within the budget; that is evidence the hand-written styles were hard to beat here, not proof."}`) : h("p", {}, `No stored search for ${caseName(c)}.`));
+    // the AI lawyer exhibition
+    const ex = A.exhibition;
+    kids.push(h("h3", {}, "The AI lawyer against the four styles"),
+      ex ? h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+        h("thead", {}, h("tr", {}, ["Case", "AI plays", "Against", "AI wins", "Smart in its seat", "Model fell back"].map((t) => h("th", {}, t)))),
+        h("tbody", {}, ex.cells.map((x) => h("tr", {}, h("td", {}, x.case_id), h("td", {}, x.ai_side === "prosecution" ? "Accuser" : "Defender"), h("td", {}, nameOf(x.style)), h("td", {}, pct(x.ai_win_rate)), h("td", {}, pct(x.smart_reference_win_rate)), h("td", {}, pct(x.fallback_rate)))))))
+        : h("p", { class: "muted" }, "Not run yet: it needs a language-model backend. Run ", h("code", {}, "python -m courtroom exhibition --json results/exhibition.json"), " with one available."),
+      note("Exhibition, not certified. A language model is not one of the hand-written styles, so it cannot be in a payoff table or tested for best responses (see docs/LLM_ROLE.md). “Model fell back” is how often it gave no usable move and the Smart style played instead."));
+    body.replaceChildren(...kids);
+  }
+
+  registry.push({
+    id: "better",
+    build: () => chapter("better", "Can a better lawyer be found?", {
+      lead: [
+        h("p", {}, "The four styles were written by hand. Nothing says they are the best lawyers possible, and the game theory above only compares them with each other. So we ask the harder question: is there a lawyer, outside the four, who beats them?"),
+        h("p", {}, "Three of the styles are really just a handful of numbers: how many known problems a lawyer will tolerate in its own evidence, how much a move must help before it is worth a turn, how sure it must be before it objects, and so on. A search tries many settings of those numbers, keeps the one that does best against what the other side is likely to play, and tests it on trials the search never saw. If it wins clearly, it joins the game and the game is solved again, because now the other side has a new thing to answer. This is called a ", h("dfn", {}, "double oracle"), " method."),
+      ],
+      read: ["“Beats the old equilibrium by” is extra points per trial against the other side's equilibrium play. z says how many standard errors that is; the search keeps a profile only above 2.", "“Confirmed on fresh seeds” re-tests it on a third set of seeds that played no part in finding or accepting it.", "“No better lawyer found” is evidence, not proof: it only covers the family of lawyers the search can express, within its budget."],
+      fig: h("div", { id: "better-fig" }),
+      maths: h("p", {}, "Each round, for each side: take the other side's equilibrium mix y. Draw random profiles (60% of the budget) then refine the best by coordinate steps (40%), scoring each by its mean payoff against y on the training seeds. Re-score the winner and the current equilibrium mix x on held-out seeds, paired by seed; keep the winner if the mean difference exceeds 2 standard errors. Add what was kept, fill in the new rows and columns, and solve again exactly. Stop when neither side keeps anything, or after 4 rounds. With this many comparisons a lone result just above 2 standard errors is weak evidence on its own, which is why every kept profile is also confirmed on a third set of seeds."),
+    }),
+    refresh: renderBetter,
+  });
+
   /* ---------------------------------------------------------------- put them on the page */
 
   function mount() {
