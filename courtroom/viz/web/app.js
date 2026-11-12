@@ -12,7 +12,8 @@ const B = window.COURTROOM_BUNDLE;
 const API = location.protocol.startsWith("http") ? "/api" : null;
 const hasGsap = !!window.gsap;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const S = { live: false, filter: "everyday", caseId: null, p: "aggressive", d: "conservative", trial: null, idx: 0, auto: false, voice: true, run: 0 };
+const S = { live: false, filter: "everyday", caseId: null, p: "aggressive", d: "conservative", trial: null, idx: 0, auto: false, voice: true, run: 0,
+  seed: 0, surprises: false, inline: null, request: null, source: "recorded" };
 
 function el(tag, attrs = {}, ...kids) {
   const n = document.createElement(tag);
@@ -74,7 +75,7 @@ const pointName = (id) => window.STORY?.[S.caseId]?.points?.[id] ?? C().elements
 // lower-case the first letter mid-sentence, unless it starts with a name
 const lowerFirst = (t) => (/^[A-Z][a-z]/.test(t) && !/^(Sam|Raj|Rex|Vance|Lark|Kaur|Park)\b/.test(t) ? t[0].toLowerCase() + t.slice(1) : t);
 const Side = (s) => WHO[s]?.[0] ?? "The judge";
-const category = (c) => (c.tags.includes("everyday") ? "everyday" : c.tags.includes("edge-case") ? "edge-case" : "serious");
+const category = (c) => (c.tags.includes("found") || c.tags.includes("custom") ? "found" : c.tags.includes("everyday") ? "everyday" : c.tags.includes("edge-case") ? "edge-case" : "serious");
 const splitTitle = (t) => { const i = t.indexOf(" — "); return i < 0 ? { parties: "", name: t } : { parties: t.slice(0, i), name: t.slice(i + 3) }; };
 
 function flaws(it) {
@@ -95,7 +96,7 @@ const CALL = ["Your Honour, I'd like to call my witness, {X}.", "Your Honour, th
 /* a witness exhibit plays out like a film: the call, the walk to the box, the oath, the question, the testimony */
 function witnessBeats(ev, actor, it, s, say) {
   const key = witnessKey(it), name = s.witness.split(",")[0];
-  const sworn = S.trial.events.some((e) => e.seq < ev.seq && e.action?.type === "present_evidence" && story().ev[e.action.evidence_id]?.wit && witnessKey(item(e.action.evidence_id)) === key);
+  const sworn = S.trial.events.some((e) => e.seq < ev.seq && e.status !== "no_show" && e.action?.type === "present_evidence" && story().ev[e.action.evidence_id]?.wit && witnessKey(item(e.action.evidence_id)) === key);
   // split into sentences without breaking on titles like "Mrs." or "Dr."
   const safe = say.replace(/\b(Mrs|Mr|Ms|Dr|Det|Prof|St)\./g, "$1§");
   const sentences = (safe.match(/[^.?!]+[.?!]+/g) ?? [safe]).map((x) => x.trim().replaceAll("§", "."));
@@ -118,6 +119,7 @@ function witnessAt(i) {
   for (let k = i; k >= 0; k--) {
     const ev = S.trial.events[k];
     if (ev.kind === "phase_change") return null;
+    if (ev.status === "no_show" || ev.status === "no_certificate") return null; // nobody came to the stand
     if (ev.action?.type === "present_evidence") {
       const it = item(ev.action.evidence_id);
       return story().ev[it?.id]?.wit ? witnessKey(it) : null;
@@ -227,6 +229,27 @@ function narrate(ev) {
       const m = ev.summary.match(/GRANTED on (\S+?)\.?$/);
       if (m) return { log: "The judge ends the trial early.", beats: [J(`There is no accepted evidence that ${lowerFirst(pointName(m[1]))}. This trial ends now.`, { tone: "no", gavel: 1 })] };
       return { log: "The trial goes on.", beats: [J("Request denied. There is enough evidence to keep going.")] };
+    }
+    case "adverse": {
+      const it = item(ev.subject);
+      if (ev.status === "no_show") {
+        const nm = witness(it?.witness_id)?.name ?? "the witness";
+        return { log: `${nm} doesn't show up.`, beats: [
+          { who: actor, text: `Your Honour, I'd like to call my witness, ${nm}.`, exhibit: { item: it, mode: "show" } },
+          J(`${nm} is not here. The witness did not turn up, so that testimony is lost.`, { tone: "no", gavel: 1, exhibit: { item: it, mode: "no" } }),
+        ] };
+      }
+      if (ev.status === "no_certificate") {
+        return { log: "No certificate. Thrown out.", beats: [
+          { who: actor, text: `Your Honour, I'd like to show the court this digital record: ${it?.title ?? ev.subject}.`, exhibit: { item: it, mode: "show" } },
+          J("This record has no certificate to prove it is genuine. Without one it can't be used, so it is thrown out.", { tone: "no", gavel: 1, exhibit: { item: it, mode: "no" } }),
+        ] };
+      }
+      if (ev.status === "hostile") {
+        const nm = witness(ev.subject)?.name ?? "The witness";
+        return { log: `${nm} turns hostile.`, beats: [J(`${nm} has turned against the side that called them. From now on, their word counts for only a quarter.`, { tone: "no", gavel: 1 })] };
+      }
+      break;
     }
     case "watchdog":
       return { log: "The judge moves to a decision.", beats: [J("This has gone on long enough. It's time to decide.")] };
@@ -344,6 +367,7 @@ function renderCases() {
         el("span", { class: "meta" }, `${c.evidence.length} pieces of evidence · ${c.witnesses.length} witnesses`)));
   }));
   if (hasGsap && !reduced) gsap.from(box.children, { y: 40, rotate: () => gsap.utils.random(-2, 2), opacity: 0, duration: .7, stagger: .08, ease: "power3.out" });
+  window.Live?.decorateDocket?.();
 }
 
 function selectCase(id) {
@@ -351,6 +375,7 @@ function selectCase(id) {
   $$(".folder").forEach((f) => f.setAttribute("aria-pressed", String(f.dataset.id === id)));
   fixCombo("p");
   renderStyles();
+  window.Live?.caseSelected?.(id);
   // next step: brief the lawyers, with the courtroom button right below
   const head = $("#brief-title");
   scrollTo({ top: head.getBoundingClientRect().top + scrollY - 90, behavior: reduced ? "auto" : "smooth" });
@@ -387,21 +412,31 @@ function fixCombo(changed) {
 
 /* ------------------------------------------------------------------ entering and leaving the courtroom */
 
-async function enterCourt() {
-  window.Sound?.unlock();
-  Voice.unlock();
+/* Fetch (or look up) the trial for the current choices. Live: the server runs it now, with the chosen seed, surprises
+ * switch and any edited case. Otherwise: the recorded trial in the bundle. Returns false when there is nothing to play. */
+async function loadTrial() {
   const key = `${S.caseId}|${S.p}|${S.d}|0`;
-  $("#start").disabled = true;
+  S.source = "recorded";
+  S.request = { case_id: S.caseId, prosecution: S.p, defense: S.d, seed: S.seed, surprises: S.surprises };
+  if (S.inline?.id === S.caseId) S.request = { ...S.request, case_id: "", case: S.inline };
   try {
-    S.trial = S.live
-      ? await (await fetch(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ case_id: S.caseId, prosecution: S.p, defense: S.d, seed: 0 }) })).json()
-      : B.trials[key];
+    if (S.live) {
+      const r = await fetch(`${API}/trial`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(S.request) });
+      if (!r.ok) throw new Error(`trial ${r.status}`);
+      S.trial = await r.json();
+      S.source = "live";
+      S.computedAt = new Date();
+    } else S.trial = B.trials[key];
   } catch { S.trial = B.trials[key]; }
-  $("#start").disabled = false;
-  if (!S.trial?.events) return;
+  if (!S.trial?.events) return false;
+  window.Live?.ensureStory?.(C()); // cases with no script get spoken lines built from their own exhibit text
+  window.Live?.trialLoaded?.();
+  return true;
+}
 
-  const c = C();
-  $("#court-case").textContent = splitTitle(c.title).name;
+/* Everything on screen that depends on which trial is loaded: header, meters, transcript. */
+function prepareTrial() {
+  $("#court-case").textContent = splitTitle(C().title).name;
   $("#verdict").hidden = true;
   buildMeters();
   $("#transcript").replaceChildren(...S.trial.events.map((ev, i) => {
@@ -409,6 +444,32 @@ async function enterCourt() {
     return el("li", { "data-i": i, hidden: true }, el("button", { onclick: () => { setAuto(false); present(i, false); } },
       el("span", { class: `s ${WHO[n.beats[0]?.who]?.[1] ?? "j"}` }), el("span", {}, n.log)));
   }));
+}
+
+/* Play again with new choices (a new seed, an edited case) without leaving the courtroom. */
+async function rerun() {
+  setAuto(false);
+  Voice.stop();
+  S.run++;
+  if (!(await loadTrial())) return;
+  prepareTrial();
+  Exhibit.hide(false);
+  window.Court3D?.reset();
+  window.Sound?.score(0.5);
+  S.idx = 0;
+  window.Court3D?.shot("wide");
+  showCaption("court", "All rise.", "");
+  setAuto(true);
+}
+
+async function enterCourt() {
+  window.Sound?.unlock();
+  Voice.unlock();
+  $("#start").disabled = true;
+  const ok = await loadTrial();
+  $("#start").disabled = false;
+  if (!ok) return;
+  prepareTrial();
   window.Sound?.unlock();
   const firstVisit = !S.visited;
   S.visited = true;
@@ -616,7 +677,7 @@ function syncState(i, forward) {
     const own = C().evidence.filter((e) => e.owner === side);
     $(id).replaceChildren(...(own.length ? own.map((e) => {
       const s = st[e.id] ?? "unshown";
-      const [label, cls] = { offered: ["Waiting for the judge", "wait"], admitted: ["Accepted", "ok"], excluded: ["Thrown out", "no"] }[s] ?? ["Not shown yet", ""];
+      const [label, cls] = { offered: ["Waiting for the judge", "wait"], admitted: ["Accepted", "ok"], excluded: ["Thrown out", "no"], no_show: ["Witness did not appear", "no"], no_certificate: ["No certificate", "no"] }[s] ?? ["Not shown yet", ""];
       return el("li", { class: s }, el("span", { class: "ev-title" }, e.title), s !== "unshown" ? el("span", { class: `state ${cls}` }, label) : null);
     }) : [el("li", { class: "unshown" }, "No evidence")]));
   }
@@ -626,7 +687,8 @@ function syncState(i, forward) {
   // the 3D paper card follows the same exhibit as the HTML card
   const current = item(ev.action?.evidence_id ?? ev.subject ?? "");
   if (current && ev.action?.type === "present_evidence") window.Court3D?.exhibit(current, "offered", forward);
-  window.Court3D?.syncExhibits(st, current?.id, forward);
+  const room = Object.fromEntries(Object.entries(st).map(([k, v]) => [k, v === "no_show" || v === "no_certificate" ? "excluded" : v]));
+  window.Court3D?.syncExhibits(room, current?.id, forward);
 }
 
 /* Play event i: set the state, then perform its beats (camera, caption, voice). Resolves when done. */
@@ -719,6 +781,7 @@ function showVerdict() {
   $("#caption").hidden = true;
   window.Sound?.stopScore();
   window.Sound?.ending(v.pWins);
+  window.Live?.verdictShown?.();
   $("#v-replay").focus({ preventScroll: true });
   if (!hasGsap || reduced) return;
   gsap.timeline()
@@ -841,6 +904,7 @@ async function init() {
       clearTimeout(t);
     } catch { S.live = false; }
     if (S.live) renderStyles();
+    window.Live?.ready?.();
   }
 }
 
