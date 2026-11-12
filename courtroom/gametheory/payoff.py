@@ -19,7 +19,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pydantic import BaseModel, ConfigDict
 
 from courtroom.cases import CASES, generate_case, get_case
-from courtroom.contracts import CaseFile, Side, VerdictOutcome
+from courtroom.contracts import CaseFile, Side, Surprises, VerdictOutcome
 from courtroom.engine import MAX_EVENTS, run_trial, verify_chain
 from courtroom.gametheory.nash import GameAnalysis, analyze
 
@@ -47,11 +47,11 @@ class PayoffTable(BaseModel):
     analysis: GameAnalysis
 
 
-def _cell(args: tuple[CaseFile, str, str, tuple[int, ...]]) -> Cell:
-    case, row, col, seeds = args
+def _cell(args: tuple[CaseFile, str, str, tuple[int, ...], Surprises | None]) -> Cell:
+    case, row, col, seeds, surprises = args
     up, ud, wins, burden = [], [], 0, []
     for s in seeds:
-        r = run_trial(case, row, col, seed=s)
+        r = run_trial(case, row, col, seed=s, surprises=surprises)
         up.append(r.utilities[Side.PROSECUTION])
         ud.append(r.utilities[Side.DEFENSE])
         wins += r.verdict.outcome.favours is Side.PROSECUTION
@@ -80,10 +80,11 @@ def estimate_payoffs(
     col_strategies: Sequence[str] | None = None,
     seeds: Sequence[int] = tuple(range(40)),
     workers: int = 1,
+    surprises: Surprises | None = None,
 ) -> PayoffTable:
     rows = list(strategies)
     cols = list(col_strategies or strategies)
-    jobs = [(case, r, c, tuple(seeds)) for r in rows for c in cols]
+    jobs = [(case, r, c, tuple(seeds), surprises) for r in rows for c in cols]
     if workers > 1:
         with ProcessPoolExecutor(max_workers=workers) as pool:
             cells = list(pool.map(_cell, jobs))
