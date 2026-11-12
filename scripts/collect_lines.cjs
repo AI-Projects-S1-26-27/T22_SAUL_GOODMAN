@@ -9,7 +9,7 @@ const vm = require("vm");
 
 const web = path.join(__dirname, "..", "courtroom", "viz", "web");
 const stub = () => ({ matches: false, addEventListener() {} });
-const ctx = { console, setTimeout, clearTimeout, matchMedia: stub, location: { protocol: "file:" }, localStorage: { getItem: () => null, setItem() {} } };
+const ctx = { console, fetch: () => Promise.reject(new Error("no network in the line collector")), Audio: class { addEventListener() {} pause() {} }, setTimeout, clearTimeout, matchMedia: stub, location: { protocol: "file:" }, localStorage: { getItem: () => null, setItem() {} } };
 ctx.window = ctx;
 ctx.document = { querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, createElement: () => ({}) };
 vm.createContext(ctx);

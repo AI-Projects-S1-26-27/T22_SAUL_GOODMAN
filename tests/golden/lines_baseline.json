@@ -1,0 +1,2162 @@
+[
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of The Missing Cookies."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, at lunchtime a whole jar of cookies disappeared from the school kitchen. We will show that Sam was there, and that Sam took them."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, Sam was nowhere near that kitchen. He spent his whole lunch in the library, with a book and his own cookies from home."
+ },
+ {
+  "who": "court",
+  "text": "Accuser, please show your evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "The hallway camera shows a kid in a red jacket right by the kitchen door. Sam wears a red jacket."
+ },
+ {
+  "who": "defense",
+  "text": "Objection, Your Honour! That's only a rumour. The witness heard it from someone else."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The hallway video stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Maya, a classmate of Sam's."
+ },
+ {
+  "who": "bailiff",
+  "text": "Please raise your right hand. Do you swear to tell the truth, the whole truth, and nothing but the truth?"
+ },
+ {
+  "who": "witness:Maya, classmate",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Maya, tell the court what you saw at lunchtime."
+ },
+ {
+  "who": "witness:Maya, classmate",
+  "text": "I was walking to the playground and I saw Sam go into the kitchen. I'm sure it was him."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Maya's story stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "When a teacher found Sam after lunch, his shirt was covered in cookie crumbs."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The crumbs on Sam's shirt stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Mrs. Bell, the school cook."
+ },
+ {
+  "who": "witness:Mrs. Bell, school cook",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Mrs. Bell, what were you told?"
+ },
+ {
+  "who": "witness:Mrs. Bell, school cook",
+  "text": "A student came up to me after lunch and said: it was Sam, Sam took the cookies. I didn't see it myself."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. A rumour isn't proof. What Mrs. Bell heard is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "We rest our case."
+ },
+ {
+  "who": "court",
+  "text": "Before we go on, a quick check. Does the Accuser have real evidence for every point?"
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that Sam took the cookies. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "Request denied. There is enough evidence to keep going."
+ },
+ {
+  "who": "court",
+  "text": "Defender, it's your turn."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Mr. Ortiz, the school librarian."
+ },
+ {
+  "who": "witness:Mr. Ortiz, librarian",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Where was Sam at lunchtime?"
+ },
+ {
+  "who": "witness:Mr. Ortiz, librarian",
+  "text": "Sam was in my library the whole lunch break, reading a dinosaur book at the front table. I could see him the entire time."
+ },
+ {
+  "who": "prosecution",
+  "text": "Objection, Your Honour! That's only a rumour. The witness heard it from someone else."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The librarian's account stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Here is a note from Sam's mum. She packed cookies in his own lunchbox that day. That explains the crumbs."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The lunch note stays in."
+ },
+ {
+  "who": "defense",
+  "text": "These are last week's spelling contest results. Sam beat Maya. She might not be the fairest witness."
+ },
+ {
+  "who": "court",
+  "text": "A fair point. From now on, Maya's word counts for half."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The spelling contest results stays in."
+ },
+ {
+  "who": "defense",
+  "text": "We rest our case."
+ },
+ {
+  "who": "court",
+  "text": "Accuser, you may reply one last time."
+ },
+ {
+  "who": "prosecution",
+  "text": "That's all my evidence, Your Honour."
+ },
+ {
+  "who": "prosecution",
+  "text": "A witness saw him, a camera caught a kid near the kitchen, and there were crumbs on his shirt. Put it together, Your Honour."
+ },
+ {
+  "who": "defense",
+  "text": "Crumbs are not a crime. Sam had his own cookies, and the librarian watched him all lunch. There is real doubt here."
+ },
+ {
+  "who": "court",
+  "text": "Thank you both. I will now weigh the evidence."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"Sam was in the kitchen\". I was 63% sure, and I needed 90%."
+ },
+ {
+  "who": "defense",
+  "text": "That's fine by us, Your Honour."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The hallway video is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Maya, a classmate of Sam's."
+ },
+ {
+  "who": "defense",
+  "text": "No objection. Let the court see it."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Maya's story is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "We don't object."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The crumbs on Sam's shirt is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Mrs. Bell, the school cook."
+ },
+ {
+  "who": "prosecution",
+  "text": "Nothing further, Your Honour."
+ },
+ {
+  "who": "defense",
+  "text": "We're happy to carry on, Your Honour."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Mr. Ortiz, the school librarian."
+ },
+ {
+  "who": "defense",
+  "text": "Nothing further, Your Honour."
+ },
+ {
+  "who": "prosecution",
+  "text": "I have nothing more to show."
+ },
+ {
+  "who": "defense",
+  "text": "Objection, Your Honour! The witness is only guessing."
+ },
+ {
+  "who": "defense",
+  "text": "No objection, Your Honour."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The crumbs on Sam's shirt counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Objection, Your Honour! Nobody has shown that it's real."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. What Mrs. Bell heard stays in."
+ },
+ {
+  "who": "court",
+  "text": "No. That doesn't show any bias."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Mr. Ortiz, the school librarian. Where was Sam at lunchtime?"
+ },
+ {
+  "who": "prosecution",
+  "text": "That's fine by us, Your Honour."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The spelling contest results counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "The Defender has used all their turns. Let's move on."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"Sam was in the kitchen\". I was 78% sure, and I needed 90%."
+ },
+ {
+  "who": "prosecution",
+  "text": "No objection. Let the court see it."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The librarian's account counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "We don't object."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The lunch note counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The spelling contest results is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "I have nothing more to show."
+ },
+ {
+  "who": "prosecution",
+  "text": "No objection, Your Honour."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The librarian's account is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The lunch note is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "That's all my evidence, Your Honour."
+ },
+ {
+  "who": "prosecution",
+  "text": "Objection, Your Honour! That has nothing to do with this case."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The spelling contest results is now part of the record."
+ },
+ {
+  "who": "prosecution",
+  "text": "The Accuser calls Mrs. Bell, the school cook. Mrs. Bell, what were you told?"
+ },
+ {
+  "who": "court",
+  "text": "The Accuser has used all their turns. Let's move on."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The hallway video counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. What Mrs. Bell heard counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of The Broken Bike."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, Ana lent Raj her new bike for one afternoon. It came back with a bent wheel, and she had to pay to fix it. Raj should pay."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, that wheel was wobbly before Raj ever touched it. You can't blame him for damage that was already there."
+ },
+ {
+  "who": "prosecution",
+  "text": "Here's the bike shop receipt. A new wheel cost ninety dollars."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The repair receipt stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "That evening, Raj sent Ana this text. It says: sorry, I hit a curb."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Nobody has shown it's real. Raj's text is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "This photo was taken the morning Raj borrowed the bike. Look closely. The wheel is perfectly straight."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The morning photo is now part of the record."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Kim, the mechanic who fixed the bike."
+ },
+ {
+  "who": "witness:Kim, bike mechanic",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Kim, what bent that wheel?"
+ },
+ {
+  "who": "witness:Kim, bike mechanic",
+  "text": "A slow wobble doesn't do this. This wheel hit something hard, like a curb, at speed."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The mechanic's opinion is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that Raj damaged the bike. Please end the trial now."
+ },
+ {
+  "who": "prosecution",
+  "text": "The wheel was straight that morning. Raj even texted to say sorry. And the repair cost ninety dollars. He should pay it back."
+ },
+ {
+  "who": "defense",
+  "text": "The bike was second-hand, with a known wheel problem. Raj's friend saw it wobble before the ride. That's not Raj's fault."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Must pay. The Accuser proved every point."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The repair receipt is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The morning photo counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Kim, the mechanic who fixed the bike."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The mechanic's opinion counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Raj's text stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Leo, who was there when Raj picked up the bike."
+ },
+ {
+  "who": "witness:Leo, Raj's friend",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Leo, what did you notice?"
+ },
+ {
+  "who": "witness:Leo, Raj's friend",
+  "text": "When Raj wheeled it out of Ana's garage, the front wheel was already wobbling. I said so at the time."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Leo's account is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "I'll be honest with the court. Here's a photo of Leo and Raj on holiday. Yes, they're good friends."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. It doesn't help decide this case. The holiday photo is thrown out."
+ },
+ {
+  "who": "defense",
+  "text": "This is the ad Ana bought the bike from. It says: used bike, small wheel issue."
+ },
+ {
+  "who": "prosecution",
+  "text": "Objection, Your Honour! We were never shown it before the trial."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Both sides must see evidence before the trial. The old sale ad is thrown out."
+ },
+ {
+  "who": "defense",
+  "text": "Let's skip ahead, Your Honour. Just declare them guilty!"
+ },
+ {
+  "who": "court",
+  "text": "Only the Defender may ask for that, and only at the right time. Request denied, and you lose a point."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The holiday photo is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The morning photo is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Leo, who was there when Raj picked up the bike."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Leo's account counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The morning photo stays in."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The holiday photo is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "I move to end the trial immediately!"
+ },
+ {
+  "who": "court",
+  "text": "Very well. Raj's text is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The mechanic's opinion is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that the repair costs money. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Leo's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The old sale ad counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "The Accuser calls Kim, the mechanic who fixed the bike. Kim, what bent that wheel?"
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of The Dug-Up Garden."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, Mrs. Green's tomato garden was dug up overnight. The paw prints lead straight to the fence next door, where Rex the dog lives."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, Rex spent the night locked in his own yard. Something dug up that garden, but it wasn't him."
+ },
+ {
+  "who": "prosecution",
+  "text": "This photo was taken the next morning. The gate to Rex's yard is wide open."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The gate photo stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Muddy paw prints run from the dug-up tomatoes all the way to the fence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The paw prints stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that the owner was careless. Please end the trial now."
+ },
+ {
+  "who": "defense",
+  "text": "The gate has a smart lock. Its log shows it stayed locked from nine at night until seven in the morning."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The smart-lock log stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Dr. Fox, a vet."
+ },
+ {
+  "who": "witness:Dr. Fox, vet",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Dr. Fox, you measured the paw prints. What did you find?"
+ },
+ {
+  "who": "witness:Dr. Fox, vet",
+  "text": "The prints are about four centimetres wide. Rex's paws are nearly ten. And they have five long fingers. These are a raccoon's."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The vet's opinion counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Mrs. Green has complained about Rex five times before. She may have made up her mind already."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The old complaints counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "Paw prints, barking in the night, a gate left open. Rex had the chance, and the owner gave it to him."
+ },
+ {
+  "who": "defense",
+  "text": "The gate was locked all night, and a vet says those prints are far too small for Rex. It was a raccoon, Your Honour."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Doesn't have to pay. The Accuser didn't prove that \"Rex dug the garden\". I was 49% sure, and I needed 50%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The gate photo is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The paw prints is accepted."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The vet's opinion is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The old complaints is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The old complaints is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The vet's opinion stays in."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The smart-lock log is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Dr. Fox, a vet."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The vet's opinion is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The smart-lock log counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The smart-lock log is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I demand you end this trial right now!"
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Mrs. Green, the garden owner."
+ },
+ {
+  "who": "witness:Mrs. Green, garden owner",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Mrs. Green, did anyone else tell you about Rex?"
+ },
+ {
+  "who": "witness:Mrs. Green, garden owner",
+  "text": "My cousin told me that Rex digs holes all the time. Everybody knows it."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. A rumour isn't proof. The cousin's claim is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Mrs. Green herself."
+ },
+ {
+  "who": "court",
+  "text": "Mrs. Green, please remember you are still under oath."
+ },
+ {
+  "who": "prosecution",
+  "text": "Mrs. Green, what did you hear that night?"
+ },
+ {
+  "who": "witness:Mrs. Green, garden owner",
+  "text": "Around midnight I heard barking right outside my bedroom window, in my garden. Loud barking."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Mrs. Green's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Doesn't have to pay. The Accuser didn't prove that \"The owner was careless\". I was 47% sure, and I needed 50%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The cousin's claim is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Mrs. Green herself."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Mrs. Green, the garden owner."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The cousin's claim counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Mrs. Green's account stays in."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Dr. Fox, a vet. Dr. Fox, you measured the paw prints. What did you find?"
+ },
+ {
+  "who": "court",
+  "text": "A fair point. From now on, Mrs. Green's word counts for half."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The old complaints stays in."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of Helix Dynamics Trade-Secret Exfiltration."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, at two in the morning someone copied Helix's secret chip design and sent it out. We will show it was Adrian Vance, and that he did it for money."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, Adrian was asleep at home. His password was stolen in a phishing attack months ago. Someone used his account. Not him."
+ },
+ {
+  "who": "prosecution",
+  "text": "Police searched his laptop and found the secret Tessellate design files on it."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The laptop files stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Dr. Lena Marsh, a computer expert."
+ },
+ {
+  "who": "witness:Dr. Lena Marsh, computer expert",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Dr. Marsh, what was in that upload?"
+ },
+ {
+  "who": "witness:Dr. Lena Marsh, computer expert",
+  "text": "The upload was 4.2 gigabytes. The secret Tessellate design archive is 4.2 gigabytes. That is not a coincidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Dr. Marsh's analysis stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "The company's login records show Vance's account connecting at nine minutes past two in the morning."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The login record stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "These emails from a Quorvex recruiter promise him a special bonus for bringing secrets."
+ },
+ {
+  "who": "defense",
+  "text": "Objection, Your Honour! We were never shown it before the trial."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Both sides must see evidence before the trial. The recruiter emails is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Priya Nandakumar, Mr. Vance's co-worker."
+ },
+ {
+  "who": "witness:Priya Nandakumar, co-worker",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "What did he tell you?"
+ },
+ {
+  "who": "witness:Priya Nandakumar, co-worker",
+  "text": "A week before the leak, Adrian told me: Quorvex is going to make me rich. He was smiling when he said it."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Priya's account stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Twelve days later, forty thousand dollars in crypto landed in his account."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The crypto payment stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "His security badge opened the door to Lab B at two minutes past two."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The badge record stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that he meant to help a rival. Please end the trial now."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Professor Ian Cho, a security expert."
+ },
+ {
+  "who": "witness:Prof. Ian Cho, security expert",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Professor, how reliable is that upload alarm?"
+ },
+ {
+  "who": "witness:Prof. Ian Cho, security expert",
+  "text": "This alarm rule gets it wrong about three times in ten. It often flags normal backups as theft."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Professor Cho's analysis is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Tom Reyes from HR."
+ },
+ {
+  "who": "witness:Tom Reyes, HR manager",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Mr. Reyes, what do you make of the upload?"
+ },
+ {
+  "who": "witness:Tom Reyes, HR manager",
+  "text": "I think it was probably an approved personal backup. Staff do that all the time. But I didn't check myself."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Mr. Reyes's guess stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Priya once filed a formal complaint against Adrian. She is not a neutral witness."
+ },
+ {
+  "who": "court",
+  "text": "A fair point. From now on, Priya Nandakumar's word counts for half."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The complaint Priya filed is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Dana Whitfield, the Vances' neighbour."
+ },
+ {
+  "who": "witness:Dana Whitfield, neighbour",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "What kind of man is Adrian?"
+ },
+ {
+  "who": "witness:Dana Whitfield, neighbour",
+  "text": "Adrian is a lovely neighbour. He mows his lawn every Sunday and helps everyone on the street."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. It doesn't help decide this case. The neighbour's account is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "His badge, his login, his car in the garage, the upload, the money. Every road leads back to Adrian Vance."
+ },
+ {
+  "who": "defense",
+  "text": "A stolen password, an alarm that's wrong almost a third of the time, and a family who saw him at home. That is reasonable doubt."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"The files were taken out\". I was 81% sure, and I needed 90%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The laptop files is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Dr. Lena Marsh, a computer expert."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Dr. Marsh's analysis is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The login record is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The recruiter emails is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The crypto payment is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The badge record is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Professor Cho's analysis stays in."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Guilty. The Accuser proved every point."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Priya Nandakumar, Mr. Vance's co-worker."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Priya's account counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The crypto payment counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The complaint Priya filed is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The login record counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The recruiter emails stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Objection, Your Honour! It was collected illegally."
+ },
+ {
+  "who": "defense",
+  "text": "This company memo warns that staff passwords were stolen in a phishing attack in March."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The phishing memo stays in."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The complaint Priya filed counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Dana Whitfield, the Vances' neighbour."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Tom Reyes from HR."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Mr. Reyes's guess counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Their home internet router shows his phone and laptop online at home at ten past two."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The home router record stays in."
+ },
+ {
+  "who": "court",
+  "text": "The Defender, you have broken the rules too often. Your turn is over."
+ },
+ {
+  "who": "prosecution",
+  "text": "The office garage camera shows his car arriving at ten to two in the morning."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The garage video stays in."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The badge record counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that the files were taken out. Please end the trial now."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Professor Ian Cho, a security expert."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Mr. Reyes's guess is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The neighbour's account counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"The files were taken out\". I was 17% sure, and I needed 90%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Priya's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Professor Cho's analysis counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"The files were taken out\". I was 36% sure, and I needed 90%."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The home router record counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Professor Ian Cho, a security expert. Professor, how reliable is that upload alarm?"
+ },
+ {
+  "who": "court",
+  "text": "Very well. The phishing memo is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Mira Vance, Adrian's wife."
+ },
+ {
+  "who": "witness:Mira Vance, wife",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Where was your husband that night?"
+ },
+ {
+  "who": "witness:Mira Vance, wife",
+  "text": "Adrian was asleep next to me all night. I woke up at two because the baby cried, and he was right there."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Mira's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The garage video is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "A security alarm caught four gigabytes being uploaded to a personal cloud drive."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The upload alarm stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Detective Samuel Okafor."
+ },
+ {
+  "who": "witness:Det. Samuel Okafor",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Detective, what did your informant say?"
+ },
+ {
+  "who": "witness:Det. Samuel Okafor",
+  "text": "My informant told me Vance was trying to sell the chip design. I can't say who the informant is."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. A rumour isn't proof. The informant's tip is thrown out."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Professor Cho's analysis is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Mr. Reyes's guess is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Evidence taken illegally can't be used. The laptop files is thrown out."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Nobody has shown it's real. The upload alarm is thrown out."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Priya's account is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The crypto payment is now part of the record."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Detective Samuel Okafor."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The complaint Priya filed stays in."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The upload alarm counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The informant's tip is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Mira Vance, Adrian's wife. Where was your husband that night?"
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Mira's account is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The garage video is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The badge record is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The upload alarm is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The informant's tip counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Dr. Marsh's analysis counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The recruiter emails counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The garage video counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The informant's tip stays in."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The neighbour's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The home router record is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Mira Vance, Adrian's wife."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of Aurora Protocol Flash-Loan Exploit."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, thirty-one million dollars was drained from the Aurora crypto app in minutes. We will show the accused did it and meant to keep it."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, my client found a hole in Aurora's code and moved the money to protect it, just like Aurora's own rules invite. Then he gave it back."
+ },
+ {
+  "who": "prosecution",
+  "text": "These blockchain records show the attacking wallet draining the pool, step by step."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The blockchain records stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Police found the wallet's secret recovery words written on paper in his flat."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The secret key stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Nine million dollars was pushed through a mixer, a tool that hides where money goes."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The mixer record stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "A chat message from that night says: time to retire, lol."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Nobody has shown it's real. The chat message is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "The exchange's ID check links that funding account to the accused."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Both sides must see evidence before the trial. The exchange ID file is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Rosa Ibarra, a blockchain analyst."
+ },
+ {
+  "who": "witness:Rosa Ibarra, blockchain analyst",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Ms. Ibarra, where did the attacker's money come from?"
+ },
+ {
+  "who": "witness:Rosa Ibarra, blockchain analyst",
+  "text": "I followed the money backwards. The attacking wallet was funded straight from an exchange account in the accused's own name."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Rosa's money trail stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Kofi Mensah, an Aurora developer."
+ },
+ {
+  "who": "witness:Kofi Mensah, Aurora developer",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Mr. Mensah, is this how friendly hackers behave?"
+ },
+ {
+  "who": "witness:Kofi Mensah, Aurora developer",
+  "text": "No. Real white-hat hackers warn us first. Nobody honest drains thirty-one million dollars and hides part of it."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Kofi's opinion stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that that wallet took the money. Please end the trial now."
+ },
+ {
+  "who": "defense",
+  "text": "Forty-eight hours later, twenty-two million dollars went straight back to Aurora."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The returned money stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Aurora's own rules promise a ten percent reward to anyone who finds a bug and returns the funds."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The bounty policy stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Lin Zhao, who runs Aurora's bug-bounty desk."
+ },
+ {
+  "who": "witness:Lin Zhao, bug-bounty desk",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "When did you hear from the accused?"
+ },
+ {
+  "who": "witness:Lin Zhao, bug-bounty desk",
+  "text": "He messaged our desk less than two hours after the attack. He said he had the funds safe and wanted to return them."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Lin Zhao's account stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Kofi Mensah lost his own savings in this attack. He has a reason to be angry."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Kofi's losses stays in."
+ },
+ {
+  "who": "court",
+  "text": "A fair point. From now on, Kofi Mensah's word counts for half."
+ },
+ {
+  "who": "prosecution",
+  "text": "He hid nine million through a mixer and joked about retiring. That's not a rescue. That's a robbery."
+ },
+ {
+  "who": "defense",
+  "text": "He called the bounty desk within two hours and returned twenty-two million. Thieves don't give the money back."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"That wallet took the money\". I was 86% sure, and I needed 90%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The blockchain records is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The secret key is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The mixer record is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Rosa Ibarra, a blockchain analyst."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Rosa's money trail is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The mixer record counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The exchange ID file stays in."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Kofi's opinion is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Lin Zhao, who runs Aurora's bug-bounty desk. When did you hear from the accused?"
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Dr. Sam Ortega, a data scientist."
+ },
+ {
+  "who": "witness:Dr. Sam Ortega, data scientist",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Dr. Ortega, can we trust the method that linked those wallets?"
+ },
+ {
+  "who": "witness:Dr. Sam Ortega, data scientist",
+  "text": "That wallet-matching method is wrong about one time in four. On its own, it can't tell you who owns a wallet."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The wallet-matching flaw counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that he meant to keep it. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The returned money counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The bounty policy counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Lin Zhao's account counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Dr. Sam Ortega, a data scientist."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The wallet-matching flaw stays in."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Kofi's losses is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"He controlled the wallet\". I was 44% sure, and I needed 90%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Rosa's money trail is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Lin Zhao, who runs Aurora's bug-bounty desk."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Lin Zhao's account is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The returned money is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The bounty policy is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The wallet-matching flaw is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Kofi's losses is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Evidence taken illegally can't be used. The secret key is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Kofi Mensah, an Aurora developer."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Dr. Sam Ortega, a data scientist. Dr. Ortega, can we trust the method that linked those wallets?"
+ },
+ {
+  "who": "prosecution",
+  "text": "Here's a printout of those same transactions from a public website."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The printout stays in."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The blockchain records is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that he controlled the wallet. Please end the trial now."
+ },
+ {
+  "who": "prosecution",
+  "text": "I move to end the trial immediately!"
+ },
+ {
+  "who": "prosecution",
+  "text": "Objection, Your Honour! The witness is only guessing."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The printout is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The mixer record is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The chat message stays in."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The secret key counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I demand you end this trial right now!"
+ },
+ {
+  "who": "court",
+  "text": "Very well. Lin Zhao's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of AV-7 Crosswalk Collision."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, a self-driving taxi hit a cyclist in a crosswalk. The company knew its cars struggle to see bikes at dusk, and shipped them anyway."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, our car saw the cyclist and braked. The cyclist rode through a red light. This was a tragic accident, not a faulty car."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Dr. Ben Hollis, a crash expert."
+ },
+ {
+  "who": "witness:Dr. Ben Hollis, crash expert",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Dr. Hollis, when did the car brake?"
+ },
+ {
+  "who": "witness:Dr. Ben Hollis, crash expert",
+  "text": "I rebuilt the crash from the skid marks and video. The car began braking nearly a second later than it should have."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The crash reconstruction stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "The hospital bills come to one hundred and eighty-six thousand dollars."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The medical bills counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "This internal company report says the car loses track of bikes at dusk. It was marked: won't fix."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Both sides must see evidence before the trial. The internal bug report is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Someone online posted that these cars can't see bikes."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. A rumour isn't proof. The forum post is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Dr. Aiko Tan, a former engineer at the company."
+ },
+ {
+  "who": "witness:Dr. Aiko Tan, former engineer",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Dr. Tan, did they know about the problem?"
+ },
+ {
+  "who": "witness:Dr. Aiko Tan, former engineer",
+  "text": "Yes. At dusk the car spotted only seventy-one percent of bikes. We told the managers. They shipped it anyway."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Dr. Tan's account is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that the fault caused the crash. Please end the trial now."
+ },
+ {
+  "who": "defense",
+  "text": "The car's own data shows it spotted the cyclist more than a second and a half before the crash."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The car's data counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Martin Lund, who was in the next car."
+ },
+ {
+  "who": "witness:Martin Lund, driver",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Mr. Lund, what did you see?"
+ },
+ {
+  "who": "witness:Martin Lund, driver",
+  "text": "I was stopped right next to the crossing. The cyclist's light was red. He rode straight through it."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Martin's account stays in."
+ },
+ {
+  "who": "defense",
+  "text": "A safety regulator checked this software and passed it."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The safety check is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Dr. Tan was fired by the company for mishandling data. She may hold a grudge."
+ },
+ {
+  "who": "court",
+  "text": "A fair point. From now on, Dr. Aiko Tan's word counts for half."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Dr. Tan's firing record counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Grace Obi, who saw the crash."
+ },
+ {
+  "who": "witness:Grace Obi, eyewitness",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Ms. Obi, what colour was the light?"
+ },
+ {
+  "who": "witness:Grace Obi, eyewitness",
+  "text": "I was waiting to cross. The walk sign was green for the cyclist. Then the taxi just kept coming."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Grace's account stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "A known bug marked won't fix, an engineer who warned them, and braking that came too late. The company is responsible."
+ },
+ {
+  "who": "defense",
+  "text": "The car detected the cyclist. A regulator checked the software. And a witness saw a red light. The fault was not ours."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Doesn't have to pay. The Accuser didn't prove that \"The car's software was faulty\". I was 30% sure, and I needed 50%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The crash reconstruction is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The medical bills is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The internal bug report is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Martin Lund, who was in the next car."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Grace's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The medical bills stays in."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The internal bug report counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The car's data is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "The cyclist was not wearing a helmet, which made the injuries worse."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The helmet report is now part of the record."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Grace Obi, who saw the crash."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Dr. Tan's account counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Martin's account is now part of the record."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Dr. Aiko Tan, a former engineer at the company."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Martin's account counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The safety check counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Dr. Tan's firing record is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Grace's account counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Dr. Tan's firing record is now part of the record."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that the car's software was faulty. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Doesn't have to pay. The Accuser didn't prove that \"The car's software was faulty\". I was 18% sure, and I needed 50%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The forum post is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Dr. Tan's firing record stays in."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Doesn't have to pay. The Accuser didn't prove that \"The car's software was faulty\". I was 28% sure, and I needed 50%."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The helmet report counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The safety check stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Dr. Ruth Adeyemi, who treated the cyclist."
+ },
+ {
+  "who": "witness:Dr. Ruth Adeyemi, doctor",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Doctor, how badly was he hurt?"
+ },
+ {
+  "who": "witness:Dr. Ruth Adeyemi, doctor",
+  "text": "He had a broken pelvis. He needed surgery and fourteen weeks of physical therapy to walk properly again."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The doctor's report is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Dr. Ruth Adeyemi, who treated the cyclist."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Dr. Tan's account stays in."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Nobody has shown it's real. The forum post is thrown out."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The doctor's report stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls Dr. Ben Hollis, a crash expert."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The helmet report is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The safety check is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of The Empty Docket."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, we say the accused committed a cyber crime."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they have brought a case with no evidence at all. Let's see if they can prove anything."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that something wrong happened. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "There is no accepted evidence that something wrong happened. This trial ends now."
+ },
+ {
+  "who": "prosecution",
+  "text": "We rest on what we've said."
+ },
+ {
+  "who": "defense",
+  "text": "Words aren't evidence, Your Honour. There's nothing here."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Case dismissed. The Accuser had no accepted evidence that \"Something wrong happened\"."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of Mutually Exclusive Testimony."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, a drone fleet went rogue after someone typed a bad command. We say it was Lark."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, Lark was on a break. Someone else was at that keyboard."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, Operator A."
+ },
+ {
+  "who": "witness:Operator A, shift operator",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "Who typed the command?"
+ },
+ {
+  "who": "witness:Operator A, shift operator",
+  "text": "I watched Lark type that command. I was standing right behind the chair."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Operator A's account stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that Lark sent the bad command. Please end the trial now."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Operator B."
+ },
+ {
+  "who": "witness:Operator B, shift operator",
+  "text": "I do."
+ },
+ {
+  "who": "defense",
+  "text": "Where was Lark?"
+ },
+ {
+  "who": "witness:Operator B, shift operator",
+  "text": "Lark was on a break. I was the one sitting at that console, and I didn't type it either."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. Operator B's account stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "Operator A saw Lark type it. That should settle it."
+ },
+ {
+  "who": "defense",
+  "text": "Operator B was actually at the console, and says it wasn't Lark. It's one word against another."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Doesn't have to pay. The Accuser didn't prove that \"Lark sent the bad command\". I was 50% sure, and I needed 50%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Operator A's account is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Operator B."
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. Operator B's account is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Operator B's account counts as evidence."
+ },
+ {
+  "who": "prosecution",
+  "text": "Objection, Your Honour! It was collected illegally."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of Fruit of the Poisonous Tree."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, a ransomware attack locked a company's computers and someone demanded money. We say that was Ms. Kaur."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, every piece of their evidence was gathered the wrong way. Watch closely."
+ },
+ {
+  "who": "prosecution",
+  "text": "Police took a hard drive from her home that holds the attack software."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The hard drive stays in."
+ },
+ {
+  "who": "prosecution",
+  "text": "This is the ransom note that appeared on the company's screens."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Nobody has shown it's real. The ransom note is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "These records show the ransom wallet's payments."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Both sides must see evidence before the trial. The ransom wallet records is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "We recorded her phone calls, where she talks about the attack software."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Evidence taken illegally can't be used. The phone recording is thrown out."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, I'd like to call my witness, a paid informant."
+ },
+ {
+  "who": "witness:Paid informant",
+  "text": "I do."
+ },
+ {
+  "who": "prosecution",
+  "text": "What do you know about the attack?"
+ },
+ {
+  "who": "witness:Paid informant",
+  "text": "Someone told me Kaur did it. I don't remember who. I was paid for the tip."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. A rumour isn't proof. The informant's story is thrown out."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that Kaur demanded a ransom. Please end the trial now."
+ },
+ {
+  "who": "prosecution",
+  "text": "The recordings, the drive and the note all point to her."
+ },
+ {
+  "who": "defense",
+  "text": "Illegal recordings, an illegal search and a note nobody can vouch for. The rules exist for a reason."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Not guilty. The Accuser didn't prove that \"Kaur launched the attack\". I was 76% sure, and I needed 90%."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The hard drive is accepted."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, the Accuser calls a paid informant."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The ransom note stays in."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The phone recording counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The informant's story stays in."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that Kaur launched the attack. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "There is no accepted evidence that Kaur launched the attack. This trial ends now."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Case dismissed. The Accuser had no accepted evidence that \"Kaur launched the attack\"."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The ransom note is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The informant's story counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The phone recording stays in."
+ },
+ {
+  "who": "court",
+  "text": "Sustained. Evidence taken illegally can't be used. The hard drive is thrown out."
+ },
+ {
+  "who": "court",
+  "text": "There is no accepted evidence that Kaur demanded a ransom. This trial ends now."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Case dismissed. The Accuser had no accepted evidence that \"Kaur demanded a ransom\"."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The phone recording is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Overruled. I see no problem with it. The ransom wallet records stays in."
+ },
+ {
+  "who": "court",
+  "text": "Court is now in session. This is the case of Prosecution Brings Only Exculpatory Material."
+ },
+ {
+  "who": "prosecution",
+  "text": "Your Honour, we say Ms. Park bought shares using secret company news."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, Ms. Park's trade was planned months in advance. Even the Accuser's own file shows it."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, they haven't given you real proof that Park traded on secret tips. Please end the trial now."
+ },
+ {
+  "who": "court",
+  "text": "There is no accepted evidence that Park traded on secret tips. This trial ends now."
+ },
+ {
+  "who": "prosecution",
+  "text": "We leave it to the court."
+ },
+ {
+  "who": "defense",
+  "text": "There is no evidence of a secret tip. The trade was on autopilot."
+ },
+ {
+  "who": "court",
+  "text": "I have reached my verdict. Case dismissed. The Accuser had no accepted evidence that \"Park traded on secret tips\"."
+ },
+ {
+  "who": "prosecution",
+  "text": "Here is a calendar entry from that week."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The calendar entry is accepted."
+ }
+]
