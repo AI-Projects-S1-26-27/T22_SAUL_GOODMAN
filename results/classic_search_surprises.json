@@ -1,0 +1,32 @@
+{
+ "candidates": 50,
+ "found": [],
+ "label_counts": {
+  "battle-of-the-sexes": 0,
+  "chicken": 0,
+  "dominance-solvable": 4444,
+  "matching-pennies": 105,
+  "other": 9671,
+  "prisoners-dilemma": 0,
+  "stag-hunt": 0
+ },
+ "label_counts_no_tolerance": {
+  "battle-of-the-sexes": 0,
+  "chicken": 0,
+  "dominance-solvable": 9419,
+  "matching-pennies": 404,
+  "other": 4347,
+  "prisoners-dilemma": 49,
+  "stag-hunt": 1
+ },
+ "note": "Found by search: tried gen-0 to gen-394; a corner that looked like a target game on a few seeds is listed only if it keeps the same name, under the full tolerance, on 40 fresh seeds and on at least 80% of their resamples. Nothing was tuned.",
+ "seconds": 0,
+ "start": 0,
+ "surprises": true,
+ "targets": [
+  "prisoners-dilemma",
+  "stag-hunt",
+  "battle-of-the-sexes"
+ ],
+ "tried": 395
+}

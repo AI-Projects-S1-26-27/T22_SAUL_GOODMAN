@@ -1,0 +1,7582 @@
+{
+ "cases": {
+  "aurora-defi": {
+   "A": [
+    [
+     -6.978,
+     -6.922,
+     -6.978,
+     -3.136
+    ],
+    [
+     -1.68,
+     -1.68,
+     -1.68,
+     -1.648
+    ],
+    [
+     -2.02,
+     -4.4855,
+     -4.5015,
+     -2.6285
+    ],
+    [
+     -6.419,
+     -6.207,
+     -6.2405,
+     -4.5315
+    ]
+   ],
+   "B": [
+    [
+     5.9935,
+     7.4575,
+     7.2355,
+     4.9685
+    ],
+    [
+     6.7,
+     7.79,
+     7.79,
+     6.3355
+    ],
+    [
+     6.5,
+     7.473,
+     7.251,
+     5.2345
+    ],
+    [
+     6.9345,
+     8.112,
+     8.001,
+     5.5855
+    ]
+   ],
+   "SA": [
+    [
+     0.163399,
+     0.160807,
+     0.163399,
+     0.095948
+    ],
+    [
+     0.037281,
+     0.037281,
+     0.037281,
+     0.034713
+    ],
+    [
+     0.040402,
+     0.206311,
+     0.205453,
+     0.080108
+    ],
+    [
+     0.16893,
+     0.186194,
+     0.187541,
+     0.127362
+    ]
+   ],
+   "SB": [
+    [
+     0.027521,
+     0.031297,
+     0.040603,
+     0.096522
+    ],
+    [
+     0.0,
+     0.029198,
+     0.029198,
+     0.106504
+    ],
+    [
+     0.01005,
+     0.026963,
+     0.036625,
+     0.098849
+    ],
+    [
+     0.132329,
+     0.092114,
+     0.101993,
+     0.158739
+    ]
+   ],
+   "case_id": "aurora-defi",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 32,
+    "matching-pennies": 0,
+    "other": 4,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9606,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 191,
+      "other": 9
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.955,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 156,
+      "other": 44
+     },
+     "reason": "Each side has one best play (reckless, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.78,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 155,
+      "other": 45
+     },
+     "reason": "Each side has one best play (reckless, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.775,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 121,
+      "other": 79
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.605,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 156,
+      "other": 44
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.78,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 155,
+      "other": 45
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.775,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 191,
+      "other": 9
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.955,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 191,
+      "other": 9
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.955,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "broken-bike": {
+   "A": [
+    [
+     8.662,
+     8.662,
+     8.662,
+     8.7795
+    ],
+    [
+     6.6635,
+     9.312,
+     9.312,
+     6.245
+    ],
+    [
+     6.5135,
+     9.312,
+     9.312,
+     6.1655
+    ],
+    [
+     7.421,
+     7.421,
+     7.421,
+     6.4355
+    ]
+   ],
+   "B": [
+    [
+     -0.861,
+     -0.303,
+     -0.303,
+     -3.7265
+    ],
+    [
+     -0.676,
+     -0.622,
+     -0.622,
+     -0.7015
+    ],
+    [
+     -0.676,
+     -0.622,
+     -0.622,
+     -0.7015
+    ],
+    [
+     -0.396,
+     0.1625,
+     0.1625,
+     -2.3995
+    ]
+   ],
+   "SA": [
+    [
+     0.034751,
+     0.034751,
+     0.034751,
+     0.036287
+    ],
+    [
+     0.434902,
+     0.016653,
+     0.016653,
+     0.457865
+    ],
+    [
+     0.434902,
+     0.016653,
+     0.016653,
+     0.4601
+    ],
+    [
+     0.221283,
+     0.221283,
+     0.221283,
+     0.213048
+    ]
+   ],
+   "SB": [
+    [
+     0.019625,
+     0.026637,
+     0.026637,
+     0.12629
+    ],
+    [
+     0.522239,
+     0.022922,
+     0.022922,
+     0.555933
+    ],
+    [
+     0.522239,
+     0.022922,
+     0.022922,
+     0.555933
+    ],
+    [
+     0.20952,
+     0.200782,
+     0.200782,
+     0.269609
+    ]
+   ],
+   "case_id": "broken-bike",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 7,
+    "matching-pennies": 0,
+    "other": 29,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9825,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 4,
+      "matching-pennies": 3,
+      "other": 193
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.965,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 4,
+      "matching-pennies": 3,
+      "other": 193
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.965,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.96,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.96,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 4,
+      "matching-pennies": 3,
+      "other": 193
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.965,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 4,
+      "matching-pennies": 3,
+      "other": 193
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.965,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.96,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.96,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 2,
+      "matching-pennies": 2,
+      "other": 196
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.98,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 2,
+      "matching-pennies": 2,
+      "other": 196
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.98,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 8,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.96,
+     "ties": 7
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.96,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.96,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 2,
+      "matching-pennies": 2,
+      "other": 196
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.98,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 2,
+      "matching-pennies": 2,
+      "other": 196
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.98,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 10,
+      "other": 190
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.95,
+     "ties": 7
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.96,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 7,
+      "matching-pennies": 1,
+      "other": 192
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.96,
+     "ties": 3
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "cookie-jar": {
+   "A": [
+    [
+     -2.4,
+     -2.4,
+     -2.4,
+     -1.784
+    ],
+    [
+     -1.318,
+     -1.318,
+     -1.318,
+     -1.25
+    ],
+    [
+     -1.816,
+     -1.816,
+     -1.816,
+     -1.256
+    ],
+    [
+     -3.192,
+     -3.192,
+     -3.192,
+     -2.7935
+    ]
+   ],
+   "B": [
+    [
+     7.135,
+     8.2625,
+     8.2595,
+     6.143
+    ],
+    [
+     7.3,
+     8.39,
+     8.39,
+     6.991
+    ],
+    [
+     7.135,
+     8.2625,
+     8.2595,
+     6.143
+    ],
+    [
+     7.2985,
+     8.3855,
+     8.3825,
+     6.489
+    ]
+   ],
+   "SA": [
+    [
+     0.017408,
+     0.017408,
+     0.017408,
+     0.237923
+    ],
+    [
+     0.027299,
+     0.027299,
+     0.027299,
+     0.025742
+    ],
+    [
+     0.029703,
+     0.029703,
+     0.029703,
+     0.226481
+    ],
+    [
+     0.094253,
+     0.094253,
+     0.094253,
+     0.19044
+    ]
+   ],
+   "SB": [
+    [
+     0.005967,
+     0.03085,
+     0.031636,
+     0.271899
+    ],
+    [
+     0.0,
+     0.029198,
+     0.029198,
+     0.103302
+    ],
+    [
+     0.005967,
+     0.03085,
+     0.031636,
+     0.271899
+    ],
+    [
+     0.057544,
+     0.0457,
+     0.046316,
+     0.234648
+    ]
+   ],
+   "case_id": "cookie-jar",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 30,
+    "matching-pennies": 0,
+    "other": 6,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9896,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 175,
+      "other": 25
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.875,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 175,
+      "other": 25
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.875,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 175,
+      "other": 25
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.875,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "edge-defense-only": {
+   "A": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     -0.606,
+     -0.606,
+     -0.606,
+     -0.606
+    ]
+   ],
+   "B": [
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.758,
+     9.85,
+     9.85,
+     9.613
+    ]
+   ],
+   "SA": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.06496,
+     0.06496,
+     0.06496,
+     0.06496
+    ]
+   ],
+   "SB": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.016918,
+     0.0,
+     0.0,
+     0.041661
+    ]
+   ],
+   "case_id": "edge-defense-only",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 9,
+    "matching-pennies": 0,
+    "other": 27,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 1.0,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "edge-empty-docket": {
+   "A": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     -0.169,
+     -0.169,
+     -0.169,
+     -0.169
+    ]
+   ],
+   "B": [
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ]
+   ],
+   "SA": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.051123,
+     0.051123,
+     0.051123,
+     0.051123
+    ]
+   ],
+   "SB": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ]
+   ],
+   "case_id": "edge-empty-docket",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 9,
+    "matching-pennies": 0,
+    "other": 27,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9987,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (aggressive, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (aggressive, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (aggressive, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (conservative, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (conservative, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (conservative, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (adaptive, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (adaptive, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (adaptive, reckless) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "edge-mutual-exclusion": {
+   "A": [
+    [
+     -0.85,
+     -0.85,
+     -0.85,
+     -0.642
+    ],
+    [
+     -0.526,
+     -0.526,
+     -0.526,
+     -0.322
+    ],
+    [
+     -0.526,
+     -0.526,
+     -0.526,
+     -0.322
+    ],
+    [
+     -1.206,
+     -1.206,
+     -1.206,
+     -1.006
+    ]
+   ],
+   "B": [
+    [
+     9.0,
+     9.454,
+     9.454,
+     8.35
+    ],
+    [
+     9.0,
+     9.454,
+     9.454,
+     8.35
+    ],
+    [
+     9.0,
+     9.454,
+     9.454,
+     8.35
+    ],
+    [
+     9.017,
+     9.467,
+     9.467,
+     8.3865
+    ]
+   ],
+   "SA": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.146334
+    ],
+    [
+     0.015771,
+     0.015771,
+     0.015771,
+     0.142574
+    ],
+    [
+     0.015771,
+     0.015771,
+     0.015771,
+     0.142574
+    ],
+    [
+     0.082224,
+     0.082224,
+     0.082224,
+     0.172085
+    ]
+   ],
+   "SB": [
+    [
+     0.0,
+     0.017169,
+     0.017169,
+     0.179778
+    ],
+    [
+     0.0,
+     0.017169,
+     0.017169,
+     0.179778
+    ],
+    [
+     0.0,
+     0.017169,
+     0.017169,
+     0.179778
+    ],
+    [
+     0.01196,
+     0.018521,
+     0.018521,
+     0.180153
+    ]
+   ],
+   "case_id": "edge-mutual-exclusion",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 25,
+    "matching-pennies": 0,
+    "other": 11,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 1.0,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "edge-poisoned-tree": {
+   "A": [
+    [
+     -5.31,
+     -4.955,
+     -4.955,
+     7.909
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     -0.88,
+     -0.498,
+     -0.498,
+     7.705
+    ],
+    [
+     -5.7885,
+     -5.5685,
+     -5.5685,
+     6.4485
+    ]
+   ],
+   "B": [
+    [
+     8.2365,
+     8.305,
+     8.305,
+     -1.164
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.3965,
+     9.012,
+     9.012,
+     0.1425
+    ],
+    [
+     8.2715,
+     8.4335,
+     8.4335,
+     -1.0175
+    ]
+   ],
+   "SA": [
+    [
+     0.366314,
+     0.422564,
+     0.422564,
+     0.241695
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.150205,
+     0.246986,
+     0.246986,
+     0.336855
+    ],
+    [
+     0.381044,
+     0.413348,
+     0.413348,
+     0.275538
+    ]
+   ],
+   "SB": [
+    [
+     0.252309,
+     0.281389,
+     0.281389,
+     0.192842
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.007532
+    ],
+    [
+     0.112504,
+     0.238235,
+     0.238235,
+     0.346129
+    ],
+    [
+     0.252431,
+     0.274044,
+     0.274044,
+     0.269631
+    ]
+   ],
+   "case_id": "edge-poisoned-tree",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 6,
+    "matching-pennies": 9,
+    "other": 21,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9478,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 35,
+      "other": 165
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.825,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 35,
+      "other": 165
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.825,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 17,
+      "other": 183
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.915,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 22,
+      "other": 178
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.89,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 22,
+      "other": 178
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.89,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 199,
+      "other": 1
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.995,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 113,
+      "other": 87
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.565,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 113,
+      "other": 87
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.565,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 35,
+      "other": 165
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.825,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 35,
+      "other": 165
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.825,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "garden-dog": {
+   "A": [
+    [
+     -1.156,
+     -1.156,
+     -1.156,
+     -0.968
+    ],
+    [
+     -0.844,
+     -0.844,
+     -0.844,
+     -0.512
+    ],
+    [
+     -0.844,
+     -0.844,
+     -0.844,
+     -0.512
+    ],
+    [
+     -2.448,
+     -2.448,
+     -2.448,
+     -1.6365
+    ]
+   ],
+   "B": [
+    [
+     7.85,
+     8.628,
+     8.628,
+     7.2745
+    ],
+    [
+     7.85,
+     8.628,
+     8.628,
+     7.2745
+    ],
+    [
+     7.85,
+     8.628,
+     8.628,
+     7.2745
+    ],
+    [
+     8.7715,
+     9.5045,
+     9.4585,
+     5.4625
+    ]
+   ],
+   "SA": [
+    [
+     0.021942,
+     0.021942,
+     0.021942,
+     0.182435
+    ],
+    [
+     0.027791,
+     0.027791,
+     0.027791,
+     0.177031
+    ],
+    [
+     0.027791,
+     0.027791,
+     0.027791,
+     0.177031
+    ],
+    [
+     0.078705,
+     0.078705,
+     0.078705,
+     0.35712
+    ]
+   ],
+   "SB": [
+    [
+     0.0,
+     0.022922,
+     0.022922,
+     0.210028
+    ],
+    [
+     0.0,
+     0.022922,
+     0.022922,
+     0.210028
+    ],
+    [
+     0.0,
+     0.022922,
+     0.022922,
+     0.210028
+    ],
+    [
+     0.034445,
+     0.027497,
+     0.029704,
+     0.398615
+    ]
+   ],
+   "case_id": "garden-dog",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 25,
+    "matching-pennies": 0,
+    "other": 11,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9931,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 190,
+      "other": 10
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.95,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 190,
+      "other": 10
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.95,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 190,
+      "other": 10
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.95,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (conservative); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 12
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 8
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 190,
+      "other": 10
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.95,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 190,
+      "other": 10
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.95,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "helix-espionage": {
+   "A": [
+    [
+     -3.4495,
+     7.724,
+     -3.068,
+     1.705
+    ],
+    [
+     -1.95,
+     -1.95,
+     -1.95,
+     -2.169
+    ],
+    [
+     -3.113,
+     7.574,
+     -1.695,
+     1.968
+    ],
+    [
+     -5.9555,
+     2.7285,
+     -5.064,
+     1.1985
+    ]
+   ],
+   "B": [
+    [
+     3.8775,
+     -0.6,
+     5.212,
+     -1.285
+    ],
+    [
+     5.966,
+     8.8,
+     7.626,
+     4.0535
+    ],
+    [
+     5.64,
+     -1.2,
+     5.155,
+     -0.957
+    ],
+    [
+     5.529,
+     2.376,
+     6.634,
+     -2.4585
+    ]
+   ],
+   "SA": [
+    [
+     0.472401,
+     0.019956,
+     0.47633,
+     0.535659
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.013386
+    ],
+    [
+     0.036602,
+     0.019956,
+     0.477513,
+     0.517797
+    ],
+    [
+     0.29139,
+     0.471307,
+     0.4073,
+     0.529169
+    ]
+   ],
+   "SB": [
+    [
+     0.403905,
+     0.0,
+     0.427822,
+     0.520406
+    ],
+    [
+     0.020036,
+     0.0,
+     0.041271,
+     0.094089
+    ],
+    [
+     0.01656,
+     0.0,
+     0.405603,
+     0.52953
+    ],
+    [
+     0.208431,
+     0.415634,
+     0.284521,
+     0.573925
+    ]
+   ],
+   "case_id": "helix-espionage",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 19,
+    "matching-pennies": 5,
+    "other": 12,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.8822,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 176,
+      "other": 24
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.88,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 120,
+      "other": 80
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.6,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 176,
+      "other": 24
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.88,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 120,
+      "other": 80
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.6,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 51,
+      "other": 149
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.745,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 120,
+      "other": 80
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 0.6,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 16,
+      "other": 184
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.92,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 4,
+      "other": 196
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.98,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 16,
+      "other": 184
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.92,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 92,
+      "other": 108
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.46,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 3,
+      "other": 197
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.985,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 92,
+      "other": 108
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 0.46,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "Each side has one best play (aggressive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 142,
+      "other": 58
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.71,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 199,
+      "other": 1
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 183,
+      "other": 17
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.915,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 51,
+      "other": 149
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.745,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 183,
+      "other": 17
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.915,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 2,
+      "matching-pennies": 15,
+      "other": 183
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.915,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 15,
+      "matching-pennies": 2,
+      "other": 183
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.915,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 18,
+      "other": 182
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.91,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 17,
+      "other": 183
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.915,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "matching-pennies",
+     "label_counts": {
+      "matching-pennies": 200
+     },
+     "reason": "Neither side has a stable pure choice: whatever one does, the other wants to switch, and round again.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 39,
+      "other": 161
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.805,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (adaptive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 1,
+      "other": 199
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.995,
+     "ties": 4
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The column side has a dominant play (adaptive); the other side's best reply to it is clear.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  },
+  "kestrel-av": {
+   "A": [
+    [
+     2.4705,
+     7.846,
+     7.846,
+     6.3755
+    ],
+    [
+     -1.8,
+     -1.8,
+     -1.8,
+     1.3945
+    ],
+    [
+     -1.946,
+     -2.278,
+     -2.092,
+     -1.7735
+    ],
+    [
+     2.587,
+     3.961,
+     3.453,
+     4.162
+    ]
+   ],
+   "B": [
+    [
+     1.636,
+     -0.75,
+     -1.206,
+     -2.8705
+    ],
+    [
+     7.124,
+     8.35,
+     7.894,
+     2.599
+    ],
+    [
+     7.568,
+     8.65,
+     8.214,
+     6.318
+    ],
+    [
+     0.992,
+     2.2425,
+     1.987,
+     -3.027
+    ]
+   ],
+   "SA": [
+    [
+     0.64646,
+     0.017634,
+     0.017634,
+     0.341752
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.471487
+    ],
+    [
+     0.036623,
+     0.044132,
+     0.043069,
+     0.162265
+    ],
+    [
+     0.505511,
+     0.477958,
+     0.49513,
+     0.395466
+    ]
+   ],
+   "SB": [
+    [
+     0.44171,
+     0.0,
+     0.033645,
+     0.308527
+    ],
+    [
+     0.029375,
+     0.0,
+     0.035514,
+     0.493445
+    ],
+    [
+     0.018903,
+     0.0,
+     0.033681,
+     0.182128
+    ],
+    [
+     0.430909,
+     0.401541,
+     0.414456,
+     0.443458
+    ]
+   ],
+   "case_id": "kestrel-av",
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "label_counts": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "dominance-solvable": 29,
+    "matching-pennies": 0,
+    "other": 7,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "mean_stability": 0.9678,
+   "n_resamples": 200,
+   "n_seeds": 100,
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "subgames": [
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "conservative"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 0
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 5,
+      "matching-pennies": 9,
+      "other": 186
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.93,
+     "ties": 5
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 5,
+      "matching-pennies": 4,
+      "other": 191
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.955,
+     "ties": 6
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 14,
+      "other": 186
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 0.93,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "The row side has a dominant play (aggressive); the other side's best reply to it is clear.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (aggressive, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "aggressive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 197,
+      "other": 3
+     },
+     "reason": "Each side has one best play (conservative, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 0.985,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (conservative, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "adaptive"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 121,
+      "other": 79
+     },
+     "reason": "Each side has one best play (reckless, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.605,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 17,
+      "other": 183
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 0.915,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 3
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "conservative",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "conservative"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 121,
+      "other": 79
+     },
+     "reason": "Each side has one best play (reckless, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.605,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "aggressive",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "dominance-solvable": 17,
+      "other": 183
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 0.915,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "aggressive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, aggressive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "conservative",
+      "adaptive"
+     ],
+     "label": "other",
+     "label_counts": {
+      "other": 200
+     },
+     "reason": "The payoffs do not have the order of any classic game, or the data cannot separate them.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    },
+    {
+     "cols": [
+      "conservative",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, conservative) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 1
+    },
+    {
+     "cols": [
+      "adaptive",
+      "reckless"
+     ],
+     "label": "dominance-solvable",
+     "label_counts": {
+      "dominance-solvable": 200
+     },
+     "reason": "Each side has one best play (reckless, adaptive) and there is no dilemma: nobody is worse off for it.",
+     "rows": [
+      "adaptive",
+      "reckless"
+     ],
+     "stability": 1.0,
+     "ties": 2
+    }
+   ],
+   "surprises": false,
+   "z": 2.0
+  }
+ },
+ "n_resamples": 200,
+ "n_seeds": 100,
+ "surprises": false
+}

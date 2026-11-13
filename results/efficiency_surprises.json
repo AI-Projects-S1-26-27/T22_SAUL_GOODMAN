@@ -1,0 +1,2136 @@
+{
+ "cases": {
+  "aurora-defi": {
+   "A": [
+    [
+     -6.7115,
+     -6.6595,
+     -6.7115,
+     -3.1925
+    ],
+    [
+     -1.634,
+     -1.634,
+     -1.634,
+     -1.602
+    ],
+    [
+     -2.008,
+     -4.5755,
+     -4.5955,
+     -2.6985
+    ],
+    [
+     -6.118,
+     -5.9325,
+     -5.978,
+     -4.255
+    ]
+   ],
+   "B": [
+    [
+     6.3055,
+     7.682,
+     7.523,
+     5.136
+    ],
+    [
+     6.982,
+     8.014,
+     8.014,
+     6.6315
+    ],
+    [
+     6.7345,
+     7.7125,
+     7.5415,
+     5.3095
+    ],
+    [
+     7.3025,
+     8.337,
+     8.262,
+     6.183
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.0,
+    "minimax": 0.0,
+    "nash_value": 0.0,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 7.682,
+     "mixed_value_exact": "3841/500",
+     "pure_strategy": "conservative",
+     "pure_value": 7.682
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": 8.014,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": -1.634,
+      "security_gap_col": 0.332,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 8.014,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": -1.634,
+      "security_gap_col": 0.332,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "conservative",
+      "conservative"
+     ],
+     [
+      "conservative",
+      "adaptive"
+     ],
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "reckless",
+      "conservative"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": -1.634,
+     "mixed_value_exact": "-817/500",
+     "pure_strategy": "conservative",
+     "pure_value": -1.634
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "broken-bike": {
+   "A": [
+    [
+     8.662,
+     8.662,
+     8.662,
+     8.812
+    ],
+    [
+     7.1795,
+     9.332,
+     9.332,
+     6.7595
+    ],
+    [
+     7.246,
+     9.332,
+     9.332,
+     6.7935
+    ],
+    [
+     7.421,
+     7.421,
+     7.421,
+     6.4765
+    ]
+   ],
+   "B": [
+    [
+     -0.861,
+     -0.303,
+     -0.303,
+     -3.7295
+    ],
+    [
+     -1.176,
+     -0.622,
+     -0.622,
+     -1.2215
+    ],
+    [
+     -1.376,
+     -0.622,
+     -0.622,
+     -1.3215
+    ],
+    [
+     -0.396,
+     0.1625,
+     0.1625,
+     -2.4395
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    [
+     0.8,
+     1.0,
+     1.0,
+     0.76
+    ],
+    [
+     0.82,
+     1.0,
+     1.0,
+     0.77
+    ],
+    [
+     0.96,
+     0.96,
+     0.96,
+     0.96
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 1.0,
+    "minimax": 1.0,
+    "nash_value": 1.0,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": -0.622,
+     "mixed_value_exact": "-311/500",
+     "pure_strategy": "conservative",
+     "pure_value": -0.622
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": -0.622,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": 9.332,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.67,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": -0.622,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": 9.332,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.67,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": -0.622,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 9.332,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.67,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": -0.622,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 9.332,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.67,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "aggressive",
+      "conservative"
+     ],
+     [
+      "aggressive",
+      "adaptive"
+     ],
+     [
+      "conservative",
+      "conservative"
+     ],
+     [
+      "conservative",
+      "adaptive"
+     ],
+     [
+      "adaptive",
+      "conservative"
+     ],
+     [
+      "adaptive",
+      "adaptive"
+     ],
+     [
+      "reckless",
+      "conservative"
+     ],
+     [
+      "reckless",
+      "adaptive"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "aggressive": "1"
+     },
+     "mixed_value": 8.662,
+     "mixed_value_exact": "4331/500",
+     "pure_strategy": "aggressive",
+     "pure_value": 8.662
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "cookie-jar": {
+   "A": [
+    [
+     -2.336,
+     -2.332,
+     -2.332,
+     -1.732
+    ],
+    [
+     -1.294,
+     -1.294,
+     -1.294,
+     -1.214
+    ],
+    [
+     -1.764,
+     -1.756,
+     -1.756,
+     -1.212
+    ],
+    [
+     -3.165,
+     -3.169,
+     -3.169,
+     -2.677
+    ]
+   ],
+   "B": [
+    [
+     7.311,
+     8.3325,
+     8.3475,
+     6.2695
+    ],
+    [
+     7.434,
+     8.465,
+     8.483,
+     7.0345
+    ],
+    [
+     7.2895,
+     8.349,
+     8.364,
+     6.278
+    ],
+    [
+     7.4505,
+     8.4545,
+     8.4635,
+     6.5175
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.05
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.04
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.0,
+    "minimax": 0.0,
+    "nash_value": 0.0,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "adaptive": "1"
+     },
+     "mixed_value": 8.3475,
+     "mixed_value_exact": "3339/400",
+     "pure_strategy": "adaptive",
+     "pure_value": 8.3475
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 8.483,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": -1.294,
+      "security_gap_col": 0.1355,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "conservative",
+      "adaptive"
+     ],
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "adaptive",
+      "reckless"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": -1.294,
+     "mixed_value_exact": "-647/500",
+     "pure_strategy": "conservative",
+     "pure_value": -1.294
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "edge-defense-only": {
+   "A": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     -0.606,
+     -0.606,
+     -0.606,
+     -0.606
+    ]
+   ],
+   "B": [
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.758,
+     9.85,
+     9.85,
+     9.613
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.0,
+    "minimax": 0.0,
+    "nash_value": 0.0,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 9.85,
+     "mixed_value_exact": "197/20",
+     "pure_strategy": "conservative",
+     "pure_value": 9.85
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "1"
+      },
+      "col_payoff": 9.922,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "1",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 0.072,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "1"
+      },
+      "col_payoff": 9.922,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 0.072,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "1"
+      },
+      "col_payoff": 9.922,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 0.072,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "aggressive",
+      "reckless"
+     ],
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "adaptive",
+      "reckless"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "aggressive": "1"
+     },
+     "mixed_value": 0.0,
+     "mixed_value_exact": "0",
+     "pure_strategy": "aggressive",
+     "pure_value": 0.0
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "edge-empty-docket": {
+   "A": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     -0.169,
+     -0.169,
+     -0.169,
+     -0.169
+    ]
+   ],
+   "B": [
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.0,
+    "minimax": 0.0,
+    "nash_value": 0.0,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "reckless": "1"
+     },
+     "mixed_value": 9.922,
+     "mixed_value_exact": "4961/500",
+     "pure_strategy": "reckless",
+     "pure_value": 9.922
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "1"
+      },
+      "col_payoff": 9.922,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "1",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "1"
+      },
+      "col_payoff": 9.922,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "1"
+      },
+      "col_payoff": 9.922,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "aggressive",
+      "reckless"
+     ],
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "adaptive",
+      "reckless"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "aggressive": "1"
+     },
+     "mixed_value": 0.0,
+     "mixed_value_exact": "0",
+     "pure_strategy": "aggressive",
+     "pure_value": 0.0
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "edge-mutual-exclusion": {
+   "A": [
+    [
+     1.03,
+     1.03,
+     1.03,
+     1.138
+    ],
+    [
+     1.282,
+     1.282,
+     1.282,
+     1.386
+    ],
+    [
+     1.282,
+     1.282,
+     1.282,
+     1.386
+    ],
+    [
+     0.712,
+     0.712,
+     0.712,
+     0.812
+    ]
+   ],
+   "B": [
+    [
+     7.3105,
+     7.7245,
+     7.7245,
+     6.88
+    ],
+    [
+     7.3105,
+     7.7245,
+     7.7245,
+     6.88
+    ],
+    [
+     7.3105,
+     7.7245,
+     7.7245,
+     6.88
+    ],
+    [
+     7.3275,
+     7.7375,
+     7.7375,
+     6.9165
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.18,
+     0.18,
+     0.18,
+     0.19
+    ],
+    [
+     0.18,
+     0.18,
+     0.18,
+     0.19
+    ],
+    [
+     0.18,
+     0.18,
+     0.18,
+     0.19
+    ],
+    [
+     0.18,
+     0.18,
+     0.18,
+     0.19
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.18,
+    "minimax": 0.18,
+    "nash_value": 0.18,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 7.7245,
+     "mixed_value_exact": "15449/2000",
+     "pure_strategy": "conservative",
+     "pure_value": 7.7245
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": 7.7245,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": 1.282,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 7.7245,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": 1.282,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": 7.7245,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 1.282,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 7.7245,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 1.282,
+      "security_gap_col": 0.0,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "conservative",
+      "conservative"
+     ],
+     [
+      "conservative",
+      "adaptive"
+     ],
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "adaptive",
+      "conservative"
+     ],
+     [
+      "adaptive",
+      "adaptive"
+     ],
+     [
+      "adaptive",
+      "reckless"
+     ],
+     [
+      "reckless",
+      "conservative"
+     ],
+     [
+      "reckless",
+      "adaptive"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 1.282,
+     "mixed_value_exact": "641/500",
+     "pure_strategy": "conservative",
+     "pure_value": 1.282
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "edge-poisoned-tree": {
+   "A": [
+    [
+     -5.13,
+     -4.875,
+     -4.875,
+     7.271
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     -0.98,
+     -0.501,
+     -0.501,
+     7.3785
+    ],
+    [
+     -5.8955,
+     -5.7755,
+     -5.7755,
+     5.9085
+    ]
+   ],
+   "B": [
+    [
+     8.399,
+     8.553,
+     8.553,
+     -0.4735
+    ],
+    [
+     9.85,
+     9.85,
+     9.85,
+     9.922
+    ],
+    [
+     9.5035,
+     9.015,
+     9.015,
+     0.44
+    ],
+    [
+     8.623,
+     8.8685,
+     8.8685,
+     -0.3565
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.05,
+     0.07,
+     0.07,
+     0.91
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.06,
+     0.06,
+     0.85
+    ],
+    [
+     0.03,
+     0.04,
+     0.04,
+     0.88
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.05,
+    "minimax": 0.05,
+    "nash_value": 0.05,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": false,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 8.553,
+     "mixed_value_exact": "8553/1000",
+     "pure_strategy": "conservative",
+     "pure_value": 8.553
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "14757/16717",
+       "conservative": "0",
+       "reckless": "1960/16717"
+      },
+      "col_payoff": 9.847269114990969,
+      "dominated_by": [
+       {
+        "col": "reckless",
+        "col_gain": 0.074730885009031,
+        "row": "conservative",
+        "row_gain": 0.0
+       },
+       {
+        "col": "aggressive",
+        "col_gain": 0.002730885009031,
+        "row": "conservative",
+        "row_gain": 0.0
+       },
+       {
+        "col": "conservative",
+        "col_gain": 0.002730885009031,
+        "row": "conservative",
+        "row_gain": 0.0
+       }
+      ],
+      "pareto_efficient": false,
+      "pure": false,
+      "row_mix": {
+       "adaptive": "144/18271",
+       "aggressive": "0",
+       "conservative": "18127/18271",
+       "reckless": "0"
+      },
+      "row_payoff": 0.0,
+      "security_gap_col": 1.294269,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "adaptive",
+      "reckless"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 0.0,
+     "mixed_value_exact": "0",
+     "pure_strategy": "conservative",
+     "pure_value": 0.0
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "garden-dog": {
+   "A": [
+    [
+     -1.092,
+     -1.092,
+     -1.092,
+     -0.908
+    ],
+    [
+     -0.824,
+     -0.824,
+     -0.824,
+     -0.492
+    ],
+    [
+     -0.824,
+     -0.824,
+     -0.824,
+     -0.492
+    ],
+    [
+     -1.357,
+     -1.236,
+     -1.123,
+     -0.9445
+    ]
+   ],
+   "B": [
+    [
+     7.85,
+     8.628,
+     8.628,
+     7.2745
+    ],
+    [
+     7.85,
+     8.628,
+     8.628,
+     7.2745
+    ],
+    [
+     7.85,
+     8.628,
+     8.628,
+     7.2745
+    ],
+    [
+     7.5935,
+     8.278,
+     8.1405,
+     4.8755
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.03
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.03
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.03
+    ],
+    [
+     0.11,
+     0.12,
+     0.13,
+     0.2
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.11,
+    "minimax": 0.11,
+    "nash_value": 0.11,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": true,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": 8.278,
+     "mixed_value_exact": "4139/500",
+     "pure_strategy": "conservative",
+     "pure_value": 8.278
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": 8.628,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": -0.824,
+      "security_gap_col": 0.35,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 8.628,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "row_payoff": -0.824,
+      "security_gap_col": 0.35,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "0",
+       "conservative": "1",
+       "reckless": "0"
+      },
+      "col_payoff": 8.628,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": -0.824,
+      "security_gap_col": 0.35,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     },
+     {
+      "col_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 8.628,
+      "dominated_by": [],
+      "pareto_efficient": true,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "1",
+       "aggressive": "0",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": -0.824,
+      "security_gap_col": 0.35,
+      "security_gap_row": 0.0,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "conservative",
+      "conservative"
+     ],
+     [
+      "conservative",
+      "adaptive"
+     ],
+     [
+      "conservative",
+      "reckless"
+     ],
+     [
+      "adaptive",
+      "conservative"
+     ],
+     [
+      "adaptive",
+      "adaptive"
+     ],
+     [
+      "adaptive",
+      "reckless"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "conservative": "1"
+     },
+     "mixed_value": -0.824,
+     "mixed_value_exact": "-103/125",
+     "pure_strategy": "conservative",
+     "pure_value": -0.824
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "helix-espionage": {
+   "A": [
+    [
+     -4.021,
+     5.706,
+     -3.739,
+     1.0565
+    ],
+    [
+     -2.004,
+     -2.004,
+     -2.004,
+     -2.163
+    ],
+    [
+     -3.1405,
+     5.585,
+     -2.272,
+     1.789
+    ],
+    [
+     -6.18,
+     1.579,
+     -5.266,
+     0.4
+    ]
+   ],
+   "B": [
+    [
+     4.212,
+     1.011,
+     5.687,
+     -0.531
+    ],
+    [
+     5.865,
+     8.626,
+     7.486,
+     4.1585
+    ],
+    [
+     5.6335,
+     0.489,
+     5.3275,
+     -0.739
+    ],
+    [
+     5.638,
+     3.335,
+     6.5455,
+     -1.4805
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.15,
+     0.82,
+     0.17,
+     0.51
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.82,
+     0.19,
+     0.5
+    ],
+    [
+     0.03,
+     0.62,
+     0.11,
+     0.56
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.15,
+    "minimax": 0.15,
+    "nash_value": 0.15,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": false,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "adaptive": "2843/3562",
+      "aggressive": "719/3562"
+     },
+     "mixed_value": 5.389266984839978,
+     "mixed_value_exact": "19196569/3562000",
+     "pure_strategy": "adaptive",
+     "pure_value": 5.3275
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "7589/7857",
+       "aggressive": "0",
+       "conservative": "268/7857",
+       "reckless": "0"
+      },
+      "col_payoff": 7.07441013632182,
+      "dominated_by": [
+       {
+        "col": "conservative",
+        "col_gain": 1.55158986367818,
+        "row": "conservative",
+        "row_gain": 0.0
+       },
+       {
+        "col": "adaptive",
+        "col_gain": 0.41158986367818,
+        "row": "conservative",
+        "row_gain": 0.0
+       }
+      ],
+      "pareto_efficient": false,
+      "pure": false,
+      "row_mix": {
+       "adaptive": "2280/11957",
+       "aggressive": "0",
+       "conservative": "9677/11957",
+       "reckless": "0"
+      },
+      "row_payoff": -2.004,
+      "security_gap_col": 1.685143,
+      "security_gap_row": 0.035512,
+      "strictly_dominated": false
+     }
+    ],
+    "pareto_cells": [
+     [
+      "aggressive",
+      "conservative"
+     ],
+     [
+      "conservative",
+      "conservative"
+     ],
+     [
+      "reckless",
+      "conservative"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "adaptive": "318/10177",
+      "conservative": "9859/10177"
+     },
+     "mixed_value": -2.039512135206839,
+     "mixed_value_exact": "-4151223/2035400",
+     "pure_strategy": "conservative",
+     "pure_value": -2.163
+    },
+    "social_dilemma": false
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  },
+  "kestrel-av": {
+   "A": [
+    [
+     2.1915,
+     6.6695,
+     6.6695,
+     5.321
+    ],
+    [
+     -0.4325,
+     -0.4325,
+     -0.4325,
+     1.5215
+    ],
+    [
+     -1.8705,
+     -0.3665,
+     -1.4045,
+     -1.1875
+    ],
+    [
+     1.1985,
+     2.992,
+     2.7855,
+     3.417
+    ]
+   ],
+   "B": [
+    [
+     2.16,
+     0.55,
+     0.118,
+     -1.5885
+    ],
+    [
+     6.094,
+     7.203,
+     6.799,
+     2.609
+    ],
+    [
+     7.68,
+     6.85,
+     7.65,
+     5.888
+    ],
+    [
+     2.0955,
+     3.042,
+     2.5005,
+     -2.1795
+    ]
+   ],
+   "accuser_win_rate": [
+    [
+     0.55,
+     0.87,
+     0.87,
+     0.8
+    ],
+    [
+     0.13,
+     0.13,
+     0.13,
+     0.32
+    ],
+    [
+     0.0,
+     0.18,
+     0.06,
+     0.07
+    ],
+    [
+     0.59,
+     0.67,
+     0.68,
+     0.76
+    ]
+   ],
+   "col_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ],
+   "constant_sum": {
+    "maximin": 0.59,
+    "minimax": 0.59,
+    "nash_value": 0.59,
+    "saddle_point": true,
+    "theorem_holds": true
+   },
+   "efficiency": {
+    "all_equilibria_efficient": false,
+    "col_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "col_security": {
+     "mixed_strategy": {
+      "aggressive": "4984/5113",
+      "conservative": "129/5113"
+     },
+     "mixed_value": 2.1193800117347936,
+     "mixed_value_exact": "1083639/511300",
+     "pure_strategy": "aggressive",
+     "pure_value": 2.0955
+    },
+    "equilibria": [
+     {
+      "col_mix": {
+       "adaptive": "0",
+       "aggressive": "1",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "col_payoff": 2.16,
+      "dominated_by": [
+       {
+        "col": "conservative",
+        "col_gain": 0.882,
+        "row": "reckless",
+        "row_gain": 0.8005
+       },
+       {
+        "col": "adaptive",
+        "col_gain": 0.3405,
+        "row": "reckless",
+        "row_gain": 0.594
+       }
+      ],
+      "pareto_efficient": false,
+      "pure": true,
+      "row_mix": {
+       "adaptive": "0",
+       "aggressive": "1",
+       "conservative": "0",
+       "reckless": "0"
+      },
+      "row_payoff": 2.1915,
+      "security_gap_col": 0.04062,
+      "security_gap_row": 0.0,
+      "strictly_dominated": true
+     }
+    ],
+    "pareto_cells": [
+     [
+      "aggressive",
+      "conservative"
+     ],
+     [
+      "conservative",
+      "conservative"
+     ],
+     [
+      "adaptive",
+      "aggressive"
+     ],
+     [
+      "adaptive",
+      "conservative"
+     ],
+     [
+      "adaptive",
+      "adaptive"
+     ],
+     [
+      "reckless",
+      "conservative"
+     ]
+    ],
+    "row_labels": [
+     "aggressive",
+     "conservative",
+     "adaptive",
+     "reckless"
+    ],
+    "row_security": {
+     "mixed_strategy": {
+      "aggressive": "1"
+     },
+     "mixed_value": 2.1915,
+     "mixed_value_exact": "4383/2000",
+     "pure_strategy": "aggressive",
+     "pure_value": 2.1915
+    },
+    "social_dilemma": true
+   },
+   "row_strategies": [
+    "aggressive",
+    "conservative",
+    "adaptive",
+    "reckless"
+   ]
+  }
+ },
+ "n_seeds": 100,
+ "surprises": true
+}

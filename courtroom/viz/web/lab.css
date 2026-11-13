@@ -266,3 +266,24 @@
   .glossary dt { border-bottom: 0; padding-bottom: 0; }
   .glossary dd { padding-top: 4px; }
 }
+
+/* lecture-game chapters: classic games, Pareto, security */
+.tbk { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0; }
+.tbk-card { flex: 1 1 190px; max-width: 240px; margin: 0; padding: 10px 12px; border: 1px solid var(--line, #d9d2c3); border-radius: 8px; background: rgba(255, 255, 255, 0.5); }
+.game2 { border-collapse: collapse; margin: 6px 0; font-size: 0.9rem; }
+.game2 th, .game2 td { border: 1px solid var(--line, #d9d2c3); padding: 4px 9px; text-align: center; }
+.game2 thead th, .game2 tbody th { background: rgba(0, 0, 0, 0.04); font-weight: 600; }
+.side-by-side { display: flex; flex-wrap: wrap; gap: 24px; margin: 10px 0; }
+.side-by-side figure { margin: 0; }
+.pair-pick { margin: 12px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pair-pick select { font: inherit; padding: 3px 6px; }
+.classic-counts { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.classic-counts li b { font-variant-numeric: tabular-nums; }
+.classic-counts li.zero { color: var(--muted, #6b6559); }
+.pareto-table td.pareto { background: rgba(46, 125, 80, 0.14); }
+.pareto-table td.eqcell { outline: 2px solid #1f4e79; outline-offset: -2px; }
+.pareto-table .tag-p { color: #2e7d50; }
+.pareto-table .tag-e { color: #1f4e79; }
+.eq-eff { padding-left: 1.1em; }
+.eq-eff li { margin: 4px 0; }
+.found-classic { padding-left: 1.1em; }

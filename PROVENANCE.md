@@ -52,6 +52,12 @@ The result files this version of the docs was generated from:
 |---|---|---|
 | `results/bootstrap.json` | `a6d12d32968a` | 24 KiB |
 | `results/bootstrap_surprises.json` | `68c6cc900f5a` | 24 KiB |
+| `results/classic.json` | `074c483ad5ce` | 150 KiB |
+| `results/classic_search.json` | `e9f1de20a447` | 1 KiB |
+| `results/classic_search_surprises.json` | `0d505640cbfd` | 1 KiB |
+| `results/classic_surprises.json` | `8957c39b245d` | 149 KiB |
+| `results/efficiency.json` | `db871dae1e5f` | 34 KiB |
+| `results/efficiency_surprises.json` | `bf9b8caf98ab` | 34 KiB |
 | `results/matters.json` | `d4c87d4ce5a1` | 6 KiB |
 | `results/matters_surprises.json` | `0666468af658` | 6 KiB |
 | `results/oracle/broken-bike.json` | `ae02f6839677` | 6 KiB |

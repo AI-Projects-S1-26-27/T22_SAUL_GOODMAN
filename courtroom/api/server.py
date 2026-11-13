@@ -22,8 +22,12 @@ from courtroom.cases import CASES, generate_case, get_case
 from courtroom.contracts import CaseFile, Surprises, TrialResult
 from courtroom.engine import run_trial, run_with_agents, verify_chain
 from courtroom.gametheory import PayoffTable, estimate_payoffs, replicator
-from courtroom.gametheory.bootstrap import bootstrap_case
-from courtroom.gametheory.finder import find_contested
+from courtroom.gametheory.bootstrap import STYLES as STYLES4
+from courtroom.gametheory.bootstrap import bootstrap_case, collect_samples
+from courtroom.gametheory.classic import LABELS as CLASSIC_LABELS
+from courtroom.gametheory.classic import classify_case
+from courtroom.gametheory.efficiency import constant_sum_check, efficiency
+from courtroom.gametheory.finder import find_classic, find_contested
 from courtroom.gametheory.matters import measure
 from courtroom.gametheory.oracle import run_oracle
 from courtroom.judge.explain import build_facts, template_text
@@ -104,6 +108,28 @@ class MattersRequest(BaseModel):
     case_id: str = ""
     case: CaseFile | None = None
     seeds: int = Field(default=8, ge=1, le=8)
+    surprises: Surprises | bool | None = None
+
+
+class ClassicRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
+    seeds: int = Field(default=20, ge=5, le=30)
+    resamples: int = Field(default=60, ge=10, le=100)
+    surprises: Surprises | bool | None = None
+
+
+class ClassicFindRequest(BaseModel):
+    start: int = Field(default=0, ge=0, le=100_000)
+    count: int = Field(default=12, ge=1, le=30)
+    targets: list[str] = Field(default_factory=lambda: ["prisoners-dilemma", "stag-hunt", "battle-of-the-sexes"], max_length=7)
+    surprises: Surprises | bool | None = None
+
+
+class EfficiencyRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
+    seeds: int = Field(default=20, ge=5, le=30)
     surprises: Surprises | bool | None = None
 
 
@@ -237,6 +263,44 @@ def create_app() -> FastAPI:
         """Search generated cases for contested ones (bounded: at most 60 candidates and about 25 seconds)."""
         report = find_contested(req.start, req.count, req.top, surprises=_surprises(req.surprises), time_budget=25.0)
         return JSONResponse(report.model_dump(mode="json"))
+
+    @app.post("/api/classic")
+    def classic(req: ClassicRequest) -> JSONResponse:
+        """Which classic game does each two-by-two corner of this case's measured table resemble? (bounded: 30 seeds at most)"""
+        case = _pick_case(req.case_id, req.case)
+        sur = _surprises(req.surprises)
+        samples = collect_samples(case, STYLES4, tuple(range(req.seeds)), surprises=sur)
+        res = classify_case(case.id, samples, STYLES4, STYLES4, n_resamples=req.resamples, surprises=sur is not None)
+        return JSONResponse(res.model_dump(mode="json"))
+
+    @app.post("/api/classic/find")
+    def classic_find(req: ClassicFindRequest) -> JSONResponse:
+        """Search generated cases for a prisoner's dilemma, stag hunt or battle of the sexes (bounded: about 25 seconds)."""
+        bad = [t for t in req.targets if t not in CLASSIC_LABELS]
+        if bad:
+            raise HTTPException(422, f"unknown classic game {bad[0]}")
+        rep = find_classic(tuple(req.targets), req.start, req.count, surprises=_surprises(req.surprises), time_budget=25.0, n_resamples=40, confirm_seeds=tuple(range(1000, 1020)))
+        return JSONResponse(rep.model_dump(mode="json"))
+
+    @app.post("/api/efficiency")
+    def efficiency_route(req: EfficiencyRequest) -> JSONResponse:
+        """Pareto-efficient cells, whether each equilibrium is efficient, and the security values (bounded: 30 seeds at most)."""
+        case = _pick_case(req.case_id, req.case)
+        t = estimate_payoffs(case, STYLES4, seeds=range(req.seeds), surprises=_surprises(req.surprises))
+        win = {(c.row, c.col): c.prosecution_win_rate for c in t.cells}
+        W = [[win[(r, c)] for c in t.col_strategies] for r in t.row_strategies]
+        return JSONResponse(
+            {
+                "case_id": case.id,
+                "row_strategies": t.row_strategies,
+                "col_strategies": t.col_strategies,
+                "A": t.analysis.A,
+                "B": t.analysis.B,
+                "accuser_win_rate": W,
+                "efficiency": efficiency(t.analysis).model_dump(mode="json"),
+                "constant_sum": constant_sum_check(W).model_dump(mode="json"),
+            }
+        )
 
     @app.post("/api/explain")
     def explain(req: ExplainRequest) -> JSONResponse:

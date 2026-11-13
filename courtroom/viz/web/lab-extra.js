@@ -247,6 +247,207 @@
     refresh: renderBetter,
   });
 
+  /* ---------------------------------------------------------------- the lecture games: classic games, Pareto, security */
+
+  /* The five textbook games, as 2x2 payoffs (row player, column player). These are the textbook definitions the classifier is tested
+   * against in tests/test_classic.py; they are not results. Everything else in these chapters is read from results/. */
+  const TEXTBOOK = {
+    "prisoners-dilemma": { name: "Prisoner's dilemma", rows: ["Cooperate", "Defect"], cols: ["Cooperate", "Defect"], A: [[3, 0], [5, 1]], B: [[3, 5], [0, 1]],
+      story: "Each side does better by defecting whatever the other does, yet both are worse off when both defect than when both cooperate." },
+    "stag-hunt": { name: "Stag hunt", rows: ["Stag", "Hare"], cols: ["Stag", "Hare"], A: [[4, 0], [3, 3]], B: [[4, 3], [0, 3]],
+      story: "Two stable outcomes. Hunting the stag together is best, but it fails if the other goes for the safe hare." },
+    "battle-of-the-sexes": { name: "Battle of the sexes", rows: ["Bach", "Stravinsky"], cols: ["Bach", "Stravinsky"], A: [[3, 0], [0, 2]], B: [[2, 0], [0, 3]],
+      story: "Two stable outcomes and each side prefers a different one; going to different concerts is worst for both." },
+    chicken: { name: "Chicken", rows: ["Swerve", "Straight"], cols: ["Swerve", "Straight"], A: [[0, -1], [1, -10]], B: [[0, 1], [-1, -10]],
+      story: "Each side would like to be the one who does not give way, but both refusing is a crash." },
+    "matching-pennies": { name: "Matching pennies", rows: ["Heads", "Tails"], cols: ["Heads", "Tails"], A: [[1, -1], [-1, 1]], B: [[-1, 1], [1, -1]],
+      story: "One side wants to match, the other wants to differ: no pure choice is stable, so each must randomise." },
+  };
+  const CLASSIC_NAME = { ...Object.fromEntries(Object.entries(TEXTBOOK).map(([k, v]) => [k, v.name])), "dominance-solvable": "Dominance-solvable (one clear best play)", other: "None of the classic games" };
+  const CLASSIC_ORDER = ["prisoners-dilemma", "stag-hunt", "battle-of-the-sexes", "chicken", "matching-pennies", "dominance-solvable", "other"];
+  const toNum = (v) => (typeof v === "string" && v.includes("/") ? +v.split("/")[0] / +v.split("/")[1] : +v);
+  const mixOf = (mix) => mixText(Object.fromEntries(Object.entries(mix ?? {}).map(([k, v]) => [k, toNum(v)]).filter(([, v]) => v > 0)));
+  const fmt = (v) => (Math.abs(v) < 5e-3 ? 0 : Math.round(v * 100) / 100).toString().replace("-", "−");
+  const grid2 = (A, B, rows, cols, caption, extra = {}) => h("table", { class: "game2", "aria-label": caption },
+    h("thead", {}, h("tr", {}, h("th", {}), cols.map((c) => h("th", { scope: "col" }, c)))),
+    h("tbody", {}, rows.map((r, i) => h("tr", {}, h("th", { scope: "row" }, r), cols.map((_, j) => h("td", { title: extra.title?.(i, j) }, h("b", {}, fmt(A[i][j])), ", ", fmt(B[i][j])))))));
+
+  let lectSur = false;
+  let classicLive = null, classicPick = { r: [0, 1], c: [0, 1] }, searchLive = null;
+  const lectCase = (name, id, sur) => A[`${name}${sur ? "_surprises" : ""}`]?.cases?.[id];
+  const lectToggle = () => toggle(lectSur, (v) => { lectSur = v; classicLive = null; effLive = null; refreshLect(); });
+  const refreshLect = () => { renderClassic(); renderPareto(); renderMinimax(); };
+
+  async function renderClassic() {
+    const c = B.cases.find((x) => x.id === caseId), body = $("#classic-fig");
+    if (!c || !body) return;
+    const r = classicLive?.case_id === c.id && classicLive.surprises === lectSur ? classicLive : lectCase("classic", c.id, lectSur);
+    const kids = [lectToggle()];
+    kids.push(h("div", { class: "tbk" }, Object.entries(TEXTBOOK).map(([k, t]) => h("figure", { class: "tbk-card" },
+      h("figcaption", {}, h("b", {}, t.name)), grid2(t.A, t.B, t.rows, t.cols, `${t.name}, textbook payoffs`), h("p", { class: "muted small" }, t.story)))),
+      note("The five textbook games. Each cell shows the row player's payoff first, then the column player's. Only the order of the payoffs matters, not their size."));
+    if (!r) { body.replaceChildren(...kids, note("No measurement is stored for this case.")); return; }
+    const total = r.subgames.length;
+    kids.push(h("h3", {}, `${caseName(c)}: the ${total} two-by-two corners of its measured table`),
+      h("p", {}, `Pick any two of the four styles for the Accuser and any two for the Defender and you get a two-by-two game. There are ${total} such corners. Each is named by the order of its payoffs, treating a gap smaller than two standard errors as a tie.`),
+      h("ul", { class: "classic-counts" }, CLASSIC_ORDER.map((k) => h("li", { class: r.label_counts[k] ? null : "zero" }, h("b", {}, String(r.label_counts[k] ?? 0)), ` ${CLASSIC_NAME[k]}`))),
+      note(`Measured over ${r.n_seeds} seeds. How often a corner keeps its label when the seeds are resampled ${r.n_resamples} times: ${pct(r.mean_stability)} on average.`));
+    // one corner at a time, beside the textbook game it resembles
+    const S4 = r.row_strategies;
+    const pick = (key, which, label) => h("select", { "aria-label": label, onchange: (e) => { const v = [...e.target.parentNode.querySelectorAll("select")].map((x) => +x.value); classicPick[key] = v.sort(); renderClassic(); } },
+      S4.map((n, i) => h("option", { value: i, selected: classicPick[key][which] === i }, nameOf(n))));
+    const [r0, r1] = classicPick.r, [c0, c1] = classicPick.c;
+    const rowsKey = [S4[r0], S4[r1]], colsKey = [S4[c0], S4[c1]];
+    const sub = r0 !== r1 && c0 !== c1 ? r.subgames.find((g) => g.rows[0] === rowsKey[0] && g.rows[1] === rowsKey[1] && g.cols[0] === colsKey[0] && g.cols[1] === colsKey[1]) : null;
+    const chooser = h("div", { class: "pair-pick" }, h("span", {}, "Accuser plays "), pick("r", 0, "Accuser style one"), " or ", pick("r", 1, "Accuser style two"),
+      h("span", {}, "  against Defender "), pick("c", 0, "Defender style one"), " or ", pick("c", 1, "Defender style two"));
+    kids.push(chooser);
+    if (sub) {
+      const ri = [r0, r1], ci = [c0, c1];
+      const sel = (M) => ri.map((i) => ci.map((j) => M[i][j]));
+      const tb = TEXTBOOK[sub.label];
+      kids.push(h("div", { class: "side-by-side" },
+        h("figure", {}, h("figcaption", {}, h("b", {}, "Ours (measured)")),
+          grid2(sel(r.A), sel(r.B), rowsKey.map(nameOf), colsKey.map(nameOf), "measured payoffs", { title: (i, j) => `Accuser ±${fmt(r.SA[ri[i]][ci[j]])}, Defender ±${fmt(r.SB[ri[i]][ci[j]])} (standard errors)` })),
+        tb ? h("figure", {}, h("figcaption", {}, h("b", {}, `Textbook: ${tb.name}`)), grid2(tb.A, tb.B, tb.rows, tb.cols, "textbook payoffs")) : null),
+        h("p", {}, h("b", {}, CLASSIC_NAME[sub.label]), `. ${sub.reason} The label kept ${pct(sub.stability)} of ${r.n_resamples} resamples.`));
+    } else kids.push(note("Choose two different styles on each side."));
+    // what search over generated cases found
+    const sr = searchLive ?? A[`classic_search${lectSur ? "_surprises" : ""}`];
+    kids.push(h("h3", {}, "Could the three games we did not find be found by search?"));
+    if (sr) {
+      const total2 = Object.values(sr.label_counts).reduce((x, y) => x + y, 0);
+      kids.push(h("p", {}, `${searchLive ? "Just now, " : ""}${sr.tried} generated cases (gen-${sr.start} to gen-${sr.start + sr.tried - 1}) were measured: ${total2} two-by-two corners. A case counts only if the same corner carries the same name again on fresh seeds.`),
+        h("ul", { class: "classic-counts" }, CLASSIC_ORDER.map((k) => h("li", { class: sr.label_counts[k] ? null : "zero" }, h("b", {}, String(sr.label_counts[k] ?? 0)), ` ${CLASSIC_NAME[k]}`))),
+        sr.found.length ? h("ul", { class: "found-classic" }, sr.found.map((f) => h("li", {}, h("b", {}, f.case_id), ` ${CLASSIC_NAME[f.label]}: ${f.rows.map(nameOf).join(" or ")} against ${f.cols.map(nameOf).join(" or ")}, kept on ${pct(f.stability)} of resamples. `,
+          h("a", { class: "btn ghost sm", href: `index.html#watch=${f.case_id}|${f.rows[0]}|${f.cols[0]}` }, "Play it in the courtroom"), h("span", { class: "muted small" }, " (needs the local server; found by search, not written by hand)"))))
+          : h("p", { class: "headline" }, `Not found: none of the ${sr.tried} generated cases has a prisoner's dilemma, stag hunt or battle of the sexes that survives fresh seeds.`),
+        sr.label_counts_no_tolerance ? note(`Reading the measured means as exact numbers (no tolerance) the same corners would be called: ${CLASSIC_ORDER.filter((k) => sr.label_counts_no_tolerance[k]).map((k) => `${sr.label_counts_no_tolerance[k]} ${CLASSIC_NAME[k]}`).join(", ")}.`) : null);
+    } else kids.push(h("p", { class: "muted" }, "No stored search."));
+    if (live) {
+      const btn = h("button", { class: "btn ghost sm", type: "button" }, "Search 12 more generated cases now (about 25 seconds)");
+      btn.addEventListener("click", async () => {
+        btn.disabled = true; btn.textContent = "Searching…";
+        try { searchLive = await post("/classic/find", { start: 5000 + Math.floor(Math.random() * 90) * 12, count: 12, surprises: lectSur }); renderClassic(); } catch { btn.textContent = "Could not run it"; }
+      });
+      const btn2 = h("button", { class: "btn ghost sm", type: "button" }, "Re-measure this case with fresh seeds (about 20 seconds)");
+      btn2.addEventListener("click", async () => {
+        btn2.disabled = true; btn2.textContent = "Measuring…";
+        try { classicLive = await post("/classic", { case_id: c.id, seeds: 20, resamples: 60, surprises: lectSur }); classicLive.case_id = c.id; classicLive.surprises = lectSur; renderClassic(); } catch { btn2.textContent = "Could not run it"; }
+      });
+      kids.push(h("p", {}, btn, " ", btn2));
+    } else kids.push(needServer("Searching again or re-measuring"));
+    body.replaceChildren(...kids);
+    const named = CLASSIC_ORDER.slice(0, 5).filter((k) => r.label_counts[k]);
+    says("classic", h("p", {}, h("b", {}, caseName(c)), `${lectSur ? " (surprises on)" : ""}: ${r.label_counts["dominance-solvable"]} of ${total} corners are dominance-solvable and ${r.label_counts.other} match no classic game. `,
+      named.length ? `The classic games that do appear: ${named.map((k) => `${CLASSIC_NAME[k].toLowerCase()} (${r.label_counts[k]})`).join(", ")}. ` : "None of the five classic games appears in this case. ",
+      "The classifier says so plainly rather than forcing a match: the payoffs are what the engine measured and nothing was changed to make a lecture game appear."));
+  }
+
+  registry.push({
+    id: "classic",
+    build: () => chapter("classic", "Which classic game is this?", {
+      lead: [
+        h("p", {}, "Game theory has a few famous two-by-two games. The ", h("dfn", {}, "prisoner's dilemma"), ": each side does better by defecting, yet both lose if both do. The ", h("dfn", {}, "stag hunt"), ": two stable outcomes, one better but riskier. ", h("dfn", {}, "Battle of the sexes"), " (Bach or Stravinsky): two stable outcomes, each side prefers a different one. ", h("dfn", {}, "Chicken"), ": each wants to be the one who does not give way, but both refusing is a crash. ", h("dfn", {}, "Matching pennies"), ": one side wants to match, the other to differ."),
+        h("p", {}, "What makes a game one of these is only the order of its payoffs. So we can read that order off our own measured tables and ask honestly: does anything in this courtroom look like the games from the lectures? If not, the answer is \"no\", and the page says so."),
+      ],
+      read: ["The five cards are the textbook games. Cells show the row player's payoff first.", "Each case's 4×4 table contains 36 two-by-two corners. The counts say how many corners carry each name.", "“Dominance-solvable” means one play is simply best, so there is no dilemma. “None of the classic games” means the payoffs do not have that order, or the data cannot separate them.", "The last block is a search over generated cases for the three games we did not find in the library."],
+      fig: h("div", { id: "classic-fig" }),
+      maths: h("p", {}, "A payoff counts as better than another only if it is higher by more than two standard errors of the difference; otherwise it is a tie, and a game that needs a strict order where the data has a tie is “none of the classic games”. Prisoner's dilemma: both sides have a strictly dominant play, and for each side temptation > reward > punishment > sucker. Stag hunt: two pure equilibria, both sides prefer the same one, and for both sides the other equilibrium's play has the better worst case. Battle of the sexes: two pure equilibria, each side prefers a different one, and both equilibria beat both mismatches for both sides. Chicken: the same, but each side ranks the four outcomes strictly, with mutual pushing the worst. Matching pennies: no pure equilibrium. The result files are produced by scripts/run_analysis.py classic and scripts/run_classic_search.py."),
+    }),
+    refresh: renderClassic,
+  });
+
+  /* ---- Pareto */
+
+  let effLive = null;
+  const effOf = (id) => (effLive?.case_id === id && effLive.surprises === lectSur ? effLive : lectCase("efficiency", id, lectSur));
+  const isPureEq = (q) => Object.values(q.row_mix).filter((v) => v !== "0").length === 1 && Object.values(q.col_mix).filter((v) => v !== "0").length === 1;
+
+  function renderPareto() {
+    const c = B.cases.find((x) => x.id === caseId), body = $("#pareto-fig");
+    if (!c || !body) return;
+    const e = effOf(c.id);
+    const kids = [lectToggle()];
+    if (!e) { body.replaceChildren(...kids, note("No measurement is stored for this case.")); return; }
+    const ef = e.efficiency, pc = new Set(ef.pareto_cells.map(([r, k]) => `${r}|${k}`));
+    const eqCells = new Set(ef.equilibria.filter(isPureEq).map((q) => `${Object.keys(q.row_mix).find((k) => q.row_mix[k] !== "0")}|${Object.keys(q.col_mix).find((k) => q.col_mix[k] !== "0")}`));
+    kids.push(h("div", { class: "ed-scroll" }, h("table", { class: "lab-table pareto-table" },
+      h("thead", {}, h("tr", {}, h("th", {}, ""), e.col_strategies.map((d) => h("th", {}, `${nameOf(d)} Defender`)))),
+      h("tbody", {}, e.row_strategies.map((r, i) => h("tr", {}, h("th", { scope: "row" }, `${nameOf(r)} Accuser`), e.col_strategies.map((d, j) => {
+        const key = `${r}|${d}`;
+        return h("td", { class: `${pc.has(key) ? "pareto" : "dominated"} ${eqCells.has(key) ? "eqcell" : ""}`, title: `${pc.has(key) ? "Pareto-efficient" : "another cell is at least as good for both and better for one"}${eqCells.has(key) ? "; a pure equilibrium" : ""}` },
+          h("b", {}, fmt(e.A[i][j])), ", ", fmt(e.B[i][j]), pc.has(key) ? h("span", { class: "tag-p", "aria-label": "Pareto-efficient" }, " ★") : null, eqCells.has(key) ? h("span", { class: "tag-e", "aria-label": "pure equilibrium" }, " ◆") : null);
+      })))))),
+      note("Each cell: Accuser's payoff, then Defender's. ★ marks a Pareto-efficient cell: no other cell is at least as good for both sides and better for one. ◆ marks a pure equilibrium."));
+    kids.push(h("h3", {}, "Is each equilibrium efficient?"),
+      h("ul", { class: "eq-eff" }, ef.equilibria.map((q) => h("li", {},
+        h("b", {}, `Accuser ${mixOf(q.row_mix)}, Defender ${mixOf(q.col_mix)}`), ` pays (${fmt(q.row_payoff)}, ${fmt(q.col_payoff)}): `,
+        q.pareto_efficient ? "Pareto-efficient, nothing beats it for both sides." : q.strictly_dominated ? `dominated: ${nameOf(q.dominated_by[0].row)} Accuser against ${nameOf(q.dominated_by[0].col)} Defender would give both sides more (${fmt(q.dominated_by[0].row_gain)} and ${fmt(q.dominated_by[0].col_gain)}). That is the prisoner's-dilemma lesson.` : `weakly dominated: ${nameOf(q.dominated_by[0].row)} Accuser against ${nameOf(q.dominated_by[0].col)} Defender helps ${q.dominated_by[0].row_gain > 0 && q.dominated_by[0].col_gain > 0 ? "both" : "one side"} and hurts nobody (+${fmt(q.dominated_by[0].row_gain)}, +${fmt(q.dominated_by[0].col_gain)}).`))),
+      note("A mixed equilibrium is compared by its expected payoffs against the cells (pure pairs of styles); mixing across cells together, which would need the sides to coordinate, is not considered."));
+    body.replaceChildren(...kids);
+    const nd = ef.equilibria.filter((q) => !q.pareto_efficient).length, nd2 = ef.equilibria.filter((q) => q.strictly_dominated).length;
+    says("pareto", h("p", {}, h("b", {}, caseName(c)), `${lectSur ? " (surprises on)" : ""}: ${ef.pareto_cells.length} of ${e.row_strategies.length * e.col_strategies.length} cells are Pareto-efficient. `,
+      ef.equilibria.length ? `${ef.equilibria.length - nd} of ${ef.equilibria.length} equilibria are efficient; ${nd2 ? `${nd2} ${nd2 === 1 ? "is" : "are"} dominated for both sides by some other cell, so this case shows the prisoner's-dilemma pattern.` : nd ? "the others are only weakly dominated (a cell helps one side without hurting the other), which is not a dilemma." : "none is dominated, so there is no dilemma in the equilibrium."}` : "No equilibrium was found."));
+  }
+
+  registry.push({
+    id: "pareto",
+    build: () => chapter("pareto", "Is the equilibrium efficient?", {
+      lead: [
+        h("p", {}, "An outcome is ", h("dfn", {}, "Pareto-efficient"), " if nobody can be made better off without making someone worse off. It sounds like a mild test, but the prisoner's dilemma shows what failing it means: both sides play the equilibrium, and both would have preferred another outcome."),
+        h("p", {}, "So for each case we mark the Pareto-efficient cells of the 4×4 table, and for each Nash equilibrium ask whether some other cell is better for both sides at once."),
+      ],
+      read: ["★ cells are efficient. A plain cell has some other cell that is at least as good for both sides and better for one.", "◆ marks a pure equilibrium. A ◆ without a ★ is an equilibrium the sides could jointly improve on.", "“Dominated for both sides” is the dilemma pattern. “Weakly dominated” is not: one side could gain and nobody loses."],
+      fig: h("div", { id: "pareto-fig" }),
+      maths: h("p", {}, "A cell (i, j) is Pareto-efficient if no cell has both payoffs at least as high and one strictly higher. This is checked in exact arithmetic on the measured mean payoffs (the same table as the other chapters, 100 seeds). The comparison uses the means, not a significance test, so a small apparent gain can be noise; the table shows the gains so you can judge their size."),
+    }),
+    refresh: renderPareto,
+  });
+
+  /* ---- Minimax */
+
+  function renderMinimax() {
+    const c = B.cases.find((x) => x.id === caseId), body = $("#minimax-fig");
+    if (!c || !body) return;
+    const e = effOf(c.id);
+    const kids = [lectToggle()];
+    if (!e) { body.replaceChildren(...kids, note("No measurement is stored for this case.")); return; }
+    const ef = e.efficiency, cs = e.constant_sum;
+    const side = (who, sec) => h("tr", {}, h("th", { scope: "row" }, who), h("td", {}, `${fmt(sec.pure_value)} (${nameOf(sec.pure_strategy)})`), h("td", {}, `${fmt(sec.mixed_value)}`),
+      h("td", {}, mixOf(sec.mixed_strategy)));
+    kids.push(h("h3", {}, "What each side can guarantee in the real game"),
+      h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+        h("thead", {}, h("tr", {}, ["Side", "Safest single style (guaranteed payoff)", "Safest mix: guaranteed payoff", "The mix"].map((t) => h("th", {}, t)))),
+        h("tbody", {}, side("Accuser", ef.row_security), side("Defender", ef.col_security)))),
+      h("p", {}, "At each equilibrium, how far above its guaranteed floor does each side end up?"),
+      h("ul", { class: "eq-eff" }, ef.equilibria.map((q) => h("li", {}, `Equilibrium paying (${fmt(q.row_payoff)}, ${fmt(q.col_payoff)}): Accuser ${fmt(q.security_gap_row)} above its floor, Defender ${fmt(q.security_gap_col)} above its floor.`))),
+      note("The courtroom game is not zero-sum and each lawyer sees only part of the evidence, so the guaranteed payoff is only a floor: a cautious lawyer who ignores the opponent's incentives. The gap is what reasoning about the opponent adds."),
+      h("h3", {}, "The constant-sum game: the minimax theorem"),
+      h("p", {}, "Take only who wins: the Accuser's chance of winning, and the Defender's, which is one minus it. That is constant-sum, because every gain for one side is exactly a loss for the other."),
+      h("div", { class: "stab" }, h("div", { class: "stab-label" }, h("b", {}, `Accuser can guarantee ${pct(cs.maximin)}`), `; Defender can hold the Accuser to ${pct(cs.minimax)}`, cs.nash_value != null ? `; Nash value ${pct(cs.nash_value)}.` : "."),
+        h("p", { class: cs.theorem_holds ? "headline" : "warn" }, cs.theorem_holds ? `Maximin equals minimax${cs.nash_value != null ? " equals the Nash value" : ""}, as the minimax theorem says${cs.saddle_point ? " (here a pure saddle point, so nobody needs to randomise)" : " (here the sides must mix)"}.` : "The theorem did not hold on this table, which should be impossible: report it.")),
+      h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Accuser wins"), e.col_strategies.map((d) => h("th", {}, `${nameOf(d)} Defender`)))),
+        h("tbody", {}, e.row_strategies.map((r, i) => h("tr", {}, h("th", { scope: "row" }, `${nameOf(r)} Accuser`), e.accuser_win_rate[i].map((w) => h("td", {}, pct(w)))))))));
+    body.replaceChildren(...kids);
+    says("minimax", h("p", {}, h("b", {}, caseName(c)), `${lectSur ? " (surprises on)" : ""}: in the win-probability game the Accuser can guarantee ${pct(cs.maximin)} and the Defender can hold it there, so the value of the game is ${pct(cs.maximin)}. In the full game the Accuser's guaranteed payoff is ${fmt(ef.row_security.mixed_value)} and the Defender's is ${fmt(ef.col_security.mixed_value)}.`));
+  }
+
+  registry.push({
+    id: "minimax",
+    build: () => chapter("minimax", "What can each side guarantee?", {
+      lead: [
+        h("p", {}, "A cautious player can ask a different question from “what is the best reply?”: “what is the most I can be sure of, whatever the other side does?” That is the ", h("dfn", {}, "security value"), " or maximin. A lawyer can improve on playing one style by mixing styles, so we compute the best mix exactly."),
+        h("p", {}, "In a game where one side's gain is exactly the other's loss (", h("dfn", {}, "zero-sum"), " or constant-sum), the most the first can guarantee and the least the second can hold it to are the same number, and equal the Nash value. That is the ", h("dfn", {}, "minimax theorem"), ". Our courtroom game is not zero-sum, but the question of who wins is, so we check the theorem on that."),
+      ],
+      read: ["The first table is the real game: what each side can guarantee, and how far above that floor the equilibrium puts it.", "The second part is the win-probability game, where the theorem should hold exactly.", "If the table shows a pure saddle point, neither side needs to randomise."],
+      fig: h("div", { id: "minimax-fig" }),
+      maths: h("p", {}, "The maximin of a payoff matrix is max v subject to: for every opposing play, the mix's expected payoff is at least v. Its solution sits at a vertex of that polytope, so the code tries every choice of k plays to mix over and k opposing plays that bind, solves the (k+1)×(k+1) system exactly in rational numbers, keeps the feasible ones and takes the best v. The minimax value is the same computation on the transposed negation. The test suite checks maximin = minimax = Nash value on random constant-sum matrices and on the project's own tables."),
+    }),
+    refresh: renderMinimax,
+  });
+
   /* ---------------------------------------------------------------- put them on the page */
 
   function mount() {

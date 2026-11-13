@@ -127,6 +127,53 @@ def cmd_find(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_classic(a: argparse.Namespace) -> int:
+    """Which classic game (prisoner's dilemma, stag hunt, ...) does each 2x2 corner of a case's measured table resemble?"""
+    from courtroom.gametheory.bootstrap import STYLES, collect_samples
+    from courtroom.gametheory.classic import LABELS, PLAIN, classify_case
+    from courtroom.gametheory.finder import find_classic
+
+    sur = _surprises(a)
+    if a.find:
+        rep = find_classic(tuple(a.find.split(",")), a.start, a.count, surprises=sur)
+        console.print(f"[grey50]{rep.note} ({rep.seconds}s)[/]")
+        console.print("labels over every 2x2 corner tried: " + ", ".join(f"{k} {v}" for k, v in rep.label_counts.items()))
+        console.print("same, reading the means as exact (no tolerance): " + ", ".join(f"{k} {v}" for k, v in rep.label_counts_no_tolerance.items()))
+        for f in rep.found:
+            console.print(f"[bold]{f.case_id:10s}[/] {PLAIN[f.label]}: {f.rows} vs {f.cols}  survives {f.stability:.0%} of resamples")
+        if not rep.found:
+            console.print("[yellow]None found: no generated case in this range has a stable two-by-two game of that kind.[/]")
+        if a.json:
+            Path(a.json).write_text(rep.model_dump_json(indent=2), encoding="utf-8")
+        return 0
+    ids = [a.case] if a.case else list(CASES)
+    for cid in ids:
+        samples = collect_samples(_case(cid), STYLES, tuple(range(a.seeds)), workers=a.workers, surprises=sur)
+        res = classify_case(cid, samples, STYLES, STYLES, n_resamples=a.resamples, surprises=sur is not None)
+        shown = ", ".join(f"{PLAIN[k]} {res.label_counts[k]}" for k in LABELS if res.label_counts[k])
+        console.print(f"[bold]{cid:24s}[/] {shown}  (labels survive {res.mean_stability:.0%} of resamples on average)")
+    return 0
+
+
+def cmd_efficiency(a: argparse.Namespace) -> int:
+    """Pareto-efficient cells, equilibrium efficiency and security (maximin) values of a case's measured 4x4 game."""
+    from courtroom.gametheory.bootstrap import STYLES
+    from courtroom.gametheory.efficiency import constant_sum_check, efficiency
+    from courtroom.gametheory.payoff import estimate_payoffs
+
+    t = estimate_payoffs(_case(a.case), STYLES, seeds=tuple(range(a.seeds)), workers=a.workers, surprises=_surprises(a))
+    e = efficiency(t.analysis)
+    win = {(c.row, c.col): c.prosecution_win_rate for c in t.cells}
+    cs = constant_sum_check([[win[(r, c)] for c in t.col_strategies] for r in t.row_strategies])
+    console.print(f"[bold]{a.case}[/]  Pareto-efficient cells: {', '.join(f'{r}/{c}' for r, c in e.pareto_cells)}")
+    for q in e.equilibria:
+        tag = "Pareto-efficient" if q.pareto_efficient else ("dominated for both sides (a dilemma)" if q.strictly_dominated else "weakly Pareto-dominated (a cell helps one side and hurts nobody)")
+        console.print(f"  equilibrium payoffs ({q.row_payoff:.2f}, {q.col_payoff:.2f}): {tag}; above the security floor by {q.security_gap_row:.2f} (Accuser), {q.security_gap_col:.2f} (Defender)")
+    console.print(f"  security values (mixed): Accuser {e.row_security.mixed_value:.3f}, Defender {e.col_security.mixed_value:.3f}")
+    console.print(f"  win-probability game (constant-sum): maximin {cs.maximin:.4f}, minimax {cs.minimax:.4f}, Nash value {cs.nash_value}; theorem holds: {cs.theorem_holds}")
+    return 0
+
+
 def cmd_oracle(a: argparse.Namespace) -> int:
     """Can the four hand-written lawyer styles be beaten? A double-oracle search over lawyer profiles."""
     from courtroom.gametheory.oracle import run_oracle
@@ -245,6 +292,25 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seeds", type=int, default=8)
     surprise_arg(p)
     p.set_defaults(fn=cmd_matters)
+
+    p = sub.add_parser("classic", help="which classic game does each 2x2 corner of the measured table resemble?")
+    p.add_argument("--case", help="one case id (default: the whole library)")
+    p.add_argument("--seeds", type=int, default=30)
+    p.add_argument("--resamples", type=int, default=100)
+    p.add_argument("--workers", type=int, default=1)
+    p.add_argument("--find", help="search generated cases instead, e.g. prisoners-dilemma,stag-hunt,battle-of-the-sexes")
+    p.add_argument("--start", type=int, default=0)
+    p.add_argument("--count", type=int, default=30)
+    p.add_argument("--json")
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_classic)
+
+    p = sub.add_parser("efficiency", help="Pareto efficiency, security values and the minimax theorem on a case's measured game")
+    p.add_argument("--case", default="helix-espionage")
+    p.add_argument("--seeds", type=int, default=30)
+    p.add_argument("--workers", type=int, default=1)
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_efficiency)
 
     p = sub.add_parser("oracle", help="best-response search: can the four hand-written styles be beaten?")
     p.add_argument("--case", default="helix-espionage")
