@@ -232,3 +232,33 @@ goes behind a flag that defaults to today's rules (see `Surprises`).
 
 **Rules for results.** A search result is whatever it found. Do not change a case, a parameter or a seed after seeing a result to make it
 look better; if the method changes, re-run everything and say so.
+
+
+---
+
+## 9. The lecture concepts: classic games, Pareto, security values, the trial tree, lookahead
+
+These parts read results or search the trial; none may change a recorded trial, a spoken line or the certified styles.
+
+| You want to change | Edit | Then also |
+|---|---|---|
+| How a 2x2 game is named (prisoner's dilemma, stag hunt, ...) | `courtroom/gametheory/classic.py` | `tests/test_classic.py` (textbook matrices, relabelling, rescaling, noise); re-run `scripts/run_analysis.py classic` (and `--surprises`) and `scripts/run_classic_search.py` |
+| Pareto cells, security values, the minimax theorem check | `courtroom/gametheory/efficiency.py` | `tests/test_efficiency.py`; re-run `scripts/run_analysis.py efficiency` (and `--surprises`) |
+| The trial tree (minimax, alpha-beta, move ordering) | `courtroom/gametheory/search.py` | `tests/test_search.py`; re-run `scripts/run_tree.py` |
+| The lookahead lawyer | `courtroom/agents/lookahead.py` | `tests/test_lookahead.py`; re-run `scripts/run_lookahead.py` (and `--surprises`) |
+| The chapters "Which classic game is this?", "Is the equilibrium efficient?", "What can each side guarantee?", "Thinking ahead" | `courtroom/viz/web/lab-extra.js`, `lab.css` | `python scripts/build_analysis_js.py`; bump `?v=N` in `lab.html`; `node --check` |
+| Numbers in `REPORT.md` and `DEVIATIONS.md` for these | `scripts/render_docs.py` (never by hand) | `python scripts/render_docs.py` then `--check` |
+
+Rules that matter here:
+
+- **The tree uses the engine's rules, not a copy.** A node is a real `Court` with logging switched off; legal moves come from `validate` and the
+  judge, moves are applied by `Court._dispatch`, values come from the judge and `utilities`. `tests/test_search.py` replays recorded trials
+  through the tree and compares. If you change how the engine takes a step, that test is the one that tells you the tree has drifted.
+- **The open-file game is a relaxation** (both sides see everything, no perception noise, zero-sum payoff). Never present its values as the
+  certified game's. Any new "dominated move" you leave out of the search needs a test that putting it back leaves the value unchanged.
+- **Lookahead is an exhibition.** It must read only its `PartyView` and the public `Oracle` (a test checks the source), must not be added to
+  the four certified styles, the bundle or any payoff table behind a certified claim, and is labelled "exhibition, not certified". Do not tune
+  it after seeing its comparison; if you change it, say so and re-run everything.
+- **Search results are whatever they found.** "Not found" is a result. Do not change a case, a tolerance or a seed to make a lecture game appear;
+  if the method changes, re-run both modes and say so in the report.
+

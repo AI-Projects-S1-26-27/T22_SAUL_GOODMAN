@@ -68,3 +68,18 @@ looked at. Then **How sure are we?**: say which conclusions are shaky. Ending on
 | Voices for unscripted lines | The browser's own speech is used; the recorded cast is only for the library cases. |
 
 Before the session: `python -m pytest`, `node scripts/check_lab_math.cjs`, and `python scripts/render_docs.py --check` should all pass.
+
+## Optional, about 60 seconds more: tie it to the lectures
+
+Stay in the **Strategy lab** and walk four chapters, each computed from our own games:
+
+1. **Which classic game is this?** Say what the chapter looked for: the prisoner's dilemma, stag hunt, battle of the sexes and chicken in
+   every two-by-two corner of every case's table, and in generated cases found by search. Read the answer honestly, including "not found"
+   for the games that do not occur; point at the corners that are matching pennies, and show one beside the textbook matrix. Do not claim
+   a case is a dilemma that the chapter does not call one.
+2. **Is the equilibrium efficient?** Pick a case and read whether its equilibrium is Pareto-efficient, or dominated for both sides.
+3. **What can each side guarantee?** Show the security values and the minimax theorem line for the win-probability game: maximin equals
+   minimax equals the Nash value. Say that the real game is not constant-sum, so there the security value is only a floor.
+4. **Thinking ahead.** Show the table of nodes: plain minimax against alpha-beta with the best move first, with the same value every time.
+   Open the drawn tree and point at a scissors line. Say plainly that this is the open-file version (both sides see everything, zero-sum),
+   and that the lookahead lawyer below it is an exhibition. If the local server is on, pick **Lookahead** as one side's style in the room.

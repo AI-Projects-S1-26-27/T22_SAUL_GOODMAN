@@ -45,6 +45,21 @@ Set up once: Python 3.11 or newer and `pip install -e ".[dev]"`. Nothing below n
 | The lab and the report read those files, not new runs. | `python scripts/build_analysis_js.py` then `python scripts/render_docs.py` | `courtroom/viz/web/data/analysis.js` |
 | The docs are not out of date. | `python scripts/render_docs.py --check` | |
 
+## The lecture concepts: classic games, Pareto, minimax, alpha-beta
+
+| Claim | Command | Output file |
+|---|---|---|
+| The classifier names the textbook games correctly (prisoner's dilemma, stag hunt, battle of the sexes, chicken, matching pennies), is unchanged by relabelling and rescaling, and says "none" when noise hides the order. | `python -m pytest tests/test_classic.py` | |
+| Which classic game each two-by-two corner of each case resembles, and how often the label survives resampling. | `python scripts/run_analysis.py classic --workers 4` (and `--surprises`); one case: `python -m courtroom classic --case helix-espionage` | `results/classic.json`, `results/classic_surprises.json` |
+| Whether the games we did not find in the library can be found among generated cases. | `python scripts/run_classic_search.py --count 400` (and `--surprises`); live: `python -m courtroom classic --find prisoners-dilemma,stag-hunt,battle-of-the-sexes` | `results/classic_search.json`, `results/classic_search_surprises.json` |
+| Pareto-efficient cells, whether each equilibrium is efficient, and security values. | `python scripts/run_analysis.py efficiency --workers 4` (and `--surprises`); one case: `python -m courtroom efficiency --case kestrel-av` | `results/efficiency.json`, `results/efficiency_surprises.json` |
+| Maximin equals minimax equals the Nash value on constant-sum games (exact). | `python -m pytest tests/test_efficiency.py` | |
+| The game tree uses the engine's own rules: a recorded trial replayed through the tree gives the same verdict and payoffs. | `python -m pytest tests/test_search.py -k engine` | |
+| Plain minimax, alpha-beta and alpha-beta with move ordering give the same value; node counts. | `python scripts/run_tree.py --workers 4`; one case: `python -m courtroom tree --case cookie-jar` | `results/tree_search.json` |
+| Dropping passes and moves the judge would reject does not change the value. | `python -m pytest tests/test_search.py -k dominated` | |
+| The lookahead lawyer sees only its view and the public oracle, plays legal moves, is reproducible, and alpha-beta makes its choices unchanged. | `python -m pytest tests/test_lookahead.py` | |
+| Whether lookahead beats the four styles (exhibition, not certified). | `python scripts/run_lookahead.py --workers 4` (and `--surprises`); one case: `python -m courtroom lookahead --case kestrel-av` | `results/lookahead.json`, `results/lookahead_surprises.json` |
+
 The result files this version of the docs was generated from:
 
 <!-- BEGIN GENERATED:files -->

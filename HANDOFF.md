@@ -32,3 +32,25 @@ None. Nothing failed three honest attempts.
 
 Not merged on purpose. When it is time: run `python -m pytest`, `ruff check courtroom tests scripts`, `node --check courtroom/viz/web/*.js`,
 `node scripts/check_lab_math.cjs`, `python scripts/render_docs.py --check`, and `node scripts/collect_lines.cjs | diff - tests/golden/lines_baseline.json`.
+
+## The lecture-concepts round (classic games, Pareto, minimax, alpha-beta, lookahead)
+
+No blocker: nothing failed three honest attempts. What is worth knowing:
+
+- **Nothing in the library or the generated cases is a prisoner's dilemma, stag hunt, battle of the sexes or chicken.** The finder searches for the
+  first three (the ones the brief named); it does not search for chicken, which the classifier can name but which was not a search target. The
+  report says "not found" in each place. Do not retune a case to change that.
+- **The tree search solves the open-file relaxation only** (both sides see everything, no perception noise, zero-sum advantage), and only the
+  cases small enough to finish. `helix-espionage` (ten and seven exhibits) did not finish within its node limit, which is recorded as such.
+  `aurora-defi` and `kestrel-av` were solved with the ordered alpha-beta alone, because plain minimax would not finish.
+- **The lookahead lawyer is an exhibition.** It beats the four-style equilibrium in one case (`kestrel-av`, both seats, surprises off and on) and is
+  clearly worse in several small ones. It does not model the opponent's own future offers, and its leaf estimate is a heuristic. One design
+  change was made before any comparison (adding the log-odds potential to its score); that is disclosed in `REPORT.md` section 6.9.
+- **`Oracle.log_odds` gained an optional `also_impeach` argument** so the lawyer can look at more than one impeachment. Existing calls are
+  unchanged and the pinned digests did not move.
+- **`DEVIATIONS.md` is new on this branch.** The earlier round had not written it. It was checked against the proposal PDF and the code; the
+  reason for the proposal's Mixed(0.5) being replaced by Wild in the four-by-four game is not recorded anywhere in the repository, and the file
+  says so.
+- **The hosted site does not show the lookahead style** (it has no recorded trials and needs the local server), and its lab chapters read the
+  stored results. Nothing was pushed or deployed.
+

@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DOCS = ("REPORT.md", "PROVENANCE.md", "DEMO_SCRIPT.md", "docs/LLM_ROLE.md")
+DOCS = ("REPORT.md", "PROVENANCE.md", "DEMO_SCRIPT.md", "DEVIATIONS.md", "docs/LLM_ROLE.md")
 BLOCK = re.compile(r"<!-- BEGIN GENERATED:(\w+) -->.*?<!-- END GENERATED:\1 -->", re.S)
 
 

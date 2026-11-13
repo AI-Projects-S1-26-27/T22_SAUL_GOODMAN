@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-DOCS = ("REPORT.md", "PROVENANCE.md", "DEMO_SCRIPT.md")
+DOCS = ("REPORT.md", "PROVENANCE.md", "DEMO_SCRIPT.md", "DEVIATIONS.md")
 RESULTS = ROOT / "results"
 NAMES = {"aggressive": "Bold", "conservative": "Careful", "adaptive": "Smart", "reckless": "Wild"}
 
@@ -220,10 +220,214 @@ def demo_cases() -> str:
             f"- Cases where the evidence alone decides (show these as everyday trials, **not** as examples of strategy mattering): {', '.join(flat)}.")
 
 
+# --------------------------------------------------------------------------- the lecture concepts (classic games, Pareto, minimax, alpha-beta)
+
+CLASSIC_WORDS = {
+    "prisoners-dilemma": "prisoner's dilemma", "stag-hunt": "stag hunt", "battle-of-the-sexes": "battle of the sexes", "chicken": "chicken",
+    "matching-pennies": "matching pennies", "dominance-solvable": "dominance-solvable", "other": "none of the classic games",
+}
+
+
+def _classic_line(d: dict, label: str) -> str:
+    names = case_names()
+    per = {cid: c["label_counts"].get(label, 0) for cid, c in d.get("cases", {}).items()}
+    total = sum(per.values())
+    where = [f"{names[c]} ({n})" for c, n in per.items() if n]
+    return f"{total} ({'; '.join(where)})" if total else "0"
+
+
+def classic_findings() -> str:
+    out = []
+    for name, tag in (("classic", "Plain rules"), ("classic_surprises", "Courtroom surprises on")):
+        d = load(name)
+        if not d:
+            continue
+        corners = sum(sum(c["label_counts"].values()) for c in d["cases"].values())
+        out.append(f"- **{tag}.** {len(d['cases'])} cases, {corners} two-by-two corners (every pair of the four styles for each side), measured over {d['n_seeds']} seeds, "
+                   f"labels re-tested on {d['n_resamples']} resamples of the seeds.")
+        for k in ("prisoners-dilemma", "stag-hunt", "battle-of-the-sexes", "chicken", "matching-pennies", "dominance-solvable", "other"):
+            out.append(f"  - {CLASSIC_WORDS[k].capitalize()}: {_classic_line(d, k)}.")
+        stab = [(sg["label"], sg["stability"]) for c in d["cases"].values() for sg in c["subgames"]]
+        mp = [v for k, v in stab if k == "matching-pennies"]
+        if mp:
+            out.append(f"  - The matching-pennies corners kept their label on {pct(sum(mp) / len(mp))} of resamples on average.")
+    for name, tag in (("classic_search", "plain rules"), ("classic_search_surprises", "surprises on")):
+        d = load(name)
+        if not d:
+            continue
+        n = sum(d["label_counts"].values())
+        raw = d["label_counts_no_tolerance"]
+        cand = d["candidates"]
+        out.append(f"- **Search over generated cases ({tag}).** {d['tried']} generated cases ({d['note'].split(';')[0].replace('Found by search: ', '')}), {n} corners. "
+                   f"Read as exact numbers, {cand} corners looked like a prisoner's dilemma, stag hunt or battle of the sexes "
+                   f"({raw['prisoners-dilemma']} dilemma, {raw['stag-hunt']} stag hunt, {raw['battle-of-the-sexes']} battle of the sexes); "
+                   f"**{len(d['found'])} kept** their name under the full tolerance on fresh seeds.")
+    return "\n".join(out)
+
+
+def efficiency_findings() -> str:
+    names = case_names()
+    out = []
+    for name, tag in (("efficiency", "Plain rules"), ("efficiency_surprises", "Courtroom surprises on")):
+        d = load(name)
+        if not d:
+            continue
+        cases = d["cases"]
+        dil = [names[c] for c, r in cases.items() if r["efficiency"]["social_dilemma"]]
+        weak = [names[c] for c, r in cases.items() if not r["efficiency"]["social_dilemma"] and not r["efficiency"]["all_equilibria_efficient"]]
+        eff = [names[c] for c, r in cases.items() if r["efficiency"]["all_equilibria_efficient"]]
+        out.append(f"- **{tag}** ({d['n_seeds']} seeds): an equilibrium dominated for **both** sides by some cell (the prisoner's-dilemma pattern) in {len(dil)} of {len(cases)} cases"
+                   f"{' (' + ', '.join(dil) + ')' if dil else ''}; only weakly dominated (a cell helps one side and hurts nobody) in {len(weak)}"
+                   f"{' (' + ', '.join(weak) + ')' if weak else ''}; every equilibrium Pareto-efficient in {len(eff)}{' (' + ', '.join(eff) + ')' if eff else ''}.")
+    return "\n".join(out)
+
+
+def security_findings() -> str:
+    names = case_names()
+    out = []
+    for name, tag in (("efficiency", "Plain rules"), ("efficiency_surprises", "Courtroom surprises on")):
+        d = load(name)
+        if not d:
+            continue
+        cases = d["cases"]
+        ok = sum(1 for r in cases.values() if r["constant_sum"]["theorem_holds"])
+        vals = {names[c]: r["constant_sum"]["maximin"] for c, r in cases.items()}
+        saddle = sum(1 for r in cases.values() if r["constant_sum"]["saddle_point"])
+        gaps_r = [q["security_gap_row"] for r in cases.values() for q in r["efficiency"]["equilibria"]]
+        gaps_c = [q["security_gap_col"] for r in cases.values() for q in r["efficiency"]["equilibria"]]
+        out.append(f"- **{tag}.** In the win-probability game (constant-sum) maximin equals minimax equals the Nash value in {ok} of {len(cases)} cases, as the minimax theorem says; "
+                   f"a pure saddle point (nobody needs to randomise) in {saddle}. The Accuser's guaranteed win rate runs from {pct(min(vals.values()))} ({min(vals, key=vals.get)}) to {pct(max(vals.values()))} ({max(vals, key=vals.get)}). "
+                   f"In the full general-sum game, an equilibrium pays the Accuser between {min(gaps_r):.2f} and {max(gaps_r):.2f} above its security value and the Defender between {min(gaps_c):.2f} and {max(gaps_c):.2f} above its own.")
+    return "\n".join(out)
+
+
+def tree_table() -> str:
+    d = load("tree_search")
+    if not d:
+        return "_No stored search._"
+    rows = []
+    for cid, r in d["cases"].items():
+        ran = r.get("ran_all_three", True)
+        limit = r["node_limit"]
+
+        def cell(n: int | None, ran: bool = True, limit: int = limit) -> str:
+            return "not run" if not ran else (f"more than {limit:,}" if n is None else f"{n:,}")
+
+        rows.append([cid, f"{r['evidence'][0]}, {r['evidence'][1]}", "not solved" if r["value"] is None else f"{r['value']:g}", cell(r["minimax_nodes"], ran), cell(r["alphabeta_nodes"], ran), cell(r["alphabeta_ordered_nodes"]),
+                     "–" if r["values_agree"] is None else ("yes" if r["values_agree"] else "NO")])
+    return table(["Case", "Exhibits (Accuser, Defender)", "Best-play value", "Plain minimax nodes", "Alpha-beta nodes", "Alpha-beta with ordering", "Same value?"], rows)
+
+
+def tree_findings() -> str:
+    d = load("tree_search")
+    if not d:
+        return ""
+    rs = list(d["cases"].values())
+    solved = [r for r in rs if r["value"] is not None]
+    full = [r for r in rs if r["minimax_nodes"] and r["alphabeta_nodes"] and r["alphabeta_ordered_nodes"]]
+    agree = all(r["values_agree"] for r in solved)
+    shares = sorted(r["pruned_share"] for r in full)
+    big = max(full, key=lambda r: r["minimax_nodes"])
+    ord_better = sum(1 for r in full if r["alphabeta_ordered_nodes"] < r["alphabeta_nodes"])
+    ord_worse = [r["case_id"] for r in full if r["alphabeta_ordered_nodes"] > r["alphabeta_nodes"]]
+    unsolved = [r["case_id"] for r in rs if r["value"] is None]
+    only_ordered = [r["case_id"] for r in rs if r.get("ran_all_three") is False and r["value"] is not None]
+    wins = sum(1 for r in solved if r["value"] > 0)
+    out = [
+        f"- {len(solved)} of {len(rs)} cases were solved exactly; {'plain minimax, alpha-beta and alpha-beta with move ordering returned **the same value in every one**' if agree else '**the methods disagreed somewhere: see the table**'}.",
+        f"- On the {len(full)} cases where plain minimax also finished, alpha-beta with move ordering visited between {pct(1 - shares[-1])} and {pct(1 - shares[0])} of minimax's nodes; the most expensive was {big['case_id']}: "
+        f"{big['minimax_nodes']:,} nodes for plain minimax, {big['alphabeta_nodes']:,} for alpha-beta, {big['alphabeta_ordered_nodes']:,} with ordering.",
+        f"- Move ordering helped in {ord_better} of the {len(full)} cases" + (f" and made no difference or cost slightly more in {len(ord_worse)} ({', '.join(ord_worse)})" if ord_worse else "") + ".",
+        f"- Larger cases ({', '.join(only_ordered) or 'none'}) were solved with the ordered search alone, because plain minimax would not finish; {', '.join(unsolved) or 'none'} could not be solved within the node limit.",
+        f"- With both sides seeing everything, the Accuser can win in {wins} of the {len(solved)} solved cases; in the others the Defender wins whatever the Accuser does.",
+    ]
+    return "\n".join(out)
+
+
+def lookahead_findings() -> str:
+    names = case_names()
+    out = []
+    for name, tag in (("lookahead", "Plain rules"), ("lookahead_surprises", "Courtroom surprises on")):
+        d = load(name)
+        if not d:
+            continue
+        beats, worse, same = [], [], []
+        for cid, r in d["cases"].items():
+            seats = [s for s in ("prosecution", "defense") if r[s]["beats"]]
+            bad = [s for s in ("prosecution", "defense") if r[s]["worse"]]
+            lab = {"prosecution": "as Accuser", "defense": "as Defender"}
+            if seats:
+                beats.append(f"{names[cid]} ({' and '.join(lab[x] for x in seats)})")
+            if bad:
+                worse.append(f"{names[cid]} ({' and '.join(lab[x] for x in bad)})")
+            if not seats and not bad:
+                same.append(names[cid])
+        out.append(f"- **{tag}** ({d['n_seeds']} seeds, paired by seed, against the four-style equilibrium): lookahead beat it by more than two standard errors in {len(beats)} of {len(d['cases'])} cases"
+                   f"{': ' + '; '.join(beats) if beats else ''}; did clearly worse in {len(worse)}{': ' + '; '.join(worse) if worse else ''}; was not distinguishable in {len(same)}{': ' + ', '.join(same) if same else ''}.")
+    return "\n".join(out)
+
+
+def lectures() -> str:
+    """The lecture concepts, where each is computed and what our data says (every figure read from results/)."""
+    c = load("classic")
+    cs = load("classic_surprises")
+    search = load("classic_search")
+    ssearch = load("classic_search_surprises")
+
+    def n(d: dict, label: str) -> int:
+        return sum(x["label_counts"].get(label, 0) for x in d.get("cases", {}).values())
+
+    def found(label: str) -> str:
+        a, b = n(c, label), n(cs, label)
+        if a == 0 and b == 0:
+            sf = len([f for f in search.get("found", []) if f["label"] == label]) + len([f for f in ssearch.get("found", []) if f["label"] == label])
+            return f"**Not found.** 0 of {sum(sum(x['label_counts'].values()) for x in c['cases'].values())} corners in the library, and {sf} kept after searching {search.get('tried', 0)} generated cases."
+        return f"{a} corners (plain), {b} (surprises on)."
+
+    eff, effs = load("efficiency"), load("efficiency_surprises")
+    dil = sum(1 for r in eff.get("cases", {}).values() if r["efficiency"]["social_dilemma"])
+    dils = sum(1 for r in effs.get("cases", {}).values() if r["efficiency"]["social_dilemma"])
+    ok = sum(1 for r in eff.get("cases", {}).values() if r["constant_sum"]["theorem_holds"]) + sum(1 for r in effs.get("cases", {}).values() if r["constant_sum"]["theorem_holds"])
+    tot = len(eff.get("cases", {})) + len(effs.get("cases", {}))
+    tr = load("tree_search")
+    solved = [r for r in tr.get("cases", {}).values() if r["value"] is not None]
+    full = [r for r in solved if r["minimax_nodes"] and r["alphabeta_ordered_nodes"]]
+    la = load("lookahead")
+    las = load("lookahead_surprises")
+
+    def lab(d: dict) -> int:
+        return sum(1 for r in d.get("cases", {}).values() if r["prosecution"]["beats"] or r["defense"]["beats"])
+
+    rows = [
+        ["Prisoner's dilemma", "`gametheory/classic.py`; `python -m courtroom classic`; `results/classic*.json`", found("prisoners-dilemma"), "Only pairs of styles (2×2 corners of the 4×4 table). A gap under two standard errors is a tie, and a game needing a strict order where there is a tie is called none of the classic games."],
+        ["Stag hunt", "same", found("stag-hunt"), "Risk is read from each play's worst case (a security-level notion), not from risk dominance."],
+        ["Battle of the sexes (Bach or Stravinsky)", "same", found("battle-of-the-sexes"), "Needs two pure equilibria that the sides rank differently."],
+        ["Chicken", "same", found("chicken"), "The same two-equilibria shape with a full strict order of four outcomes."],
+        ["Matching pennies", "same", f"{n(c, 'matching-pennies')} corners (plain), {n(cs, 'matching-pennies')} (surprises on)", "Named when no pure equilibrium survives the tolerance; the sides need not be zero-sum."],
+        ["Pareto optimality", "`gametheory/efficiency.py`; `python -m courtroom efficiency`; `results/efficiency*.json`", f"Some equilibrium dominated for both sides in {dil} of {len(eff.get('cases', {}))} cases (plain), {dils} (surprises on).", "Compared on mean payoffs over pure pairs of styles; a mixed equilibrium is compared by its expected payoffs, and mixing across cells together is not considered."],
+        ["Minimax and the minimax theorem", "`gametheory/efficiency.py` (exact maximin by vertex enumeration); `tests/test_efficiency.py`", f"Maximin = minimax = Nash value in {ok} of {tot} win-probability games.", "Holds only for the constant-sum win-probability game. The real game is general-sum, so there the security value is only a floor."],
+        ["Minimax on the trial tree", "`gametheory/search.py`; `python -m courtroom tree`; `results/tree_search.json`", f"{len(solved)} of {len(tr.get('cases', {}))} cases solved exactly.", "An open-file relaxation: both sides see all exhibits and flaws, no perception noise, and a zero-sum payoff (Accuser utility minus Defender utility). The real game has hidden information and is not zero-sum."],
+        ["Alpha-beta pruning", "same", f"Same value as plain minimax in all {len(full)} cases where both finished, with move ordering cutting the nodes visited as shown in the table.", "Pruning is exact; the saving depends on the case and on the ordering heuristic."],
+        ["Thinking ahead (depth-limited alpha-beta)", "`agents/lookahead.py`; `python -m courtroom lookahead`; `results/lookahead*.json`", f"Beat the four-style equilibrium in {lab(la)} of {len(la.get('cases', {}))} cases (plain) and {lab(las)} (surprises on).", "Exhibition, not certified. It uses only its own view and the public oracle, assumes the worst reply, and scores positions with a heuristic."],
+    ]
+    return table(["Lecture concept", "Where it is computed", "What our data says", "Limits"], rows)
+
+
+def deviation_seeds() -> str:
+    rows = []
+    for name, what in (("bootstrap", "Bootstrap of the equilibrium label"), ("classic", "Classic-game labels"), ("efficiency", "Pareto and security"), ("sensitivity", "Rulebook sensitivity"), ("matters", "Does strategy matter"), ("lookahead", "Lookahead comparison")):
+        d = load(name)
+        if d:
+            rows.append([what, f"`results/{name}.json`", str(d.get("n_seeds", d.get("seeds", "–")))])
+    return table(["Analysis", "File", "Seeds per cell"], rows)
+
+
 BLOCKS = {
     "constants": constants, "matters": matters, "matters_findings": matters_findings, "bootstrap": bootstrap, "bootstrap_findings": bootstrap_findings,
     "sensitivity": sensitivity, "sensitivity_findings": sensitivity_findings, "oracle": oracle, "oracle_findings": oracle_findings,
     "exhibition": exhibition, "files": files, "demo_cases": demo_cases,
+    "classic_findings": classic_findings, "efficiency_findings": efficiency_findings, "security_findings": security_findings, "tree_table": tree_table,
+    "tree_findings": tree_findings, "lookahead_findings": lookahead_findings, "lectures": lectures, "deviation_seeds": deviation_seeds,
 }
 PATTERN = re.compile(r"(<!-- BEGIN GENERATED:(\w+) -->)\n(.*?)\n?(<!-- END GENERATED:\2 -->)", re.S)
 

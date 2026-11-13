@@ -84,8 +84,8 @@ a green **LIVE** badge and everything below is worked out in front of you by the
 - **Strategy lab chapters** "How sure are we?" (bootstrap stability and sensitivity to the rulebook's constants) and "Can a better
   lawyer be found?" (a double-oracle search over lawyer profiles, with `python -m courtroom oracle`), each with surprises off and on.
 
-Documents: `REPORT.md` (the write-up), `PROVENANCE.md` (one command per claim), `DEMO_SCRIPT.md` (a five-minute run), `AGENTS.md` (how to
-change things safely). Numbers in those documents are generated from `results/` by `python scripts/render_docs.py`.
+Documents: `REPORT.md` (the write-up), `PROVENANCE.md` (one command per claim), `DEMO_SCRIPT.md` (a five-minute run), `DEVIATIONS.md`
+(where the code and the proposal differ), `AGENTS.md` (how to change things safely). Numbers in those documents are generated from `results/` by `python scripts/render_docs.py`.
 
 ```bash
 python -m courtroom matters                      # does strategy matter, case by case
@@ -94,6 +94,33 @@ python -m courtroom oracle --case helix-espionage --budget 60 --workers 4
 python -m courtroom verify --case helix-espionage --seed 6 -p adaptive -d aggressive --surprises
 python scripts/stub_ollama.py                    # a stand-in model server, to try the AI features with no key
 ```
+
+---
+
+## The lecture concepts, computed from our own games
+
+Six course ideas are computed from this project's own measured games, never pasted in. Where an idea does not occur in our data, the lab and
+`REPORT.md` say so plainly (section 6.6 to 6.9).
+
+- **Classic games** (prisoner's dilemma, stag hunt, battle of the sexes, chicken, matching pennies): every two-by-two corner of every case's
+  measured table is named by the order of its payoffs, with a tolerance tied to the standard errors and a bootstrap stability. Generated cases
+  are searched for the games not found in the library.
+- **Pareto optimality:** the efficient cells of each table, and whether each equilibrium is efficient or dominated for both sides.
+- **Minimax:** exact mixed security values, the minimax theorem checked on the win-probability game, and the gap in the real general-sum game.
+- **Minimax and alpha-beta on the trial tree:** the trial as a sequential game on the engine's own rules, solved exactly on an open-file
+  relaxation (both sides see everything, zero-sum). A **lookahead** lawyer (depth-limited alpha-beta) is an exhibition style, selectable
+  with the local server and never part of the certified analysis. Lab chapters: "Which classic game is this?", "Is the equilibrium
+  efficient?", "What can each side guarantee?", "Thinking ahead".
+
+```bash
+python -m courtroom classic --case helix-espionage        # which classic game does each 2x2 corner resemble?
+python -m courtroom classic --find prisoners-dilemma,stag-hunt,battle-of-the-sexes --count 30
+python -m courtroom efficiency --case kestrel-av          # Pareto, security values, minimax theorem
+python -m courtroom tree --case cookie-jar                # minimax vs alpha-beta on the trial tree
+python -m courtroom lookahead --case kestrel-av           # does thinking ahead beat the four styles? (exhibition)
+```
+
+The proposal-versus-code differences are listed in `DEVIATIONS.md`.
 
 ---
 
@@ -257,6 +284,10 @@ Run any command with `--help` for its options.
 | `GET /api/strategies` | Available playing styles |
 | `POST /api/trial` | Run one trial `{case_id, prosecution, defense, seed}` |
 | `POST /api/game` | Payoff matrix + equilibria `{case_id, strategies, seeds}` |
+| `POST /api/classic`, `POST /api/classic/find` | Classic-game labels for a case's 2x2 corners; search generated cases for a dilemma, stag hunt or battle of the sexes (bounded) |
+| `POST /api/efficiency` | Pareto cells, equilibrium efficiency, security values, the minimax theorem (bounded) |
+| `POST /api/tree` | The trial tree on the open-file relaxation: minimax, alpha-beta, node counts (bounded to small cases) |
+| `POST /api/lookahead` | The lookahead lawyer against the four styles (exhibition, bounded) |
 
 ---
 
