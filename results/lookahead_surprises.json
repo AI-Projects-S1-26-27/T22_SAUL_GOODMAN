@@ -1,0 +1,627 @@
+{
+ "cases": {
+  "aurora-defi": {
+   "case_id": "aurora-defi",
+   "defense": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": 7.94,
+    "lookahead_payoff": 7.94,
+    "pure_payoffs": {
+     "adaptive": 7.94,
+     "aggressive": 6.935,
+     "conservative": 7.94,
+     "lookahead": 7.94,
+     "reckless": 6.6113
+    },
+    "side": "Defender",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": -1.66,
+    "lookahead_payoff": -1.66,
+    "pure_payoffs": {
+     "adaptive": -4.6125,
+     "aggressive": -6.6562,
+     "conservative": -1.66,
+     "lookahead": -1.66,
+     "reckless": -5.8438
+    },
+    "side": "Accuser",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead was not distinguishable from the four-style equilibrium in either seat."
+  },
+  "broken-bike": {
+   "case_id": "broken-bike",
+   "defense": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": -0.64,
+    "lookahead_payoff": -0.64,
+    "pure_payoffs": {
+     "adaptive": -0.64,
+     "aggressive": -1.07,
+     "conservative": -0.64,
+     "lookahead": -0.64,
+     "reckless": -0.8862
+    },
+    "side": "Defender",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": -0.54,
+    "equilibrium_payoff": 9.34,
+    "lookahead_payoff": 8.8,
+    "pure_payoffs": {
+     "adaptive": 9.34,
+     "aggressive": 8.6575,
+     "conservative": 9.34,
+     "lookahead": 8.8,
+     "reckless": 7.53
+    },
+    "side": "Accuser",
+    "standard_error": 0.0229,
+    "worse": true,
+    "z": -23.61
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead did clearly worse as the Accuser, and no better in the other seat."
+  },
+  "cookie-jar": {
+   "case_id": "cookie-jar",
+   "defense": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": 8.46,
+    "lookahead_payoff": 8.46,
+    "pure_payoffs": {
+     "adaptive": 8.46,
+     "aggressive": 7.4313,
+     "conservative": 8.4375,
+     "lookahead": 8.46,
+     "reckless": 7.2025
+    },
+    "side": "Defender",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "adaptive": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "adaptive": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": -1.32,
+    "lookahead_payoff": -1.32,
+    "pure_payoffs": {
+     "adaptive": -1.76,
+     "aggressive": -2.31,
+     "conservative": -1.32,
+     "lookahead": -1.32,
+     "reckless": -3.0112
+    },
+    "side": "Accuser",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead was not distinguishable from the four-style equilibrium in either seat."
+  },
+  "edge-defense-only": {
+   "case_id": "edge-defense-only",
+   "defense": {
+    "beats": false,
+    "difference": -0.0825,
+    "equilibrium_payoff": 9.9325,
+    "lookahead_payoff": 9.85,
+    "pure_payoffs": {
+     "adaptive": 9.85,
+     "aggressive": 9.85,
+     "conservative": 9.85,
+     "lookahead": 9.85,
+     "reckless": 9.9325
+    },
+    "side": "Defender",
+    "standard_error": 0.0119,
+    "worse": true,
+    "z": -6.9
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "reckless": 1.0
+    },
+    "prosecution": {
+     "aggressive": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "reckless": 1.0
+    },
+    "prosecution": {
+     "aggressive": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": 0.0,
+    "lookahead_payoff": 0.0,
+    "pure_payoffs": {
+     "adaptive": 0.0,
+     "aggressive": 0.0,
+     "conservative": 0.0,
+     "lookahead": 0.0,
+     "reckless": -0.5525
+    },
+    "side": "Accuser",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead did clearly worse as the Defender, and no better in the other seat."
+  },
+  "edge-empty-docket": {
+   "case_id": "edge-empty-docket",
+   "defense": {
+    "beats": false,
+    "difference": -0.0825,
+    "equilibrium_payoff": 9.9325,
+    "lookahead_payoff": 9.85,
+    "pure_payoffs": {
+     "adaptive": 9.85,
+     "aggressive": 9.85,
+     "conservative": 9.85,
+     "lookahead": 9.85,
+     "reckless": 9.9325
+    },
+    "side": "Defender",
+    "standard_error": 0.0119,
+    "worse": true,
+    "z": -6.9
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "reckless": 1.0
+    },
+    "prosecution": {
+     "aggressive": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "reckless": 1.0
+    },
+    "prosecution": {
+     "aggressive": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": 0.0,
+    "equilibrium_payoff": 0.0,
+    "lookahead_payoff": 0.0,
+    "pure_payoffs": {
+     "adaptive": 0.0,
+     "aggressive": 0.0,
+     "conservative": 0.0,
+     "lookahead": 0.0,
+     "reckless": -0.0975
+    },
+    "side": "Accuser",
+    "standard_error": 0.0,
+    "worse": false,
+    "z": 0.0
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead did clearly worse as the Defender, and no better in the other seat."
+  },
+  "edge-mutual-exclusion": {
+   "case_id": "edge-mutual-exclusion",
+   "defense": {
+    "beats": false,
+    "difference": -0.23,
+    "equilibrium_payoff": 7.7788,
+    "lookahead_payoff": 7.5488,
+    "pure_payoffs": {
+     "adaptive": 7.7788,
+     "aggressive": 7.3987,
+     "conservative": 7.7788,
+     "lookahead": 7.5488,
+     "reckless": 7.1088
+    },
+    "side": "Defender",
+    "standard_error": 0.0317,
+    "worse": true,
+    "z": -7.26
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": -0.24,
+    "equilibrium_payoff": 1.24,
+    "lookahead_payoff": 1.0,
+    "pure_payoffs": {
+     "adaptive": 1.24,
+     "aggressive": 1.0,
+     "conservative": 1.24,
+     "lookahead": 1.0,
+     "reckless": 0.7638
+    },
+    "side": "Accuser",
+    "standard_error": 0.0314,
+    "worse": true,
+    "z": -7.65
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead did clearly worse than the four-style equilibrium in both seats."
+  },
+  "edge-poisoned-tree": {
+   "case_id": "edge-poisoned-tree",
+   "defense": {
+    "beats": false,
+    "difference": -0.0016,
+    "equilibrium_payoff": 9.8471,
+    "lookahead_payoff": 9.8454,
+    "pure_payoffs": {
+     "adaptive": 9.8432,
+     "aggressive": 9.8471,
+     "conservative": 9.8432,
+     "lookahead": 9.8454,
+     "reckless": 9.8471
+    },
+    "side": "Defender",
+    "standard_error": 0.0023,
+    "worse": false,
+    "z": -0.72
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "aggressive": 0.9001,
+     "reckless": 0.0999
+    },
+    "prosecution": {
+     "adaptive": 0.009,
+     "conservative": 0.991
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "aggressive": 0.9001,
+     "reckless": 0.0999
+    },
+    "prosecution": {
+     "adaptive": 0.009,
+     "conservative": 0.991
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": -0.0,
+    "equilibrium_payoff": 0.0,
+    "lookahead_payoff": 0.0,
+    "pure_payoffs": {
+     "adaptive": 0.0,
+     "aggressive": -2.8775,
+     "conservative": 0.0,
+     "lookahead": 0.0,
+     "reckless": -4.7422
+    },
+    "side": "Accuser",
+    "standard_error": 0.0013,
+    "worse": false,
+    "z": -0.0
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead was not distinguishable from the four-style equilibrium in either seat."
+  },
+  "garden-dog": {
+   "case_id": "garden-dog",
+   "defense": {
+    "beats": false,
+    "difference": -0.33,
+    "equilibrium_payoff": 8.61,
+    "lookahead_payoff": 8.28,
+    "pure_payoffs": {
+     "adaptive": 8.61,
+     "aggressive": 7.85,
+     "conservative": 8.61,
+     "lookahead": 8.28,
+     "reckless": 7.4675
+    },
+    "side": "Defender",
+    "standard_error": 0.0243,
+    "worse": true,
+    "z": -13.56
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "conservative": 1.0
+    },
+    "prosecution": {
+     "conservative": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": -0.26,
+    "equilibrium_payoff": -0.86,
+    "lookahead_payoff": -1.12,
+    "pure_payoffs": {
+     "adaptive": -0.86,
+     "aggressive": -1.12,
+     "conservative": -0.86,
+     "lookahead": -1.12,
+     "reckless": -0.9688
+    },
+    "side": "Accuser",
+    "standard_error": 0.0306,
+    "worse": true,
+    "z": -8.51
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead did clearly worse than the four-style equilibrium in both seats."
+  },
+  "helix-espionage": {
+   "case_id": "helix-espionage",
+   "defense": {
+    "beats": false,
+    "difference": 0.3689,
+    "equilibrium_payoff": 5.6759,
+    "lookahead_payoff": 6.0448,
+    "pure_payoffs": {
+     "adaptive": 5.6759,
+     "aggressive": 5.6759,
+     "conservative": 2.8365,
+     "lookahead": 6.0448,
+     "reckless": 0.7497
+    },
+    "side": "Defender",
+    "standard_error": 0.4782,
+    "worse": false,
+    "z": 0.77
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "adaptive": 0.8445,
+     "aggressive": 0.1555
+    },
+    "prosecution": {
+     "adaptive": 0.7263,
+     "conservative": 0.2737
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "adaptive": 0.8737,
+     "lookahead": 0.1263
+    },
+    "prosecution": {
+     "adaptive": 0.4879,
+     "conservative": 0.5121
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 0.1263,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": false,
+    "difference": -0.5796,
+    "equilibrium_payoff": -2.01,
+    "lookahead_payoff": -2.5896,
+    "pure_payoffs": {
+     "adaptive": -2.01,
+     "aggressive": -3.3815,
+     "conservative": -2.01,
+     "lookahead": -2.5896,
+     "reckless": -4.9753
+    },
+    "side": "Accuser",
+    "standard_error": 0.4625,
+    "worse": false,
+    "z": -1.25
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead was not distinguishable from the four-style equilibrium in either seat."
+  },
+  "kestrel-av": {
+   "case_id": "kestrel-av",
+   "defense": {
+    "beats": true,
+    "difference": 1.7011,
+    "equilibrium_payoff": 1.9942,
+    "lookahead_payoff": 3.6953,
+    "pure_payoffs": {
+     "adaptive": 1.9942,
+     "aggressive": 1.9942,
+     "conservative": 1.5692,
+     "lookahead": 3.6953,
+     "reckless": -2.6909
+    },
+    "side": "Defender",
+    "standard_error": 0.546,
+    "worse": false,
+    "z": 3.12
+   },
+   "equilibrium_of_four": {
+    "defense": {
+     "adaptive": 0.1468,
+     "aggressive": 0.8532
+    },
+    "prosecution": {
+     "aggressive": 0.1944,
+     "reckless": 0.8056
+    }
+   },
+   "five_by_five_equilibrium": {
+    "defense": {
+     "lookahead": 1.0
+    },
+    "prosecution": {
+     "aggressive": 1.0
+    }
+   },
+   "lookahead_in_equilibrium": {
+    "defense": 1.0,
+    "prosecution": 0.0
+   },
+   "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
+   "prosecution": {
+    "beats": true,
+    "difference": 2.6057,
+    "equilibrium_payoff": 1.8629,
+    "lookahead_payoff": 4.4685,
+    "pure_payoffs": {
+     "adaptive": -1.7551,
+     "aggressive": 1.8629,
+     "conservative": -0.7438,
+     "lookahead": 4.4685,
+     "reckless": 1.8629
+    },
+    "side": "Accuser",
+    "standard_error": 1.0575,
+    "worse": false,
+    "z": 2.46
+   },
+   "seeds": 40,
+   "surprises": true,
+   "verdict": "Lookahead beat the four-style equilibrium as the Accuser and Defender by more than 2 standard errors."
+  }
+ },
+ "exhibition": true,
+ "n_seeds": 40,
+ "surprises": true
+}

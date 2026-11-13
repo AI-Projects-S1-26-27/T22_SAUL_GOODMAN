@@ -65,10 +65,13 @@ class Oracle:
         self._impeachments = dict(impeachments)
         self._tau = float(THRESHOLD_LOG_ODDS[cache.case.standard])
 
-    def log_odds(self, add: Iterable[str] = (), impeach: str | None = None) -> dict[str, float]:
+    def log_odds(
+        self, add: Iterable[str] = (), impeach: str | None = None, also_impeach: Iterable[str] = ()
+    ) -> dict[str, float]:
+        """Exact log-odds per element if ``add`` were admitted and the witnesses ``impeach`` / ``also_impeach`` were each impeached once more."""
         imp = dict(self._impeachments)
-        if impeach is not None:
-            imp[impeach] = imp.get(impeach, 0) + 1
+        for w in (*([impeach] if impeach is not None else []), *also_impeach):
+            imp[w] = imp.get(w, 0) + 1
         return self._cache.log_odds(self._admitted | frozenset(add), imp)
 
     def potential(self, log_odds: Mapping[str, float]) -> float:

@@ -567,7 +567,16 @@ window.Live = (() => {
     if (S.live) renderMatters();
   }
 
+  /* An exhibition style that is not one of the four certified ones: selectable only with the local server (it has no recorded trials). */
+  function addLookahead() {
+    if (STYLE.lookahead) return;
+    STYLE.lookahead = { label: "Lookahead", blurb: "Thinks a few moves ahead with alpha-beta and fears the worst reply. An exhibition style: not one of the four certified ones." };
+    STYLE_ORDER.push("lookahead");
+    renderStyles();
+  }
+
   function ready() {
+    addLookahead();
     $("#surprise-row").hidden = false;
     $("#surprise-me").addEventListener("click", surprise);
     $("#editor").addEventListener("click", (e) => { if (e.target.id === "editor") closeEditor(); });

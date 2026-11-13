@@ -174,6 +174,37 @@ def cmd_efficiency(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_tree(a: argparse.Namespace) -> int:
+    """Solve the trial as a game tree (open-file relaxation): plain minimax, alpha-beta, and alpha-beta with move ordering."""
+    from courtroom.gametheory.search import solve_case
+
+    case = _case(a.case)
+    r = solve_case(case, max_nodes=a.max_nodes, with_minimax=not a.skip_minimax, with_unordered=not a.skip_minimax)
+    console.print(f"[bold]{r.case_id}[/]  {r.title}  ({r.evidence[0]} Accuser exhibits, {r.evidence[1]} Defender exhibits)")
+    console.print(f"[grey50]{r.note}[/]")
+    show = lambda n: "more than the node limit" if n is None else f"{n:,}"  # noqa: E731
+    console.print(f"  value (Accuser advantage with best play): {r.value}")
+    console.print(f"  nodes visited: minimax {show(r.minimax_nodes)}; alpha-beta {show(r.alphabeta_nodes)}; alpha-beta with ordering {show(r.alphabeta_ordered_nodes)}")
+    if r.pruned_share is not None:
+        console.print(f"  pruned away: {r.pruned_share:.1%} of minimax's nodes; ordering saved {r.ordering_saving:.1%} over unordered alpha-beta")
+    console.print(f"  the three values agree: {r.values_agree}")
+    for step in r.best_play:
+        console.print(f"    - {step}")
+    return 0 if r.values_agree in (True, None) else 1
+
+
+def cmd_lookahead(a: argparse.Namespace) -> int:
+    """Does the lookahead lawyer (depth-limited alpha-beta) beat the four hand-written styles? Exhibition, not certified."""
+    from courtroom.gametheory.lookahead_eval import compare_lookahead
+
+    ids = [a.case] if a.case else list(CASES)
+    for cid in ids:
+        r = compare_lookahead(_case(cid), tuple(range(a.seeds)), _surprises(a), a.workers)
+        console.print(f"[bold]{cid:24s}[/] Accuser z {r.prosecution.z:+.1f}, Defender z {r.defense.z:+.1f}: {r.verdict}")
+    console.print("[grey50]Exhibition, not certified: lookahead is not one of the four certified styles.[/]")
+    return 0
+
+
 def cmd_oracle(a: argparse.Namespace) -> int:
     """Can the four hand-written lawyer styles be beaten? A double-oracle search over lawyer profiles."""
     from courtroom.gametheory.oracle import run_oracle
@@ -311,6 +342,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--workers", type=int, default=1)
     surprise_arg(p)
     p.set_defaults(fn=cmd_efficiency)
+
+    p = sub.add_parser("tree", help="the trial as a game tree: exact minimax and alpha-beta (open-file relaxation)")
+    p.add_argument("--case", default="cookie-jar", help="a library case or gen-<n>")
+    p.add_argument("--max-nodes", type=int, default=1_000_000)
+    p.add_argument("--skip-minimax", action="store_true", help="only the ordered alpha-beta (for cases too big for plain minimax)")
+    p.set_defaults(fn=cmd_tree)
+
+    p = sub.add_parser("lookahead", help="does the lookahead lawyer beat the four styles? (exhibition, not certified)")
+    p.add_argument("--case", help="one case id (default: the whole library)")
+    p.add_argument("--seeds", type=int, default=20)
+    p.add_argument("--workers", type=int, default=1)
+    surprise_arg(p)
+    p.set_defaults(fn=cmd_lookahead)
 
     p = sub.add_parser("oracle", help="best-response search: can the four hand-written styles be beaten?")
     p.add_argument("--case", default="helix-espionage")

@@ -287,3 +287,12 @@
 .eq-eff { padding-left: 1.1em; }
 .eq-eff li { margin: 4px 0; }
 .found-classic { padding-left: 1.1em; }
+
+/* thinking ahead: the drawn search tree */
+.t-tree { list-style: none; padding-left: 1.2em; margin: 4px 0; border-left: 2px solid var(--line, #d9d2c3); }
+.t-root { border-left: 0; padding-left: 0; }
+.t-tree li { margin: 3px 0; }
+.t-tree summary { cursor: pointer; }
+.t-move { font-weight: 600; }
+.t-cut { color: #8a4b12; font-style: italic; }
+.t-leaf { color: var(--ink, #2b2620); }

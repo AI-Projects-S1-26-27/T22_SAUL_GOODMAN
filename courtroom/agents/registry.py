@@ -7,6 +7,7 @@ from collections.abc import Callable
 
 from courtroom.agents.adversarial import ChaosAgent, RecklessAgent
 from courtroom.agents.base import Agent
+from courtroom.agents.lookahead import LookaheadAgent
 from courtroom.agents.policies import PROFILES, CounselAgent, MixedAgent
 
 STRATEGY_NAMES: tuple[str, ...] = ("aggressive", "conservative", "adaptive", "reckless", "chaos")
@@ -24,6 +25,7 @@ def describe_strategies() -> list[dict[str, str]]:
     out = [{"name": p.name, "label": p.label, "description": p.description} for p in PROFILES.values()]
     out.append({"name": "reckless", "label": "Reckless", "description": "Random legal moves and the occasional rule break."})
     out.append({"name": "chaos", "label": "Chaos", "description": "Random, often illegal actions (robustness fuzzing)."})
+    out.append({"name": "lookahead", "label": "Lookahead (exhibition)", "description": "Thinks a few moves ahead with alpha-beta. Not one of the four certified styles; compared with them in a labelled extra."})
     out.extend({"name": n, "label": label, "description": desc} for n, (_, label, desc) in _EXTRA.items())
     out.append({"name": "mixed:<p>", "label": "Mixed", "description": "Aggressive with probability p, else Conservative."})
     return out
@@ -37,6 +39,8 @@ def make_agent(strategy: str, rng: random.Random) -> Agent:
         return ChaosAgent(rng)
     if strategy == "reckless":
         return RecklessAgent(rng)
+    if strategy == "lookahead":  # an exhibition style: selectable, never part of the certified analysis or the recorded bundle
+        return LookaheadAgent()
     if strategy in _EXTRA:
         return _EXTRA[strategy][0](rng)
     if strategy.startswith("mixed:"):

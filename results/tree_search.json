@@ -1,0 +1,800 @@
+{
+ "cases": {
+  "aurora-defi": {
+   "alphabeta_nodes": null,
+   "alphabeta_ordered_cutoffs": 192260,
+   "alphabeta_ordered_nodes": 344204,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "aurora-defi",
+   "evidence": [
+    8,
+    5
+   ],
+   "minimax_leaves": null,
+   "minimax_nodes": null,
+   "node_limit": 400000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": null,
+   "pruned_share": null,
+   "ran_all_three": false,
+   "seconds": 0,
+   "title": "People v. 'nyx.eth' \u2014 Aurora Protocol Flash-Loan Exploit",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "broken-bike": {
+   "alphabeta_nodes": 3734,
+   "alphabeta_ordered_cutoffs": 354,
+   "alphabeta_ordered_nodes": 732,
+   "best_play": [
+    "Accuser offers P-PHOTO",
+    "Defender passes",
+    "Accuser offers P-RECEIPT",
+    "Defender passes",
+    "Accuser rests",
+    "Defender passes",
+    "Defender rests",
+    "Accuser rests"
+   ],
+   "case_id": "broken-bike",
+   "evidence": [
+    4,
+    3
+   ],
+   "minimax_leaves": 8844,
+   "minimax_nodes": 31609,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.804,
+   "pruned_share": 0.9768,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Lee v. Patel \u2014 The Broken Bike",
+   "value": 9.4,
+   "value_exact": "47/5",
+   "values_agree": true
+  },
+  "cookie-jar": {
+   "alphabeta_nodes": 5174,
+   "alphabeta_ordered_cutoffs": 202,
+   "alphabeta_ordered_nodes": 444,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "cookie-jar",
+   "evidence": [
+    4,
+    3
+   ],
+   "minimax_leaves": 10224,
+   "minimax_nodes": 38251,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.9142,
+   "pruned_share": 0.9884,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "School v. Sam \u2014 The Missing Cookies",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "edge-defense-only": {
+   "alphabeta_nodes": 9,
+   "alphabeta_ordered_cutoffs": 2,
+   "alphabeta_ordered_nodes": 8,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "edge-defense-only",
+   "evidence": [
+    1,
+    1
+   ],
+   "minimax_leaves": 4,
+   "minimax_nodes": 9,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.1111,
+   "pruned_share": 0.1111,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "State v. Park \u2014 Prosecution Brings Only Exculpatory Material",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "edge-empty-docket": {
+   "alphabeta_nodes": 4,
+   "alphabeta_ordered_cutoffs": 0,
+   "alphabeta_ordered_nodes": 4,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "edge-empty-docket",
+   "evidence": [
+    0,
+    0
+   ],
+   "minimax_leaves": 2,
+   "minimax_nodes": 4,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.0,
+   "pruned_share": 0.0,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "State v. Doe \u2014 The Empty Docket",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "edge-mutual-exclusion": {
+   "alphabeta_nodes": 21,
+   "alphabeta_ordered_cutoffs": 4,
+   "alphabeta_ordered_nodes": 14,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "edge-mutual-exclusion",
+   "evidence": [
+    1,
+    1
+   ],
+   "minimax_leaves": 6,
+   "minimax_nodes": 21,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.3333,
+   "pruned_share": 0.3333,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Orbital Freight v. Lark \u2014 Mutually Exclusive Testimony",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "edge-poisoned-tree": {
+   "alphabeta_nodes": 2408,
+   "alphabeta_ordered_cutoffs": 911,
+   "alphabeta_ordered_nodes": 1826,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "edge-poisoned-tree",
+   "evidence": [
+    5,
+    0
+   ],
+   "minimax_leaves": 12662,
+   "minimax_nodes": 46387,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.2417,
+   "pruned_share": 0.9606,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "State v. Kaur \u2014 Fruit of the Poisonous Tree",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "garden-dog": {
+   "alphabeta_nodes": 3536,
+   "alphabeta_ordered_cutoffs": 222,
+   "alphabeta_ordered_nodes": 542,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "garden-dog",
+   "evidence": [
+    4,
+    3
+   ],
+   "minimax_leaves": 10196,
+   "minimax_nodes": 38329,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.8467,
+   "pruned_share": 0.9859,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Neighbours v. Rex's Owner \u2014 The Dug-Up Garden",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "gen-20": {
+   "alphabeta_nodes": 25,
+   "alphabeta_ordered_cutoffs": 9,
+   "alphabeta_ordered_nodes": 24,
+   "best_play": [
+    "Accuser offers P0",
+    "Defender passes",
+    "Defender passes",
+    "Defender rests",
+    "Accuser rests"
+   ],
+   "case_id": "gen-20",
+   "evidence": [
+    1,
+    2
+   ],
+   "minimax_leaves": 10,
+   "minimax_nodes": 28,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.04,
+   "pruned_share": 0.1429,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #20: warehouse robot sabotage",
+   "value": 9.7,
+   "value_exact": "97/10",
+   "values_agree": true
+  },
+  "gen-27": {
+   "alphabeta_nodes": 44,
+   "alphabeta_ordered_cutoffs": 14,
+   "alphabeta_ordered_nodes": 45,
+   "best_play": [
+    "Accuser offers P0",
+    "Defender passes",
+    "Accuser rests",
+    "Defender passes",
+    "Defender offers D1",
+    "Accuser passes",
+    "Defender offers D2",
+    "Accuser passes",
+    "Defender rests",
+    "Accuser rests"
+   ],
+   "case_id": "gen-27",
+   "evidence": [
+    1,
+    2
+   ],
+   "minimax_leaves": 12,
+   "minimax_nodes": 45,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": -0.0227,
+   "pruned_share": 0.0,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #27: biometric data broker leak",
+   "value": -9.7,
+   "value_exact": "-97/10",
+   "values_agree": true
+  },
+  "gen-39": {
+   "alphabeta_nodes": 21,
+   "alphabeta_ordered_cutoffs": 3,
+   "alphabeta_ordered_nodes": 9,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "gen-39",
+   "evidence": [
+    1,
+    3
+   ],
+   "minimax_leaves": 8,
+   "minimax_nodes": 21,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.5714,
+   "pruned_share": 0.5714,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #39: biometric data broker leak",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "gen-44": {
+   "alphabeta_nodes": 138,
+   "alphabeta_ordered_cutoffs": 8,
+   "alphabeta_ordered_nodes": 20,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "gen-44",
+   "evidence": [
+    2,
+    1
+   ],
+   "minimax_leaves": 95,
+   "minimax_nodes": 233,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.8551,
+   "pruned_share": 0.9142,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #44: smart-contract governance capture",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "gen-51": {
+   "alphabeta_nodes": 33,
+   "alphabeta_ordered_cutoffs": 12,
+   "alphabeta_ordered_nodes": 29,
+   "best_play": [
+    "Accuser offers P0",
+    "Defender passes",
+    "Defender passes",
+    "Defender rests",
+    "Accuser rests"
+   ],
+   "case_id": "gen-51",
+   "evidence": [
+    2,
+    2
+   ],
+   "minimax_leaves": 16,
+   "minimax_nodes": 48,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.1212,
+   "pruned_share": 0.3958,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #51: warehouse robot sabotage",
+   "value": 9.7,
+   "value_exact": "97/10",
+   "values_agree": true
+  },
+  "gen-57": {
+   "alphabeta_nodes": 137,
+   "alphabeta_ordered_cutoffs": 2,
+   "alphabeta_ordered_nodes": 8,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "gen-57",
+   "evidence": [
+    1,
+    3
+   ],
+   "minimax_leaves": 134,
+   "minimax_nodes": 475,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.9416,
+   "pruned_share": 0.9832,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #57: biometric data broker leak",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "gen-6": {
+   "alphabeta_nodes": 14,
+   "alphabeta_ordered_cutoffs": 6,
+   "alphabeta_ordered_nodes": 13,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "gen-6",
+   "evidence": [
+    3,
+    1
+   ],
+   "minimax_leaves": 8,
+   "minimax_nodes": 16,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.0714,
+   "pruned_share": 0.1875,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #6: smart-contract governance capture",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  },
+  "gen-62": {
+   "alphabeta_nodes": 163,
+   "alphabeta_ordered_cutoffs": 40,
+   "alphabeta_ordered_nodes": 102,
+   "best_play": [
+    "Accuser offers P1",
+    "Defender passes",
+    "Accuser rests",
+    "Defender passes",
+    "Defender rests",
+    "Accuser rests"
+   ],
+   "case_id": "gen-62",
+   "evidence": [
+    2,
+    2
+   ],
+   "minimax_leaves": 66,
+   "minimax_nodes": 248,
+   "node_limit": 1000000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": 0.3742,
+   "pruned_share": 0.5887,
+   "ran_all_three": true,
+   "seconds": 0,
+   "title": "Generated case #62: warehouse robot sabotage",
+   "value": 9.7,
+   "value_exact": "97/10",
+   "values_agree": true
+  },
+  "helix-espionage": {
+   "alphabeta_nodes": null,
+   "alphabeta_ordered_cutoffs": null,
+   "alphabeta_ordered_nodes": null,
+   "best_play": [],
+   "case_id": "helix-espionage",
+   "evidence": [
+    10,
+    7
+   ],
+   "minimax_leaves": null,
+   "minimax_nodes": null,
+   "node_limit": 60000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": null,
+   "pruned_share": null,
+   "ran_all_three": false,
+   "seconds": 0,
+   "title": "State v. Adrian Vance \u2014 Helix Dynamics Trade-Secret Exfiltration",
+   "value": null,
+   "value_exact": null,
+   "values_agree": null
+  },
+  "kestrel-av": {
+   "alphabeta_nodes": null,
+   "alphabeta_ordered_cutoffs": 111768,
+   "alphabeta_ordered_nodes": 239514,
+   "best_play": [
+    "Accuser rests",
+    "Defender passes"
+   ],
+   "case_id": "kestrel-av",
+   "evidence": [
+    7,
+    5
+   ],
+   "minimax_leaves": null,
+   "minimax_nodes": null,
+   "node_limit": 400000,
+   "note": "Open-file relaxation: both sides see every exhibit and flaw, no perception noise, and the payoff is zero-sum (the Accuser's utility minus the Defender's). Plain minimax, alpha-beta, and alpha-beta with best-first ordering must give the same value.",
+   "ordering_saving": null,
+   "pruned_share": null,
+   "ran_all_three": false,
+   "seconds": 0,
+   "title": "Halvorsen v. Kestrel Mobility \u2014 AV-7 Crosswalk Collision",
+   "value": -10.0,
+   "value_exact": "-10",
+   "values_agree": true
+  }
+ },
+ "example": {
+  "case_id": "gen-51",
+  "tree": {
+   "alpha": 9.7,
+   "beta": null,
+   "children": [
+    {
+     "alpha": null,
+     "beta": -10.0,
+     "children": [
+      {
+       "kind": "leaf",
+       "move": "Defender passes",
+       "value": -10.0,
+       "verdict": "directed_acquittal"
+      },
+      {
+       "kind": "leaf",
+       "move": "Defender moves for a directed verdict",
+       "value": -9.85,
+       "verdict": "directed_acquittal"
+      }
+     ],
+     "kind": "min",
+     "move": "Accuser rests",
+     "mover": "Defender",
+     "skipped": [],
+     "value": -10.0,
+     "window": "motion"
+    },
+    {
+     "alpha": -10.0,
+     "beta": 9.7,
+     "children": [
+      {
+       "alpha": -10.0,
+       "beta": 9.7,
+       "children": [
+        {
+         "alpha": -10.0,
+         "beta": 9.7,
+         "children": [
+          {
+           "alpha": 9.7,
+           "beta": null,
+           "children": [
+            {
+             "kind": "leaf",
+             "move": "Accuser rests",
+             "value": 9.7,
+             "verdict": "liable"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender rests",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 9.7,
+           "window": "primary"
+          },
+          {
+           "alpha": 10.0,
+           "beta": 9.7,
+           "children": [
+            {
+             "alpha": 10.0,
+             "beta": 9.7,
+             "children": [
+              {
+               "kind": "leaf",
+               "move": "Accuser rests",
+               "value": 10.0,
+               "verdict": "liable"
+              }
+             ],
+             "kind": "max",
+             "move": "Accuser passes",
+             "mover": "Accuser",
+             "skipped": [
+              "Accuser offers P1"
+             ],
+             "value": 10.0,
+             "window": "primary"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender offers D2",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 10.0,
+           "window": "response"
+          },
+          {
+           "alpha": 10.0,
+           "beta": 9.7,
+           "children": [
+            {
+             "alpha": 10.0,
+             "beta": 9.7,
+             "children": [
+              {
+               "kind": "leaf",
+               "move": "Accuser rests",
+               "value": 10.0,
+               "verdict": "liable"
+              }
+             ],
+             "kind": "max",
+             "move": "Accuser passes",
+             "mover": "Accuser",
+             "skipped": [],
+             "value": 10.0,
+             "window": "primary"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender offers D3",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 10.0,
+           "window": "response"
+          }
+         ],
+         "kind": "min",
+         "move": "Defender passes",
+         "mover": "Defender",
+         "skipped": [],
+         "value": 9.7,
+         "window": "primary"
+        },
+        {
+         "alpha": -10.0,
+         "beta": 9.7,
+         "children": [
+          {
+           "alpha": 9.85,
+           "beta": 9.7,
+           "children": [
+            {
+             "kind": "leaf",
+             "move": "Accuser rests",
+             "value": 9.85,
+             "verdict": "liable"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender rests",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 9.85,
+           "window": "primary"
+          },
+          {
+           "alpha": 10.15,
+           "beta": 9.7,
+           "children": [
+            {
+             "alpha": 10.15,
+             "beta": 9.7,
+             "children": [
+              {
+               "kind": "leaf",
+               "move": "Accuser rests",
+               "value": 10.15,
+               "verdict": "liable"
+              }
+             ],
+             "kind": "max",
+             "move": "Accuser passes",
+             "mover": "Accuser",
+             "skipped": [
+              "Accuser offers P1"
+             ],
+             "value": 10.15,
+             "window": "primary"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender offers D2",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 10.15,
+           "window": "response"
+          },
+          {
+           "alpha": 10.15,
+           "beta": 9.7,
+           "children": [
+            {
+             "alpha": 10.15,
+             "beta": 9.7,
+             "children": [
+              {
+               "kind": "leaf",
+               "move": "Accuser rests",
+               "value": 10.15,
+               "verdict": "liable"
+              }
+             ],
+             "kind": "max",
+             "move": "Accuser passes",
+             "mover": "Accuser",
+             "skipped": [],
+             "value": 10.15,
+             "window": "primary"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender offers D3",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 10.15,
+           "window": "response"
+          }
+         ],
+         "kind": "min",
+         "move": "Defender moves for a directed verdict",
+         "mover": "Defender",
+         "skipped": [],
+         "value": 9.85,
+         "window": "primary"
+        }
+       ],
+       "kind": "min",
+       "move": "Defender passes",
+       "mover": "Defender",
+       "skipped": [],
+       "value": 9.7,
+       "window": "motion"
+      }
+     ],
+     "kind": "min",
+     "move": "Accuser offers P0",
+     "mover": "Defender",
+     "skipped": [],
+     "value": 9.7,
+     "window": "response"
+    },
+    {
+     "alpha": 9.7,
+     "beta": 9.7,
+     "children": [
+      {
+       "alpha": 9.7,
+       "beta": 9.7,
+       "children": [
+        {
+         "alpha": 9.7,
+         "beta": 9.7,
+         "children": [
+          {
+           "alpha": 9.7,
+           "beta": null,
+           "children": [
+            {
+             "kind": "leaf",
+             "move": "Accuser rests",
+             "value": 9.7,
+             "verdict": "liable"
+            }
+           ],
+           "kind": "max",
+           "move": "Defender rests",
+           "mover": "Accuser",
+           "skipped": [],
+           "value": 9.7,
+           "window": "primary"
+          }
+         ],
+         "kind": "min",
+         "move": "Defender passes",
+         "mover": "Defender",
+         "skipped": [
+          "Defender offers D2",
+          "Defender offers D3"
+         ],
+         "value": 9.7,
+         "window": "primary"
+        }
+       ],
+       "kind": "min",
+       "move": "Defender passes",
+       "mover": "Defender",
+       "skipped": [
+        "Defender moves for a directed verdict"
+       ],
+       "value": 9.7,
+       "window": "motion"
+      }
+     ],
+     "kind": "min",
+     "move": "Accuser offers P1",
+     "mover": "Defender",
+     "skipped": [],
+     "value": 9.7,
+     "window": "response"
+    }
+   ],
+   "kind": "max",
+   "move": "the trial begins",
+   "mover": "Accuser",
+   "skipped": [],
+   "value": 9.7,
+   "window": "primary"
+  }
+ },
+ "relaxation": "open file: both sides see every exhibit and flaw, no perception noise; zero-sum payoff (Accuser utility minus Defender utility)"
+}

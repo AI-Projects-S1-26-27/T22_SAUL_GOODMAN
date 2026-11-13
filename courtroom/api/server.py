@@ -28,8 +28,10 @@ from courtroom.gametheory.classic import LABELS as CLASSIC_LABELS
 from courtroom.gametheory.classic import classify_case
 from courtroom.gametheory.efficiency import constant_sum_check, efficiency
 from courtroom.gametheory.finder import find_classic, find_contested
+from courtroom.gametheory.lookahead_eval import compare_lookahead
 from courtroom.gametheory.matters import measure
 from courtroom.gametheory.oracle import run_oracle
+from courtroom.gametheory.search import solve_case, trace
 from courtroom.judge.explain import build_facts, template_text
 from courtroom.judge.tipping import tipping_points
 from courtroom.llm import default_client
@@ -130,6 +132,20 @@ class EfficiencyRequest(BaseModel):
     case_id: str = ""
     case: CaseFile | None = None
     seeds: int = Field(default=20, ge=5, le=30)
+    surprises: Surprises | bool | None = None
+
+
+class TreeRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
+    max_nodes: int = Field(default=15_000, ge=100, le=15_000)
+    picture: bool = False  # also return the nested record of the ordered alpha-beta search, for drawing
+
+
+class LookaheadRequest(BaseModel):
+    case_id: str = ""
+    case: CaseFile | None = None
+    seeds: int = Field(default=8, ge=4, le=12)
     surprises: Surprises | bool | None = None
 
 
@@ -301,6 +317,23 @@ def create_app() -> FastAPI:
                 "constant_sum": constant_sum_check(W).model_dump(mode="json"),
             }
         )
+
+    @app.post("/api/tree")
+    def tree(req: TreeRequest) -> JSONResponse:
+        """The trial as a game tree on the open-file relaxation (bounded: 15,000 nodes, so only small cases are solved exactly)."""
+        case = _pick_case(req.case_id, req.case)
+        rep = solve_case(case, max_nodes=req.max_nodes, with_line=True)
+        body = rep.model_dump(mode="json")
+        if req.picture and rep.alphabeta_ordered_nodes is not None and rep.alphabeta_ordered_nodes <= 300:
+            body["picture"] = trace(case, max_nodes=2000)
+        return JSONResponse(body)
+
+    @app.post("/api/lookahead")
+    def lookahead_route(req: LookaheadRequest) -> JSONResponse:
+        """Does the lookahead lawyer beat the four hand-written styles? Exhibition, not certified (bounded: 12 seeds)."""
+        case = _pick_case(req.case_id, req.case)
+        rep = compare_lookahead(case, tuple(range(req.seeds)), _surprises(req.surprises), workers=1)
+        return JSONResponse(rep.model_dump(mode="json"))
 
     @app.post("/api/explain")
     def explain(req: ExplainRequest) -> JSONResponse:

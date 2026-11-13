@@ -276,7 +276,7 @@
   let classicLive = null, classicPick = { r: [0, 1], c: [0, 1] }, searchLive = null;
   const lectCase = (name, id, sur) => A[`${name}${sur ? "_surprises" : ""}`]?.cases?.[id];
   const lectToggle = () => toggle(lectSur, (v) => { lectSur = v; classicLive = null; effLive = null; refreshLect(); });
-  const refreshLect = () => { renderClassic(); renderPareto(); renderMinimax(); };
+  const refreshLect = () => { renderClassic(); renderPareto(); renderMinimax(); renderAhead?.(); };
 
   async function renderClassic() {
     const c = B.cases.find((x) => x.id === caseId), body = $("#classic-fig");
@@ -446,6 +446,95 @@
       maths: h("p", {}, "The maximin of a payoff matrix is max v subject to: for every opposing play, the mix's expected payoff is at least v. Its solution sits at a vertex of that polytope, so the code tries every choice of k plays to mix over and k opposing plays that bind, solves the (k+1)×(k+1) system exactly in rational numbers, keeps the feasible ones and takes the best v. The minimax value is the same computation on the transposed negation. The test suite checks maximin = minimax = Nash value on random constant-sum matrices and on the project's own tables."),
     }),
     refresh: renderMinimax,
+  });
+
+  /* ---------------------------------------------------------------- thinking ahead: minimax and alpha-beta on the trial tree */
+
+  let aheadLive = null, aheadLookLive = null;
+  const treeData = () => A.tree_search;
+  const nodesText = (n, limit) => (n == null ? `more than ${(limit ?? 0).toLocaleString("en")}` : n.toLocaleString("en"));
+  const WINNER = (v) => (["guilty", "liable"].includes(v) ? "Accuser wins" : "Defender wins");
+
+  function treeList(n, depth = 0) {
+    if (n.kind === "leaf") return h("li", { class: "t-leaf" }, h("span", { class: "t-move" }, n.move), " → ", h("b", {}, fmt(n.value)), h("span", { class: "muted small" }, ` (${WINNER(n.verdict)})`));
+    const label = h("span", {}, h("span", { class: "t-move" }, n.move), h("span", { class: "muted small" }, ` · ${n.mover} chooses the ${n.kind === "max" ? "highest" : "lowest"} value`), " → ", h("b", {}, fmt(n.value)));
+    return h("li", {}, h("details", { open: depth < 2 }, h("summary", {}, label),
+      h("ul", { class: "t-tree" }, n.children.map((c) => treeList(c, depth + 1)),
+        n.skipped?.length ? h("li", { class: "t-cut" }, `✂ not looked at (it cannot change the answer): ${n.skipped.join("; ")}`) : null)));
+  }
+
+  function renderAhead() {
+    const c = B.cases.find((x) => x.id === caseId), body = $("#ahead-fig");
+    if (!c || !body) return;
+    const T = treeData(), kids = [];
+    const rows = T ? Object.values(T.cases) : [];
+    const mine = aheadLive?.case_id === c.id ? aheadLive : T?.cases?.[c.id];
+    if (T) {
+      kids.push(h("h3", {}, "How much of the tree does alpha-beta need to look at?"),
+        h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+          h("thead", {}, h("tr", {}, ["Case", "Exhibits (Accuser, Defender)", "Best-play value", "Plain minimax", "Alpha-beta", "Alpha-beta, best move first", "Same answer?"].map((t) => h("th", {}, t)))),
+          h("tbody", {}, rows.map((r) => h("tr", { class: r.case_id === c.id ? "current" : null },
+            h("th", { scope: "row" }, r.case_id), h("td", {}, `${r.evidence[0]}, ${r.evidence[1]}`), h("td", {}, r.value == null ? "not solved" : fmt(r.value)),
+            h("td", {}, r.ran_all_three === false ? "not run" : r.minimax_nodes != null ? nodesText(r.minimax_nodes) : nodesText(null, r.node_limit)),
+            h("td", {}, r.ran_all_three === false ? "not run" : r.alphabeta_nodes != null ? nodesText(r.alphabeta_nodes) : nodesText(null, r.node_limit)),
+            h("td", {}, r.alphabeta_ordered_nodes != null ? nodesText(r.alphabeta_ordered_nodes) : nodesText(null, r.node_limit)),
+            h("td", {}, r.values_agree == null ? "–" : r.values_agree ? "yes" : "NO")))))),
+        note(`Nodes visited by each method. ${T.relaxation}. “Not solved” means the tree was too big for the node limit shown in the “more than” cells, which is itself the point: this is what pruning is for.`));
+      const ex = T.example;
+      kids.push(h("h3", {}, `A small tree, drawn: ${ex.case_id}`),
+        h("p", {}, "Each line is a position. The side named chooses the move; the Accuser takes the highest value below it and the Defender the lowest. A value is the Accuser's utility minus the Defender's if the trial ended there (10 for a win, less 0.3 per unit of money spent and any sanctions). ✂ marks moves alpha-beta never needed to look at."),
+        h("ul", { class: "t-tree t-root" }, treeList(ex.tree)));
+    } else kids.push(note("No stored search."));
+    if (live) {
+      const btn = h("button", { class: "btn ghost sm", type: "button" }, "Solve this case's tree now (small cases only)");
+      btn.addEventListener("click", async () => {
+        btn.disabled = true; btn.textContent = "Searching…";
+        try { aheadLive = await post("/tree", { case_id: c.id, picture: true }); aheadLive.case_id = c.id; renderAhead(); } catch { btn.textContent = "Could not run it"; }
+      });
+      kids.push(h("p", {}, btn, aheadLive?.case_id === c.id ? h("span", { class: "muted small" }, ` Live result: value ${aheadLive.value == null ? "not solved (too big)" : fmt(aheadLive.value)}, nodes ${nodesText(aheadLive.minimax_nodes, 15000)} / ${nodesText(aheadLive.alphabeta_nodes, 15000)} / ${nodesText(aheadLive.alphabeta_ordered_nodes, 15000)}.`) : null));
+      if (aheadLive?.case_id === c.id && aheadLive.picture) kids.push(h("ul", { class: "t-tree t-root" }, treeList(aheadLive.picture)));
+      if (aheadLive?.case_id === c.id && aheadLive.best_play?.length) kids.push(h("p", {}, h("b", {}, "Best play: "), aheadLive.best_play.join(", then ") + "."));
+    } else kids.push(needServer("Solving another case's tree"));
+    // the lookahead lawyer against the four styles
+    const L = A[`lookahead${lectSur ? "_surprises" : ""}`];
+    kids.push(h("h3", {}, "Does a lawyer that thinks ahead beat the four styles?"), lectToggle(),
+      h("p", {}, "The lookahead lawyer is an extra style: in a real trial it can only use what any counsel is given (its own exhibits and the public scoring rule) and it weighs what the opponent will do in reply. Here it plays the equilibrium of the four hand-written styles, in each seat, on the same seeds."));
+    if (L) {
+      kids.push(h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
+        h("thead", {}, h("tr", {}, ["Case", "As Accuser: lookahead − equilibrium (z)", "As Defender: lookahead − equilibrium (z)", "Result"].map((t) => h("th", {}, t)))),
+        h("tbody", {}, Object.values(L.cases).map((r) => h("tr", { class: r.case_id === c.id ? "current" : null },
+          h("th", { scope: "row" }, r.case_id),
+          h("td", {}, `${r.prosecution.difference >= 0 ? "+" : ""}${num2(r.prosecution.difference)} (z ${r.prosecution.z})`),
+          h("td", {}, `${r.defense.difference >= 0 ? "+" : ""}${num2(r.defense.difference)} (z ${r.defense.z})`),
+          h("td", {}, r.verdict)))))),
+        note(`Exhibition, not certified: lookahead is not one of the four certified styles. ${L.n_seeds} seeds per cell, paired by seed; “beats” means more than 2 standard errors. A result of “not distinguishable” is not evidence that it is as good, only that this many seeds cannot tell.`));
+    } else kids.push(h("p", { class: "muted" }, "No stored comparison."));
+    if (live) {
+      const btn = h("button", { class: "btn ghost sm", type: "button" }, "Compare lookahead on this case now (about 20 seconds)");
+      btn.addEventListener("click", async () => {
+        btn.disabled = true; btn.textContent = "Playing…";
+        try { aheadLookLive = await post("/lookahead", { case_id: c.id, seeds: 8, surprises: lectSur }); aheadLookLive.case_id = c.id; renderAhead(); } catch { btn.textContent = "Could not run it"; }
+      });
+      kids.push(h("p", {}, btn, aheadLookLive?.case_id === c.id ? h("span", { class: "muted small" }, ` Live (8 seeds): ${aheadLookLive.verdict} (Accuser z ${aheadLookLive.prosecution.z}, Defender z ${aheadLookLive.defense.z}).`) : null));
+    }
+    body.replaceChildren(...kids);
+    const t = mine;
+    says("ahead", t ? h("p", {}, h("b", {}, caseName(c)), `: ${t.value == null ? "the tree is too big to solve exactly here." : `with both sides seeing everything and playing perfectly, the Accuser's advantage is ${fmt(t.value)} (${t.value > 0 ? "the Accuser wins" : "the Defender wins"}). Plain minimax looked at ${nodesText(t.minimax_nodes, t.node_limit)} positions; alpha-beta with the best move first looked at ${nodesText(t.alphabeta_ordered_nodes, t.node_limit)}, and all methods gave the same value.`} This is the open-file game, not the real one with hidden information.`) : h("p", {}, `No exact search is stored for ${caseName(c)}${live ? ", but you can solve it above if it is small" : ""}.`));
+  }
+
+  registry.push({
+    id: "ahead",
+    build: () => chapter("ahead", "Thinking ahead", {
+      lead: [
+        h("p", {}, "So far each lawyer picks one style and sticks to it. A real trial is a sequence of moves: offer an exhibit, wait for the objection, answer. A lawyer who thinks ahead asks \"if I do this, what will the other side do, and what do I do then?\" Searching that is the job of ", h("dfn", {}, "minimax"), ": assume the other side always picks the reply that is worst for you, and choose the move whose worst case is best."),
+        h("p", {}, h("dfn", {}, "Alpha-beta pruning"), " gives exactly the same answer while skipping lines that cannot matter: if you already have a move that guarantees 5, there is no need to finish checking a move once you find a reply that holds you to 3. Looking at the most promising move first prunes more."),
+        h("p", {}, "The real trial hides information (you see the other side's exhibits through a noisy signal) and is not zero-sum, so minimax does not apply to it as it stands. The search here solves an ", h("dfn", {}, "open-file"), " version: both sides see everything, and the payoff is the Accuser's utility minus the Defender's. It runs on the engine's own rules, not a copy."),
+      ],
+      read: ["The table counts the positions each method looked at. The three methods must give the same value; the page says if they do not.", "The drawn tree is a small case. Open and close branches to follow the search. ✂ marks branches that were never explored.", "The last table is a separate experiment: a lawyer that searches a few moves ahead using only what a real lawyer is given, against the four styles."],
+      fig: h("div", { id: "ahead-fig" }),
+      maths: h("p", {}, "Alpha-beta keeps two numbers, alpha (the best the Accuser can already guarantee) and beta (the best the Defender can already guarantee), and stops looking at a position once alpha ≥ beta. With perfect ordering it looks at about the square root of the positions plain minimax does. Passing a turn, and objections or impeachments the judge would reject, are left out of the search because they are never better than another move; a test puts them back and checks the value is unchanged. The lookahead lawyer searches its own next three moves, assumes the opponent replies with whatever hurts it most, and (when the opponent offers an exhibit) weighs an objection by its belief that the objection will be sustained. It scores a position by the log-odds potential, a smooth estimate of whether the Accuser clears the bar, and the money and sanctions so far. These are simplifications, so it is reported as an exhibition."),
+    }),
+    refresh: renderAhead,
   });
 
   /* ---------------------------------------------------------------- put them on the page */

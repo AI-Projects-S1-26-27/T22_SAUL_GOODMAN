@@ -58,6 +58,8 @@ The result files this version of the docs was generated from:
 | `results/classic_surprises.json` | `8957c39b245d` | 149 KiB |
 | `results/efficiency.json` | `db871dae1e5f` | 34 KiB |
 | `results/efficiency_surprises.json` | `bf9b8caf98ab` | 34 KiB |
+| `results/lookahead.json` | `0acfd8ad9e13` | 14 KiB |
+| `results/lookahead_surprises.json` | `a42bc3a08d17` | 14 KiB |
 | `results/matters.json` | `d4c87d4ce5a1` | 6 KiB |
 | `results/matters_surprises.json` | `0666468af658` | 6 KiB |
 | `results/oracle/broken-bike.json` | `ae02f6839677` | 6 KiB |
@@ -68,6 +70,7 @@ The result files this version of the docs was generated from:
 | `results/oracle/kestrel-av_surprises.json` | `a34e2704d278` | 6 KiB |
 | `results/sensitivity.json` | `15e9ca0d1157` | 11 KiB |
 | `results/sensitivity_surprises.json` | `3a373cf16d44` | 11 KiB |
+| `results/tree_search.json` | `fa50d86eb5a9` | 22 KiB |
 
 160 recorded trials are pinned in `tests/golden/bundle_digests.json`; 540 spoken lines in `tests/golden/lines_baseline.json`.
 <!-- END GENERATED:files -->
