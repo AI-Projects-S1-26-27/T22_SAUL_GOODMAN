@@ -1,0 +1,36 @@
+"""Review findings API3, API4, API5, A3, S2, S3: bad input gets a clean answer, never a 500 or an unbounded read."""
+
+from __future__ import annotations
+
+from fastapi.testclient import TestClient
+
+from courtroom.api.server import create_app
+
+client = TestClient(create_app())
+
+
+def test_game_rejects_unknown_and_malformed_strategy_names_with_422() -> None:  # API5
+    for bad in ("nope", "mixed:abc"):
+        r = client.post("/api/game", json={"case_id": "cookie-jar", "strategies": ["aggressive", bad], "seeds": 1})
+        assert r.status_code == 422, (bad, r.status_code)
+
+
+def test_game_refuses_the_lookahead_exhibition_style() -> None:  # A3
+    r = client.post("/api/game", json={"case_id": "cookie-jar", "strategies": ["aggressive", "lookahead"], "seeds": 1})
+    assert r.status_code == 422 and "exhibition" in r.text
+
+
+def test_oversized_body_is_refused_before_it_is_read() -> None:  # API4, S3
+    r = client.post("/api/trial", content=b"{" + b" " * 2_000_000 + b"}", headers={"Content-Type": "application/json"})
+    assert r.status_code == 413
+
+
+def test_deeply_nested_json_is_a_422_not_a_500() -> None:  # API3
+    r = client.post("/api/trial", content=b"[" * 50_000 + b"]" * 50_000, headers={"Content-Type": "application/json"})
+    assert r.status_code in (413, 422)
+
+
+def test_a_foreign_host_header_is_refused() -> None:  # S2
+    assert client.get("/api/health", headers={"Host": "evil.example"}).status_code == 400
+    assert client.get("/api/health", headers={"Host": "127.0.0.1:8000"}).status_code == 200
+    assert client.get("/api/health", headers={"Host": "localhost:8000"}).status_code == 200

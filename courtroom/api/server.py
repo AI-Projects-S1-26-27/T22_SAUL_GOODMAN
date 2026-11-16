@@ -12,6 +12,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
@@ -50,6 +51,7 @@ MAX_INLINE_EVIDENCE = 30
 MAX_INLINE_WITNESSES = 15
 MAX_INLINE_ELEMENTS = 8
 MAX_INLINE_CHARS = 60_000
+MAX_BODY_BYTES = 1_000_000
 
 
 class TrialRequest(BaseModel):
@@ -67,6 +69,16 @@ class TrialRequest(BaseModel):
 
         make_agent(v, random.Random(0))  # raises ValueError on unknown names
         return v
+
+
+def _known_strategies(names: list[str]) -> list[str]:
+    import random
+
+    for v in names:
+        if v == "lookahead":
+            raise ValueError("lookahead is an exhibition style, not one of the certified styles; it cannot enter a payoff table")
+        make_agent(v, random.Random(0))  # raises ValueError on unknown or malformed names
+    return names
 
 
 class ExplainRequest(TrialRequest):
@@ -104,6 +116,11 @@ class GameRequest(BaseModel):
     strategies: list[str] = Field(default_factory=lambda: ["aggressive", "conservative"], min_length=2, max_length=4)
     seeds: int = Field(default=20, ge=1, le=100)
     surprises: Surprises | bool | None = None
+
+    @field_validator("strategies")
+    @classmethod
+    def _known(cls, v: list[str]) -> list[str]:
+        return _known_strategies(v)
 
 
 class MattersRequest(BaseModel):
@@ -212,6 +229,19 @@ def _run(req: TrialRequest, case: CaseFile | None = None) -> TrialResult:
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Saul Goodman Courtroom", version=__version__)
+    # the server is for this computer only: a request that names another host (DNS rebinding) is refused
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "[::1]", "testserver"])
+
+    @app.middleware("http")
+    async def limit_body(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+        # a case is at most MAX_INLINE_CHARS; nothing legitimate is anywhere near this, so refuse before reading
+        n = request.headers.get("content-length")
+        if n is not None and n.isdigit() and int(n) > MAX_BODY_BYTES:
+            return JSONResponse({"detail": f"request body too large (over {MAX_BODY_BYTES} bytes)"}, status_code=413)
+        try:
+            return await call_next(request)
+        except RecursionError:
+            return JSONResponse({"detail": "request body too deeply nested"}, status_code=422)
 
     @app.middleware("http")
     async def no_stale_ui(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
