@@ -196,7 +196,7 @@ class EvidenceItem(Frozen):
     personal_knowledge: bool = True
     contradicts: tuple[str, ...] = ()
     impeaches: tuple[str, ...] = ()
-    cost: float | None = Field(default=None, ge=0.0)
+    cost: float | None = Field(default=None, ge=0.0, allow_inf_nan=False)
 
     @field_validator("reliability")
     @classmethod
@@ -233,7 +233,7 @@ class CaseFile(Frozen):
     elements: tuple[LegalElement, ...] = Field(min_length=1)
     witnesses: tuple[Witness, ...] = ()
     evidence: tuple[EvidenceItem, ...] = ()
-    budget: float = Field(default=10.0, gt=0)
+    budget: float = Field(default=10.0, gt=0, allow_inf_nan=False)
     max_primary_turns: int = Field(default=8, ge=1, le=64)
     rebuttal_turns: int = Field(default=2, ge=0, le=16)
     perception_accuracy: float = Field(default=0.8, ge=0.5, le=1.0)

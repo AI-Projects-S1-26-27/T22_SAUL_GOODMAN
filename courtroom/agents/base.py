@@ -49,7 +49,7 @@ class ScoreCache:
         if key not in self._cache:
             exact = score_record(self.case, key[0], dict(key[1])).log_odds
             self._cache[key] = {k: float(v) for k, v in exact.items()}
-        return self._cache[key]
+        return dict(self._cache[key])  # a copy: callers may not change the cached scores
 
 
 class Oracle:

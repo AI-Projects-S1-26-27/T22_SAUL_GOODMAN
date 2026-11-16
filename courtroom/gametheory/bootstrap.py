@@ -147,6 +147,10 @@ def bootstrap_case(
     surprises: Surprises | None = None,
 ) -> LabelStability:
     """Resample the seed set ``n_resamples`` times; report how often the label holds."""
+    if n_resamples < 1:
+        raise ValueError("n_resamples must be at least 1")
+    if not seeds:
+        raise ValueError("seeds must not be empty")
     rows, cols = list(strategies), list(strategies)
     samples = collect_samples(case, strategies, seeds, workers=workers, surprises=surprises)
 
