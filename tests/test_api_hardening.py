@@ -34,3 +34,18 @@ def test_a_foreign_host_header_is_refused() -> None:  # S2
     assert client.get("/api/health", headers={"Host": "evil.example"}).status_code == 400
     assert client.get("/api/health", headers={"Host": "127.0.0.1:8000"}).status_code == 200
     assert client.get("/api/health", headers={"Host": "localhost:8000"}).status_code == 200
+
+
+def test_a_third_heavy_request_gets_503_instead_of_starving_the_server() -> None:  # API1
+    from courtroom.api import server
+
+    held = [server._HEAVY.acquire(blocking=False) for _ in range(server.MAX_HEAVY_JOBS)]
+    try:
+        assert all(held)
+        r = client.post("/api/tree", json={"case_id": "cookie-jar"})
+        assert r.status_code == 503
+        assert client.get("/api/health").status_code == 200  # light endpoints are unaffected
+    finally:
+        for _ in held:
+            server._HEAVY.release()
+    assert client.post("/api/tree", json={"case_id": "cookie-jar"}).status_code == 200  # and it recovers

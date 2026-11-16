@@ -7,10 +7,11 @@ Input sizes are bounded so a demo audience can't hang the server.
 from __future__ import annotations
 
 import json
-from collections.abc import Awaitable, Callable
+import threading
+from collections.abc import Awaitable, Callable, Iterator
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -52,6 +53,18 @@ MAX_INLINE_WITNESSES = 15
 MAX_INLINE_ELEMENTS = 8
 MAX_INLINE_CHARS = 60_000
 MAX_BODY_BYTES = 1_000_000
+MAX_HEAVY_JOBS = 2  # CPU-heavy requests running at once; a third gets a 503 instead of starving /api/health
+_HEAVY = threading.BoundedSemaphore(MAX_HEAVY_JOBS)
+
+
+def heavy() -> Iterator[None]:
+    """Dependency for the endpoints that can run for seconds: at most MAX_HEAVY_JOBS at a time, the rest are told to retry."""
+    if not _HEAVY.acquire(blocking=False):
+        raise HTTPException(503, "the server is busy with other heavy requests; try again in a few seconds")
+    try:
+        yield
+    finally:
+        _HEAVY.release()
 
 
 class TrialRequest(BaseModel):
@@ -305,13 +318,13 @@ def create_app() -> FastAPI:
         return JSONResponse(measure(case, seeds=tuple(range(req.seeds)), surprises=_surprises(req.surprises)).model_dump(mode="json"))
 
     @app.post("/api/find")
-    def find(req: FindRequest) -> JSONResponse:
+    def find(req: FindRequest, _: None = Depends(heavy)) -> JSONResponse:
         """Search generated cases for contested ones (bounded: at most 60 candidates and about 25 seconds)."""
         report = find_contested(req.start, req.count, req.top, surprises=_surprises(req.surprises), time_budget=25.0)
         return JSONResponse(report.model_dump(mode="json"))
 
     @app.post("/api/classic")
-    def classic(req: ClassicRequest) -> JSONResponse:
+    def classic(req: ClassicRequest, _: None = Depends(heavy)) -> JSONResponse:
         """Which classic game does each two-by-two corner of this case's measured table resemble? (bounded: 30 seeds at most)"""
         case = _pick_case(req.case_id, req.case)
         sur = _surprises(req.surprises)
@@ -320,7 +333,7 @@ def create_app() -> FastAPI:
         return JSONResponse(res.model_dump(mode="json"))
 
     @app.post("/api/classic/find")
-    def classic_find(req: ClassicFindRequest) -> JSONResponse:
+    def classic_find(req: ClassicFindRequest, _: None = Depends(heavy)) -> JSONResponse:
         """Search generated cases for a prisoner's dilemma, stag hunt or battle of the sexes (bounded: about 25 seconds)."""
         bad = [t for t in req.targets if t not in CLASSIC_LABELS]
         if bad:
@@ -329,7 +342,7 @@ def create_app() -> FastAPI:
         return JSONResponse(rep.model_dump(mode="json"))
 
     @app.post("/api/efficiency")
-    def efficiency_route(req: EfficiencyRequest) -> JSONResponse:
+    def efficiency_route(req: EfficiencyRequest, _: None = Depends(heavy)) -> JSONResponse:
         """Pareto-efficient cells, whether each equilibrium is efficient, and the security values (bounded: 30 seeds at most)."""
         case = _pick_case(req.case_id, req.case)
         t = estimate_payoffs(case, STYLES4, seeds=range(req.seeds), surprises=_surprises(req.surprises))
@@ -349,7 +362,7 @@ def create_app() -> FastAPI:
         )
 
     @app.post("/api/tree")
-    def tree(req: TreeRequest) -> JSONResponse:
+    def tree(req: TreeRequest, _: None = Depends(heavy)) -> JSONResponse:
         """The trial as a game tree on the open-file relaxation (bounded: 15,000 nodes, so only small cases are solved exactly)."""
         case = _pick_case(req.case_id, req.case)
         rep = solve_case(case, max_nodes=req.max_nodes, with_line=True)
@@ -359,7 +372,7 @@ def create_app() -> FastAPI:
         return JSONResponse(body)
 
     @app.post("/api/lookahead")
-    def lookahead_route(req: LookaheadRequest) -> JSONResponse:
+    def lookahead_route(req: LookaheadRequest, _: None = Depends(heavy)) -> JSONResponse:
         """Does the lookahead lawyer beat the four hand-written styles? Exhibition, not certified (bounded: 12 seeds)."""
         case = _pick_case(req.case_id, req.case)
         rep = compare_lookahead(case, tuple(range(req.seeds)), _surprises(req.surprises), workers=1)
@@ -406,14 +419,14 @@ def create_app() -> FastAPI:
         return JSONResponse(narrate_case(_pick_case(req.case_id, req.case), client))
 
     @app.post("/api/bootstrap")
-    def bootstrap(req: BootstrapRequest) -> JSONResponse:
+    def bootstrap(req: BootstrapRequest, _: None = Depends(heavy)) -> JSONResponse:
         """How often the equilibrium label survives resampling the seeds (bounded: 40 seeds at most)."""
         case = _pick_case(req.case_id, req.case)
         res = bootstrap_case(case, seeds=tuple(range(req.seeds)), n_resamples=req.resamples, workers=1, surprises=_surprises(req.surprises))
         return JSONResponse(res.model_dump(mode="json"))
 
     @app.post("/api/oracle")
-    def oracle(req: OracleRequest) -> JSONResponse:
+    def oracle(req: OracleRequest, _: None = Depends(heavy)) -> JSONResponse:
         """A small, bounded best-response search run live. The committed results use a larger budget (see /api/results)."""
         case = _pick_case(req.case_id, req.case)
         rep = run_oracle(case, budget=req.budget, surprises=_surprises(req.surprises), train=tuple(range(4)), heldout=tuple(range(100, 108)), workers=4, max_rounds=req.rounds)
@@ -431,7 +444,7 @@ def create_app() -> FastAPI:
         return out
 
     @app.post("/api/game")
-    def game(req: GameRequest) -> JSONResponse:
+    def game(req: GameRequest, _: None = Depends(heavy)) -> JSONResponse:
         if "llm" in req.strategies:
             raise HTTPException(422, "the AI lawyer is an exhibition, not a certified strategy; it cannot enter a payoff table")
         if "chaos" in req.strategies:
