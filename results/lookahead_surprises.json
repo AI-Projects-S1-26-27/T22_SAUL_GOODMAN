@@ -134,7 +134,7 @@
      "aggressive": 7.4313,
      "conservative": 8.4375,
      "lookahead": 8.46,
-     "reckless": 7.2025
+     "reckless": 7.1862
     },
     "side": "Defender",
     "standard_error": 0.0,
@@ -317,7 +317,7 @@
      "aggressive": 7.3987,
      "conservative": 7.7788,
      "lookahead": 7.5488,
-     "reckless": 7.1088
+     "reckless": 7.1963
     },
     "side": "Defender",
     "standard_error": 0.0317,
@@ -496,62 +496,62 @@
    "case_id": "helix-espionage",
    "defense": {
     "beats": false,
-    "difference": 0.3689,
-    "equilibrium_payoff": 5.6759,
-    "lookahead_payoff": 6.0448,
+    "difference": 0.352,
+    "equilibrium_payoff": 5.6662,
+    "lookahead_payoff": 6.0182,
     "pure_payoffs": {
-     "adaptive": 5.6759,
-     "aggressive": 5.6759,
-     "conservative": 2.8365,
-     "lookahead": 6.0448,
-     "reckless": 0.7497
+     "adaptive": 5.6662,
+     "aggressive": 5.6662,
+     "conservative": 2.9129,
+     "lookahead": 6.0182,
+     "reckless": 1.0693
     },
     "side": "Defender",
-    "standard_error": 0.4782,
+    "standard_error": 0.4924,
     "worse": false,
-    "z": 0.77
+    "z": 0.71
    },
    "equilibrium_of_four": {
     "defense": {
-     "adaptive": 0.8445,
-     "aggressive": 0.1555
+     "adaptive": 0.8383,
+     "aggressive": 0.1617
     },
     "prosecution": {
-     "adaptive": 0.7263,
-     "conservative": 0.2737
+     "adaptive": 0.7674,
+     "conservative": 0.2326
     }
    },
    "five_by_five_equilibrium": {
     "defense": {
-     "adaptive": 0.8737,
-     "lookahead": 0.1263
+     "adaptive": 0.8684,
+     "lookahead": 0.1316
     },
     "prosecution": {
-     "adaptive": 0.4879,
-     "conservative": 0.5121
+     "adaptive": 0.5234,
+     "conservative": 0.4766
     }
    },
    "lookahead_in_equilibrium": {
-    "defense": 0.1263,
+    "defense": 0.1316,
     "prosecution": 0.0
    },
    "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
    "prosecution": {
     "beats": false,
-    "difference": -0.5796,
+    "difference": -0.5806,
     "equilibrium_payoff": -2.01,
-    "lookahead_payoff": -2.5896,
+    "lookahead_payoff": -2.5906,
     "pure_payoffs": {
      "adaptive": -2.01,
-     "aggressive": -3.3815,
+     "aggressive": -3.3668,
      "conservative": -2.01,
-     "lookahead": -2.5896,
-     "reckless": -4.9753
+     "lookahead": -2.5906,
+     "reckless": -4.9842
     },
     "side": "Accuser",
-    "standard_error": 0.4625,
+    "standard_error": 0.4849,
     "worse": false,
-    "z": -1.25
+    "z": -1.2
    },
    "seeds": 40,
    "surprises": true,
@@ -561,20 +561,20 @@
    "case_id": "kestrel-av",
    "defense": {
     "beats": true,
-    "difference": 1.7011,
+    "difference": 1.7192,
     "equilibrium_payoff": 1.9942,
-    "lookahead_payoff": 3.6953,
+    "lookahead_payoff": 3.7134,
     "pure_payoffs": {
      "adaptive": 1.9942,
      "aggressive": 1.9942,
      "conservative": 1.5692,
-     "lookahead": 3.6953,
-     "reckless": -2.6909
+     "lookahead": 3.7134,
+     "reckless": -2.4643
     },
     "side": "Defender",
-    "standard_error": 0.546,
+    "standard_error": 0.5443,
     "worse": false,
-    "z": 3.12
+    "z": 3.16
    },
    "equilibrium_of_four": {
     "defense": {

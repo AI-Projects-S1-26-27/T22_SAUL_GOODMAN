@@ -141,7 +141,7 @@ class Court:
         opp = side.opponent
         own = tuple(i for i in self.case.evidence if i.owner is side)
         options = tuple(
-            (item.id, w) for w in st.testified_witnesses(opp) for item in own if (item.id, w) not in st.used_impeachments
+            (item.id, w) for w in st.testified_witnesses(opp) for item in own if item.id in st.admitted and (item.id, w) not in st.used_impeachments
         )
         return PartyView(
             side=side,

@@ -188,7 +188,7 @@
  "max_rounds": 4,
  "rng_seed": 0,
  "rounds_run": 1,
- "seconds": 4.7,
+ "seconds": 5.1,
  "start_equilibrium": {
   "defense_mix": {
    "aggressive": 0.4937,

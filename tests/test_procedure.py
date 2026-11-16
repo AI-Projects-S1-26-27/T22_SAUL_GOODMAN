@@ -163,3 +163,22 @@ def test_rng_isolation_between_trials() -> None:
     random.seed(12345)  # global RNG must not influence outcomes
     b = Court(case, CounselAgent(AGGRESSIVE), CounselAgent(AGGRESSIVE), seed=1).run()
     assert a.digest == b.digest
+
+
+def test_impeachment_needs_an_admitted_exhibit_E1() -> None:
+    """E1: an exhibit that was never offered and admitted cannot be used to impeach a witness."""
+    from courtroom.contracts import Witness
+
+    case = make_case(
+        (item("D1", D, kind="testimony", witness_id="W", support={"e1": -0.5}), item("P1", impeaches=("W",))),
+        witnesses=(Witness(id="W", name="w", role="r", credibility=0.8),),
+        budget=5.0,
+    )
+    st = ProcedureState(case)
+    st.enter(Phase.PROSECUTION_CASE)
+    st.admitted.append("D1")  # W has testified for the defense
+    act = Action(actor=P, type=ActionType.IMPEACH, evidence_id="P1", witness_id="W")
+    v = validate(act, st, P, "primary")
+    assert v is not None and v.rule_id == "V-IMPEACH-NOT-ADMITTED"
+    st.admitted.append("P1")
+    assert validate(act, st, P, "primary") is None

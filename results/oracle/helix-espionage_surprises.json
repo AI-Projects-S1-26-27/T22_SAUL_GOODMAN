@@ -6,9 +6,9 @@
    "confirm_difference": null,
    "confirm_z": null,
    "confirmed": null,
-   "difference": -0.1923,
+   "difference": -0.1885,
    "heldout_candidate": -2.2575,
-   "heldout_current": -2.0653,
+   "heldout_current": -2.069,
    "name": "best-pro-1",
    "params": {
     "max_known_defects": 2.0,
@@ -19,42 +19,42 @@
    },
    "plain": "shows evidence even with up to 2 known problems; spends a turn only if it moves the judge by at least 0.17; objects only when it is 19% sure of a flaw; and only if the exhibit would matter by 0.22 or more; holds back 13% of its budget for objections (reasons about the other lawyer)",
    "side": "prosecution",
-   "standard_error": 0.6516,
+   "standard_error": 0.6432,
    "train_payoff": -0.8635,
    "tried": 60,
-   "z": -0.3
+   "z": -0.29
   },
   {
    "accepted": true,
-   "confirm_difference": 0.4436,
-   "confirm_z": 2.42,
+   "confirm_difference": 0.87,
+   "confirm_z": 5.55,
    "confirmed": true,
-   "difference": 0.3837,
-   "heldout_candidate": 7.6165,
-   "heldout_current": 7.2328,
+   "difference": 0.8993,
+   "heldout_candidate": 8.1491,
+   "heldout_current": 7.2498,
    "name": "best-def-1",
    "params": {
     "max_known_defects": 0.0,
-    "min_gain": 0.81,
-    "objection_belief": 0.63,
-    "objection_min_impact": 1.44,
-    "reserve_fraction": 0.02
+    "min_gain": 0.48,
+    "objection_belief": 0.01,
+    "objection_min_impact": 0.1,
+    "reserve_fraction": 0.6
    },
-   "plain": "shows only clean evidence; spends a turn only if it moves the judge by at least 0.81; objects only when it is 63% sure of a flaw; and only if the exhibit would matter by 1.44 or more; holds back 2% of its budget for objections (always asks for the trial to end early, objects to anything big whatever it suspects)",
+   "plain": "shows only clean evidence; spends a turn only if it moves the judge by at least 0.48; objects on the slightest suspicion; and only if the exhibit would matter by 0.10 or more; holds back 60% of its budget for objections (reasons about the other lawyer)",
    "side": "defense",
-   "standard_error": 0.1333,
-   "train_payoff": 7.581,
+   "standard_error": 0.1378,
+   "train_payoff": 7.8633,
    "tried": 60,
-   "z": 2.88
+   "z": 6.52
   },
   {
    "accepted": false,
    "confirm_difference": null,
    "confirm_z": null,
    "confirmed": null,
-   "difference": -0.2548,
-   "heldout_candidate": -2.3175,
-   "heldout_current": -2.0627,
+   "difference": -0.1017,
+   "heldout_candidate": -2.2306,
+   "heldout_current": -2.1289,
    "name": "best-pro-2",
    "params": {
     "max_known_defects": 2.0,
@@ -65,8 +65,54 @@
    },
    "plain": "shows evidence even with up to 2 known problems; spends a turn only if it moves the judge by at least 0.34; objects only when it is 63% sure of a flaw; and only if the exhibit would matter by 1.32 or more; holds back 17% of its budget for objections (always asks for the trial to end early, objects to anything big whatever it suspects)",
    "side": "prosecution",
-   "standard_error": 0.8827,
-   "train_payoff": -0.8176,
+   "standard_error": 1.423,
+   "train_payoff": 0.1439,
+   "tried": 60,
+   "z": -0.07
+  },
+  {
+   "accepted": true,
+   "confirm_difference": 0.6294,
+   "confirm_z": 3.28,
+   "confirmed": true,
+   "difference": 1.4249,
+   "heldout_candidate": 7.5553,
+   "heldout_current": 6.1304,
+   "name": "best-def-2",
+   "params": {
+    "max_known_defects": 2.0,
+    "min_gain": 0.85,
+    "objection_belief": 0.04,
+    "objection_min_impact": 1.17,
+    "reserve_fraction": 0.6
+   },
+   "plain": "shows evidence even with up to 2 known problems; spends a turn only if it moves the judge by at least 0.85; objects on the slightest suspicion; and only if the exhibit would matter by 1.17 or more; holds back 60% of its budget for objections",
+   "side": "defense",
+   "standard_error": 0.6409,
+   "train_payoff": 7.3022,
+   "tried": 60,
+   "z": 2.22
+  },
+  {
+   "accepted": false,
+   "confirm_difference": null,
+   "confirm_z": null,
+   "confirmed": null,
+   "difference": -0.2363,
+   "heldout_candidate": -2.4877,
+   "heldout_current": -2.2514,
+   "name": "best-pro-3",
+   "params": {
+    "max_known_defects": 1.0,
+    "min_gain": 0.05,
+    "objection_belief": 0.95,
+    "objection_min_impact": 0.25,
+    "reserve_fraction": 0.13
+   },
+   "plain": "shows evidence even with up to 1 known problem; spends a turn only if it moves the judge by at least 0.05; almost never objects; and only if the exhibit would matter by 0.25 or more; holds back 13% of its budget for objections (always asks for the trial to end early, objects to anything big whatever it suspects)",
+   "side": "prosecution",
+   "standard_error": 0.818,
+   "train_payoff": -0.3972,
    "tried": 60,
    "z": -0.29
   },
@@ -75,23 +121,23 @@
    "confirm_difference": null,
    "confirm_z": null,
    "confirmed": null,
-   "difference": 0.3917,
-   "heldout_candidate": 7.5408,
-   "heldout_current": 7.1491,
-   "name": "best-def-2",
+   "difference": 0.2003,
+   "heldout_candidate": 6.8056,
+   "heldout_current": 6.6054,
+   "name": "best-def-3",
    "params": {
     "max_known_defects": 2.0,
-    "min_gain": 0.71,
-    "objection_belief": 0.62,
-    "objection_min_impact": 1.32,
-    "reserve_fraction": 0.05
+    "min_gain": 0.5,
+    "objection_belief": 0.47,
+    "objection_min_impact": 1.5,
+    "reserve_fraction": 0.55
    },
-   "plain": "shows evidence even with up to 2 known problems; spends a turn only if it moves the judge by at least 0.71; objects only when it is 62% sure of a flaw; and only if the exhibit would matter by 1.32 or more; holds back 5% of its budget for objections",
+   "plain": "shows evidence even with up to 2 known problems; spends a turn only if it moves the judge by at least 0.50; objects only when it is 47% sure of a flaw; and only if the exhibit would matter by 1.50 or more; holds back 55% of its budget for objections",
    "side": "defense",
-   "standard_error": 0.2384,
-   "train_payoff": 7.8626,
+   "standard_error": 0.2653,
+   "train_payoff": 7.2824,
    "tried": 60,
-   "z": 1.64
+   "z": 0.75
   }
  ],
  "case_id": "helix-espionage",
@@ -124,10 +170,10 @@
  "exploitability": {
   "defense": {
    "best_found": "best-def-1",
-   "best_found_payoff": 7.6076,
-   "equilibrium_payoff": 7.1634,
+   "best_found_payoff": 8.0776,
+   "equilibrium_payoff": 7.1727,
    "found_better": true,
-   "gain": 0.4442
+   "gain": 0.905
   },
   "prosecution": {
    "best_found": "conservative",
@@ -160,32 +206,37 @@
   },
   {
    "name": "best-def-1",
-   "plain": "shows only clean evidence; spends a turn only if it moves the judge by at least 0.81; objects only when it is 63% sure of a flaw; and only if the exhibit would matter by 1.44 or more; holds back 2% of its budget for objections (always asks for the trial to end early, objects to anything big whatever it suspects)",
+   "plain": "shows only clean evidence; spends a turn only if it moves the judge by at least 0.48; objects on the slightest suspicion; and only if the exhibit would matter by 0.10 or more; holds back 60% of its budget for objections (reasons about the other lawyer)",
+   "searched": true
+  },
+  {
+   "name": "best-def-2",
+   "plain": "shows evidence even with up to 2 known problems; spends a turn only if it moves the judge by at least 0.85; objects on the slightest suspicion; and only if the exhibit would matter by 1.17 or more; holds back 60% of its budget for objections",
    "searched": true
   }
  ],
  "final_equilibrium": {
   "defense_mix": {
-   "adaptive": 0.7327,
-   "best-def-1": 0.201,
-   "conservative": 0.0662
+   "adaptive": 0.6092,
+   "best-def-1": 0.3212,
+   "best-def-2": 0.0696
   },
   "defense_mix_exact": {
-   "adaptive": "21257485284375/29011504038281",
-   "best-def-1": "5832640693750/29011504038281",
-   "conservative": "1921378060156/29011504038281"
+   "adaptive": "1252895627/2056733105",
+   "best-def-1": "294916531808/918184421875",
+   "best-def-2": "447576396094/6427290953125"
   },
-  "defense_payoff": 7.0844,
+  "defense_payoff": 6.3721,
   "found": true,
   "prosecution_mix": {
-   "adaptive": 0.0904,
-   "aggressive": 0.1046,
-   "conservative": 0.805
+   "adaptive": 0.2837,
+   "aggressive": 0.2897,
+   "conservative": 0.4266
   },
   "prosecution_mix_exact": {
-   "adaptive": "5771996875/63821153134",
-   "aggressive": "6673725009/63821153134",
-   "conservative": "25687715625/31910576567"
+   "adaptive": "160453319351/565586281250",
+   "aggressive": "1064994542578/3676310828125",
+   "conservative": "3136739419531/7352621656250"
   },
   "prosecution_payoff": -1.9969,
   "pure": false,
@@ -213,7 +264,7 @@
    "searched": false
   }
  ],
- "headline": "The hand-written styles could be beaten: 1 better profile(s) were found for the defense (gain 0.44 per trial), then the game was solved again with them. 1 of 1 also beat the original equilibrium on a third set of seeds nobody had looked at.",
+ "headline": "The hand-written styles could be beaten: 2 better profile(s) were found for the defense (gain 0.91 per trial), then the game was solved again with them. 2 of 2 also beat the original equilibrium on a third set of seeds nobody had looked at.",
  "heldout_seeds": [
   100,
   101,
@@ -242,8 +293,8 @@
  ],
  "max_rounds": 4,
  "rng_seed": 0,
- "rounds_run": 2,
- "seconds": 20.7,
+ "rounds_run": 3,
+ "seconds": 28.3,
  "start_equilibrium": {
   "defense_mix": {
    "adaptive": 0.9411,
@@ -253,15 +304,15 @@
    "adaptive": "7815625/8304687",
    "conservative": "489062/8304687"
   },
-  "defense_payoff": 7.1634,
+  "defense_payoff": 7.1727,
   "found": true,
   "prosecution_mix": {
-   "adaptive": 0.1792,
-   "conservative": 0.8208
+   "adaptive": 0.1896,
+   "conservative": 0.8104
   },
   "prosecution_mix_exact": {
-   "adaptive": "584375/3260156",
-   "conservative": "2675781/3260156"
+   "adaptive": "1168750/6164063",
+   "conservative": "4995313/6164063"
   },
   "prosecution_payoff": -1.9969,
   "pure": false,
@@ -273,7 +324,7 @@
   "adaptive",
   "reckless"
  ],
- "stopped": "round 2: neither side found a profile that beat the current equilibrium by more than 2 standard errors",
+ "stopped": "round 3: neither side found a profile that beat the current equilibrium by more than 2 standard errors",
  "surprises": true,
  "train_seeds": [
   0,
@@ -285,5 +336,5 @@
   6,
   7
  ],
- "trials": 5360
+ "trials": 7456
 }

@@ -19,9 +19,9 @@
   "edge-empty-docket": 0.0,
   "edge-mutual-exclusion": 0.0,
   "edge-poisoned-tree": 0.199219,
-  "garden-dog": 0.011719,
-  "helix-espionage": 0.359375,
-  "kestrel-av": 0.386719
+  "garden-dog": 0.015625,
+  "helix-espionage": 0.347656,
+  "kestrel-av": 0.390625
  },
  "case_ids": [
   "cookie-jar",
@@ -91,9 +91,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.214844,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.347656,
-    "kestrel-av": 0.347656
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.351562,
+    "kestrel-av": 0.351562
    },
    "setting": "-25%"
   },
@@ -122,9 +122,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.351562,
-    "kestrel-av": 0.347656
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.34375,
+    "kestrel-av": 0.351562
    },
    "setting": "-25%"
   },
@@ -153,9 +153,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.164062,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.132812,
-    "kestrel-av": 0.328125
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.128906,
+    "kestrel-av": 0.335938
    },
    "setting": "-25%"
   },
@@ -188,9 +188,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.375,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.359375,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.347656,
+    "kestrel-av": 0.390625
    },
    "setting": "-25%"
   },
@@ -217,9 +217,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.203125,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.390625,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.40625,
+    "kestrel-av": 0.390625
    },
    "setting": "-25%"
   },
@@ -246,9 +246,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.203125,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.335938,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.324219,
+    "kestrel-av": 0.390625
    },
    "setting": "+25%"
   },
@@ -276,8 +276,8 @@
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
     "garden-dog": 0.015625,
-    "helix-espionage": 0.355469,
-    "kestrel-av": 0.386719
+    "helix-espionage": 0.359375,
+    "kestrel-av": 0.390625
    },
    "setting": "+25%"
   },
@@ -304,9 +304,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.210938,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.425781,
-    "kestrel-av": 0.382812
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.445312,
+    "kestrel-av": 0.378906
    },
    "setting": "+25%"
   },
@@ -335,9 +335,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.355469,
-    "kestrel-av": 0.347656
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.347656,
+    "kestrel-av": 0.351562
    },
    "setting": "+25%"
   },
@@ -364,9 +364,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.15625,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.105469,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.113281,
+    "kestrel-av": 0.390625
    },
    "setting": "+25%"
   },
@@ -395,9 +395,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.210938,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.488281,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.5,
+    "kestrel-av": 0.390625
    },
    "setting": "p=0.80"
   },
@@ -424,9 +424,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.203125,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.382812,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.417969,
+    "kestrel-av": 0.390625
    },
    "setting": "p=0.85"
   },
@@ -453,9 +453,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.359375,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.347656,
+    "kestrel-av": 0.390625
    },
    "setting": "p=0.90"
   },
@@ -482,9 +482,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.15625,
-    "garden-dog": 0.011719,
-    "helix-espionage": 0.113281,
-    "kestrel-av": 0.386719
+    "garden-dog": 0.015625,
+    "helix-espionage": 0.117188,
+    "kestrel-av": 0.390625
    },
    "setting": "p=0.95"
   }

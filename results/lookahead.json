@@ -138,7 +138,7 @@
      "aggressive": 7.3,
      "conservative": 8.36,
      "lookahead": 8.36,
-     "reckless": 7.08
+     "reckless": 7.0888
     },
     "side": "Defender",
     "standard_error": 0.0,
@@ -321,7 +321,7 @@
      "aggressive": 9.0,
      "conservative": 9.43,
      "lookahead": 9.15,
-     "reckless": 8.3537
+     "reckless": 8.4737
     },
     "side": "Defender",
     "standard_error": 0.0294,
@@ -500,39 +500,39 @@
    "case_id": "helix-espionage",
    "defense": {
     "beats": false,
-    "difference": -0.9849,
-    "equilibrium_payoff": 5.7483,
-    "lookahead_payoff": 4.7634,
+    "difference": -1.0997,
+    "equilibrium_payoff": 5.7515,
+    "lookahead_payoff": 4.6519,
     "pure_payoffs": {
-     "adaptive": 5.7483,
-     "aggressive": 5.7483,
-     "conservative": 2.0336,
-     "lookahead": 4.7634,
-     "reckless": 1.0447
+     "adaptive": 5.7515,
+     "aggressive": 5.7515,
+     "conservative": 2.0088,
+     "lookahead": 4.6519,
+     "reckless": 1.4181
     },
     "side": "Defender",
-    "standard_error": 0.5806,
+    "standard_error": 0.6102,
     "worse": false,
-    "z": -1.7
+    "z": -1.8
    },
    "equilibrium_of_four": {
     "defense": {
-     "adaptive": 0.6657,
-     "aggressive": 0.3343
+     "adaptive": 0.6573,
+     "aggressive": 0.3427
     },
     "prosecution": {
-     "adaptive": 0.6766,
-     "conservative": 0.3234
+     "adaptive": 0.7225,
+     "conservative": 0.2775
     }
    },
    "five_by_five_equilibrium": {
     "defense": {
-     "adaptive": 0.6657,
-     "aggressive": 0.3343
+     "adaptive": 0.6573,
+     "aggressive": 0.3427
     },
     "prosecution": {
-     "adaptive": 0.6766,
-     "conservative": 0.3234
+     "adaptive": 0.7225,
+     "conservative": 0.2775
     }
    },
    "lookahead_in_equilibrium": {
@@ -542,20 +542,20 @@
    "note": "Exhibition, not certified: lookahead is an extra style outside the four certified ones and is never in a payoff table used for the certified analysis.",
    "prosecution": {
     "beats": false,
-    "difference": -0.5806,
+    "difference": -0.5823,
     "equilibrium_payoff": -1.95,
-    "lookahead_payoff": -2.5306,
+    "lookahead_payoff": -2.5323,
     "pure_payoffs": {
      "adaptive": -1.95,
-     "aggressive": -2.5247,
+     "aggressive": -2.5123,
      "conservative": -1.95,
-     "lookahead": -2.5306,
-     "reckless": -4.4219
+     "lookahead": -2.5323,
+     "reckless": -4.435
     },
     "side": "Accuser",
-    "standard_error": 0.3601,
+    "standard_error": 0.379,
     "worse": false,
-    "z": -1.61
+    "z": -1.54
    },
    "seeds": 40,
    "surprises": false,
@@ -573,7 +573,7 @@
      "aggressive": 1.2418,
      "conservative": 1.2418,
      "lookahead": 4.7929,
-     "reckless": -3.036
+     "reckless": -2.8746
     },
     "side": "Defender",
     "standard_error": 0.5249,

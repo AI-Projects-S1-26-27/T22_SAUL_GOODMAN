@@ -65,29 +65,29 @@ The result files this version of the docs was generated from:
 <!-- BEGIN GENERATED:files -->
 | Result file | sha256 (first 12) | Size |
 |---|---|---|
-| `results/bootstrap.json` | `a6d12d32968a` | 24 KiB |
-| `results/bootstrap_surprises.json` | `68c6cc900f5a` | 24 KiB |
-| `results/classic.json` | `074c483ad5ce` | 150 KiB |
-| `results/classic_search.json` | `e9f1de20a447` | 1 KiB |
-| `results/classic_search_surprises.json` | `0d505640cbfd` | 1 KiB |
-| `results/classic_surprises.json` | `8957c39b245d` | 149 KiB |
-| `results/efficiency.json` | `db871dae1e5f` | 34 KiB |
-| `results/efficiency_surprises.json` | `bf9b8caf98ab` | 34 KiB |
-| `results/lookahead.json` | `0acfd8ad9e13` | 14 KiB |
-| `results/lookahead_surprises.json` | `a42bc3a08d17` | 14 KiB |
+| `results/bootstrap.json` | `441a883b5ed7` | 24 KiB |
+| `results/bootstrap_surprises.json` | `9abd8495b12a` | 24 KiB |
+| `results/classic.json` | `c0f9f0791a5a` | 150 KiB |
+| `results/classic_search.json` | `43face64976a` | 1 KiB |
+| `results/classic_search_surprises.json` | `01b4699396ed` | 1 KiB |
+| `results/classic_surprises.json` | `f92598a71220` | 149 KiB |
+| `results/efficiency.json` | `fb14937b87f4` | 34 KiB |
+| `results/efficiency_surprises.json` | `780394ec7f2d` | 34 KiB |
+| `results/lookahead.json` | `4f19ef9c385c` | 14 KiB |
+| `results/lookahead_surprises.json` | `1ecc9349ef8a` | 14 KiB |
 | `results/matters.json` | `d4c87d4ce5a1` | 6 KiB |
 | `results/matters_surprises.json` | `0666468af658` | 6 KiB |
 | `results/oracle/broken-bike.json` | `ae02f6839677` | 6 KiB |
 | `results/oracle/broken-bike_surprises.json` | `447612ef1bf4` | 4 KiB |
-| `results/oracle/helix-espionage.json` | `c622d2855e70` | 8 KiB |
-| `results/oracle/helix-espionage_surprises.json` | `9a00cf6de679` | 6 KiB |
-| `results/oracle/kestrel-av.json` | `267180fa861f` | 4 KiB |
-| `results/oracle/kestrel-av_surprises.json` | `a34e2704d278` | 6 KiB |
-| `results/sensitivity.json` | `15e9ca0d1157` | 11 KiB |
-| `results/sensitivity_surprises.json` | `3a373cf16d44` | 11 KiB |
-| `results/tree_search.json` | `fa50d86eb5a9` | 22 KiB |
+| `results/oracle/helix-espionage.json` | `fb15f6beab54` | 8 KiB |
+| `results/oracle/helix-espionage_surprises.json` | `8c0f0fe5738f` | 8 KiB |
+| `results/oracle/kestrel-av.json` | `38c56ee34e51` | 4 KiB |
+| `results/oracle/kestrel-av_surprises.json` | `405d7c1b2cf4` | 6 KiB |
+| `results/sensitivity.json` | `943dc7ca3e48` | 11 KiB |
+| `results/sensitivity_surprises.json` | `5e1e068989e5` | 11 KiB |
+| `results/tree_search.json` | `452f4d8ce4ef` | 22 KiB |
 
-160 recorded trials are pinned in `tests/golden/bundle_digests.json`; 540 spoken lines in `tests/golden/lines_baseline.json`.
+160 recorded trials are pinned in `tests/golden/bundle_digests.json`; 537 spoken lines in `tests/golden/lines_baseline.json`.
 <!-- END GENERATED:files -->
 
 ## The language model

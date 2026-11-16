@@ -118,7 +118,7 @@ class Node(Court):
             for item in case.evidence:
                 if item.owner is side:
                     cands.append(Action(actor=side, type=ActionType.PRESENT_EVIDENCE, evidence_id=item.id))
-                    for w in st.testified_witnesses(side.opponent):
+                    for w in st.testified_witnesses(side.opponent) if item.id in st.admitted else ():
                         if not prune or w in item.impeaches:
                             cands.append(Action(actor=side, type=ActionType.IMPEACH, evidence_id=item.id, witness_id=w))
             cands.append(Action(actor=side, type=ActionType.REST))

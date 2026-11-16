@@ -14,13 +14,13 @@
  "baseline_win_rate": {
   "aurora-defi": 0.0,
   "broken-bike": 0.929688,
-  "cookie-jar": 0.011719,
+  "cookie-jar": 0.0,
   "edge-defense-only": 0.0,
   "edge-empty-docket": 0.0,
   "edge-mutual-exclusion": 0.0,
   "edge-poisoned-tree": 0.183594,
-  "garden-dog": 0.042969,
-  "helix-espionage": 0.304688,
+  "garden-dog": 0.046875,
+  "helix-espionage": 0.300781,
   "kestrel-av": 0.394531
  },
  "case_ids": [
@@ -87,12 +87,12 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
-    "garden-dog": 0.042969,
+    "garden-dog": 0.046875,
     "helix-espionage": 0.300781,
     "kestrel-av": 0.355469
    },
@@ -118,13 +118,13 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.183594,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.300781,
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.28125,
     "kestrel-av": 0.355469
    },
    "setting": "-25%"
@@ -154,9 +154,9 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.144531,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.125,
-    "kestrel-av": 0.355469
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.117188,
+    "kestrel-av": 0.359375
    },
    "setting": "-25%"
   },
@@ -184,13 +184,13 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.851562,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.34375,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.304688,
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.300781,
     "kestrel-av": 0.398438
    },
    "setting": "-25%"
@@ -211,15 +211,15 @@
    },
    "parameter": "standards_of_proof",
    "prosecution_win_rate": {
-    "aurora-defi": 0.0,
+    "aurora-defi": 0.003906,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.324219,
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.34375,
     "kestrel-av": 0.394531
    },
    "setting": "-25%"
@@ -244,12 +244,12 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.1875,
-    "garden-dog": 0.042969,
+    "garden-dog": 0.046875,
     "helix-espionage": 0.289062,
     "kestrel-av": 0.394531
    },
@@ -275,14 +275,14 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.183594,
     "garden-dog": 0.046875,
-    "helix-espionage": 0.304688,
-    "kestrel-av": 0.398438
+    "helix-espionage": 0.3125,
+    "kestrel-av": 0.394531
    },
    "setting": "+25%"
   },
@@ -306,14 +306,14 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.902344,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.207031,
-    "garden-dog": 0.066406,
-    "helix-espionage": 0.390625,
-    "kestrel-av": 0.371094
+    "garden-dog": 0.070312,
+    "helix-espionage": 0.40625,
+    "kestrel-av": 0.367188
    },
    "setting": "+25%"
   },
@@ -337,12 +337,12 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.183594,
-    "garden-dog": 0.042969,
+    "garden-dog": 0.046875,
     "helix-espionage": 0.300781,
     "kestrel-av": 0.355469
    },
@@ -371,7 +371,7 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.132812,
-    "garden-dog": 0.042969,
+    "garden-dog": 0.046875,
     "helix-espionage": 0.101562,
     "kestrel-av": 0.394531
    },
@@ -397,13 +397,13 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.207031,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.460938,
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.472656,
     "kestrel-av": 0.394531
    },
    "setting": "p=0.80"
@@ -426,15 +426,15 @@
    },
    "parameter": "beyond_reasonable_doubt",
    "prosecution_win_rate": {
-    "aurora-defi": 0.0,
+    "aurora-defi": 0.003906,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.199219,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.324219,
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.355469,
     "kestrel-av": 0.394531
    },
    "setting": "p=0.85"
@@ -457,13 +457,13 @@
    "prosecution_win_rate": {
     "aurora-defi": 0.0,
     "broken-bike": 0.929688,
-    "cookie-jar": 0.011719,
+    "cookie-jar": 0.0,
     "edge-defense-only": 0.0,
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.183594,
-    "garden-dog": 0.042969,
-    "helix-espionage": 0.304688,
+    "garden-dog": 0.046875,
+    "helix-espionage": 0.300781,
     "kestrel-av": 0.394531
    },
    "setting": "p=0.90"
@@ -491,7 +491,7 @@
     "edge-empty-docket": 0.0,
     "edge-mutual-exclusion": 0.0,
     "edge-poisoned-tree": 0.132812,
-    "garden-dog": 0.042969,
+    "garden-dog": 0.046875,
     "helix-espionage": 0.113281,
     "kestrel-av": 0.394531
    },

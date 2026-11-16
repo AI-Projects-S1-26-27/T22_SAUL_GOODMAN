@@ -26,6 +26,7 @@ VIOLATION_RULES: dict[str, str] = {
     "V-REBUTTAL-SCOPE": "Rebuttal evidence must contradict admitted defense evidence.",
     "V-OBJ-TARGET": "Objection must target the pending item (contemporaneous-objection rule).",
     "V-IMPEACH-TARGET": "Only an opposing witness who has testified may be impeached.",
+    "V-IMPEACH-NOT-ADMITTED": "An exhibit can impeach a witness only after it has been offered and admitted.",
     "V-AGENT-FAULT": "The agent failed to produce a well-formed action.",
 }
 
@@ -75,6 +76,8 @@ def validate(action: Action, state: ProcedureState, expected_side: Side, window:
                 return _v("V-NOT-OWNER", item.id)
             if action.witness_id not in state.testified_witnesses(action.actor.opponent):
                 return _v("V-IMPEACH-TARGET", action.witness_id)
+            if item.id not in state.admitted:
+                return _v("V-IMPEACH-NOT-ADMITTED", item.id)
             if (item.id, action.witness_id) in state.used_impeachments:
                 return _v("V-DUPLICATE", f"{item.id} vs {action.witness_id}")
             if ledger.budget < IMPEACHMENT_COST:

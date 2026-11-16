@@ -25,9 +25,9 @@
     },
     {
      "col": "reckless",
-     "high": -2.964,
-     "low": -3.296,
-     "mean": -3.136,
+     "high": -3.09,
+     "low": -3.404,
+     "mean": -3.236,
      "row": "aggressive"
     },
     {
@@ -81,37 +81,37 @@
     },
     {
      "col": "reckless",
-     "high": -2.475,
-     "low": -2.8035,
-     "mean": -2.6285,
+     "high": -2.49,
+     "low": -2.8045,
+     "mean": -2.6525,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
      "high": -6.1305,
-     "low": -6.7615,
-     "mean": -6.419,
+     "low": -6.7745,
+     "mean": -6.436,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -5.8445,
-     "low": -6.5765,
-     "mean": -6.207,
+     "high": -5.8615,
+     "low": -6.579,
+     "mean": -6.224,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -5.8185,
-     "low": -6.6065,
-     "mean": -6.2405,
+     "high": -5.8315,
+     "low": -6.6235,
+     "mean": -6.2535,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -4.353,
-     "low": -4.795,
-     "mean": -4.5315,
+     "high": -4.311,
+     "low": -4.7815,
+     "mean": -4.5325,
      "row": "reckless"
     }
    ],
@@ -304,9 +304,9 @@
     },
     {
      "col": "reckless",
-     "high": -1.256,
-     "low": -2.228,
-     "mean": -1.784,
+     "high": -1.804,
+     "low": -2.364,
+     "mean": -2.128,
      "row": "aggressive"
     },
     {
@@ -332,9 +332,9 @@
     },
     {
      "col": "reckless",
-     "high": -1.198,
-     "low": -1.298,
-     "mean": -1.25,
+     "high": -1.222,
+     "low": -1.318,
+     "mean": -1.274,
      "row": "conservative"
     },
     {
@@ -360,37 +360,37 @@
     },
     {
      "col": "reckless",
-     "high": -0.808,
-     "low": -1.668,
-     "mean": -1.256,
+     "high": -1.224,
+     "low": -1.784,
+     "mean": -1.548,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -2.9835,
-     "low": -3.37,
+     "high": -2.9945,
+     "low": -3.3705,
      "mean": -3.192,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -2.9805,
-     "low": -3.4015,
+     "high": -2.975,
+     "low": -3.405,
      "mean": -3.192,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -3.0285,
-     "low": -3.3875,
+     "high": -3.0295,
+     "low": -3.395,
      "mean": -3.192,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -2.3295,
-     "low": -3.1445,
-     "mean": -2.7935,
+     "high": -2.724,
+     "low": -3.284,
+     "mean": -3.048,
      "row": "reckless"
     }
    ],
@@ -1083,9 +1083,9 @@
     },
     {
      "col": "reckless",
-     "high": -0.8715,
-     "low": -2.3455,
-     "mean": -1.6365,
+     "high": -2.109,
+     "low": -3.0425,
+     "mean": -2.592,
      "row": "reckless"
     }
    ],
@@ -1131,16 +1131,16 @@
     },
     {
      "col": "adaptive",
-     "high": -2.1995,
-     "low": -3.919,
-     "mean": -3.068,
+     "high": -2.1835,
+     "low": -3.898,
+     "mean": -3.052,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": 2.7505,
-     "low": 0.5945,
-     "mean": 1.705,
+     "high": 2.4165,
+     "low": 0.284,
+     "mean": 1.4815,
      "row": "aggressive"
     },
     {
@@ -1166,16 +1166,16 @@
     },
     {
      "col": "reckless",
-     "high": -2.142,
-     "low": -2.19,
-     "mean": -2.169,
+     "high": -2.157,
+     "low": -2.205,
+     "mean": -2.184,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": -3.0455,
-     "low": -3.1865,
-     "mean": -3.113,
+     "high": -3.042,
+     "low": -3.185,
+     "mean": -3.11,
      "row": "adaptive"
     },
     {
@@ -1187,44 +1187,44 @@
     },
     {
      "col": "adaptive",
-     "high": -0.7655,
-     "low": -2.596,
-     "mean": -1.695,
+     "high": -0.754,
+     "low": -2.5705,
+     "mean": -1.675,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": 2.8845,
-     "low": 1.1355,
-     "mean": 1.968,
+     "high": 2.507,
+     "low": 0.668,
+     "mean": 1.6205,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -5.3495,
-     "low": -6.4655,
-     "mean": -5.9555,
+     "high": -5.357,
+     "low": -6.4855,
+     "mean": -5.9755,
      "row": "reckless"
     },
     {
      "col": "conservative",
      "high": 3.545,
-     "low": 1.792,
-     "mean": 2.7285,
+     "low": 1.796,
+     "mean": 2.7325,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -4.314,
-     "low": -5.913,
-     "mean": -5.064,
+     "high": -4.114,
+     "low": -5.6315,
+     "mean": -4.864,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": 2.1135,
-     "low": 0.199,
-     "mean": 1.1985,
+     "high": 1.523,
+     "low": -0.632,
+     "mean": 0.5065,
      "row": "reckless"
     }
    ],
@@ -1238,8 +1238,8 @@
     "reckless"
    ],
    "label_counts": {
-    "dominance-solvable": 1,
-    "mixed": 199
+    "dominance-solvable": 2,
+    "mixed": 198
    },
    "n_resamples": 200,
    "n_seeds": 100,
@@ -1250,7 +1250,7 @@
     "adaptive",
     "reckless"
    ],
-   "stability": 0.995,
+   "stability": 0.99,
    "surprises": false
   },
   "kestrel-av": {
@@ -1306,9 +1306,9 @@
     },
     {
      "col": "reckless",
-     "high": 2.499,
-     "low": 0.572,
-     "mean": 1.3945,
+     "high": 1.4675,
+     "low": -0.0325,
+     "mean": 0.663,
      "row": "conservative"
     },
     {
@@ -1362,9 +1362,9 @@
     },
     {
      "col": "reckless",
-     "high": 4.821,
-     "low": 3.4915,
-     "mean": 4.162,
+     "high": 4.21,
+     "low": 2.614,
+     "mean": 3.4475,
      "row": "reckless"
     }
    ],

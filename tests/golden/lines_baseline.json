@@ -137,11 +137,11 @@
  },
  {
   "who": "court",
-  "text": "A fair point. From now on, Maya's word counts for half."
+  "text": "Overruled. I see no problem with it. The spelling contest results stays in."
  },
  {
   "who": "court",
-  "text": "Overruled. I see no problem with it. The spelling contest results stays in."
+  "text": "A fair point. From now on, Maya's word counts for half."
  },
  {
   "who": "defense",
@@ -244,20 +244,12 @@
   "text": "Overruled. I see no problem with it. What Mrs. Bell heard stays in."
  },
  {
-  "who": "court",
-  "text": "No. That doesn't show any bias."
- },
- {
   "who": "defense",
   "text": "The Defender calls Mr. Ortiz, the school librarian. Where was Sam at lunchtime?"
  },
  {
-  "who": "prosecution",
-  "text": "That's fine by us, Your Honour."
- },
- {
   "who": "court",
-  "text": "Accepted. The spelling contest results counts as evidence."
+  "text": "No. That doesn't show any bias."
  },
  {
   "who": "court",
@@ -284,8 +276,12 @@
   "text": "Accepted. The lunch note counts as evidence."
  },
  {
+  "who": "prosecution",
+  "text": "No objection, Your Honour."
+ },
+ {
   "who": "court",
-  "text": "Very well. The spelling contest results is accepted."
+  "text": "Accepted. The spelling contest results counts as evidence."
  },
  {
   "who": "defense",
@@ -293,23 +289,43 @@
  },
  {
   "who": "prosecution",
-  "text": "No objection, Your Honour."
- },
- {
-  "who": "court",
-  "text": "I'll allow it. The librarian's account is now part of the record."
+  "text": "That's fine by us, Your Honour."
  },
  {
   "who": "court",
   "text": "I'll allow it. The lunch note is now part of the record."
  },
  {
+  "who": "court",
+  "text": "I'll allow it. The librarian's account is now part of the record."
+ },
+ {
   "who": "defense",
   "text": "That's all my evidence, Your Honour."
  },
  {
+  "who": "court",
+  "text": "Very well. The librarian's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The lunch note is accepted."
+ },
+ {
   "who": "prosecution",
   "text": "Objection, Your Honour! That has nothing to do with this case."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The spelling contest results is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The hallway video counts as evidence."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. What Mrs. Bell heard counts as evidence."
  },
  {
   "who": "court",
@@ -322,14 +338,6 @@
  {
   "who": "court",
   "text": "The Accuser has used all their turns. Let's move on."
- },
- {
-  "who": "court",
-  "text": "Accepted. The hallway video counts as evidence."
- },
- {
-  "who": "court",
-  "text": "Accepted. What Mrs. Bell heard counts as evidence."
  },
  {
   "who": "court",
@@ -721,14 +729,6 @@
  },
  {
   "who": "court",
-  "text": "A fair point. From now on, Mrs. Green's word counts for half."
- },
- {
-  "who": "court",
-  "text": "Overruled. I see no problem with it. The old complaints stays in."
- },
- {
-  "who": "court",
   "text": "Court is now in session. This is the case of Helix Dynamics Trade-Secret Exfiltration."
  },
  {
@@ -873,11 +873,11 @@
  },
  {
   "who": "court",
-  "text": "A fair point. From now on, Priya Nandakumar's word counts for half."
+  "text": "Very well. The complaint Priya filed is accepted."
  },
  {
   "who": "court",
-  "text": "I'll allow it. The complaint Priya filed is now part of the record."
+  "text": "A fair point. From now on, Priya Nandakumar's word counts for half."
  },
  {
   "who": "defense",
@@ -960,8 +960,20 @@
   "text": "Accepted. The crypto payment counts as evidence."
  },
  {
+  "who": "defense",
+  "text": "Your Honour, I'd like to call my witness, Professor Ian Cho, a security expert."
+ },
+ {
   "who": "court",
-  "text": "Very well. The complaint Priya filed is accepted."
+  "text": "Very well. Professor Cho's analysis is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "Your Honour, the Defender calls Tom Reyes from HR."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. The complaint Priya filed counts as evidence."
  },
  {
   "who": "court",
@@ -984,16 +996,8 @@
   "text": "Overruled. I see no problem with it. The phishing memo stays in."
  },
  {
-  "who": "court",
-  "text": "Accepted. The complaint Priya filed counts as evidence."
- },
- {
   "who": "defense",
   "text": "Your Honour, the Defender calls Dana Whitfield, the Vances' neighbour."
- },
- {
-  "who": "defense",
-  "text": "Your Honour, the Defender calls Tom Reyes from HR."
  },
  {
   "who": "court",
@@ -1028,12 +1032,12 @@
   "text": "Your Honour, they haven't given you real proof that the files were taken out. Please end the trial now."
  },
  {
-  "who": "defense",
-  "text": "Your Honour, I'd like to call my witness, Professor Ian Cho, a security expert."
+  "who": "court",
+  "text": "I'll allow it. Mr. Reyes's guess is now part of the record."
  },
  {
   "who": "court",
-  "text": "I'll allow it. Mr. Reyes's guess is now part of the record."
+  "text": "I'll allow it. The complaint Priya filed is now part of the record."
  },
  {
   "who": "court",
@@ -1061,14 +1065,6 @@
  },
  {
   "who": "defense",
-  "text": "The Defender calls Professor Ian Cho, a security expert. Professor, how reliable is that upload alarm?"
- },
- {
-  "who": "court",
-  "text": "Very well. The phishing memo is accepted."
- },
- {
-  "who": "defense",
   "text": "Your Honour, the Defender calls Mira Vance, Adrian's wife."
  },
  {
@@ -1089,7 +1085,19 @@
  },
  {
   "who": "court",
-  "text": "Very well. The garage video is accepted."
+  "text": "Very well. The neighbour's account is accepted."
+ },
+ {
+  "who": "court",
+  "text": "Very well. Mr. Reyes's guess is accepted."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Tom Reyes from HR. Mr. Reyes, what do you make of the upload?"
+ },
+ {
+  "who": "court",
+  "text": "I'll allow it. The garage video is now part of the record."
  },
  {
   "who": "prosecution",
@@ -1118,14 +1126,6 @@
  {
   "who": "court",
   "text": "Sustained. A rumour isn't proof. The informant's tip is thrown out."
- },
- {
-  "who": "court",
-  "text": "Very well. Professor Cho's analysis is accepted."
- },
- {
-  "who": "court",
-  "text": "Very well. Mr. Reyes's guess is accepted."
  },
  {
   "who": "court",
@@ -1160,20 +1160,24 @@
   "text": "Very well. The informant's tip is accepted."
  },
  {
-  "who": "defense",
-  "text": "The Defender calls Mira Vance, Adrian's wife. Where was your husband that night?"
+  "who": "court",
+  "text": "I'll allow it. The neighbour's account is now part of the record."
+ },
+ {
+  "who": "prosecution",
+  "text": "Objection, Your Honour! The witness is only guessing."
  },
  {
   "who": "court",
-  "text": "I'll allow it. Mira's account is now part of the record."
- },
- {
-  "who": "court",
-  "text": "I'll allow it. The garage video is now part of the record."
+  "text": "Accepted. The garage video counts as evidence."
  },
  {
   "who": "court",
   "text": "I'll allow it. The badge record is now part of the record."
+ },
+ {
+  "who": "court",
+  "text": "Very well. The garage video is accepted."
  },
  {
   "who": "court",
@@ -1193,23 +1197,15 @@
  },
  {
   "who": "court",
-  "text": "Accepted. The garage video counts as evidence."
- },
- {
-  "who": "court",
   "text": "Overruled. I see no problem with it. The informant's tip stays in."
  },
  {
   "who": "court",
-  "text": "Very well. The neighbour's account is accepted."
+  "text": "I'll allow it. The home router record is now part of the record."
  },
  {
   "who": "court",
-  "text": "Very well. The home router record is accepted."
- },
- {
-  "who": "defense",
-  "text": "Your Honour, I'd like to call my witness, Mira Vance, Adrian's wife."
+  "text": "I'll allow it. Mira's account is now part of the record."
  },
  {
   "who": "court",
@@ -1401,7 +1397,7 @@
  },
  {
   "who": "defense",
-  "text": "The Defender calls Lin Zhao, who runs Aurora's bug-bounty desk. When did you hear from the accused?"
+  "text": "Your Honour, I'd like to call my witness, Lin Zhao, who runs Aurora's bug-bounty desk."
  },
  {
   "who": "defense",
@@ -1422,6 +1418,14 @@
  {
   "who": "court",
   "text": "Accepted. The wallet-matching flaw counts as evidence."
+ },
+ {
+  "who": "defense",
+  "text": "The Defender calls Lin Zhao, who runs Aurora's bug-bounty desk. When did you hear from the accused?"
+ },
+ {
+  "who": "court",
+  "text": "Very well. Kofi's losses is accepted."
  },
  {
   "who": "defense",
@@ -1460,10 +1464,6 @@
   "text": "Very well. Rosa's money trail is accepted."
  },
  {
-  "who": "defense",
-  "text": "Your Honour, I'd like to call my witness, Lin Zhao, who runs Aurora's bug-bounty desk."
- },
- {
   "who": "court",
   "text": "I'll allow it. Lin Zhao's account is now part of the record."
  },
@@ -1481,15 +1481,15 @@
  },
  {
   "who": "court",
-  "text": "Very well. Kofi's losses is accepted."
- },
- {
-  "who": "court",
   "text": "Sustained. Evidence taken illegally can't be used. The secret key is thrown out."
  },
  {
   "who": "prosecution",
   "text": "Your Honour, the Accuser calls Kofi Mensah, an Aurora developer."
+ },
+ {
+  "who": "court",
+  "text": "Accepted. Kofi's losses counts as evidence."
  },
  {
   "who": "defense",
@@ -1516,10 +1516,6 @@
   "text": "I move to end the trial immediately!"
  },
  {
-  "who": "prosecution",
-  "text": "Objection, Your Honour! The witness is only guessing."
- },
- {
   "who": "court",
   "text": "I'll allow it. The printout is now part of the record."
  },
@@ -1534,14 +1530,6 @@
  {
   "who": "court",
   "text": "Accepted. The secret key counts as evidence."
- },
- {
-  "who": "prosecution",
-  "text": "Your Honour, I demand you end this trial right now!"
- },
- {
-  "who": "court",
-  "text": "Very well. Lin Zhao's account is accepted."
  },
  {
   "who": "court",
@@ -1665,11 +1653,11 @@
  },
  {
   "who": "court",
-  "text": "A fair point. From now on, Dr. Aiko Tan's word counts for half."
+  "text": "I'll allow it. Dr. Tan's firing record is now part of the record."
  },
  {
   "who": "court",
-  "text": "Accepted. Dr. Tan's firing record counts as evidence."
+  "text": "A fair point. From now on, Dr. Aiko Tan's word counts for half."
  },
  {
   "who": "prosecution",
@@ -1736,6 +1724,10 @@
   "text": "I'll allow it. The car's data is now part of the record."
  },
  {
+  "who": "court",
+  "text": "Accepted. Dr. Tan's firing record counts as evidence."
+ },
+ {
   "who": "defense",
   "text": "The cyclist was not wearing a helmet, which made the injuries worse."
  },
@@ -1769,15 +1761,11 @@
  },
  {
   "who": "court",
-  "text": "Very well. Dr. Tan's firing record is accepted."
- },
- {
-  "who": "court",
   "text": "Accepted. Grace's account counts as evidence."
  },
  {
-  "who": "court",
-  "text": "I'll allow it. Dr. Tan's firing record is now part of the record."
+  "who": "defense",
+  "text": "The Defender calls Martin Lund, who was in the next car. Mr. Lund, what did you see?"
  },
  {
   "who": "defense",
@@ -1849,11 +1837,11 @@
  },
  {
   "who": "court",
-  "text": "Very well. The helmet report is accepted."
+  "text": "Overruled. I see no problem with it. The helmet report stays in."
  },
  {
   "who": "court",
-  "text": "Very well. The safety check is accepted."
+  "text": "Very well. Martin's account is accepted."
  },
  {
   "who": "court",
