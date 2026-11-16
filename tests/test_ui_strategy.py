@@ -90,3 +90,41 @@ def test_surprises_toggle_updates_which_style_wins_in_live_mode() -> None:  # st
         assert pg.locator("#matrix .cell").count() == 16
         assert errors == []
         assert grid_before != [] and pg.locator("#matrix .cell b").all_inner_texts() != []
+
+
+def test_a_failing_trial_request_is_never_replaced_by_a_different_saved_trial() -> None:  # W2, W3
+    from tests.ui_support import live_server
+
+    with live_server() as base, page() as (pg, errors):
+        pg.route("**/api/trial", lambda r: r.fulfill(status=500, body="boom"))
+        pg.goto(f"{base}/index.html")
+        pg.wait_for_selector("#live-seed")
+        pg.evaluate("selectCase('cookie-jar')")
+        pg.fill("#live-seed", "7")
+        pg.dispatch_event("#live-seed", "change")
+        pg.click("#start")
+        pg.wait_for_function("document.querySelector('#combo-note').innerText.includes('did not answer')")
+        assert "seed 7" in pg.inner_text("#combo-note")
+        assert pg.evaluate("document.querySelector('#court').hidden")  # the asked-for trial could not be played, and nothing else was passed off
+        pg.fill("#live-seed", "0")
+        pg.dispatch_event("#live-seed", "change")
+        pg.click("#start")
+        pg.wait_for_selector("#live-badge .pill.edit")
+        assert "SAVED TRIAL" in pg.inner_text("#live-badge")  # seed 0 may fall back to the saved seed-0 trial, but says so
+        # W3: arrow keys on the music slider must not step the trial
+        i = pg.evaluate("S.idx")
+        pg.focus("#music-vol")
+        pg.keyboard.press("ArrowRight")
+        assert pg.evaluate("S.idx") == i
+        assert errors == []
+
+
+def test_no_horizontal_overflow_on_a_phone() -> None:  # W1
+    with static_server() as base, page(base_viewport=(375, 812)) as (pg, _):
+        for path, wait in (("index.html", "#strat-case option"), ("lab.html", ".chapter")):
+            pg.goto(f"{base}/{path}")
+            pg.wait_for_selector(wait, state="attached")
+            if path == "index.html":
+                pg.evaluate("selectCase('broken-bike')")
+            pg.wait_for_timeout(800)
+            assert pg.evaluate("document.documentElement.scrollWidth") <= 376, path

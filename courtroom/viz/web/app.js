@@ -419,6 +419,7 @@ function fixCombo(changed) {
 async function loadTrial() {
   const key = `${S.caseId}|${S.p}|${S.d}|0`;
   S.source = "recorded";
+  S.fallback = false;
   S.request = { case_id: S.caseId, prosecution: S.p, defense: S.d, seed: S.seed, surprises: S.surprises };
   if (S.inline?.id === S.caseId) S.request = { ...S.request, case_id: "", case: S.inline };
   try {
@@ -429,7 +430,14 @@ async function loadTrial() {
       S.source = "live";
       S.computedAt = new Date();
     } else S.trial = B.trials[key];
-  } catch { S.trial = B.trials[key]; }
+  } catch (e) {
+    // the server is on but did not answer: never pass a saved trial off as the one that was asked for
+    const asked = S.seed !== 0 || S.surprises || S.inline?.id === S.caseId;
+    S.trial = asked ? null : B.trials[key];
+    S.fallback = !!S.trial;
+    const note = $("#combo-note");
+    if (note) note.textContent = asked ? `The server did not answer (${e.message}), so the trial you asked for (seed ${S.seed}${S.surprises ? ", surprises on" : ""}${S.inline?.id === S.caseId ? ", edited case" : ""}) could not be played. Try again.` : `The server did not answer (${e.message}), so the saved trial is shown.`;
+  }
   if (!S.trial?.events) return false;
   window.Live?.ensureStory?.(C()); // cases with no script get spoken lines built from their own exhibit text
   window.Live?.trialLoaded?.();
@@ -921,7 +929,7 @@ async function init() {
   $("#v-styles").addEventListener("click", () => { leaveCourt(); $("#brief").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
   $("#v-cases").addEventListener("click", () => { leaveCourt(); $("#docket").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); });
   addEventListener("keydown", (e) => {
-    if ($("#court").hidden || e.target.closest?.("select")) return;
+    if ($("#court").hidden || e.target.closest?.("select, input, textarea")) return;
     if (e.key === "Escape") { if (!$("#notes").hidden) setNotes(false); else leaveCourt(); }
     else if (e.key === "ArrowRight") step(1);
     else if (e.key === "ArrowLeft") step(-1);

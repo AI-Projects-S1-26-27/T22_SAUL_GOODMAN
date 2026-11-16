@@ -130,6 +130,7 @@ window.Live = (() => {
     const parts = [el("span", { class: `pill ${live ? "live" : "rec"}` }, live ? "LIVE" : "RECORDED")];
     const when = live ? `computed just now (${S.computedAt.toLocaleTimeString()}), seed ${t.seed}` : `replayed from a saved file, seed ${t.seed}`;
     parts.push(el("span", { class: "when" }, when));
+    if (S.fallback) parts.push(el("span", { class: "pill edit", title: "The server is on but did not answer this request, so a saved trial is shown." }, "SERVER DID NOT ANSWER: SAVED TRIAL"));
     if (t.surprises) parts.push(el("span", { class: "pill sur" }, "SURPRISES ON"));
     if (S.inline?.id === S.caseId) parts.push(el("span", { class: "pill edit" }, "EDITED CASE"));
     if (S.llmNote) parts.push(el("span", { class: "pill ai" }, S.llmNote));
