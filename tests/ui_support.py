@@ -63,20 +63,34 @@ def live_server() -> Iterator[str]:
     import socket
     import subprocess
     import sys
+    import tempfile
     import time
 
-    with socket.socket() as s:
-        s.bind(("127.0.0.1", 0))
-        port = s.getsockname()[1]
-    proc = subprocess.Popen([sys.executable, "-m", "courtroom", "serve", "--port", str(port)], cwd=WEB.parent.parent.parent, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    try:
+    last_error = ""
+    for _attempt in range(3):  # a port found free can be taken before the server binds it: pick again
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            port = s.getsockname()[1]
+        log = tempfile.TemporaryFile()  # noqa: SIM115 - kept open for the server's lifetime
+        proc = subprocess.Popen([sys.executable, "-m", "courtroom", "serve", "--port", str(port)], cwd=WEB.parent.parent.parent, stdout=subprocess.DEVNULL, stderr=log)
+        up = False
         for _ in range(80):
+            if proc.poll() is not None:
+                log.seek(0)
+                last_error = log.read()[-500:].decode(errors="replace")
+                break
             try:
                 socket.create_connection(("127.0.0.1", port), 0.3).close()
+                up = True
                 break
             except OSError:
                 time.sleep(0.25)
-        yield f"http://127.0.0.1:{port}"
-    finally:
+        if up:
+            try:
+                yield f"http://127.0.0.1:{port}"
+            finally:
+                proc.terminate()
+                proc.wait(timeout=10)
+            return
         proc.terminate()
-        proc.wait(timeout=10)
+    raise RuntimeError(f"the local server did not start: {last_error}")
