@@ -57,7 +57,7 @@ def main() -> int:
         try:
             importlib.import_module(mod)
             check(f"import {mod}", True)
-        except Exception as e:  # noqa: BLE001 - any import failure is a failed check
+        except Exception as e:
             check(f"import {mod}", False, str(e))
 
     print("Port")
@@ -82,7 +82,7 @@ def main() -> int:
                 key = f"{cid}|aggressive|conservative|0"
                 if key in pinned and pinned[key] != res.digest:
                     bad.append(f"{cid}: digest differs from the pinned one")
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 bad.append(f"{cid}: {type(e).__name__}: {e}")
         check(f"all {len(CASES)} library cases play to a verdict with the pinned digest", not bad, "; ".join(bad))
 
