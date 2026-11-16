@@ -42,7 +42,7 @@ const CASE_PLAIN = {
   "edge-defense-only": "The only evidence in the file actually helps the person accused. The judge should end the trial early.",
 };
 const STYLE = {
-  aggressive: { label: "Bold", blurb: "Shows every piece of evidence, even weak ones, and objects a lot." },
+  aggressive: { label: "Bold", blurb: "Offers the evidence that helps it, even flawed items, and objects a lot." },
   conservative: { label: "Careful", blurb: "Shows only strong evidence and objects only when sure." },
   adaptive: { label: "Smart", blurb: "Watches the other lawyer and changes plan to match." },
   reckless: { label: "Wild", blurb: "Grabs evidence at random, objects on a whim and sometimes breaks the rules." },

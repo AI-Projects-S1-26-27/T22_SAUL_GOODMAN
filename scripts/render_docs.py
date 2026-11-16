@@ -208,16 +208,28 @@ def files() -> str:
     return table(["Result file", "sha256 (first 12)", "Size"], rows) + f"\n\n{len(pinned)} recorded trials are pinned in `tests/golden/bundle_digests.json`; {len(lines)} spoken lines in `tests/golden/lines_baseline.json`."
 
 
+def docket_tab(case_id: str) -> str:
+    """Which docket tab a library case sits in (the same rule as category() in app.js)."""
+    from courtroom.cases import get_case
+
+    tags = get_case(case_id).tags
+    return "Everyday" if "everyday" in tags else "Tricky tests" if "edge-case" in tags else "Serious"
+
+
 def demo_cases() -> str:
     off = load("matters").get("cases", {})
     if not off:
         return ""
-    moves = [f"`{c}`" for c, r in off.items() if r["verdict"] == "lawyers"]
-    some = [f"`{c}`" for c, r in off.items() if r["verdict"] == "partly_lawyers"]
-    flat = [f"`{c}`" for c, r in off.items() if r["verdict"] == "evidence"]
-    return (f"- Cases where changing the styles flips the verdict (use these to show strategy mattering): {', '.join(moves)}.\n"
-            f"- Cases where it moves a little: {', '.join(some) or 'none'}.\n"
-            f"- Cases where the evidence alone decides (show these as everyday trials, **not** as examples of strategy mattering): {', '.join(flat)}.")
+
+    def show(ids: list[str]) -> str:
+        return ", ".join(f"`{c}` ({docket_tab(c)} tab)" for c in ids)
+
+    moves = [c for c, r in off.items() if r["verdict"] == "lawyers"]
+    some = [c for c, r in off.items() if r["verdict"] == "partly_lawyers"]
+    flat = [c for c, r in off.items() if r["verdict"] == "evidence"]
+    return (f"- Cases whose card is tagged \"Decided by the lawyers\" (use these to show strategy mattering): {show(moves)}.\n"
+            f"- Cases tagged \"Partly the lawyers\": {show(some) or 'none'}.\n"
+            f"- Cases where the evidence alone decides (tagged \"Decided by the evidence\"; show these as plain trials, **not** as examples of strategy mattering): {show(flat)}.")
 
 
 # --------------------------------------------------------------------------- the lecture concepts (classic games, Pareto, minimax, alpha-beta)

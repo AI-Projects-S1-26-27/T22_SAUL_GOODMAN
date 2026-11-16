@@ -126,33 +126,26 @@ The proposal-versus-code differences are listed in `DEVIATIONS.md`.
 
 ## The web app
 
-The web app is laid out as a lawyer's **case folder**: six index tabs on a single sheet. Each tab
-has its own link (`#overview`, `#courtroom`, `#casefile`, `#verdict`, `#strategy`, `#judge`), so
-you can share exactly what you're looking at.
+The home page is one scrolling page (the strategy lab is a second page, `lab.html`):
 
-| Tab | What it shows |
+| Section | What it shows |
 |---|---|
-| **Overview** | The idea on one page. A live replay of a real trial runs in the hero. Below it: who's in the room (the judge, the record and both lawyers), the five moves a lawyer can make, the four playing styles, and why every result can be checked. |
-| **Courtroom** | Pick a case and a style for each side, then play, pause or step through the trial. Every event is narrated in plain English. You also get stage progress, *How sure is the judge?* meters for each point with the bar it must clear, a clickable transcript, and live evidence boards showing what was shown, accepted or thrown out. |
-| **Case file** | The accusation and charge, the points that must be proven, the standard of proof and the case budget. Witnesses come with credibility and possible bias. Every exhibit comes with its reliability, what it clashes with and its hidden flaws. |
-| **Verdict** | Why the loaded trial ended the way it did. Each point shows a bar per exhibit for how far it pushed the judge either way. An **evidence map** shows which exhibits back each other up and which clash. Also here: the judge's exact working, each side's ledger, and the fingerprinted event chain. |
-| **Strategy** | *Which style wins?* A win-rate matrix for every pairing of styles, the stable (Nash) choices explained in plain language, the smart mixes, and the win rate when both sides play smart. |
-| **The judge** | How rulings and verdicts are made, the three standards of proof, the six objection grounds, and the exact formula. |
+| **Hero and How a trial works** | The idea in a few lines: two lawyers, one fixed rulebook judge. |
+| **Today's docket** | The cases, in three tabs: *Everyday*, *Serious* and *Tricky tests* (plus *Found by search* when the local server has found any). Picking a card selects the case. |
+| **Brief your lawyers** | One of four styles for each side, a seed box, a courtroom-surprises switch, and the other live controls when the local server is running; on the hosted site it says RECORDED. **Enter the courtroom** opens the 3D room. |
+| **The courtroom** | The trial plays step by step with voices and music; a case-notes drawer, a transcript, how sure the judge is of each point, and a verdict card with *Why this verdict?* and *What would flip it?* when live. |
+| **Which style wins?** | The four-by-four win-rate table for the picked case (stored certified results), with what each side pays, the stable picks, and a plain note when the evidence decides the case. |
+| **Strategy lab** | A second page that works the game out chapter by chapter (payoff tables, equilibria, best replies, classic games, efficiency, guarantees, thinking ahead). |
 
-The header has two switches:
+A **Guide** link in the top bar opens a one-screen map of which part does what and runs a guided tour of the page (it also opens once, by itself, the first time a browser visits each page).
 
-- **Technical details** reveals rule IDs, the agents' reasoning, event hashes, exact payoffs,
-  equilibrium fractions and a replicator-dynamics plot.
-- **Light/dark theme** follows your system setting by default and remembers your choice.
-
-The front end is plain HTML, CSS and JavaScript with **no build step and no network
-dependencies**, and the fonts are self-hosted. When the API isn't reachable it falls back to the
-pre-exported bundle (`courtroom/viz/web/data/bundle.js`), so it also works offline or opened
-straight from `file://`.
+The front end is plain HTML, CSS and JavaScript with **no build step**. It loads GSAP, three.js and Google Fonts from CDNs for polish; the
+trial player still works without them. When the API isn't reachable it falls back to the pre-exported bundle
+(`courtroom/viz/web/data/bundle.js`), so the recorded trials play offline or from `file://` (without the 3D scene if three.js cannot load).
 
 **Hosted demo vs. local server.** The Vercel deployment is the static UI running on that bundle.
-It includes the seed-0 trial for six style pairings per case plus the 2×2 Aggressive/Careful
-games, and it greys out the rest. Run `python -m courtroom serve` locally to unlock everything.
+It includes the seed-0 trial for all sixteen pairings of the four styles on each case, plus the 2×2 Aggressive/Careful
+games, and the stored results the lab reads; it hides the controls that need the engine. Run `python -m courtroom serve` locally to unlock everything.
 
 ---
 
@@ -174,7 +167,7 @@ On its turn, a lawyer can:
 | **Present evidence** | Offer a document, record or witness. The other side gets exactly one chance to object (or pass). |
 | **Object** | Claim the evidence is hearsay, unverified, illegally obtained, shared too late, guesswork or off-topic. A wrong objection is penalised. |
 | **Challenge a witness** | Use evidence to impeach a witness. If it works, that witness counts for half. |
-| **Ask to end early** | The defense can move for a directed verdict if a point has no accepted evidence at all. |
+| **Ask to end early** | The defense can move for a directed verdict; it is granted only if some point's log-odds are below zero. (If a point has no accepted supporting evidence at all, the judge ends the trial on its own: rule DV-2.) |
 | **Rest** | Stop presenting. Passing twice in a row counts as resting, so nobody can stall forever. |
 
 Every move costs part of a fixed **budget**, each stage has a **turn cap**, and neither lawyer can
@@ -190,11 +183,13 @@ flaws are waived, just as in real procedure, which is what makes objection strat
 
 | Style | Behaviour |
 |---|---|
-| **Aggressive** | Offers everything that helps, including defective items, and objects on thin suspicion. |
-| **Careful** (conservative) | Offers only clean evidence that matters, and objects only when confident. |
-| **Adaptive** | Maximises expected value and learns the opponent's objection rate (Beta posterior). |
-| **Chaotic** | Makes random, often illegal moves. It exists to prove the rules can't be broken. |
-| **Mixed** *(local only)* | Aggressive with probability *p*, otherwise Careful. |
+| **Aggressive** (Bold) | Offers the evidence that helps it, including flawed items when the gain is worth the risk, and objects on thin suspicion. |
+| **Careful** (Conservative) | Offers only clean evidence that matters, and objects only when confident. |
+| **Adaptive** (Smart) | Maximises expected value and learns the opponent's objection rate (Beta posterior). |
+| **Reckless** (Wild) | Plays random legal moves, objects on a whim, and sometimes moves out of turn. This is the fourth style in every certified table. |
+| **Mixed** *(local only)* | Aggressive with probability *p*, otherwise Careful. Not one of the four styles in the certified tables. |
+
+`chaos` (random, often illegal moves) is a test-only agent that exists to prove the rules cannot be broken; it is not offered as a style.
 
 ---
 
@@ -341,7 +336,7 @@ judge only through the read-only `Oracle`, and the visualisation layer can't inf
 - **Agent crashes:** caught at the fault barrier (`V-AGENT-FAULT`), including in `opening_statement()`.
 - **Demo infrastructure:** bundle fallback, works from `file://`, and `no-cache` headers.
 - **Verified:** a 2,500-trial fuzz run, including the Chaotic agent, had 0 crashes and 0 invariant
-  violations, and 250/250 replays were bit-identical. All 483 tests pass.
+  violations, and 250/250 replays were bit-identical. The whole suite passes.
 
 ---
 
@@ -376,7 +371,7 @@ courtroom/
   viz/         terminal dashboard + web/ (index.html, styles.css, app.js, data/bundle.js)
   cli.py       command-line entry point
 docs/DESIGN.md design dialectic and calibration notes
-tests/         483 tests
+tests/         the test suite
 ```
 
 ---

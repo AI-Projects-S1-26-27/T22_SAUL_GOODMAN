@@ -21,8 +21,8 @@ Set up once: Python 3.11 or newer and `pip install -e ".[dev]"`. Nothing below n
 | ...also with courtroom surprises on. | `python -m courtroom verify --case helix-espionage --seed 6 -p adaptive -d aggressive --surprises` |
 | Verdict arithmetic is exact (`Fraction`), permutation invariant, and follows the rules. | `python -m pytest tests/test_judge.py tests/test_procedure.py tests/test_engine.py` |
 | Nothing crashes under fuzzing (chaos agents, generated cases). | `python -m courtroom stress --cases 100` |
-| The whole suite passes with no key, no Ollama and no network. | `python -m pytest` |
-| Style, imports and syntax. | `ruff check courtroom tests scripts` and `node --check courtroom/viz/web/*.js` |
+| The whole suite passes with no key, no Ollama and no network (the browser tests need Playwright's Chromium: `python -m playwright install chromium`). | `python -m pytest` |
+| Style, imports and syntax. | `ruff check courtroom tests scripts` and `for f in courtroom/viz/web/*.js; do node --check "$f" || exit 1; done` |
 
 ## What the live controls compute
 
@@ -51,7 +51,7 @@ Set up once: Python 3.11 or newer and `pip install -e ".[dev]"`. Nothing below n
 |---|---|---|
 | The classifier names the textbook games correctly (prisoner's dilemma, stag hunt, battle of the sexes, chicken, matching pennies), is unchanged by relabelling and rescaling, and says "none" when noise hides the order. | `python -m pytest tests/test_classic.py` | |
 | Which classic game each two-by-two corner of each case resembles, and how often the label survives resampling. | `python scripts/run_analysis.py classic --workers 4` (and `--surprises`); one case: `python -m courtroom classic --case helix-espionage` | `results/classic.json`, `results/classic_surprises.json` |
-| Whether the games we did not find in the library can be found among generated cases. | `python scripts/run_classic_search.py --count 400` (and `--surprises`); live: `python -m courtroom classic --find prisoners-dilemma,stag-hunt,battle-of-the-sexes` | `results/classic_search.json`, `results/classic_search_surprises.json` |
+| Whether the games we did not find in the library can be found among generated cases. | `python scripts/run_classic_search.py --count 400` (and `--surprises`; 400 are requested and the ones with no evidence are skipped, so fewer are measured); live: `python -m courtroom classic --find prisoners-dilemma,stag-hunt,battle-of-the-sexes` | `results/classic_search.json`, `results/classic_search_surprises.json` |
 | Pareto-efficient cells, whether each equilibrium is efficient, and security values. | `python scripts/run_analysis.py efficiency --workers 4` (and `--surprises`); one case: `python -m courtroom efficiency --case kestrel-av` | `results/efficiency.json`, `results/efficiency_surprises.json` |
 | Maximin equals minimax equals the Nash value on constant-sum games (exact). | `python -m pytest tests/test_efficiency.py` | |
 | The game tree uses the engine's own rules: a recorded trial replayed through the tree gives the same verdict and payoffs. | `python -m pytest tests/test_search.py -k engine` | |

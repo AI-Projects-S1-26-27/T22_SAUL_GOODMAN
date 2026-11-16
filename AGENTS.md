@@ -150,7 +150,7 @@ All sound is synthesised in `sound.js`. There are no audio files to manage.
 
 ```bash
 python -m pytest
-node --check courtroom/viz/web/*.js
+for f in courtroom/viz/web/*.js; do node --check "$f" || exit 1; done
 ```
 
 - **Cache-busting:** after changing any web file, bump the `?v=N` on every `<script>` and stylesheet link in

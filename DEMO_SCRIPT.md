@@ -6,9 +6,9 @@ say **LIVE**. Everything below is computed in front of the examiner by the exact
 Which cases to use, measured by `python -m courtroom matters` (stored in `results/matters.json`):
 
 <!-- BEGIN GENERATED:demo_cases -->
-- Cases where changing the styles flips the verdict (use these to show strategy mattering): `broken-bike`, `helix-espionage`, `kestrel-av`.
-- Cases where it moves a little: `edge-poisoned-tree`.
-- Cases where the evidence alone decides (show these as everyday trials, **not** as examples of strategy mattering): `aurora-defi`, `cookie-jar`, `edge-defense-only`, `edge-empty-docket`, `edge-mutual-exclusion`, `garden-dog`.
+- Cases whose card is tagged "Decided by the lawyers" (use these to show strategy mattering): `broken-bike` (Everyday tab), `helix-espionage` (Serious tab), `kestrel-av` (Serious tab).
+- Cases tagged "Partly the lawyers": `edge-poisoned-tree` (Tricky tests tab).
+- Cases where the evidence alone decides (tagged "Decided by the evidence"; show these as plain trials, **not** as examples of strategy mattering): `aurora-defi` (Serious tab), `cookie-jar` (Everyday tab), `edge-defense-only` (Tricky tests tab), `edge-empty-docket` (Tricky tests tab), `edge-mutual-exclusion` (Tricky tests tab), `garden-dog` (Everyday tab).
 <!-- END GENERATED:demo_cases -->
 
 Do not present a case from the last group as an example of strategy mattering: measured, it does not.
@@ -17,14 +17,14 @@ The first time a browser opens the home page or the lab, a short guided tour ope
 
 ## 0:00 An everyday case, to show the room (about 45 seconds)
 
-Pick an everyday case from the docket and enter the courtroom. Point at the **LIVE** badge: "this trial was computed just now". Ask
+Pick `cookie-jar` or `garden-dog` from the **Everyday** tab (not `broken-bike`: it sits in the same tab but is the exception, a case the lawyers decide) and enter the courtroom. Point at the **LIVE** badge: "this trial was computed just now". Ask
 the examiner for a **seed** (the box in "Brief your lawyers") and run it. Click **Run it again and compare**: both digests match and
 the hash chain is valid. Say plainly what you are about to see: in this case the evidence decides, so the verdict will not move
 however the lawyers play. The docket tag on the card says so.
 
 ## 0:45 A case where the lawyers matter (about 60 seconds)
 
-Go back to the docket and open one from the "lawyers move the verdict" group. Under **Does strategy matter here?** show the table of
+Go back to the docket and open a card tagged **Decided by the lawyers** (the generated list above names the tab each one is in). Under **Does strategy matter here?** show the table of
 all nine pairings. Ask the examiner to pick a style for each lawyer, enter the room, and let it play to the verdict. Go back, change
 one style, play again: the verdict changes. Then open **Why this verdict?** on the verdict card: the judge's own numbers in plain
 words.
