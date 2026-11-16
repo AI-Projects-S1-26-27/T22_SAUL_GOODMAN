@@ -40,7 +40,7 @@ Set up once: Python 3.11 or newer and `pip install -e ".[dev]"`. Nothing below n
 |---|---|---|
 | Stability of each case's conclusion under resampling. | `python scripts/run_analysis.py bootstrap --workers 4` (and `--surprises`) | `results/bootstrap.json`, `results/bootstrap_surprises.json` |
 | Whether conclusions survive changes to the rulebook's constants. | `python scripts/run_analysis.py sensitivity` (and `--surprises`) | `results/sensitivity.json`, `results/sensitivity_surprises.json` |
-| Whether the four hand-written styles can be beaten. | `python scripts/run_oracle_results.py --workers 4` | `results/oracle/<case>.json` and `<case>_surprises.json` |
+| Whether the four hand-written styles can be beaten. | `python scripts/run_oracle_results.py --workers 4` | `results/oracle/<case>.json` and `<case>_surprises.json`. These files also record the wall-clock `seconds` the run took, so a re-run changes their sha256 values (the certified numbers in them do not change); re-run `python scripts/render_docs.py` afterwards. |
 | ...for one case, with your own budget. | `python -m courtroom oracle --case helix-espionage --budget 60 --workers 4` | |
 | The lab and the report read those files, not new runs. | `python scripts/build_analysis_js.py` then `python scripts/render_docs.py` | `courtroom/viz/web/data/analysis.js` |
 | The docs are not out of date. | `python scripts/render_docs.py --check` | |
