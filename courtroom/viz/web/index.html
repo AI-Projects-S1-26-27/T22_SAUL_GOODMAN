@@ -8,8 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=13">
   <link rel="stylesheet" href="live.css?v=4">
+  <link rel="stylesheet" href="tour.css?v=1">
 </head>
 <body>
   <a class="skip" href="#docket">Skip to the cases</a>
@@ -101,9 +102,12 @@
       <div class="wrap strat-grid">
         <div>
           <h2 id="strat-title" class="section-title">Which style wins?</h2>
-          <p class="lede">We replayed every case many times with each mix of styles. Each box shows how often the <b class="t-p">Accuser</b> wins.</p>
+          <p class="lede">We replayed every case many times with each of the four styles on each side. Each box shows how often the <b class="t-p">Accuser</b> wins, and what each side pays.</p>
           <label class="select-label">Case <select id="strat-case"></select></label>
+          <p class="strat-note" id="strat-flat" hidden></p>
+          <p class="strat-note" id="strat-rating" hidden></p>
           <p class="takeaway" id="takeaway"></p>
+          <p class="muted small" id="strat-src"></p>
         </div>
         <div class="matrix" id="matrix"></div>
       </div>
@@ -210,6 +214,7 @@
   <noscript><p class="noscript">This page needs JavaScript to run the trial.</p></noscript>
 
   <script src="data/bundle.js?v=12"></script>
+  <script src="data/analysis.js?v=4"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -224,8 +229,9 @@
   <script src="sound.js?v=12"></script>
   <script src="scene.js?v=12"></script>
   <script src="courtroom3d.js?v=12"></script>
-  <script src="app.js?v=14"></script>
-  <script src="live.js?v=8"></script>
-  <script src="handoff.js?v=13"></script>
+  <script src="app.js?v=16"></script>
+  <script src="live.js?v=10"></script>
+  <script src="handoff.js?v=14"></script>
+  <script src="tour.js?v=2"></script>
 </body>
 </html>

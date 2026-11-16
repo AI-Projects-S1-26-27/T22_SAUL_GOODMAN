@@ -7,6 +7,7 @@
   "use strict";
   const m = location.hash.match(/^#watch=([^|]+)\|([^|]+)\|([^|]+)$/);
   if (!m) return;
+  window.COURTROOM_WATCH = true; // tour.js reads this: it does not open over a shared link
   const [caseId, p, d] = m.slice(1).map(decodeURIComponent);
   history.replaceState(null, "", location.pathname + location.search);
   try {

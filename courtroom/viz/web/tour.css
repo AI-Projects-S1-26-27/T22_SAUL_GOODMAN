@@ -1,0 +1,28 @@
+/* Guide: spotlight tour and one-screen map (tour.js). */
+.nav nav a.nav-guide { color: var(--brass); }
+@media (max-width: 760px) { .nav nav a.nav-guide { display: inline-block; } }
+.tour { position: fixed; inset: 0; z-index: 200; }
+.tour[hidden] { display: none; }
+.tour-shield { position: absolute; inset: 0; }
+.tour-spot { position: fixed; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(8, 6, 4, .78), 0 0 0 3px var(--brass); pointer-events: none; transition: top .35s var(--ease), left .35s var(--ease), width .35s var(--ease), height .35s var(--ease); }
+.tour-card { position: fixed; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--ink-2); color: var(--bone); border: 1px solid var(--brass); border-radius: 14px; padding: 20px 22px; box-shadow: 0 18px 60px rgba(0, 0, 0, .6); }
+.tour-card.centered { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.tour-card.wide { width: min(860px, calc(100vw - 32px)); }
+.tour-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.tour-kicker { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
+.tour-x { background: none; border: 0; font-size: 26px; line-height: 1; color: var(--bone-2); padding: 0 6px; }
+.tour-card h2 { font: 600 26px/1.15 var(--serif); margin: 4px 0 8px; }
+.tour-card p { margin: 0 0 12px; font-size: 17px; color: var(--bone-2); }
+.tour-map-h { font-weight: 600; color: var(--bone) !important; margin-top: 6px !important; }
+.tour-map { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 14px; }
+.tour-map th, .tour-map td { text-align: left; padding: 7px 8px; border-top: 1px solid var(--ink-3); vertical-align: top; color: var(--bone-2); }
+.tour-map thead th { color: var(--bone); border-top: 0; font-weight: 600; }
+.tour-map tbody th { color: var(--bone); font-weight: 500; }
+.tour-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.tour-btn { border-radius: 8px; padding: 10px 18px; font-size: 16px; font-weight: 600; border: 1px solid var(--brass); background: none; color: var(--bone); }
+.tour-btn.primary { background: var(--brass); color: var(--brass-ink); }
+@media (max-width: 640px) {
+  .tour-card, .tour-card.wide { left: 8px !important; right: 8px; top: auto !important; bottom: 8px; width: auto; transform: none; max-height: 60vh; }
+  .tour-map th:nth-child(3), .tour-map td:nth-child(3) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tour-spot { transition: none; } }

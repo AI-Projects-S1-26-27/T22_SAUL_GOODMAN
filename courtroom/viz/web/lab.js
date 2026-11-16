@@ -1004,6 +1004,8 @@
     recompute();
     $("#lab-source").textContent = L.source === "live" ? `Averaged over ${L.runs} fresh trials per pairing, run on this computer.`
       : `Using one recorded trial per pairing${L.live ? ". Run fresh trials for steadier averages." : "."}`;
+    const ns = window.COURTROOM_ANALYSIS?.efficiency?.n_seeds;
+    if (ns) $("#lab-source").textContent += ` The later chapters on certainty, classic games, efficiency and guarantees use stored results averaged over ${ns} seeds, so their numbers differ a little from this table.`;
     renderKpis(); renderLedger(); renderMatrix(); renderSolve(); renderBR(); renderLandSays(); renderWhatIf(); renderEvo(); renderBelief(); Land.update();
     window.dispatchEvent(new CustomEvent("lab-refresh", { detail: { caseId: L.caseId, live: L.live } })); // lab-extra.js listens
   }

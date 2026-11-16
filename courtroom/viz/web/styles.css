@@ -144,9 +144,12 @@ select { min-height: 44px; padding: 8px 12px; border-radius: 6px; border: 0; bac
 .cell .bg { position: absolute; inset: 0; background: rgba(232, 115, 90, .35); transform-origin: bottom; }
 .cell b { position: relative; display: block; font: 600 46px/1 var(--serif); }
 .cell small { position: relative; color: var(--bone-2); font-size: 14px; }
+.cell small.pay { display: block; margin-top: 8px; font-size: 12px; }
+.cell.nodata b { font-size: 22px; color: var(--bone-2); }
+.strat-note { font-size: 16px; color: var(--bone); max-width: 46ch; margin-top: 18px; padding: 12px 14px; border-left: 3px solid var(--brass); background: var(--ink-3); border-radius: 0 8px 8px 0; }
 .cell.eq { box-shadow: inset 0 0 0 3px var(--brass); }
 .cell.eq small::after { content: " · stable pick"; color: var(--brass); font-weight: 600; }
-.takeaway { font-size: 19px; color: var(--bone-2); max-width: 46ch; margin-top: 30px; }
+.takeaway { font-size: 19px; color: var(--bone-2); max-width: 46ch; margin-top: 22px; }
 @media (max-width: 900px) { .strat-grid { grid-template-columns: 1fr; gap: 36px; } }
 
 .foot { padding: 48px 24px 64px; text-align: center; color: var(--bone-2); font-size: 16px; background: var(--ink); }

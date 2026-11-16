@@ -13,6 +13,8 @@ Which cases to use, measured by `python -m courtroom matters` (stored in `result
 
 Do not present a case from the last group as an example of strategy mattering: measured, it does not.
 
+The first time a browser opens the home page or the lab, a short guided tour opens by itself (once per browser). Press **Escape** to dismiss it, or open **Guide** in the nav at any time for the one-screen map and to run it again. The tour skips the live-only steps on the hosted site.
+
 ## 0:00 An everyday case, to show the room (about 45 seconds)
 
 Pick an everyday case from the docket and enter the courtroom. Point at the **LIVE** badge: "this trial was computed just now". Ask

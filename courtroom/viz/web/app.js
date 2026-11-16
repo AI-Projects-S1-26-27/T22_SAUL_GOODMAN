@@ -376,6 +376,8 @@ function selectCase(id) {
   fixCombo("p");
   renderStyles();
   window.Live?.caseSelected?.(id);
+  const sc = $("#strat-case");
+  if (sc && [...sc.options].some((o) => o.value === id)) { sc.value = id; renderStrategy(id); }
   // next step: brief the lawyers, with the courtroom button right below
   const head = $("#brief-title");
   scrollTo({ top: head.getBoundingClientRect().top + scrollY - 90, behavior: reduced ? "auto" : "smooth" });
@@ -794,30 +796,64 @@ function showVerdict() {
 
 /* ------------------------------------------------------------------ strategy */
 
+/* Which style wins: the four-by-four certified result (results/efficiency.json, shipped in data/analysis.js). */
+const fracNum = (s) => { const [n, d] = String(s).split("/"); return d ? Number(n) / Number(d) : Number(n); };
+const money = (v) => (v == null || Number.isNaN(v) ? "no data" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1));
+const mixWords = (mix) => {
+  const parts = Object.entries(mix).map(([k, v]) => [k, fracNum(v)]).filter(([, w]) => w > 0).sort((a, b) => b[1] - a[1]);
+  if (parts.length === 1) return styleOf(parts[0][0]).label.toLowerCase();
+  return "a mix of " + parts.map(([k, w]) => `${styleOf(k).label.toLowerCase()} ${Math.round(100 * w)}%`).join(", ");
+};
+
+function strategyTakeaway(g, flat) {
+  const eqs = g.efficiency.equilibria;
+  if (!eqs.length) return [el("b", {}, "No stable pick found. "), "The search found no pair of choices that neither lawyer wants to leave."];
+  const say = (e) => `${mixWords(e.row_mix)} for the Accuser against ${mixWords(e.col_mix)} for the Defender`;
+  const out = [];
+  if (eqs.length === 1 && eqs[0].pure) out.push(el("b", {}, "The stable pick: "), `${say(eqs[0])}. Neither lawyer can do better by switching alone. Game theory calls this a Nash equilibrium.`);
+  else if (eqs.length === 1) out.push(el("b", {}, "No single best style here. "), `The stable pick is to mix: ${say(eqs[0])}, so the other side can't predict them.`);
+  else out.push(el("b", {}, `${eqs.length} stable picks: `), `${eqs.slice(0, 4).map(say).join("; ")}${eqs.length > 4 ? "; and more" : ""}. Each one is a Nash equilibrium, so the game has no single best style.`);
+  if (flat) out.push(" Because the Accuser's chance is the same in every box, these picks are decided by what each lawyer pays, not by who wins.");
+  return out;
+}
+
 function renderStrategy(cid) {
-  const g = B.games[cid], box = $("#matrix");
-  if (!g) { box.replaceChildren(el("p", { class: "muted" }, "No strategy data for this case.")); return; }
+  const A_ = window.COURTROOM_ANALYSIS, sur = !!S.surprises;
+  const eff = sur ? A_?.efficiency_surprises : A_?.efficiency;
+  const g = eff?.cases?.[cid], box = $("#matrix"), flatBox = $("#strat-flat"), rating = $("#strat-rating"), t = $("#takeaway");
+  flatBox.hidden = rating.hidden = true;
+  if (!g) { box.replaceChildren(el("p", { class: "muted" }, "No data for this case.")); t.replaceChildren(); $("#strat-src").textContent = ""; return; }
   const rows = g.row_strategies, cols = g.col_strategies;
-  const pureKey = (mix) => Object.keys(mix).find((k) => mix[k] === 1);
-  const eq = new Set(g.analysis.equilibria.filter((e) => e.pure).map((e) => `${pureKey(e.row_mix)}|${pureKey(e.col_mix)}`));
-  const cell = Object.fromEntries(g.cells.map((c) => [`${c.row}|${c.col}`, c]));
+  const rateAt = (i, j) => { const v = g.accuser_win_rate?.[i]?.[j]; return typeof v === "number" ? v : null; };
+  const vals = rows.flatMap((_, i) => cols.map((_, j) => rateAt(i, j)));
+  const known = vals.filter((v) => v !== null);
+  const flat = known.length === vals.length && known.every((v) => v === known[0]);
+  const pureKey = (mix) => Object.keys(mix).find((k) => mix[k] === "1");
+  const eq = new Set(g.efficiency.equilibria.filter((e) => e.pure).map((e) => `${pureKey(e.row_mix)}|${pureKey(e.col_mix)}`));
   box.style.setProperty("--cols", cols.length);
   const kids = [el("div", { class: "h" }, ""), ...cols.map((c) => el("div", { class: "h col" }, `${styleOf(c).label} Defender`))];
-  for (const r of rows) {
+  rows.forEach((r, i) => {
     kids.push(el("div", { class: "h row" }, `${styleOf(r).label} Accuser`));
-    for (const c of cols) {
-      const w = cell[`${r}|${c}`]?.prosecution_win_rate ?? 0;
-      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}` },
-        el("span", { class: "bg", style: `transform:scaleY(${w})` }), el("b", {}, pct(w)), el("small", {}, "Accuser wins")));
-    }
-  }
+    cols.forEach((c, j) => {
+      const w = rateAt(i, j);
+      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}${w === null ? " nodata" : ""}` },
+        el("span", { class: "bg", style: `transform:scaleY(${w ?? 0})` }), el("b", {}, w === null ? "no data" : pct(w)), el("small", {}, "Accuser wins"),
+        el("small", { class: "pay" }, `pays: Acc ${money(g.A?.[i]?.[j])} · Def ${money(g.B?.[i]?.[j])}`)));
+    });
+  });
   box.replaceChildren(...kids);
-  if (hasGsap && !reduced) gsap.from($$(".cell .bg", box), { scaleY: 0, duration: 1, stagger: .1, ease: "power3.out" });
-  const e = g.analysis.equilibria.find((x) => x.pure);
-  const t = $("#takeaway");
-  t.replaceChildren();
-  if (e) t.append(el("b", {}, "The stable pick: "), `a ${styleOf(pureKey(e.row_mix)).label.toLowerCase()} Accuser against a ${styleOf(pureKey(e.col_mix)).label.toLowerCase()} Defender. Neither lawyer can do better by switching alone. Game theory calls this a Nash equilibrium.`);
-  else t.append(el("b", {}, "No single best style here. "), "Each lawyer does best by mixing it up, so the other side can't predict them.");
+  if (hasGsap && !reduced) gsap.from($$(".cell .bg", box), { scaleY: 0, duration: 1, stagger: .05, ease: "power3.out" });
+  const m = ((sur ? A_?.matters_surprises : A_?.matters)?.cases ?? []);
+  const mm = Array.isArray(m) ? m.find((x) => x.case_id === cid) : m[cid];
+  const byEvidence = flat || (mm?.verdict === "evidence" && known.length === vals.length);
+  if (byEvidence) {
+    const lo = Math.min(...known), hi = Math.max(...known);
+    flatBox.textContent = `The evidence decides this case: the Accuser wins ${lo === hi ? pct(lo) : `only ${pct(lo)} to ${pct(hi)}`} whatever either lawyer does. What still differs is each side's payoff (what the case costs it, and any sanctions), shown in small print in each box.`;
+    flatBox.hidden = false;
+  }
+  if (mm) { rating.textContent = `Does strategy matter here? ${mm.label}. ${mm.explanation}`; rating.hidden = false; }
+  t.replaceChildren(...strategyTakeaway(g, byEvidence));
+  $("#strat-src").textContent = `Averaged over ${eff.n_seeds} seeds for each pairing${sur ? ", with courtroom surprises on" : ""}. These are stored results, so the seed box does not change them.`;
 }
 
 /* ------------------------------------------------------------------ page motion */
@@ -893,9 +929,8 @@ async function init() {
   });
 
   const sc = $("#strat-case");
-  sc.replaceChildren(...B.cases.filter((c) => B.games[c.id]).map((c) => el("option", { value: c.id }, splitTitle(c.title).name)));
-  const varied = B.cases.find((c) => new Set(B.games[c.id]?.cells.map((x) => x.prosecution_win_rate)).size > 1);
-  if (varied) sc.value = varied.id;
+  sc.replaceChildren(...B.cases.filter((c) => window.COURTROOM_ANALYSIS?.efficiency?.cases?.[c.id]).map((c) => el("option", { value: c.id }, splitTitle(c.title).name)));
+  if ([...sc.options].some((o) => o.value === S.caseId)) sc.value = S.caseId;
   sc.addEventListener("change", () => renderStrategy(sc.value));
   initMotion();
   if (!hasGsap || reduced) renderStrategy(sc.value);

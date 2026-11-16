@@ -407,6 +407,8 @@
 
   /* ---- Minimax */
 
+  const allEqual = (m) => m.flat().every((v) => v === m[0][0]);
+
   function renderMinimax() {
     const c = B.cases.find((x) => x.id === caseId), body = $("#minimax-fig");
     if (!c || !body) return;
@@ -421,12 +423,13 @@
         h("thead", {}, h("tr", {}, ["Side", "Safest single style (guaranteed payoff)", "Safest mix: guaranteed payoff", "The mix"].map((t) => h("th", {}, t)))),
         h("tbody", {}, side("Accuser", ef.row_security), side("Defender", ef.col_security)))),
       h("p", {}, "At each equilibrium, how far above its guaranteed floor does each side end up?"),
-      h("ul", { class: "eq-eff" }, ef.equilibria.map((q) => h("li", {}, `Equilibrium paying (${fmt(q.row_payoff)}, ${fmt(q.col_payoff)}): Accuser ${fmt(q.security_gap_row)} above its floor, Defender ${fmt(q.security_gap_col)} above its floor.`))),
+      h("ul", { class: "eq-eff" }, ef.equilibria.map((q) => h("li", {}, `${mixOf(q.row_mix)} Accuser against ${mixOf(q.col_mix)} Defender, paying (${fmt(q.row_payoff)}, ${fmt(q.col_payoff)}): Accuser ${fmt(q.security_gap_row)} above its floor, Defender ${fmt(q.security_gap_col)} above its floor.`))),
       note("The courtroom game is not zero-sum and each lawyer sees only part of the evidence, so the guaranteed payoff is only a floor: a cautious lawyer who ignores the opponent's incentives. The gap is what reasoning about the opponent adds."),
       h("h3", {}, "The constant-sum game: the minimax theorem"),
       h("p", {}, "Take only who wins: the Accuser's chance of winning, and the Defender's, which is one minus it. That is constant-sum, because every gain for one side is exactly a loss for the other."),
       h("div", { class: "stab" }, h("div", { class: "stab-label" }, h("b", {}, `Accuser can guarantee ${pct(cs.maximin)}`), `; Defender can hold the Accuser to ${pct(cs.minimax)}`, cs.nash_value != null ? `; Nash value ${pct(cs.nash_value)}.` : "."),
         h("p", { class: cs.theorem_holds ? "headline" : "warn" }, cs.theorem_holds ? `Maximin equals minimax${cs.nash_value != null ? " equals the Nash value" : ""}, as the minimax theorem says${cs.saddle_point ? " (here a pure saddle point, so nobody needs to randomise)" : " (here the sides must mix)"}.` : "The theorem did not hold on this table, which should be impossible: report it.")),
+      allEqual(e.accuser_win_rate) ? note(`Every box is ${pct(e.accuser_win_rate[0][0])} because the evidence decides this case: whatever either lawyer does, the Accuser wins ${pct(e.accuser_win_rate[0][0])} of the time. That is a true result, not missing data, and it is why the guarantee, the minimax and the Nash value are all the same number.`) : "",
       h("div", { class: "ed-scroll" }, h("table", { class: "lab-table" },
         h("thead", {}, h("tr", {}, h("th", {}, "Accuser wins"), e.col_strategies.map((d) => h("th", {}, `${nameOf(d)} Defender`)))),
         h("tbody", {}, e.row_strategies.map((r, i) => h("tr", {}, h("th", { scope: "row" }, `${nameOf(r)} Accuser`), e.accuser_win_rate[i].map((w) => h("td", {}, pct(w)))))))));

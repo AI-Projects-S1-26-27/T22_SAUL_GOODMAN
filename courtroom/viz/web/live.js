@@ -15,7 +15,7 @@
 "use strict";
 
 window.Live = (() => {
-  /* global API, S, B, C, el, $, $$, selectCase, renderCases, renderStyles, enterCourt, rerun, splitTitle, STYLE, STYLE_ORDER, Voice */
+  /* global API, S, B, C, el, $, $$, selectCase, renderStrategy, renderCases, renderStyles, enterCourt, rerun, splitTitle, STYLE, STYLE_ORDER, Voice */
   const post = async (path, body) => {
     const r = await fetch(`${API}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!r.ok) throw new Error(`${path}: ${r.status} ${(await r.text()).slice(0, 200)}`);
@@ -106,7 +106,7 @@ window.Live = (() => {
     const newSeed = el("button", { class: "tbtn", type: "button", onclick: () => { S.seed = randomSeed(); seed.value = S.seed; } }, "New seed");
     const sur = el("input", { type: "checkbox", id: "live-surprises" });
     sur.checked = S.surprises;
-    sur.addEventListener("change", () => { S.surprises = sur.checked; renderMatters(); decorateDocket(); });
+    sur.addEventListener("change", () => { S.surprises = sur.checked; renderMatters(); decorateDocket(); renderStrategy($("#strat-case").value); });
     box.replaceChildren(
       el("div", { class: "live-head" }, el("b", { class: "pill live" }, "LIVE"), el("span", {}, "The local server is on. Every trial is computed now, not replayed.")),
       el("div", { class: "live-grid" },
@@ -576,6 +576,7 @@ window.Live = (() => {
   }
 
   function ready() {
+    if (!S.live) return; // on the hosted site /api/health fails: no live-only control may appear
     addLookahead();
     $("#surprise-row").hidden = false;
     $("#surprise-me").addEventListener("click", surprise);
