@@ -11,5 +11,5 @@ How the project was planned, driven, checked and published. None of this is need
 | [`PUSH_PLAN.md`](PUSH_PLAN.md) | What is already in the official repository, and the exact commands to publish everything without force. Not yet run. |
 | [`DEPLOY.md`](DEPLOY.md) | How to host the live server on a free host (prepared, not deployed). |
 
-Related documents elsewhere: [`../VIVA_PREP.md`](../VIVA_PREP.md), [`../REHEARSAL.md`](../REHEARSAL.md), [`../CODE_REVIEW.md`](../CODE_REVIEW.md),
+Related documents elsewhere: [`../REHEARSAL.md`](../REHEARSAL.md), [`../CODE_REVIEW.md`](../CODE_REVIEW.md),
 [`../UI_AUDIT.md`](../UI_AUDIT.md), [`../../DEVIATIONS.md`](../../DEVIATIONS.md), [`../../HANDOFF.md`](../../HANDOFF.md).

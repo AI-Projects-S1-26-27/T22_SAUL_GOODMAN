@@ -37,7 +37,7 @@ Then, in the browser:
 | 4:40 | Strategy lab, last chapter | "End on a limitation, on purpose." |
 
 Every member answers a question about their own package in the viva, so before the demo agree who answers if the examiner asks about
-which package (`docs/VIVA_PREP.md`). The presenter should not answer for another member.
+which package (see the proposal's ownership table). The presenter should not answer for another member.
 
 ## Inputs to hand the examiner (all of these are safe)
 
