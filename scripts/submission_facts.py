@@ -213,8 +213,54 @@ def e1_effect() -> dict:
     return {"trials": len(old), "digests_changed": len(changed), "verdicts_flipped": len(flipped), "flipped": flipped}
 
 
+COURSE_SNAPSHOT = ROOT / "report" / "generated" / "course_history.json"
+LUMP_COMMIT = "e6d4f32"  # the first commit of this branch's lineage (27 Sep): the whole core in one commit
+CORE_PATH = re.compile(r"^courtroom/(contracts|judge|procedure|agents|engine|gametheory|cases)/.*\.py$")
+
+
+def course_history() -> dict:
+    """The official course repository's history (remote ref course/main), or the committed snapshot of it when that ref is not present.
+
+    It is a second, different history of the same code: eight author names, an incremental timeline from 2 Oct, and a final tree whose core
+    source files are mostly byte-identical to the one-commit lump on 27 Sep. Both timelines are reported; neither is judged here."""
+    ok = subprocess.run(["git", "rev-parse", "--verify", "-q", "course/main"], cwd=ROOT, capture_output=True, text=True).returncode == 0
+    if not ok:
+        return json.loads(COURSE_SNAPSHOT.read_text(encoding="utf-8")) if COURSE_SNAPSHOT.exists() else {}
+    rows = [x.split("|", 2) for x in _git("log", "course/main", "--no-merges", "--format=%H|%an|%ad", "--date=short").strip().splitlines()]
+    by_author = Counter(a for _, a, _ in rows)
+    dates = sorted(d for _, _, d in rows)
+    areas: dict[str, Counter] = defaultdict(Counter)
+    first_in: dict[str, str] = {}
+    for h, a, d in rows:
+        for path in _git("show", "--name-only", "--format=", h).split():
+            parts = path.split("/")
+            areas[a]["viz" if parts[:2] == ["courtroom", "viz"] else parts[1] if parts[0] == "courtroom" and len(parts) > 2 else parts[0]] += 1
+            if CORE_PATH.match(path):
+                first_in[path] = min(first_in.get(path, d), d)
+    lump = [p for p in _git("ls-tree", "-r", "--name-only", LUMP_COMMIT).split() if CORE_PATH.match(p)]
+    same = differ = 0
+    for p in lump:
+        a = subprocess.run(["git", "rev-parse", f"{LUMP_COMMIT}:{p}"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        b = subprocess.run(["git", "rev-parse", f"course/main:{p}"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        same += bool(b) and a == b
+        differ += bool(b) and a != b
+    per_day = Counter(dates)
+    pkg_first = {pk: min((d for p, d in first_in.items() if p.startswith(f"courtroom/{pk}/")), default="") for pk in ("contracts", "cases", "procedure", "judge", "agents", "gametheory", "engine")}
+    out = {
+        "commits": len(rows), "by_author": dict(by_author.most_common()), "first": dates[0], "last": dates[-1],
+        "days_with_commits": len(per_day), "max_per_day": max(per_day.values()), "min_per_day": min(per_day.values()),
+        "areas_by_author": {a: dict(c.most_common()) for a, c in areas.items()},
+        "core_files_in_lump": len(lump), "core_files_identical_to_lump": same, "core_files_different_from_lump": differ,
+        "package_first_in_official_history": pkg_first, "lump_commit_date": _git("log", "-1", "--format=%ad", "--date=short", LUMP_COMMIT).strip(),
+    }
+    COURSE_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
+    COURSE_SNAPSHOT.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    return out
+
+
 def collect() -> dict:
     g = git_facts()
+    g["course"] = course_history()
     g["claude_coauthored"] = claude_coauthored()
     g["e1"] = e1_effect()
     return {"results": results_facts(), "git": g}

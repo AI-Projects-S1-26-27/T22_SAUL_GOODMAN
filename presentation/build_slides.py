@@ -195,6 +195,7 @@ def build() -> Presentation:
 
     # ------------------------------------------------------------------ 6. management
     s = frame(prs, "Project management and work division", 6)
+    C = G["course"]
     ms = G["milestones"]
     rows = [(f"{g['gate']} planned {g['planned']}:", f"{g['what']}; first in git {g['first_in_git']} ({g['status']})") for g in G["gates"]]
     rows += [(d["date"], d["what"]) for d in ms]
@@ -206,9 +207,9 @@ def build() -> Presentation:
         [("Wild replaced Mixed(0.5) in the 4×4 game", 14)],
         [("Language-model layer: optional exhibition, never run live here", 14)],
         [("Impeachment needs an admitted exhibit (found in review)", 14)],
-        [(f"{G['non_merge_commits']} commits by {len(G['by_author'])} authors: see the report on contributions", 14, True)],
+        [(f"Official repo: {C['commits']} commits, {len(C['by_author'])} authors. This branch: {G['non_merge_commits']} commits, {len(G['by_author'])} authors. How they relate: see the report", 14, True)],
     ], line=ORANGE)
-    notes(s, "1:00", "Be plain about the history: the core engine landed in one commit before the proposal timeline began, and later work is concentrated in a few authors. The report's Individual Contributions section is the honest account; each member explains their own package in the viva.")
+    notes(s, "1:00", "Be plain about the history. There are two: the official course repository shows each member committing their own package from 2 October, and this integration branch starts with one commit on 27 September that already contains the core, with later work concentrated in one author. The report states both and leaves how they relate to the team to explain. Each member explains their own package in the viva.")
     return prs
 
 
