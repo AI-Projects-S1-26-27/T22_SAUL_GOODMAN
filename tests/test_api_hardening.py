@@ -27,7 +27,7 @@ def test_oversized_body_is_refused_before_it_is_read() -> None:  # API4, S3
 
 def test_deeply_nested_json_is_a_422_not_a_500() -> None:  # API3
     r = client.post("/api/trial", content=b"[" * 50_000 + b"]" * 50_000, headers={"Content-Type": "application/json"})
-    assert r.status_code in (413, 422)
+    assert r.status_code in (400, 413, 422)  # newer FastAPI answers 400 for JSON it cannot parse
 
 
 def test_a_foreign_host_header_is_refused() -> None:  # S2

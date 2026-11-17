@@ -27,7 +27,7 @@ OUT = ROOT / "report" / "generated" / "facts.json"
 PACKAGES = ("contracts", "cases", "procedure", "judge", "agents", "gametheory", "engine", "api", "cli", "viz")
 
 
-FIRST_CERTIFIED_COMMIT = "6c5e33d"  # the last commit whose bootstrap.json was run at 100 seeds (before the 200-seed re-run)
+FIRST_CERTIFIED_COMMIT = "f796472"  # the last commit whose bootstrap.json was run at 100 seeds (before the 200-seed re-run)
 
 
 def bootstrap_at_100_seeds() -> dict:
@@ -42,8 +42,11 @@ def bootstrap_at_100_seeds() -> dict:
 
 def code_review() -> dict:
     """Counts from docs/CODE_REVIEW.md: findings by severity (the P0 to P3 headings) and by status (the first word of the status cell)."""
+    src = ROOT / "docs" / "CODE_REVIEW.md"
+    if not src.exists():  # the review document is not shipped; its counts were recorded in facts.json when it was written
+        return json.loads(OUT.read_text(encoding="utf-8"))["results"]["code_review"]
     sev, rows = "", []
-    for ln in (ROOT / "docs" / "CODE_REVIEW.md").read_text(encoding="utf-8").splitlines():
+    for ln in src.read_text(encoding="utf-8").splitlines():
         h = re.match(r"###\s+(P\d)", ln)
         if h:
             sev = h.group(1)
@@ -159,13 +162,13 @@ def _gate(g: str, planned: str, what: str, path: str) -> dict:
 
 
 def _first_added(path: str) -> str:
-    out = _git("log", "--branches", "--diff-filter=A", "--format=%ad", "--date=short", "--", path).split()
+    out = _git("log", "HEAD", "--diff-filter=A", "--format=%ad", "--date=short", "--", path).split()
     return out[-1] if out else ""
 
 
 def git_facts() -> dict:
     """Commit counts and dates, from every local branch (no emails, no remotes)."""
-    raw = _git("log", "--branches", "--no-merges", "--format=%H|%an|%ad|%s", "--date=short").strip().splitlines()
+    raw = _git("log", "HEAD", "--no-merges", "--format=%H|%an|%ad|%s", "--date=short").strip().splitlines()
     commits = [x.split("|", 3) for x in raw]
     by_author = Counter(a for _, a, _, _ in commits)
     dates: dict[str, list[str]] = defaultdict(list)
@@ -183,7 +186,7 @@ def git_facts() -> dict:
                 key = parts[0]
             pkgs[a][key] += 1
     all_dates = sorted(d for _, _, d, _ in commits)
-    on_main = _git("log", "final-integration", "--no-merges", "--format=%ad", "--date=short").split()
+    on_main = _git("log", "HEAD", "--no-merges", "--format=%ad", "--date=short").split()
     return {
         "non_merge_commits": len(commits),
         "by_author": dict(by_author.most_common()),
@@ -194,11 +197,11 @@ def git_facts() -> dict:
         "distinct_commit_days": len(set(all_dates)),
         "milestones": [{"what": w, "path": p, "date": _first_added(p)} for w, p in MILESTONES],
         "gates": [_gate(g, d, w, p) for g, d, w, p in GATES],
-        "merge_commits_by_github": int(_git("log", "--branches", "--merges", "--format=%an").split("\n").count("PramitKH26")),
+        "merge_commits_by_github": int(_git("log", "HEAD", "--merges", "--format=%an").split("\n").count("PramitKH26")),
     }
 
 
-E1_COMMIT = "6c5e33d"  # the commit that fixed finding E1 (impeachment with an unadmitted exhibit)
+E1_COMMIT = "f796472"  # the commit that fixed finding E1 (impeachment with an unadmitted exhibit)
 
 
 def e1_effect() -> dict:
@@ -214,7 +217,7 @@ def e1_effect() -> dict:
 
 
 COURSE_SNAPSHOT = ROOT / "report" / "generated" / "course_history.json"
-LUMP_COMMIT = "e6d4f32"  # the first commit of this branch's lineage (27 Sep): the whole core in one commit
+LUMP_COMMIT = "6ec810c"  # the first commit of this branch's lineage (27 Sep): the whole core in one commit
 CORE_PATH = re.compile(r"^courtroom/(contracts|judge|procedure|agents|engine|gametheory|cases)/.*\.py$")
 
 
@@ -223,6 +226,8 @@ def course_history() -> dict:
 
     It is a second, different history of the same code: eight author names, an incremental timeline from 2 Oct, and a final tree whose core
     source files are mostly byte-identical to the one-commit lump on 27 Sep. Both timelines are reported; neither is judged here."""
+    if COURSE_SNAPSHOT.exists():  # the official repository as it stood before the two histories were joined
+        return json.loads(COURSE_SNAPSHOT.read_text(encoding="utf-8"))
     ok = subprocess.run(["git", "rev-parse", "--verify", "-q", "course/main"], cwd=ROOT, capture_output=True, text=True).returncode == 0
     if not ok:
         return json.loads(COURSE_SNAPSHOT.read_text(encoding="utf-8")) if COURSE_SNAPSHOT.exists() else {}
@@ -269,7 +274,7 @@ def collect() -> dict:
 def claude_coauthored() -> dict:
     """Commits per author whose message carries a Co-Authored-By: Claude trailer (absence of a trailer proves nothing)."""
     out: dict[str, list[int]] = {}
-    for ln in _git("log", "--branches", "--no-merges", "--format=%an|%(trailers:key=Co-Authored-By,valueonly,separator=;)").strip().splitlines():
+    for ln in _git("log", "HEAD", "--no-merges", "--format=%an|%(trailers:key=Co-Authored-By,valueonly,separator=;)").strip().splitlines():
         a, _, tr = ln.partition("|")
         row = out.setdefault(a, [0, 0])
         row[0] += 1

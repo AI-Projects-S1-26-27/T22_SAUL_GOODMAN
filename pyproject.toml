@@ -9,15 +9,16 @@ description = "Strategic AI agents in a simulated courtroom: deterministic judge
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pydantic>=2.6",
-    "rich>=13",
-    "fastapi>=0.110",
-    "uvicorn>=0.27",
+    "pydantic==2.13.5",
+    "rich==15.0.0",
+    "fastapi==0.141.1",
+    "starlette==1.6.0",
+    "uvicorn==0.53.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5", "pyright>=1.1.380", "playwright>=1.45"]
-submission = ["python-pptx>=1.0", "matplotlib>=3.8"]  # slides and report figures; the report also needs the tectonic LaTeX engine, the PDF export of the slides needs LibreOffice
+dev = ["pytest==9.1.1", "httpx==0.28.1", "ruff>=0.5,<1", "pyright>=1.1.380,<2", "playwright>=1.45,<2"]
+submission = ["python-pptx==1.0.2", "matplotlib==3.11.1"]  # slides and report figures; the report also needs the tectonic LaTeX engine, the PDF export of the slides needs LibreOffice
 
 [project.scripts]
 courtroom = "courtroom.cli:main"
@@ -26,7 +27,7 @@ courtroom = "courtroom.cli:main"
 include = ["courtroom*"]
 
 [tool.setuptools.package-data]
-"courtroom.viz" = ["web/*", "web/data/*"]
+"courtroom.viz" = ["web/*", "web/data/*", "web/voices/*", "web/fonts/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
