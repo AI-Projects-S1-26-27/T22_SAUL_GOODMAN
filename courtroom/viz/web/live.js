@@ -366,7 +366,18 @@ window.Live = (() => {
   }
 
   const tryBody = (c) => ({ case: c, prosecution: S.p, defense: S.d, seed: S.seed, surprises: surprisesBody() });
-  const problemText = (e) => String(e.message).replace(/^\/\w+: /, "").slice(0, 400);
+  const problemText = (e) => {
+    let m = String(e.message).replace(/^\/\w+: /, "");
+    const j = m.match(/\{[\s\S]*\}/);
+    if (j) {
+      try {
+        const d = JSON.parse(j[0]).detail;
+        if (typeof d === "string") m = d;
+        else if (Array.isArray(d)) m = d.map((x) => `${(x.loc || []).slice(1).join(" > ")}: ${x.msg}`).join("; ");
+      } catch (err) { /* keep the raw text */ }
+    }
+    return m.slice(0, 400);
+  };
 
   async function tryDraft() {
     const out = $("#ed-result");
