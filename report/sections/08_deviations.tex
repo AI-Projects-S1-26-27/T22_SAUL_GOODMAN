@@ -1,0 +1,20 @@
+\section{Deviations from the proposal}\label{sec:deviations}
+\file{DEVIATIONS.md} lists every place the code differs from the proposal, each checked against the code. A summary:
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l p{4.2cm} X@{}}
+\toprule
+\textbf{\#} & \textbf{The proposal says} & \textbf{What the code does, and why it matters}\\
+\midrule
+D1 & Four strategic agents: Aggressive, Conservative, Adaptive and Mixed($p=0.5$) & The four-by-four game uses Bold, Careful, Smart and \emph{Wild} (reckless) in place of Mixed. \texttt{mixed:<p>} still exists but is not in the game. The repository does not record why.\\
+D2 & Mixed($p$) acts as Aggressive with probability $p$ at each decision & Draws once per trial, from the seed, and sticks with it; not in the four-by-four game.\\
+D3 & 200 seeds per cell and 200 resamples & Now met for the payoff tables, bootstrap and classic labels (re-run at 200); sensitivity, the does-strategy-matter measurement and the lookahead comparison use fewer seeds (Table~\ref{tab:seeds}).\\
+D4 & One noisy signal per item and defect type & Relevance is observed exactly because the support values of an offered exhibit are public; the other five grounds use the proposal's noisy channel.\\
+D5 & Directed verdict granted automatically when the prosecution rests if an element is at or below its standard & The Defender must move for it (a costed action) and it is granted only if some element's log-odds are below zero; the judge also enters one on its own initiative when no admitted evidence supports an element.\\
+D6 & Silent on when an exhibit may impeach & A party may impeach only with an exhibit already admitted. Found by the code review (E1); changed \EOneDigests{} of \EOneTrials{} recorded trials and \EOneFlipped{} verdicts, and the certified analyses were re-run.\\
+D7 & The score sums over the four strongest facts per side & All facts count, one exhibit per fact (the strongest); there is no cap of four. It could only bind where five or more facts back one side of one element; in the library only one case has that many.\\
+D8 & An exact tie goes to the defendant & Strict only for preponderance; for the two higher standards, log-odds equal to the bar meet it (pinned by a test).\\
+-- & No language model & An optional exhibition layer exists, off by default, outside every certified result (Section~\ref{sec:ai}).\\
+\bottomrule
+\end{tabularx}
+\end{center}
+D7 and D8 were found while writing this report, by reading the judge's code against the proposal's formula. They were not changed because every certified result, and every recorded verdict, depends on the judge; they are stated here so that the formulas in Section~\ref{sec:method} are the ones that actually run.

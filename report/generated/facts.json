@@ -1,0 +1,675 @@
+{
+ "git": {
+  "by_author": {
+   "Aditya": 8,
+   "Divvij0202": 11,
+   "Lakshya Sachdeva": 1,
+   "Mofasser Arafat": 8,
+   "Pramit Khandelwal": 72,
+   "PramitKH26": 14,
+   "RakshitGoel007": 16,
+   "binarycoder3012": 31,
+   "rohanp-965": 6,
+   "savage2006": 1
+  },
+  "claude_coauthored": {
+   "Aditya": {
+    "commits": 8,
+    "with_claude_trailer": 0
+   },
+   "Divvij0202": {
+    "commits": 11,
+    "with_claude_trailer": 0
+   },
+   "Lakshya Sachdeva": {
+    "commits": 1,
+    "with_claude_trailer": 0
+   },
+   "Mofasser Arafat": {
+    "commits": 8,
+    "with_claude_trailer": 0
+   },
+   "Pramit Khandelwal": {
+    "commits": 72,
+    "with_claude_trailer": 0
+   },
+   "PramitKH26": {
+    "commits": 14,
+    "with_claude_trailer": 0
+   },
+   "RakshitGoel007": {
+    "commits": 16,
+    "with_claude_trailer": 0
+   },
+   "binarycoder3012": {
+    "commits": 31,
+    "with_claude_trailer": 0
+   },
+   "rohanp-965": {
+    "commits": 6,
+    "with_claude_trailer": 0
+   },
+   "savage2006": {
+    "commits": 1,
+    "with_claude_trailer": 0
+   }
+  },
+  "commits_by_date_final_integration": {
+   "2026-09-27": 1,
+   "2026-09-30": 1,
+   "2026-10-02": 2,
+   "2026-10-11": 3,
+   "2026-10-12": 2,
+   "2026-10-13": 3,
+   "2026-10-14": 7,
+   "2026-10-15": 3,
+   "2026-10-16": 2,
+   "2026-10-17": 9,
+   "2026-10-18": 4,
+   "2026-10-19": 3,
+   "2026-10-20": 5,
+   "2026-10-21": 3,
+   "2026-10-22": 10,
+   "2026-10-23": 5,
+   "2026-10-24": 6,
+   "2026-10-25": 2,
+   "2026-10-26": 3,
+   "2026-10-27": 2,
+   "2026-10-28": 3,
+   "2026-10-29": 3,
+   "2026-10-30": 2,
+   "2026-10-31": 3,
+   "2026-11-01": 2,
+   "2026-11-02": 3,
+   "2026-11-03": 2,
+   "2026-11-04": 4,
+   "2026-11-05": 7,
+   "2026-11-06": 3,
+   "2026-11-07": 2,
+   "2026-11-08": 3,
+   "2026-11-09": 2,
+   "2026-11-10": 2,
+   "2026-11-11": 3,
+   "2026-11-12": 19,
+   "2026-11-13": 3,
+   "2026-11-15": 1,
+   "2026-11-16": 14,
+   "2026-11-17": 11
+  },
+  "course": {
+   "areas_by_author": {
+    "Aditya": {
+     ".gitignore": 1,
+     "README.md": 1,
+     "cases": 4,
+     "contracts": 2,
+     "courtroom": 1,
+     "pyproject.toml": 1,
+     "tests": 3,
+     "viz": 135
+    },
+    "Divvij0202": {
+     "procedure": 3,
+     "tests": 1,
+     "viz": 142
+    },
+    "Lakshya Sachdeva": {
+     "README.md": 1
+    },
+    "Mofasser Arafat": {
+     "agents": 7,
+     "tests": 2,
+     "viz": 135
+    },
+    "PramitKH26": {
+     "api": 4,
+     "courtroom": 3,
+     "engine": 4,
+     "scripts": 1,
+     "tests": 3,
+     "vercel.json": 1,
+     "viz": 2
+    },
+    "RakshitGoel007": {
+     "viz": 24
+    },
+    "binarycoder3012": {
+     "README.md": 3,
+     "docs": 1,
+     "judge": 5,
+     "scripts": 1,
+     "tests": 1,
+     "viz": 146
+    },
+    "rohanp-965": {
+     "gametheory": 4,
+     "scripts": 1,
+     "tests": 1,
+     "viz": 1
+    }
+   },
+   "by_author": {
+    "Aditya": 8,
+    "Divvij0202": 10,
+    "Lakshya Sachdeva": 1,
+    "Mofasser Arafat": 8,
+    "PramitKH26": 14,
+    "RakshitGoel007": 16,
+    "binarycoder3012": 19,
+    "rohanp-965": 6
+   },
+   "commits": 82,
+   "core_files_different_from_lump": 3,
+   "core_files_identical_to_lump": 23,
+   "core_files_in_lump": 26,
+   "days_with_commits": 33,
+   "first": "2026-10-02",
+   "last": "2026-11-11",
+   "lump_commit_date": "2026-09-27",
+   "max_per_day": 3,
+   "min_per_day": 2,
+   "package_first_in_official_history": {
+    "agents": "2026-10-17",
+    "cases": "2026-10-12",
+    "contracts": "2026-10-12",
+    "engine": "2026-10-18",
+    "gametheory": "2026-10-19",
+    "judge": "2026-10-15",
+    "procedure": "2026-10-13"
+   }
+  },
+  "distinct_commit_days": 40,
+  "e1": {
+   "digests_changed": 37,
+   "flipped": [
+    "helix-espionage|adaptive|reckless|0",
+    "kestrel-av|conservative|reckless|0"
+   ],
+   "trials": 160,
+   "verdicts_flipped": 2
+  },
+  "files_touched_by_author": {
+   "Aditya": {
+    ".gitignore": 1,
+    "README.md": 1,
+    "cases": 4,
+    "contracts": 2,
+    "courtroom (top level)": 1,
+    "pyproject.toml": 1,
+    "tests": 3,
+    "viz": 135
+   },
+   "Divvij0202": {
+    "procedure": 3,
+    "tests": 1,
+    "viz": 147
+   },
+   "Lakshya Sachdeva": {
+    "README.md": 1
+   },
+   "Mofasser Arafat": {
+    "agents": 7,
+    "tests": 2,
+    "viz": 135
+   },
+   "Pramit Khandelwal": {
+    ".claude": 2,
+    ".dockerignore": 1,
+    ".github": 1,
+    ".gitignore": 3,
+    "AGENTS.md": 3,
+    "AI_USAGE.md": 4,
+    "DEMO_SCRIPT.md": 4,
+    "DEMO_WALKTHROUGH.md": 13,
+    "DEVIATIONS.md": 19,
+    "Dockerfile": 1,
+    "HANDOFF.md": 10,
+    "LLM_EXHIBITION.md": 2,
+    "PROVENANCE.md": 14,
+    "README.md": 22,
+    "RESULTS.md": 14,
+    "agents": 16,
+    "api": 20,
+    "cases": 13,
+    "cli": 13,
+    "contracts": 10,
+    "docs": 27,
+    "engine": 14,
+    "gametheory": 19,
+    "judge": 18,
+    "llm": 35,
+    "presentation": 11,
+    "procedure": 6,
+    "pyproject.toml": 3,
+    "results": 56,
+    "scripts": 29,
+    "tests": 95,
+    "viz": 119
+   },
+   "PramitKH26": {
+    "api": 4,
+    "cli": 2,
+    "courtroom (top level)": 1,
+    "engine": 4,
+    "scripts": 1,
+    "tests": 3,
+    "vercel.json": 1,
+    "viz": 2
+   },
+   "RakshitGoel007": {
+    "viz": 24
+   },
+   "binarycoder3012": {
+    "AGENTS.md": 2,
+    "README.md": 6,
+    "agents": 2,
+    "api": 2,
+    "cases": 1,
+    "cli": 1,
+    "docs": 3,
+    "judge": 5,
+    "scripts": 4,
+    "tests": 3,
+    "viz": 720
+   },
+   "rohanp-965": {
+    "gametheory": 4,
+    "scripts": 1,
+    "tests": 1,
+    "viz": 1
+   },
+   "savage2006": {
+    ".gitignore": 1,
+    "README.md": 1,
+    "agents": 5,
+    "api": 2,
+    "cases": 3,
+    "cli": 1,
+    "contracts": 2,
+    "courtroom (top level)": 2,
+    "docs": 1,
+    "engine": 4,
+    "gametheory": 4,
+    "judge": 5,
+    "procedure": 3,
+    "pyproject.toml": 1,
+    "tests": 9,
+    "vercel.json": 1,
+    "viz": 6
+   }
+  },
+  "first_commit": "2026-09-27",
+  "first_last": {
+   "Aditya": [
+    "2026-10-11",
+    "2026-11-05"
+   ],
+   "Divvij0202": [
+    "2026-09-30",
+    "2026-11-11"
+   ],
+   "Lakshya Sachdeva": [
+    "2026-10-02",
+    "2026-10-02"
+   ],
+   "Mofasser Arafat": [
+    "2026-10-17",
+    "2026-11-06"
+   ],
+   "Pramit Khandelwal": [
+    "2026-10-17",
+    "2026-11-17"
+   ],
+   "PramitKH26": [
+    "2026-10-11",
+    "2026-11-08"
+   ],
+   "RakshitGoel007": [
+    "2026-10-22",
+    "2026-11-10"
+   ],
+   "binarycoder3012": [
+    "2026-10-02",
+    "2026-11-17"
+   ],
+   "rohanp-965": [
+    "2026-10-19",
+    "2026-11-09"
+   ],
+   "savage2006": [
+    "2026-09-27",
+    "2026-09-27"
+   ]
+  },
+  "gates": [
+   {
+    "days_after_plan": -19,
+    "evidence_path": "courtroom/engine/trial.py",
+    "first_in_git": "2026-09-27",
+    "gate": "G1",
+    "planned": "2026-10-16",
+    "status": "before the gate",
+    "what": "one case runs end to end"
+   },
+   {
+    "days_after_plan": -26,
+    "evidence_path": "courtroom/viz/web/data/bundle.js",
+    "first_in_git": "2026-09-27",
+    "gate": "G2",
+    "planned": "2026-10-23",
+    "status": "before the gate",
+    "what": "integrated demo on all three cases"
+   },
+   {
+    "days_after_plan": 6,
+    "evidence_path": "results/bootstrap.json",
+    "first_in_git": "2026-11-12",
+    "gate": "G3",
+    "planned": "2026-11-06",
+    "status": "6 days after the gate",
+    "what": "parameters frozen, results reproduced"
+   }
+  ],
+  "last_commit": "2026-11-17",
+  "merge_commits_by_github": 9,
+  "milestones": [
+   {
+    "date": "2026-09-27",
+    "path": "courtroom/engine/trial.py",
+    "what": "Core engine in one commit: contracts, cases, procedure, judge, agents, Nash solver, engine, API, CLI, web UI"
+   },
+   {
+    "date": "2026-11-12",
+    "path": "courtroom/gametheory/bootstrap.py",
+    "what": "Bootstrap stability of the equilibrium label"
+   },
+   {
+    "date": "2026-11-12",
+    "path": "results/bootstrap.json",
+    "what": "First certified result file"
+   },
+   {
+    "date": "2026-11-11",
+    "path": "courtroom/viz/web/lab.html",
+    "what": "Strategy lab page"
+   },
+   {
+    "date": "2026-11-12",
+    "path": "tests/golden/bundle_digests.json",
+    "what": "Pinned digests of the recorded trials"
+   },
+   {
+    "date": "2026-11-12",
+    "path": "results/matters.json",
+    "what": "Does-strategy-matter measurement"
+   }
+  ],
+  "non_merge_commits": 168
+ },
+ "results": {
+  "bootstrap": {
+   "plain": {
+    "below_80": [],
+    "n_below_80": 0,
+    "n_cases": 10,
+    "n_resamples": 200,
+    "n_seeds": 200,
+    "worst": 0.87,
+    "worst_case": "broken-bike"
+   },
+   "surprises": {
+    "below_80": [
+     "garden-dog"
+    ],
+    "n_below_80": 1,
+    "n_cases": 10,
+    "n_resamples": 200,
+    "n_seeds": 200,
+    "worst": 0.605,
+    "worst_case": "garden-dog"
+   }
+  },
+  "bootstrap_at_100_seeds": {
+   "plain": {
+    "below_80": {
+     "broken-bike": 0.35,
+     "kestrel-av": 0.535
+    },
+    "n_seeds": 100
+   },
+   "surprises": {
+    "below_80": {},
+    "n_seeds": 100
+   }
+  },
+  "case_names": {
+   "aurora-defi": "Aurora Protocol Flash-Loan Exploit",
+   "broken-bike": "The Broken Bike",
+   "cookie-jar": "The Missing Cookies",
+   "edge-defense-only": "Prosecution Brings Only Exculpatory Material",
+   "edge-empty-docket": "The Empty Docket",
+   "edge-mutual-exclusion": "Mutually Exclusive Testimony",
+   "edge-poisoned-tree": "Fruit of the Poisonous Tree",
+   "garden-dog": "The Dug-Up Garden",
+   "helix-espionage": "Helix Dynamics Trade-Secret Exfiltration",
+   "kestrel-av": "AV-7 Crosswalk Collision"
+  },
+  "classic": {
+   "corners": 360,
+   "found": {
+    "battle-of-the-sexes": 0,
+    "chicken": 0,
+    "prisoners-dilemma": 0,
+    "stag-hunt": 0
+   },
+   "matching_pennies": 16,
+   "matching_pennies_surprises": 14,
+   "n_resamples": 200,
+   "n_seeds": 200,
+   "search_kept": 0,
+   "search_looked_like": {
+    "battle-of-the-sexes": 0,
+    "prisoners-dilemma": 41,
+    "stag-hunt": 6
+   },
+   "search_tried": 395
+  },
+  "code_review": {
+   "by_severity": {
+    "P0": {
+     "fixed": 1
+    },
+    "P1": {
+     "deferred": 3,
+     "fixed": 17
+    },
+    "P2": {
+     "deferred": 9,
+     "fixed": 14,
+     "rejected": 1
+    },
+    "P3": {
+     "deferred": 23,
+     "fixed": 2
+    }
+   },
+   "total": 70
+  },
+  "efficiency": {
+   "dilemma_cases": [
+    "kestrel-av"
+   ],
+   "n_seeds": 200,
+   "theorem_holds": 20,
+   "theorem_total": 20
+  },
+  "lookahead": {
+   "beats_plain": [
+    "kestrel-av"
+   ],
+   "beats_surprises": [
+    "kestrel-av"
+   ],
+   "n_cases": 10,
+   "n_seeds": 40
+  },
+  "matters": {
+   "plain": {
+    "evidence": [
+     "aurora-defi",
+     "cookie-jar",
+     "edge-defense-only",
+     "edge-empty-docket",
+     "edge-mutual-exclusion",
+     "garden-dog"
+    ],
+    "lawyers": [
+     "broken-bike",
+     "helix-espionage",
+     "kestrel-av"
+    ],
+    "n_cases": 10,
+    "n_evidence": 6,
+    "n_move": 4,
+    "n_seeds": 8,
+    "partly": [
+     "edge-poisoned-tree"
+    ]
+   },
+   "surprises": {
+    "evidence": [
+     "aurora-defi",
+     "cookie-jar",
+     "edge-defense-only",
+     "edge-empty-docket",
+     "edge-mutual-exclusion",
+     "garden-dog"
+    ],
+    "lawyers": [
+     "helix-espionage",
+     "kestrel-av"
+    ],
+    "n_cases": 10,
+    "n_evidence": 6,
+    "n_move": 4,
+    "n_seeds": 8,
+    "partly": [
+     "broken-bike",
+     "edge-poisoned-tree"
+    ]
+   }
+  },
+  "n_cases": 10,
+  "oracle": {
+   "best": {
+    "case": "helix-espionage",
+    "gains": {
+     "defense": 1.59
+    },
+    "surprises": false
+   },
+   "n_beaten": 4,
+   "n_searches": 6,
+   "searches": [
+    {
+     "beaten": true,
+     "case": "broken-bike",
+     "confirmed": 1,
+     "gains": {
+      "defense": 0.88
+     },
+     "kept": 1,
+     "surprises": false
+    },
+    {
+     "beaten": false,
+     "case": "broken-bike",
+     "confirmed": 0,
+     "gains": {},
+     "kept": 0,
+     "surprises": true
+    },
+    {
+     "beaten": true,
+     "case": "helix-espionage",
+     "confirmed": 2,
+     "gains": {
+      "defense": 1.59
+     },
+     "kept": 2,
+     "surprises": false
+    },
+    {
+     "beaten": true,
+     "case": "helix-espionage",
+     "confirmed": 2,
+     "gains": {
+      "defense": 0.91
+     },
+     "kept": 2,
+     "surprises": true
+    },
+    {
+     "beaten": false,
+     "case": "kestrel-av",
+     "confirmed": 0,
+     "gains": {},
+     "kept": 0,
+     "surprises": false
+    },
+    {
+     "beaten": true,
+     "case": "kestrel-av",
+     "confirmed": 1,
+     "gains": {
+      "prosecution": 1.22
+     },
+     "kept": 1,
+     "surprises": true
+    }
+   ]
+  },
+  "seeds_per_cell": {
+   "bootstrap": 200,
+   "classic": 200,
+   "efficiency": 200,
+   "lookahead": 40,
+   "matters": 8,
+   "sensitivity": 16
+  },
+  "sensitivity": {
+   "fragile": [
+    "aurora-defi",
+    "broken-bike",
+    "cookie-jar",
+    "edge-mutual-exclusion",
+    "garden-dog",
+    "helix-espionage",
+    "kestrel-av"
+   ],
+   "n_seeds": 16,
+   "n_variations": 14,
+   "parameter_impact": {
+    "LLR_SCALE": 1,
+    "PRIOR_DEFECT_RATE": 6,
+    "beyond_reasonable_doubt": 1,
+    "costs": 1,
+    "sanctions": 1,
+    "standards_of_proof": 0
+   },
+   "robust": [
+    "edge-defense-only",
+    "edge-empty-docket",
+    "edge-poisoned-tree"
+   ]
+  },
+  "tree": {
+   "all_agree": true,
+   "solved": 17,
+   "total": 18,
+   "unsolved": [
+    "helix-espionage"
+   ]
+  }
+ }
+}

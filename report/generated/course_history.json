@@ -1,0 +1,82 @@
+{
+ "areas_by_author": {
+  "Aditya": {
+   ".gitignore": 1,
+   "README.md": 1,
+   "cases": 4,
+   "contracts": 2,
+   "courtroom": 1,
+   "pyproject.toml": 1,
+   "tests": 3,
+   "viz": 135
+  },
+  "Divvij0202": {
+   "procedure": 3,
+   "tests": 1,
+   "viz": 142
+  },
+  "Lakshya Sachdeva": {
+   "README.md": 1
+  },
+  "Mofasser Arafat": {
+   "agents": 7,
+   "tests": 2,
+   "viz": 135
+  },
+  "PramitKH26": {
+   "api": 4,
+   "courtroom": 3,
+   "engine": 4,
+   "scripts": 1,
+   "tests": 3,
+   "vercel.json": 1,
+   "viz": 2
+  },
+  "RakshitGoel007": {
+   "viz": 24
+  },
+  "binarycoder3012": {
+   "README.md": 3,
+   "docs": 1,
+   "judge": 5,
+   "scripts": 1,
+   "tests": 1,
+   "viz": 146
+  },
+  "rohanp-965": {
+   "gametheory": 4,
+   "scripts": 1,
+   "tests": 1,
+   "viz": 1
+  }
+ },
+ "by_author": {
+  "Aditya": 8,
+  "Divvij0202": 10,
+  "Lakshya Sachdeva": 1,
+  "Mofasser Arafat": 8,
+  "PramitKH26": 14,
+  "RakshitGoel007": 16,
+  "binarycoder3012": 19,
+  "rohanp-965": 6
+ },
+ "commits": 82,
+ "core_files_different_from_lump": 3,
+ "core_files_identical_to_lump": 23,
+ "core_files_in_lump": 26,
+ "days_with_commits": 33,
+ "first": "2026-10-02",
+ "last": "2026-11-11",
+ "lump_commit_date": "2026-09-27",
+ "max_per_day": 3,
+ "min_per_day": 2,
+ "package_first_in_official_history": {
+  "agents": "2026-10-17",
+  "cases": "2026-10-12",
+  "contracts": "2026-10-12",
+  "engine": "2026-10-18",
+  "gametheory": "2026-10-19",
+  "judge": "2026-10-15",
+  "procedure": "2026-10-13"
+ }
+}

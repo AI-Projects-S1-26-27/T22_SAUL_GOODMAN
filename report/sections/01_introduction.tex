@@ -1,0 +1,24 @@
+\section{Introduction}\label{sec:intro}
+
+\subsection{Problem and project question}
+A trial is a small resource-allocation game. Each side has a limited budget and has to decide what goes on the record, what to challenge and when to stop. A doubtful exhibit can help, but if the other side objects on the right ground it is thrown out and the presenter is penalised. Objecting to everything is not free either: it uses budget, and an overruled objection is itself sanctioned. Neither side can see which of the other's exhibits really carry a defect, and neither knows what the opponent will do next. The same structure, costly challenges against hidden flaws under a budget, appears in audits, peer review and security inspections, so the trial is a familiar instance of it.
+
+\begin{quote}\itshape
+Against a fixed and fully transparent judge, how do budgets, penalties and noisy perception decide whether an aggressive or a conservative strategy wins, and for which cases does the game have a dominant strategy rather than a mixed equilibrium?
+\end{quote}
+
+This is the question of our proposal. The feedback on the earlier topic submission set three requirements: a deterministic, well-defined verdict rule; robustness to weak, missing or contradictory evidence; and synthetic cases only. Section~\ref{sec:method} shows how the design meets the first, Section~\ref{sec:results} the second, and every case, person and organisation in the library is invented.
+
+\subsection{Contribution}
+We claim no new algorithm and no accuracy on real cases. The contribution is an inspectable formal game and a set of measurements on it that anyone can reproduce:
+\begin{itemize}
+\item a \emph{simulator}: typed case files, a phase state machine with an action validator, four lawyer styles, an exact rulebook judge, and a hash-chained event log, so that the same case, styles and seed give the same trial every time;
+\item a \emph{game-theory layer}: payoff tables from simulation, exact Nash equilibria, bootstrap stability, sensitivity to the rulebook's constants, a search for better lawyers, and the lecture concepts (classic games, Pareto efficiency, security values, minimax and alpha-beta) computed on our own games;
+\item a \emph{demo}: a web application that plays any recorded trial in a 3D courtroom with pre-recorded voices, runs fresh trials on the local server, lets an examiner edit or write a case, and a ``strategy lab'' page that walks through the analysis.
+\end{itemize}
+
+\subsection{What was delivered}
+The library has \NCases{} synthetic cases: three flagship cases (a cyber-espionage prosecution, an autonomous-vehicle liability suit and a DeFi exploit dispute), three everyday cases, and four edge fixtures. The 16 pairings of the four styles on each case, at seed~0, give \ReplayTotal{} recorded trials, whose digests are pinned by a test. All numbers in this report are generated from the stored result files under \file{results/} by scripts, so a reader can regenerate any of them (Section~\ref{sec:repro}). Where the project differs from the proposal, Section~\ref{sec:deviations} says so.
+
+\subsection{Roadmap}
+Section~\ref{sec:related} places the work among related systems. Section~\ref{sec:method} describes the method. Section~\ref{sec:results} goes through the proposal's evaluation plan row by row and reports the analysis results. Section~\ref{sec:discussion} discusses limits and reflects on how the work was done. Sections~\ref{sec:contrib} and~\ref{sec:ai} give the individual contributions and the AI usage.

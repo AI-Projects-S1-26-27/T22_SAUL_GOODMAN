@@ -376,7 +376,7 @@ python -m courtroom export --workers 4        # regenerate courtroom/viz/web/dat
 
 then re-record any changed voice lines (see [`AGENTS.md`](AGENTS.md) §4), bump the `?v=N` cache-busters in `index.html` and
 `lab.html`, and push. A container setup for hosting the **live** server (Render, Fly.io, Cloud Run) is ready in
-[`Dockerfile`](Dockerfile) and [`docs/process/DEPLOY.md`](docs/process/DEPLOY.md).
+[`Dockerfile`](Dockerfile) (set `COURTROOM_ALLOWED_HOSTS` to the public host name, and do not set a model key on a public host).
 
 ---
 
@@ -408,15 +408,15 @@ docs/           design, code review, UI audit, rehearsal, process notes
 
 | Document | What's in it |
 |---|---|
-| [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) · [`docs/REHEARSAL.md`](docs/REHEARSAL.md) | A five-minute demo run and its rehearsal sheet |
+| [`report/Saul_Goodman_T22_Report.pdf`](report/Saul_Goodman_T22_Report.pdf) | The written report (LaTeX source and build script in [`report/`](report/)) |
+| [`REPORT.md`](REPORT.md) | The long technical write-up, with every number generated from `results/` |
 | [`presentation/Saul_Goodman_T22.pdf`](presentation/Saul_Goodman_T22.pdf) | The six-slide presentation ([`.pptx`](presentation/Saul_Goodman_T22.pptx)) |
 | [`PROVENANCE.md`](PROVENANCE.md) | One command per claim: how every number is produced |
 | [`DEVIATIONS.md`](DEVIATIONS.md) | Where the code differs from the proposal, and why |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Design dialectic and calibration notes |
-| [`docs/CODE_REVIEW.md`](docs/CODE_REVIEW.md) · [`docs/UI_AUDIT.md`](docs/UI_AUDIT.md) | The structured code review with a status for every finding; the UI audit |
 | [`docs/LLM_ROLE.md`](docs/LLM_ROLE.md) | What the optional language-model layer may and may not do |
 | [`AGENTS.md`](AGENTS.md) | How to change the project safely (bundle, story, voices, sound, lab) |
-| [`docs/proposal/`](docs/proposal/) · [`docs/process/`](docs/process/) | The submitted proposal; how the work was planned, deployed and pushed |
+| [`docs/proposal/`](docs/proposal/) | The submitted proposal |
 
 ---
 

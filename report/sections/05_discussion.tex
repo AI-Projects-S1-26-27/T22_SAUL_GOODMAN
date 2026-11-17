@@ -1,0 +1,45 @@
+\section{Discussion and limitations}\label{sec:discussion}
+
+\subsection{What the results say}
+\emph{Most cases are decided by the evidence.} In \NEvidence{} of \NCases{} cases the verdict does not move with the lawyers' styles or the seed. We did not expect this and it limits the strategic story: a game-theoretic comparison of styles only has something to find in the \NMove{} cases the lawyers move. Among the three flagship cases written to showcase strategy, the one decided by the evidence is: \FlagshipEvidence{}; we report that as it is.
+
+\emph{Conclusions depend on the seed count and on one belief.} At \BootOldSeeds{} seeds two cases looked unstable; at \BootSeeds{} they do not, so a comparison with few seeds can mislead, and the proposal's 200 seeds were justified. The label changes most under the lawyers' prior defect rate (\SensPriorChanges{} changes, Table~\ref{tab:sens}), a belief inside the agents that we chose and did not measure. Sensitivity itself was run on only \SensSeeds{} seeds per cell.
+
+\emph{The four styles can be beaten, in some cases.} The search found better lawyers in \NBeaten{} of \NSearches{} runs, so ``Bold, Careful, Smart and Wild'' is a hand-picked menu, not the space of strategies; the finding that the equilibrium of the four-style game is not an equilibrium of the larger game matters for how it is read.
+
+\emph{Not found.} No prisoner's dilemma, stag hunt, battle of the sexes or chicken appears in the library or among the generated cases searched. The classifier looks at pairs of styles, so a game that needs a third style or a mixed strategy is invisible to it.
+
+\subsection{Limitations}
+\begin{itemize}
+\item \textbf{A stylised legal model.} The thresholds, constants and costs are game parameters, not legal probabilities. The system is a teaching demo, not a model of real court procedure and not a guilt predictor.
+\item \textbf{Synthetic cases written by us.} Their evidence values are modelling choices. The library was not tuned to produce any reported result, but it was written before the measurements by people who knew what they wanted to show.
+\item \textbf{Surprise chances are chosen, not observed.} Results with courtroom surprises on read as ``if this kind of luck exists''.
+\item \textbf{Relaxations.} The tree search assumes both sides see everything and the payoff is zero-sum, and covers only the cases small enough to finish; the minimax theorem holds only for the constant-sum win-probability game, not for the real general-sum game; the classifier reads pairs of styles at a tolerance of two standard errors.
+\item \textbf{Extras, labelled.} The lookahead lawyer and the optional language-model layer are exhibitions outside every certified result. The language-model layer contradicts the proposal's ``no language model'' positioning if read as part of the core, so it is optional, off by default, never imported by the core (a test checks), and never in a certified table.
+\item \textbf{Several comparisons are made.} The search tries candidates over rounds, so a lone result just above two standard errors is weak evidence; every kept profile is confirmed on fresh seeds for that reason.
+\item \textbf{Where the proposal and the code differ} is in Section~\ref{sec:deviations}, including two differences in the judge's formula that we found while writing this report (D7, D8) and did not change, because every certified result depends on the judge.
+\item \textbf{Test gap.} Only the lookahead lawyer has a source-level test that it reads nothing but its own view and the public Oracle; the four certified styles do not.
+\item \textbf{The hosted site replays.} The static copy plays recorded trials and the stored analysis; only the local server computes fresh trials.
+\end{itemize}
+
+\subsection{A code review before the demo}
+Before the demo we ran a structured code review of the whole project: \ReviewTotal{} findings in total, of which \ReviewFixed{} were fixed, \ReviewDeferred{} deferred with a reason and \ReviewRejected{} rejected. The most serious was a demo script that pointed the presenter to a docket group that did not exist; the most consequential for results was that the engine let a lawyer impeach a witness with an exhibit that had never been admitted (E1). Fixing E1 changed \EOneDigests{} of the \EOneTrials{} recorded trials and \EOneFlipped{} recorded verdicts, and required re-running the certified analyses; it is recorded as deviation D6 and the pinned digests were re-pinned deliberately.
+
+\subsection{Honest reflection on the process}
+We state these facts about how the work was done, because the course asks for an honest account.
+\begin{itemize}
+\item \textbf{Two histories describe the same code, and they disagree about when it was written.} The \emph{official course repository} (\file{course/main}, Table~\ref{tab:course}) has \CourseCommits{} non-merge commits by \CourseAuthors{} author names between \CourseFirst{} and \CourseLast{}, with between \CourseMinPerDay{} and \CourseMaxPerDay{} commits on each of \CourseDays{} days, and it shows each package being added in turn: contracts and cases on \CourseFirstContracts{}, procedure on \CourseFirstProcedure{}, the judge on \CourseFirstJudge{}, agents on \CourseFirstAgents{}, the engine on \CourseFirstEngine{} and the game theory on \CourseFirstGametheory{}. The lineage this report was written from (\file{final-integration}) starts with one commit on \LumpDate{} that already contains the whole core, and \CourseSame{} of the \CourseCore{} core source files in that commit are byte-identical to the official repository's final versions. Git alone cannot say which timeline is the working history. \todo{TEAM TO EXPLAIN how the official history was produced, for example whether the commits were re-created from earlier local work, because the rubric's commit-history criterion and the viva both depend on it}
+\item \textbf{This branch's lineage is uneven.} It has \NCommits{} non-merge commits by \NAuthors{} git author names over \NCommitDays{} days between \FirstCommit{} and \LastCommit{} (Table~\ref{tab:git}); most later work was done by one author, with AI assistance (Section~\ref{sec:ai}), and much of it in the last weeks before the deadline.
+\item \textbf{The planned weekly gates were not tracked in git.} Table~\ref{tab:milestones} lists when each milestone first appears in git; it does not show weekly commits or cross-reviews by every member.
+\item \textbf{What would have helped:} each member committing their own package in their own name through the semester, with a visible review of a teammate's package. The remedy now is real work in each member's name (their contribution paragraph, their viva notes, tests of their package), not rewriting history or authorship.
+\end{itemize}
+
+\begin{table}[ht]\centering\caption{The official course repository (\file{course/main}): commits by author name and the areas touched. Author names are as recorded; mapping a name to a team member is for the team to confirm.}\label{tab:course}
+\input{generated/tab_course.tex}
+\end{table}
+\begin{table}[ht]\centering\caption{Commits by git author name over all local branches (no merges), and the areas of the repository each touched. Names are the git author names as recorded; mapping a name to a team member is for the team to confirm.}\label{tab:git}
+\input{generated/tab_git.tex}
+\end{table}
+\begin{table}[ht]\centering\caption{When key artefacts first appear in git, against the proposal's gates (G1 16 Oct, G2 23 Oct, G3 6 Nov).}\label{tab:milestones}
+\input{generated/tab_milestones.tex}
+\end{table}

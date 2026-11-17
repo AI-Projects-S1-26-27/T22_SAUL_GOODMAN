@@ -1,0 +1,28 @@
+\section{Background and related work}\label{sec:related}
+
+\subsection{Course concepts used}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}p{3.4cm}Xl@{}}
+\toprule
+\textbf{Concept} & \textbf{How it is used here} & \textbf{Package}\\
+\midrule
+Rational agents, expected utility \cite{russell} & Each lawyer maximises $U = 10\cdot\mathbf 1[\text{win}] - 0.3\cdot\text{spent} - 1.0\cdot\text{sanctions}$ (constants in \file{engine/utility.py} and \file{agents/base.py}). The payoff is not zero-sum, so the game is general-sum. & \file{agents/}\\
+Decision under uncertainty, Bayes' rule \cite{russell} & A noisy red-flag signal about each exhibit is turned into a posterior probability that a defect exists; the Smart style also tracks the opponent's objection rate with a Beta posterior. & \file{agents/}\\
+Game formulation: states, actions, transitions, terminal test \cite{russell} & The trial is a finite state machine with typed legal actions, turn caps and guaranteed termination. & \file{procedure/}\\
+Normal-form games, Nash equilibrium, empirical game analysis \cite{shoham,nash,porter,wellman} & Payoff bimatrices over styles estimated from simulation; pure equilibria by scanning, mixed ones by support enumeration in exact rationals, iterated dominance elimination and an independent best-response check. & \file{gametheory/}\\
+Evolutionary dynamics \cite{taylor} & Replicator dynamics on the payoff tables (\file{gametheory/dynamics.py}). & \file{gametheory/}\\
+Incentive (parameter) design \cite{shoham} & Costs, sanctions and budgets are game parameters; a sweep moves them and re-solves (Section~\ref{sec:results}). No incentive-compatibility claim is made. & \file{judge/}\\
+Rule-based reasoning (KR\&R) & The judge is a forward-applied rule system: every ruling names a rule ID, so each score change and verdict can be traced. & \file{judge/}\\
+Minimax, alpha-beta, game trees \cite{russell} & The trial as a tree, solved exactly on an open-file relaxation, with pruning measured. & \file{gametheory/search.py}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Related work}
+We read the abstract page of each paper named in this subsection and describe only what that page states; Wellman's and McMahan et al.'s papers were not retrieved and are cited by title only.
+
+\paragraph{Courtroom simulation with language models.} AgentsCourt \cite{agentscourt} proposes a multi-agent framework that mirrors a court trial, with a debate simulation, legal-resource retrieval and decision refinement, to simulate a judge's decision. It introduces a benchmark of 420 Chinese judgment documents. AgentCourt \cite{agentcourt}, a different paper, simulates a court in which lawyer agents improve through adversarial interaction; its abstract reports evaluation on a new benchmark, CourtBench, and on 1,000 simulated civil cases. The Strategic Courtroom Framework \cite{siedler} has prosecution and defense teams of language-model agents with assigned traits argue over several rounds across 10 synthetic cases and more than 7,000 simulated trials, and adds a reinforcement-learning orchestrator that generates defense traits. Zhang and Ashley \cite{zhang} propose a reflective multi-agent method to generate legal arguments with fewer manipulated or hallucinated claims, evaluated on three legal scenarios.
+
+\paragraph{Game-theoretic analysis from simulation.} Wellman \cite{wellman} is the source of the empirical game-theoretic method we follow: estimate a normal-form game from simulated play, then solve it. Lanctot et al.\ \cite{psro} introduce a multiagent reinforcement-learning algorithm built on approximate best responses and empirical game analysis; their abstract states it generalises several earlier methods, including the double oracle of McMahan, Gordon and Blum \cite{mcmahan}. Our best-response search (Section~\ref{sec:method}) is the same loop with a parameter search in place of reinforcement learning as the oracle. Hennes et al.\ \cite{csro} replace the reinforcement-learning oracle with a language model that writes policies as readable code; this is the closest neighbour to a possible extension of ours, which we do not make.
+
+\paragraph{Our position.} These systems place the intelligence in language models, or use game theory on learned policies. We take the opposite route: a small formal game with no language model in the core, an exact judge, and a game-theory layer whose equilibria can be checked. A language model exists in the repository only as an optional exhibition outside every certified result (Section~\ref{sec:ai}). Agent speech in the demo comes from templates that read the decision the agent made. The contribution is an inspectable teaching demo that shows why a strategy wins or loses.

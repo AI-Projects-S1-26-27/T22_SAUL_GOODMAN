@@ -1,0 +1,148 @@
+{
+ "edge_fixtures": [
+  {
+   "budget_spent": {
+    "defense": 0.5,
+    "prosecution": 0.0
+   },
+   "case": "edge-defense-only",
+   "outcome": "directed_acquittal",
+   "reason": "Directed verdict: prosecution failed to make a prima facie case on 'trade'.",
+   "rules": [
+    "DV-2",
+    "ELEM-1",
+    "STD-1",
+    "VER-DV"
+   ]
+  },
+  {
+   "budget_spent": {
+    "defense": 0.5,
+    "prosecution": 0.0
+   },
+   "case": "edge-empty-docket",
+   "outcome": "directed_acquittal",
+   "reason": "Directed verdict: prosecution failed to make a prima facie case on 'act'.",
+   "rules": [
+    "DV-2",
+    "ELEM-1",
+    "STD-1",
+    "VER-DV"
+   ]
+  },
+  {
+   "budget_spent": {
+    "defense": 1.5,
+    "prosecution": 2.0
+   },
+   "case": "edge-mutual-exclusion",
+   "outcome": "not_liable",
+   "reason": "Element 'command' not proven to the preponderance standard.",
+   "rules": [
+    "ADM-WAIVER",
+    "DV-2",
+    "ELEM-1",
+    "OBJ-HEARSAY",
+    "SANCTION-OVR",
+    "STD-1",
+    "VER-2"
+   ]
+  },
+  {
+   "budget_spent": {
+    "defense": 2.0,
+    "prosecution": 5.5
+   },
+   "case": "edge-poisoned-tree",
+   "outcome": "not_guilty",
+   "reason": "Element 'deployment' not proven to the beyond_reasonable_doubt standard.",
+   "rules": [
+    "ADM-WAIVER",
+    "DV-2",
+    "ELEM-1",
+    "OBJ-AUTH",
+    "OBJ-DISCLOSURE",
+    "OBJ-EXCLUSIONARY",
+    "OBJ-HEARSAY",
+    "SANCTION-BF",
+    "STD-1",
+    "VER-2"
+   ]
+  }
+ ],
+ "replays": {
+  "chain_valid": 160,
+  "recorded_trials": 160,
+  "same_digest": 160
+ },
+ "stress": {
+  "crashes": 0,
+  "deterministic_replays": 2500,
+  "invariant_failures": 0,
+  "max_events": 39,
+  "mean_ms": 1.644,
+  "seconds": 9,
+  "trials": 2500
+ },
+ "tests": {
+  "analysis": {
+   "failed": 0,
+   "files": [
+    "tests/test_analysis.py",
+    "tests/test_classic.py",
+    "tests/test_efficiency.py",
+    "tests/test_search.py",
+    "tests/test_lookahead.py"
+   ],
+   "passed": 73,
+   "returncode": 0,
+   "skipped": 0
+  },
+  "correctness": {
+   "failed": 0,
+   "files": [
+    "tests/test_judge.py",
+    "tests/test_judge_boundaries.py",
+    "tests/test_gametheory.py",
+    "tests/test_nash_edges.py"
+   ],
+   "passed": 106,
+   "returncode": 0,
+   "skipped": 0
+  },
+  "live_demo": {
+   "failed": 0,
+   "files": [
+    "tests/test_api.py",
+    "tests/test_api_hardening.py",
+    "tests/test_live_api.py",
+    "tests/test_cli_smoke.py",
+    "tests/test_ui_editor_absurd.py",
+    "tests/test_voice_coverage.py",
+    "tests/test_bundle_digests.py"
+   ],
+   "passed": 215,
+   "returncode": 0,
+   "skipped": 0
+  },
+  "robustness": {
+   "failed": 0,
+   "files": [
+    "tests/test_engine.py",
+    "tests/test_contracts_and_cases.py",
+    "tests/test_procedure.py",
+    "tests/test_review_robustness.py",
+    "tests/test_agents.py"
+   ],
+   "passed": 467,
+   "returncode": 0,
+   "skipped": 0
+  }
+ },
+ "timing": {
+  "max_ms": 23.2,
+  "median_ms": 2.7,
+  "trials": 160,
+  "under_1s": true
+ }
+}

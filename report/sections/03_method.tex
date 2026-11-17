@@ -1,0 +1,83 @@
+\section{Method}\label{sec:method}
+
+\subsection{System architecture}
+The system is seven packages with narrow interfaces, plus the demo (Figure~\ref{fig:arch}). The stack is Python~3.11, Pydantic~v2 for the data contracts, FastAPI, Rich for terminal output and plain JavaScript for the browser demo. Data flows upward to the visualisation, while imports point downward. The judge never imports the agents; agents see the judge only through a read-only \emph{Oracle} that answers ``what would the score be if this exhibit were admitted'' from the public record and the agent's own beliefs, never from the true defect flags.
+
+\begin{figure}[ht]\centering
+\begin{tikzpicture}[font=\small,
+  box/.style={draw=navy,rounded corners=2pt,fill=accent!8,minimum height=1.35cm,align=center,inner sep=3pt},
+  w1/.style={box,minimum width=15.6cm},w2/.style={box,minimum width=7.7cm},w4/.style={box,minimum width=3.75cm,text width=3.45cm}]
+\node[w1] (viz) at (0,0) {\file{viz/} (Rakshit Goel): terminal replay, browser UI, strategy lab. Reads \texttt{TrialResult} and payoff tables only};
+\node[w2] (eng) at (-3.95,-1.9) {\file{engine/}, \file{api/}, \file{cli} (Pramit Khandelwal)\\ trial loop, fault barrier, hash-chained log, FastAPI};
+\node[w2] (gt) at (3.95,-1.9) {\file{gametheory/} (Rohan B. Pagire)\\ payoff Monte Carlo, exact Nash, bootstrap, search};
+\node[w4] (cases) at (-5.925,-3.9) {\file{cases/}\\ library, edge fixtures, generator\\ (Aditya Singh)};
+\node[w4] (proc) at (-1.975,-3.9) {\file{procedure/}\\ phase machine, validator, ledgers\\ (Divvij Y. Chichra)};
+\node[w4] (judge) at (1.975,-3.9) {\file{judge/}\\ exact scoring, directed verdict, trace\\ (Lakshya Sachdeva)};
+\node[w4] (agents) at (5.925,-3.9) {\file{agents/}\\ perception, Oracle, styles\\ (Mofasser A. Midda)};
+\node[w1] (con) at (0,-5.7) {\file{contracts/} (Aditya Singh): frozen Pydantic models \texttt{CaseFile}, \texttt{EvidenceItem}, \texttt{Action}, \texttt{TrialEvent}, \texttt{TrialResult}};
+\end{tikzpicture}
+\caption{Package layout with the owner of each package, as assigned in the proposal. The optional \file{llm/} package (Section~\ref{sec:ai}) sits beside the core, and a test checks the core never imports it.}\label{fig:arch}
+\end{figure}
+
+\subsection{Case model and the library}
+A case file holds the case type (criminal or civil), the standard of proof, the legal elements the Accuser must prove, the witnesses and the evidence items. Each item records its owner, kind (document, digital log, physical, financial record, testimony or expert), the fact it proves, its signed support $s_{ie}\in[-1,1]$ for each element (negative means it helps the Defender), the items it contradicts, its reliability, a presenting cost (1.0 for most kinds, 1.5 for testimony, 2.0 for experts) and defect flags (hearsay, unauthenticated, unlawfully obtained, undisclosed, no personal knowledge). A \emph{fact} is one distinct proposition. A validator rejects malformed or inconsistent files with the failing field named before any trial starts. The judge knows the true flags; the opposing lawyer sees a noisy signal about them (Section~\ref{sec:perception}). The library has \NCases{} cases (Section~\ref{sec:intro}); a seeded generator produces more for stress runs and for the contested-case finder.
+
+\subsection{Trial procedure}
+The trial is a finite state machine (Figure~\ref{fig:phases}). After every offered exhibit the other side gets one window: \texttt{OBJECT(ground)} or \texttt{PASS}; the judge rules and the window closes. An objection cannot itself be objected to, so objection loops cannot occur. Every phase has a turn cap, two consecutive passes count as resting, and a global event cap (400 events) forces deliberation, so every trial ends.
+
+\begin{figure}[ht]\centering
+\begin{tikzpicture}[font=\small,
+  st/.style={draw=navy,rounded corners=2pt,fill=accent!8,minimum height=1cm,minimum width=3.3cm,align=center,inner sep=3pt},
+  ar/.style={-{Stealth[length=2mm]},navy}]
+\node[st] (o) at (0,0) {Opening\\ statements};
+\node[st] (p) at (3.9,0) {Prosecution case\\ offer, impeach, rest};
+\node[st] (dv) at (7.8,0) {Directed-verdict\\ review};
+\node[st] (d) at (11.7,0) {Defense case\\ offer, impeach, rest};
+\node[st] (r) at (11.7,-2) {Rebuttal\\ scope-limited};
+\node[st] (del) at (7.8,-2) {Deliberation\\ judge scores};
+\node[st] (cl) at (3.9,-2) {Closed\\ verdict and digest};
+\draw[ar] (o)--(p); \draw[ar] (p)--(dv); \draw[ar] (dv)--(d) node[midway,above,font=\scriptsize]{denied};
+\draw[ar] (d)--(r); \draw[ar] (r)--(del); \draw[ar] (del)--(cl);
+\draw[ar] (dv.south west) -- ++(0,-0.5) -| (cl.north east) node[pos=0.2,above left,font=\scriptsize]{granted};
+\end{tikzpicture}
+\caption{Trial phases. Rebuttal may only answer defense exhibits; it cannot add new support for an element. The Defender must move for a directed verdict, and the judge enters one on its own initiative when no admitted evidence supports an element (Section~\ref{sec:deviations}).}\label{fig:phases}
+\end{figure}
+
+Six objection grounds (hearsay, relevance, authentication, illegally obtained, late disclosure, speculation) map to named rules and are sustained only if the defect is real. A defect nobody objects to is waived, which is why objection strategy matters. An overruled objection costs the objector \(\tfrac14\) point, a procedural violation 1 point plus a fine, knowingly offering unlawful or undisclosed evidence 2 points, and three violations mean contempt. Impeaching a witness costs 1 budget unit, and, since a review finding during final preparation (E1 in \file{docs/CODE\_REVIEW.md}), it requires an exhibit that was itself offered and admitted (validator rule \texttt{V-IMPEACH-NOT-ADMITTED}).
+
+\subsection{The deterministic judge}
+The judge scores a \emph{record}: the set of admitted exhibits and the number of times each witness was impeached. It is a pure function of the record, so the same record always gives the same verdict, whatever the order of events. Arithmetic is exact (Python \texttt{Fraction}); floats appear only in display fields. The formulas below are those of \file{courtroom/judge/scoring.py}. For an admitted exhibit $i$ and legal element $e$:
+\begin{align*}
+S_i &= r_i\,\kappa_i, & \kappa_i &= \text{cred}_{w(i)}\cdot\tfrac12^{\,n_{w(i)}}\cdot h_{w(i)},\\
+d_i &= \min\Bigl(\tfrac{9}{10},\ \sum_{j\in C(i)}\tfrac45\,\tfrac{S_j}{S_i+S_j}\Bigr), & c_{ie} &= 1 + \tfrac12\bigl(1-2^{-k_{ie}}\bigr),\\
+w_{ie} &= s_{ie}\,S_i\,(1-d_i)\,c_{ie}, & L_e &= \pi + 3\sum_{i\in\text{counted}(e)} w_{ie}.
+\end{align*}
+Here $r_i$ is reliability, $\text{cred}_{w}$ the witness's base credibility (1 for an exhibit with no witness), $n_w$ the number of successful impeachments of the witness, $h_w=\tfrac14$ if the witness turned hostile and 1 otherwise, $C(i)$ the admitted exhibits that contradict $i$, $k_{ie}$ the number of \emph{other} facts whose admitted exhibits point the same way on $e$, and $\pi$ the prior ($-1$ criminal, $0$ civil). Only the exhibit with the largest $|w_{ie}|$ for each fact is counted, so splitting one fact into many exhibits cannot inflate the score. $L_e$ is in log-odds. The Accuser wins only if \emph{every} element clears the standard: $L_e\ge \tfrac{11}{5}$ (beyond reasonable doubt, about $0.90$), $L_e\ge\tfrac{11}{10}$ (clear and convincing, about $0.75$) or $L_e>0$ (preponderance). The test is per element, so a strong motive cannot replace proof of the act.
+
+\emph{Why these constants.} The scale 3 means one perfect exhibit cannot convict in a criminal case ($-1+3=2<\tfrac{11}{5}$) but two independent good exhibits can. The cap $\tfrac{9}{10}$ means contradiction never erases an exhibit outright, and the corroboration bonus is capped at $50\%$. All are game parameters, moved in the sensitivity sweep.
+
+\emph{Directed verdict.} When the prosecution rests, the Defender may move for a directed verdict; it is granted if some element is below log-odds $0$ (rule DV-1). With no admitted evidence supporting an element the judge enters it on its own initiative (DV-2). Two points differ from the proposal's text and are recorded in Section~\ref{sec:deviations}: only the strongest exhibit per fact is counted (there is no cap of four facts), and an exact tie at a non-zero bar meets it.
+
+\subsection{Perception and the Oracle}\label{sec:perception}
+A lawyer does not see an exhibit's defect flags. For each exhibit and ground it receives one binary red-flag signal with true-positive rate $a$ (the case's perception accuracy, $0.8$ by default) and false-positive rate $(1-a)/4$, and it holds the Bayesian posterior from a prior of $0.15$ that the ground applies. With $a=0.8$ a red flag raises the belief to $\tfrac{0.12}{0.1625}\approx 0.74$. Relevance is observed exactly, because the support values of an offered exhibit are public. The Oracle lets any agent query the judge's public scoring rule on a hypothetical record, which is what ``what if this were admitted'' means; it never reveals a true flag. Agents are handed a \texttt{PartyView} built by the engine; a test checks that the lookahead lawyer reads only that view and the public Oracle, and we have no equivalent source-level test for the four certified styles (a gap noted in Section~\ref{sec:discussion}).
+
+\subsection{Agents}
+A lawyer is a \texttt{StrategyProfile}: a few numbers read by one shared decision procedure, so styles differ only in risk parameters: the number of known defects it will tolerate in its own exhibit, the minimum gain that justifies spending a turn, the belief and impact above which it objects, and the share of budget held in reserve. \emph{Bold} (aggressive) offers exhibits even with up to two known defects, objects at belief $0.35$ and keeps no reserve. \emph{Careful} (conservative) offers only clean exhibits, objects only at belief $0.70$ and impact $0.25$, and keeps $25\%$ in reserve. \emph{Smart} (adaptive) picks the move of highest expected utility under its beliefs and learns the opponent's objection rate with a Beta posterior. \emph{Wild} (reckless) plays random legal moves and sometimes breaks a rule; the proposal's Mixed$(p)$ remains in the code but is not in the four-by-four game (Section~\ref{sec:deviations}). A \emph{Chaos} agent, used only in robustness tests, plays illegal actions at random. A \emph{lookahead} lawyer (depth-limited alpha-beta) and an optional language-model lawyer exist as labelled exhibitions and are never in a certified table.
+
+\subsection{The game layer and the analyses}\label{sec:analyses}
+Each analysis below is computed from the stored results, uses the same engine and judge as the demo, and states what it assumes.
+\begin{description}
+\item[Payoff Monte Carlo.] Every pair of the four styles is played on the same seeds (common random numbers) to estimate a $4\times4$ bimatrix of mean utilities, with standard errors.
+\item[Exact Nash solver.] Pure equilibria by scanning, mixed ones by support enumeration over \texttt{Fraction}s, iterated elimination of dominated strategies, and an independent verifier that no side gains by deviating. A case is labelled \emph{pure}, \emph{mixed} or \emph{dominance-solvable}.
+\item[Bootstrap stability.] The seed set is resampled with replacement and the game re-solved; the stability of a label is the share of resamples that give the same label.
+\item[Sensitivity.] The rulebook's constants (costs, sanctions, the scale $3$, the prior defect rate and the standards of proof) are moved by $\pm25\%$ and the library is re-solved. The ``almost certain'' bar is also set between $80\%$ and $95\%$.
+\item[Does strategy matter?] For each case every pairing of Bold, Careful and Smart is played over several seeds; the \emph{pairing spread} is the best Accuser win rate minus the worst, and the \emph{seed coin-flip} is the average of $2\min(p,1-p)$. The words ``decided by the evidence'' or ``by the lawyers'' only label these two numbers.
+\item[Best-response search (double oracle).] Starting from the four styles on each side, up to four rounds: solve the game; for each side search the five profile parameters (a seeded random search, then local refinement) for the profile earning most against the other side's equilibrium mix on training seeds; re-test it on held-out seeds with a paired comparison; keep it only above two standard errors; solve again. Each kept profile is confirmed on a third seed set. No language model is involved.
+\item[Classic-game classifier.] A two-by-two corner of a payoff table is named (prisoner's dilemma, stag hunt, battle of the sexes, chicken, matching pennies) by the \emph{order} of its payoffs, treating differences under two standard errors as ties. It reads pairs of styles only.
+\item[Pareto efficiency and security values.] Exact Pareto and maximin computations (vertex enumeration in rationals); the minimax theorem is checked on the win-probability game, which is constant-sum.
+\item[Minimax and alpha-beta.] The trial as a tree, with plain minimax, alpha-beta and alpha-beta with move ordering, on the engine's own rules. This is an \emph{open-file relaxation}: both sides see every exhibit and flaw (no perception noise), and the payoff is made zero-sum (Accuser utility minus Defender utility). It is not the game the certified analysis solves.
+\item[Contested-case finder and tipping point.] The finder scores generated cases with the does-strategy-matter measure and solves the most contested; the tipping point is the smallest change to one exhibit's reliability or one witness's credibility that flips a verdict, found by re-scoring the record with the judge itself.
+\end{description}
+
+\subsection{Engine, API, demo and reproducibility}\label{sec:repro}
+The engine runs a trial, catches agent faults, and keeps a hash-chained event log; each trial ends in a digest, and \texttt{python -m courtroom verify} runs a case twice and compares digests and the chain. The FastAPI server exposes trials, games, the analyses and case validation; heavy endpoints are bounded. The web demo is plain JavaScript. The hosted copy is static: it plays the \ReplayTotal{} recorded trials in a bundle and shows the stored analysis, and says so; only the local server computes fresh trials. Every spoken line is pre-recorded with a fixed voice per character, so the voice does not depend on the device. \file{PROVENANCE.md} gives one command per claim, and a test regenerates the documents and fails if one is stale.

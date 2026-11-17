@@ -1,0 +1,93 @@
+% CS F407 final report, Team 22 (Saul Goodman). Style follows the submitted proposal (docs/proposal/AIPP_Team22_SaulGoodman.pdf).
+% Build: python report/build_report.py   (needs tectonic). Every result number is a macro from generated/numbers.tex or a generated table.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.2cm,top=2.4cm,bottom=2.2cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{texgyrepagella}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\setsansfont{texgyreheros}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\setmonofont{texgyrecursor}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic,Scale=0.88]
+\usepackage{amsmath,amssymb,unicode-math}
+\setmathfont{texgyrepagella-math.otf}
+\usepackage{booktabs,tabularx,graphicx,xcolor,microtype,enumitem,caption,longtable,array}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,calc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\definecolor{navy}{HTML}{1B2A49}
+\definecolor{accent}{HTML}{2F6DB5}
+\definecolor{todo}{HTML}{B3261E}
+\titleformat{\section}{\large\bfseries\color{navy}}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{navy}}{\thesubsection}{0.6em}{}
+\setlist{nosep,leftmargin=1.4em}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\emergencystretch}{3em}\setlength{\parindent}{0pt}\setlength{\parskip}{0.55em}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small\itshape CS F407 Artificial Intelligence, Final Report}\rhead{\small\itshape Team 22, Saul Goodman}\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\newcommand{\todo}[1]{\textcolor{todo}{\textbf{[#1]}}}
+\newcommand{\file}[1]{\texttt{#1}}
+\input{generated/numbers.tex}
+
+\begin{document}
+\thispagestyle{empty}
+\begin{center}
+\vspace*{0.5cm}
+{\large\bfseries A REPORT}\\[0.5em] {\small\bfseries ON}\\[1.2em]
+{\Large\bfseries STRATEGIC AI AGENTS\\IN A SIMULATED COURTROOM}\\[1.6em]
+{\small\bfseries BY}\\[0.8em]
+{\small\begin{tabularx}{\textwidth}{@{}p{3.6cm}p{2.6cm}X@{}}
+\toprule
+\textbf{Name of the students} & \textbf{ID No(s).} & \textbf{Discipline(s)}\\
+\midrule
+Divvij Yogesh Chichra & 2024AAPS0298H & B.E. Electronics and Communication\\
+Lakshya Sachdeva & 2024A8PS0468H & B.E. Electronics and Instrumentation\\
+Mofasser Arafat Midda & 2023B1A80965H & M.Sc. Biological Sciences and B.E. Electronics and Instrumentation\\
+Pramit Khandelwal & 2024A3PS0443H & B.E. Electrical and Electronics\\
+Rakshit Goel & 2023A3PS0373H & B.E. Electrical and Electronics\\
+Aditya Singh & 2024A8PS0491H & B.E. Electronics and Instrumentation\\
+Rohan Baban Pagire & 2024A7PS1160H & B.E. Computer Science\\
+\bottomrule
+\end{tabularx}}\\[2em]
+{\bfseries Prepared in partial fulfillment of the}\\[0.8em]
+{\Large\bfseries Course CS F407: Artificial Intelligence}\\[0.5em]
+{\small\bfseries Final Report, Team 22 (Saul Goodman)}\\[0.3em]
+{\small\bfseries Track: Demo \quad Topic: Agents \& Game Theory}\\[1.2em]
+\includegraphics[width=3.6cm]{figures/bits_logo.png}\\[1.2em]
+{\bfseries BIRLA INSTITUTE OF TECHNOLOGY \& SCIENCE, PILANI}\\[0.3em]
+{\small\bfseries Hyderabad Campus}\\[0.8em]
+{\bfseries November 2026}
+\end{center}
+\newpage
+
+\begin{center}
+{\large\scshape CS F407 Artificial Intelligence\quad Final Report\quad Overview}\\[0.8em]
+{\LARGE\bfseries Strategic AI Agents in a Simulated Courtroom}\\[0.3em]
+{\itshape Evidence, objections and limited budgets, played as a game between two rational agents}
+\end{center}
+
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\textbf{Project name} & Strategic AI Agents in a Simulated Courtroom\\
+\textbf{Team} & Team 22, Saul Goodman (7 members)\\
+\textbf{Course} & CS F407 Artificial Intelligence, BITS Pilani, Hyderabad Campus\\
+\textbf{Track} & Demo\\
+\textbf{Topic area} & Agents \& Game Theory (the rule-based judge also draws on Knowledge Representation \& Reasoning)\\
+\textbf{GitHub repository} & \url{https://github.com/AI-Projects-S1-26-27/T22_SAUL_GOODMAN}\\
+\textbf{Live demo} & \texttt{python -m courtroom serve}, then \texttt{http://127.0.0.1:8000}; a static copy with recorded trials is hosted (see \file{README.md})\\
+\end{tabularx}
+
+\paragraph{Abstract.} We built a multi-agent courtroom as a small formal game: two lawyer agents with limited budgets present, object to and challenge exhibits that carry hidden defects, and a deterministic rulebook judge with exact arithmetic rules on every objection and decides the verdict. On top of the simulator, a game-theory layer estimates payoff tables over \BootSeeds{} common seeds, solves them for Nash equilibria in exact rationals, and tests how stable each conclusion is under resampling, under changes to the rulebook's constants and against a search for better lawyers. Across the \NCases{} cases of the library, the lawyers' strategies move the verdict in only \NMove{} cases; the other \NEvidence{} are decided by the evidence alone. We report what held, what did not, and what we could not find.
+
+\tableofcontents
+\newpage
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_method}
+\input{sections/04_results}
+\input{sections/05_discussion}
+\input{sections/06_contributions}
+\input{sections/07_ai_usage}
+\input{sections/08_deviations}
+\input{sections/09_references}
+\end{document}

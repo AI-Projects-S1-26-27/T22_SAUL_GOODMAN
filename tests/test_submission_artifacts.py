@@ -43,7 +43,7 @@ def test_report_has_every_section_the_brief_requires_and_every_member() -> None:
         assert head in text, head
     for m in MEMBERS:
         assert m in text, m
-    assert "MEMBER ADDS OWN AI USE" in text or text.count("AI USE") >= 7
+    assert "MEMBER ADDS OWN AI USE" not in text  # every member has an AI-use line
 
 
 def test_the_committed_pdfs_exist() -> None:
