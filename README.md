@@ -38,9 +38,10 @@ Track: Demo · Domain: Agents & Game Theory
 11. [HTTP API](#-http-api)
 12. [Architecture and team](#-architecture-and-team)
 13. [Robustness and verification](#-robustness-and-verification)
-14. [Deploying](#-deploying)
-15. [Project layout](#-project-layout)
-16. [Documentation index](#-documentation-index)
+14. [AI usage disclosure](#-ai-usage-disclosure)
+15. [Deploying](#-deploying)
+16. [Project layout](#-project-layout)
+17. [Documentation index](#-documentation-index)
 
 ---
 
@@ -365,6 +366,23 @@ python scripts/preflight.py
 
 ---
 
+## 🤖 AI usage disclosure
+
+AI tools were used in this project, as the course allows, and every member is responsible for their part. The full account is in
+[`AI_USAGE.md`](AI_USAGE.md) and in Section 7 of the report.
+
+- **Claude** (Claude Code in the repository, and Claude chat): brainstorming, code assistance, debugging and writing help. Claude Code
+  wrote and refactored much of the code, tests and documents.
+- **Antigravity**: brainstorming, code assistance and debugging while members worked on their packages.
+- **Per member:** each member's AI use and how they checked it is listed in [`AI_USAGE.md`](AI_USAGE.md#per-member), for example
+  Lakshya Sachdeva's judge and the three.js 3D courtroom simulation, built with AI assistance.
+- **How it was checked:** the test suite (with hand-computed judge fixtures), pinned trial digests and spoken lines, mutation checks,
+  independent re-runs, a structured code review, and documents regenerated from `results/` rather than edited by hand.
+- **Inside the product:** the judge is a deterministic rulebook, not a language model. The optional model layer is off by default and never
+  enters a certified result ([`docs/LLM_ROLE.md`](docs/LLM_ROLE.md)).
+
+---
+
 ## ☁️ Deploying
 
 The hosted demo is a static deployment of `courtroom/viz/web` ([`vercel.json`](vercel.json): no build command, output directory
@@ -412,6 +430,7 @@ docs/           design, code review, UI audit, rehearsal, process notes
 | [`REPORT.md`](REPORT.md) | The long technical write-up, with every number generated from `results/` |
 | [`presentation/Saul_Goodman_T22.pdf`](presentation/Saul_Goodman_T22.pdf) | The six-slide presentation ([`.pptx`](presentation/Saul_Goodman_T22.pptx)) |
 | [`PROVENANCE.md`](PROVENANCE.md) | One command per claim: how every number is produced |
+| [`AI_USAGE.md`](AI_USAGE.md) | AI usage disclosure: tools, what each was used for, per member, and how the output was checked |
 | [`DEVIATIONS.md`](DEVIATIONS.md) | Where the code differs from the proposal, and why |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Design dialectic and calibration notes |
 | [`docs/LLM_ROLE.md`](docs/LLM_ROLE.md) | What the optional language-model layer may and may not do |
