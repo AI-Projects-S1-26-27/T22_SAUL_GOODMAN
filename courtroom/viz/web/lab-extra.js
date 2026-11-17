@@ -160,7 +160,7 @@
         btn.disabled = true; btn.textContent = "Resampling…";
         try { sureLive = await post("/bootstrap", { case_id: c.id, seeds: 20, resamples: 200, surprises: sureSur }); sureLive.case_id = c.id; sureLive.surprises = sureSur; renderSure(); } catch { btn.textContent = "Could not run it"; }
       });
-      kids.push(h("p", {}, btn, sureLive?.case_id === c.id ? h("span", { class: "muted small" }, " Showing the fresh run (20 seeds) instead of the stored one (100 seeds).") : null));
+      kids.push(h("p", {}, btn, sureLive?.case_id === c.id ? h("span", { class: "muted small" }, ` Showing the fresh run (20 seeds) instead of the stored one (${b.n_seeds} seeds).`) : null));
     }
     body.replaceChildren(...kids);
   }

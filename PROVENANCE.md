@@ -65,14 +65,14 @@ The result files this version of the docs was generated from:
 <!-- BEGIN GENERATED:files -->
 | Result file | sha256 (first 12) | Size |
 |---|---|---|
-| `results/bootstrap.json` | `441a883b5ed7` | 24 KiB |
-| `results/bootstrap_surprises.json` | `9abd8495b12a` | 24 KiB |
-| `results/classic.json` | `c0f9f0791a5a` | 150 KiB |
+| `results/bootstrap.json` | `2fb6c00183c3` | 24 KiB |
+| `results/bootstrap_surprises.json` | `e592d6c4cb6e` | 24 KiB |
+| `results/classic.json` | `05e7a3228ca5` | 150 KiB |
 | `results/classic_search.json` | `43face64976a` | 1 KiB |
 | `results/classic_search_surprises.json` | `01b4699396ed` | 1 KiB |
-| `results/classic_surprises.json` | `f92598a71220` | 149 KiB |
-| `results/efficiency.json` | `fb14937b87f4` | 34 KiB |
-| `results/efficiency_surprises.json` | `780394ec7f2d` | 34 KiB |
+| `results/classic_surprises.json` | `a419562fcb92` | 149 KiB |
+| `results/efficiency.json` | `1674b8cfdbae` | 34 KiB |
+| `results/efficiency_surprises.json` | `5fb1f68e474e` | 34 KiB |
 | `results/lookahead.json` | `4f19ef9c385c` | 14 KiB |
 | `results/lookahead_surprises.json` | `1ecc9349ef8a` | 14 KiB |
 | `results/matters.json` | `d4c87d4ce5a1` | 6 KiB |

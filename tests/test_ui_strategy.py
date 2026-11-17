@@ -71,7 +71,9 @@ def test_takeaway_names_the_certified_equilibrium_including_mixed_ones() -> None
         t = pg.inner_text("#takeaway")
         assert "mix" in t and "Accuser" in t and "Defender" in t and "%" in t
         pg.evaluate("selectCase('broken-bike')")
-        assert "4 stable picks" in pg.inner_text("#takeaway")
+        n = pg.evaluate("COURTROOM_ANALYSIS.efficiency.cases['broken-bike'].efficiency.equilibria.length")
+        assert n >= 2  # several equilibria: the takeaway must say how many, as the certified table has them
+        assert f"{n} stable picks" in pg.inner_text("#takeaway")
 
 
 def test_surprises_toggle_updates_which_style_wins_in_live_mode() -> None:  # stale-state rule

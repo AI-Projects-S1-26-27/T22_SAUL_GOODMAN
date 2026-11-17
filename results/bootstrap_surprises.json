@@ -4,114 +4,114 @@
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": -6.408,
-     "low": -6.981,
-     "mean": -6.7115,
+     "high": -6.3223,
+     "low": -6.788,
+     "mean": -6.5673,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": -6.345,
-     "low": -6.901,
-     "mean": -6.6595,
+     "high": -6.2758,
+     "low": -6.7277,
+     "mean": -6.4973,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": -6.3355,
-     "low": -7.066,
-     "mean": -6.7115,
+     "high": -6.3312,
+     "low": -6.8155,
+     "mean": -6.5673,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": -3.1245,
-     "low": -3.4925,
-     "mean": -3.2925,
+     "high": -3.1615,
+     "low": -3.3893,
+     "mean": -3.2848,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": -1.555,
-     "low": -1.722,
-     "mean": -1.634,
+     "high": -1.5675,
+     "low": -1.667,
+     "mean": -1.6185,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": -1.554,
-     "low": -1.71,
-     "mean": -1.634,
+     "high": -1.5645,
+     "low": -1.673,
+     "mean": -1.6185,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": -1.55,
-     "low": -1.714,
-     "mean": -1.634,
+     "high": -1.5585,
+     "low": -1.673,
+     "mean": -1.6185,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": -1.531,
-     "low": -1.68,
-     "mean": -1.602,
+     "high": -1.5395,
+     "low": -1.6425,
+     "mean": -1.5885,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": -1.93,
-     "low": -2.08,
-     "mean": -2.008,
+     "high": -1.912,
+     "low": -2.0135,
+     "mean": -1.9597,
      "row": "adaptive"
     },
     {
      "col": "conservative",
-     "high": -4.1805,
-     "low": -4.9895,
-     "mean": -4.5755,
+     "high": -4.108,
+     "low": -4.598,
+     "mean": -4.3388,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": -4.201,
-     "low": -4.9055,
-     "mean": -4.5955,
+     "high": -4.0852,
+     "low": -4.658,
+     "mean": -4.3667,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": -2.577,
-     "low": -2.8785,
-     "mean": -2.7105,
+     "high": -2.5332,
+     "low": -2.7223,
+     "mean": -2.6325,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -5.842,
-     "low": -6.4885,
-     "mean": -6.118,
+     "high": -5.891,
+     "low": -6.3155,
+     "mean": -6.0875,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -5.624,
-     "low": -6.2325,
-     "mean": -5.9325,
+     "high": -5.6558,
+     "low": -6.1477,
+     "mean": -5.9245,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -5.6415,
-     "low": -6.307,
-     "mean": -5.978,
+     "high": -5.7835,
+     "low": -6.2075,
+     "mean": -5.9675,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -4.0685,
-     "low": -4.5815,
-     "mean": -4.3165,
+     "high": -4.2218,
+     "low": -4.5995,
+     "mean": -4.4275,
      "row": "reckless"
     }
    ],
@@ -128,7 +128,7 @@
     "pure": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -144,113 +144,113 @@
     {
      "col": "aggressive",
      "high": 8.725,
-     "low": 8.599,
-     "mean": 8.662,
+     "low": 8.626,
+     "mean": 8.6755,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": 8.734,
-     "low": 8.59,
-     "mean": 8.662,
+     "high": 8.716,
+     "low": 8.635,
+     "mean": 8.6755,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": 8.725,
-     "low": 8.599,
-     "mean": 8.662,
+     "high": 8.716,
+     "low": 8.626,
+     "mean": 8.6755,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": 8.8905,
-     "low": 8.7355,
-     "mean": 8.812,
+     "high": 8.9032,
+     "low": 8.813,
+     "mean": 8.8632,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": 7.897,
-     "low": 6.49,
-     "mean": 7.1795,
+     "high": 7.5287,
+     "low": 6.331,
+     "mean": 6.931,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": 9.356,
-     "low": 9.308,
-     "mean": 9.332,
+     "high": 9.354,
+     "low": 9.312,
+     "mean": 9.336,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": 9.356,
-     "low": 9.308,
-     "mean": 9.332,
+     "high": 9.352,
+     "low": 9.316,
+     "mean": 9.336,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": 7.6415,
-     "low": 6.0925,
-     "mean": 6.7595,
+     "high": 7.1822,
+     "low": 5.9408,
+     "mean": 6.5258,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": 8.02,
-     "low": 6.448,
-     "mean": 7.246,
+     "high": 7.6075,
+     "low": 6.4138,
+     "mean": 7.002,
      "row": "adaptive"
     },
     {
      "col": "conservative",
-     "high": 9.356,
-     "low": 9.304,
-     "mean": 9.332,
+     "high": 9.354,
+     "low": 9.316,
+     "mean": 9.336,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": 9.36,
-     "low": 9.304,
-     "mean": 9.332,
+     "high": 9.358,
+     "low": 9.316,
+     "mean": 9.336,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": 7.502,
-     "low": 6.079,
-     "mean": 6.7935,
+     "high": 7.2235,
+     "low": 6.0177,
+     "mean": 6.606,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": 7.784,
-     "low": 7.016,
-     "mean": 7.421,
+     "high": 7.729,
+     "low": 7.1235,
+     "mean": 7.456,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": 7.816,
-     "low": 6.97,
-     "mean": 7.421,
+     "high": 7.7515,
+     "low": 7.143,
+     "mean": 7.456,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": 7.836,
-     "low": 6.991,
-     "mean": 7.421,
+     "high": 7.733,
+     "low": 7.143,
+     "mean": 7.456,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": 6.8795,
-     "low": 6.0535,
-     "mean": 6.4765,
+     "high": 6.763,
+     "low": 6.1983,
+     "mean": 6.4873,
      "row": "reckless"
     }
    ],
@@ -264,11 +264,11 @@
     "reckless"
    ],
    "label_counts": {
-    "mixed": 28,
-    "pure": 172
+    "mixed": 34,
+    "pure": 166
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -276,121 +276,121 @@
     "adaptive",
     "reckless"
    ],
-   "stability": 0.86,
+   "stability": 0.83,
    "surprises": true
   },
   "cookie-jar": {
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": -2.284,
-     "low": -2.376,
-     "mean": -2.336,
+     "high": -2.272,
+     "low": -2.346,
+     "mean": -2.308,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": -2.292,
-     "low": -2.372,
-     "mean": -2.332,
+     "high": -2.274,
+     "low": -2.336,
+     "mean": -2.306,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": -2.292,
-     "low": -2.372,
-     "mean": -2.332,
+     "high": -2.272,
+     "low": -2.34,
+     "mean": -2.306,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": -1.972,
-     "low": -2.36,
-     "mean": -2.216,
+     "high": -2.056,
+     "low": -2.308,
+     "mean": -2.19,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": -1.246,
-     "low": -1.346,
-     "mean": -1.294,
+     "high": -1.248,
+     "low": -1.328,
+     "mean": -1.29,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": -1.25,
-     "low": -1.342,
-     "mean": -1.294,
+     "high": -1.254,
+     "low": -1.328,
+     "mean": -1.29,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": -1.246,
-     "low": -1.346,
-     "mean": -1.294,
+     "high": -1.252,
+     "low": -1.326,
+     "mean": -1.29,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": -1.206,
-     "low": -1.302,
-     "mean": -1.254,
+     "high": -1.218,
+     "low": -1.278,
+     "mean": -1.25,
      "row": "conservative"
     },
     {
      "col": "aggressive",
+     "high": -1.72,
+     "low": -1.792,
+     "mean": -1.752,
+     "row": "adaptive"
+    },
+    {
+     "col": "conservative",
      "high": -1.712,
-     "low": -1.816,
-     "mean": -1.764,
-     "row": "adaptive"
-    },
-    {
-     "col": "conservative",
-     "high": -1.704,
-     "low": -1.816,
-     "mean": -1.756,
+     "low": -1.78,
+     "mean": -1.748,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": -1.704,
-     "low": -1.82,
-     "mean": -1.756,
+     "high": -1.708,
+     "low": -1.782,
+     "mean": -1.748,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": -1.404,
-     "low": -1.744,
-     "mean": -1.608,
+     "high": -1.444,
+     "low": -1.72,
+     "mean": -1.6,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -2.9605,
-     "low": -3.3515,
-     "mean": -3.165,
+     "high": -3.0077,
+     "low": -3.2625,
+     "mean": -3.1338,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -2.956,
-     "low": -3.387,
-     "mean": -3.169,
+     "high": -3.0063,
+     "low": -3.2788,
+     "mean": -3.1385,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -3.0025,
-     "low": -3.3815,
-     "mean": -3.169,
+     "high": -3.0198,
+     "low": -3.269,
+     "mean": -3.1385,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -2.9895,
-     "low": -3.3655,
-     "mean": -3.1505,
+     "high": -2.885,
+     "low": -3.2673,
+     "mean": -3.092,
      "row": "reckless"
     }
    ],
@@ -407,7 +407,7 @@
     "dominance-solvable": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -506,30 +506,30 @@
     },
     {
      "col": "aggressive",
-     "high": -0.489,
-     "low": -0.723,
-     "mean": -0.606,
+     "high": -0.4825,
+     "low": -0.6485,
+     "mean": -0.567,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -0.495,
-     "low": -0.72,
-     "mean": -0.606,
+     "high": -0.487,
+     "low": -0.6485,
+     "mean": -0.567,
      "row": "reckless"
     },
     {
      "col": "adaptive",
      "high": -0.479,
-     "low": -0.737,
-     "mean": -0.606,
+     "low": -0.6515,
+     "mean": -0.567,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -0.502,
-     "low": -0.729,
-     "mean": -0.606,
+     "high": -0.492,
+     "low": -0.655,
+     "mean": -0.567,
      "row": "reckless"
     }
    ],
@@ -546,7 +546,7 @@
     "pure": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -645,30 +645,30 @@
     },
     {
      "col": "aggressive",
-     "high": -0.091,
-     "low": -0.286,
-     "mean": -0.169,
+     "high": -0.078,
+     "low": -0.2015,
+     "mean": -0.1365,
      "row": "reckless"
     },
     {
      "col": "conservative",
      "high": -0.078,
-     "low": -0.273,
-     "mean": -0.169,
+     "low": -0.208,
+     "mean": -0.1365,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -0.091,
-     "low": -0.286,
-     "mean": -0.169,
+     "high": -0.0845,
+     "low": -0.208,
+     "mean": -0.1365,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -0.091,
-     "low": -0.299,
-     "mean": -0.169,
+     "high": -0.078,
+     "low": -0.208,
+     "mean": -0.1365,
      "row": "reckless"
     }
    ],
@@ -685,7 +685,7 @@
     "pure": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -700,114 +700,114 @@
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": 1.85,
-     "low": 0.21,
-     "mean": 1.03,
+     "high": 1.534,
+     "low": 0.418,
+     "mean": 0.98,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": 1.842,
-     "low": 0.322,
-     "mean": 1.03,
+     "high": 1.534,
+     "low": 0.432,
+     "mean": 0.98,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": 1.75,
-     "low": 0.31,
-     "mean": 1.03,
+     "high": 1.482,
+     "low": 0.516,
+     "mean": 0.98,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": 1.842,
-     "low": 0.438,
-     "mean": 1.138,
+     "high": 1.696,
+     "low": 0.534,
+     "mean": 1.034,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": 1.998,
-     "low": 0.682,
-     "mean": 1.282,
+     "high": 1.686,
+     "low": 0.672,
+     "mean": 1.226,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": 2.086,
-     "low": 0.49,
-     "mean": 1.282,
+     "high": 1.724,
+     "low": 0.728,
+     "mean": 1.226,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": 2.002,
-     "low": 0.658,
-     "mean": 1.282,
+     "high": 1.77,
+     "low": 0.788,
+     "mean": 1.226,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": 2.27,
-     "low": 0.694,
-     "mean": 1.386,
+     "high": 1.83,
+     "low": 0.726,
+     "mean": 1.278,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": 2.178,
-     "low": 0.67,
-     "mean": 1.282,
+     "high": 1.854,
+     "low": 0.76,
+     "mean": 1.226,
      "row": "adaptive"
     },
     {
      "col": "conservative",
-     "high": 1.998,
-     "low": 0.378,
-     "mean": 1.282,
+     "high": 1.71,
+     "low": 0.8,
+     "mean": 1.226,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": 2.066,
-     "low": 0.482,
-     "mean": 1.282,
+     "high": 1.822,
+     "low": 0.698,
+     "mean": 1.226,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": 2.206,
-     "low": 0.678,
-     "mean": 1.386,
+     "high": 1.824,
+     "low": 0.748,
+     "mean": 1.278,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": 1.4485,
-     "low": 0.044,
-     "mean": 0.712,
+     "high": 1.1163,
+     "low": 0.121,
+     "mean": 0.606,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": 1.3365,
-     "low": 0.011,
-     "mean": 0.712,
+     "high": 1.1287,
+     "low": 0.1443,
+     "mean": 0.606,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": 1.435,
-     "low": -0.1445,
-     "mean": 0.712,
+     "high": 1.1275,
+     "low": 0.087,
+     "mean": 0.606,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": 1.515,
-     "low": -0.0005,
-     "mean": 0.812,
+     "high": 1.1113,
+     "low": 0.0958,
+     "mean": 0.656,
      "row": "reckless"
     }
    ],
@@ -824,7 +824,7 @@
     "pure": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -839,30 +839,30 @@
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": -4.47,
+     "high": -4.79,
      "low": -5.67,
-     "mean": -5.13,
+     "mean": -5.23,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": -4.012,
-     "low": -5.524,
-     "mean": -4.875,
+     "high": -4.498,
+     "low": -5.384,
+     "mean": -4.891,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": -4.017,
-     "low": -5.495,
-     "mean": -4.875,
+     "high": -4.4525,
+     "low": -5.331,
+     "mean": -4.891,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": 7.906,
-     "low": 6.682,
-     "mean": 7.271,
+     "high": 7.789,
+     "low": 6.891,
+     "mean": 7.3585,
      "row": "aggressive"
     },
     {
@@ -895,58 +895,58 @@
     },
     {
      "col": "aggressive",
-     "high": -0.75,
-     "low": -1.1975,
-     "mean": -0.98,
+     "high": -0.725,
+     "low": -1.0125,
+     "mean": -0.8588,
      "row": "adaptive"
     },
     {
      "col": "conservative",
-     "high": -0.089,
-     "low": -0.965,
-     "mean": -0.501,
+     "high": -0.051,
+     "low": -0.7218,
+     "mean": -0.4452,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": -0.0035,
-     "low": -1.019,
-     "mean": -0.501,
+     "high": -0.1622,
+     "low": -0.7197,
+     "mean": -0.4452,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": 8.0035,
-     "low": 6.595,
-     "mean": 7.3785,
+     "high": 7.6612,
+     "low": 6.7272,
+     "mean": 7.234,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -5.226,
-     "low": -6.402,
-     "mean": -5.8955,
+     "high": -5.2915,
+     "low": -6.2595,
+     "mean": -5.8185,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -4.976,
-     "low": -6.27,
-     "mean": -5.7755,
+     "high": -5.355,
+     "low": -6.148,
+     "mean": -5.7585,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -5.122,
-     "low": -6.299,
-     "mean": -5.7755,
+     "high": -5.2673,
+     "low": -6.218,
+     "mean": -5.7585,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": 6.5225,
-     "low": 5.1715,
-     "mean": 5.9085,
+     "high": 6.5445,
+     "low": 5.6002,
+     "mean": 6.0875,
      "row": "reckless"
     }
    ],
@@ -963,7 +963,7 @@
     "mixed": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -978,114 +978,114 @@
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": -1.044,
-     "low": -1.148,
-     "mean": -1.092,
+     "high": -1.054,
+     "low": -1.124,
+     "mean": -1.09,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": -1.048,
-     "low": -1.136,
-     "mean": -1.092,
+     "high": -1.058,
+     "low": -1.126,
+     "mean": -1.09,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": -1.04,
-     "low": -1.14,
-     "mean": -1.092,
+     "high": -1.054,
+     "low": -1.128,
+     "mean": -1.09,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": -0.584,
-     "low": -1.232,
-     "mean": -0.908,
+     "high": -0.71,
+     "low": -1.204,
+     "mean": -0.976,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": -0.772,
-     "low": -0.872,
-     "mean": -0.824,
+     "high": -0.788,
+     "low": -0.86,
+     "mean": -0.82,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": -0.768,
-     "low": -0.872,
-     "mean": -0.824,
+     "high": -0.782,
+     "low": -0.86,
+     "mean": -0.82,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": -0.776,
-     "low": -0.88,
-     "mean": -0.824,
+     "high": -0.784,
+     "low": -0.862,
+     "mean": -0.82,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": 0.0,
-     "low": -0.796,
-     "mean": -0.492,
+     "high": -0.322,
+     "low": -0.726,
+     "mean": -0.536,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": -0.764,
-     "low": -0.872,
-     "mean": -0.824,
+     "high": -0.784,
+     "low": -0.854,
+     "mean": -0.82,
      "row": "adaptive"
     },
     {
      "col": "conservative",
      "high": -0.78,
-     "low": -0.872,
-     "mean": -0.824,
+     "low": -0.852,
+     "mean": -0.82,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": -0.772,
-     "low": -0.872,
-     "mean": -0.824,
+     "high": -0.778,
+     "low": -0.858,
+     "mean": -0.82,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": -0.1,
-     "low": -0.756,
-     "mean": -0.492,
+     "high": -0.318,
+     "low": -0.71,
+     "mean": -0.536,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -0.824,
-     "low": -1.8655,
-     "mean": -1.357,
+     "high": -0.5117,
+     "low": -1.5862,
+     "mean": -1.047,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": -0.67,
-     "low": -1.833,
-     "mean": -1.236,
+     "high": -0.3087,
+     "low": -1.3862,
+     "mean": -0.876,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -0.2845,
-     "low": -1.7845,
-     "mean": -1.123,
+     "high": -0.353,
+     "low": -1.379,
+     "mean": -0.8695,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": -0.825,
-     "low": -2.221,
-     "mean": -1.601,
+     "high": -0.5765,
+     "low": -1.7082,
+     "mean": -1.1835,
      "row": "reckless"
     }
    ],
@@ -1099,11 +1099,11 @@
     "reckless"
    ],
    "label_counts": {
-    "dominance-solvable": 24,
-    "pure": 176
+    "dominance-solvable": 79,
+    "pure": 121
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -1111,121 +1111,121 @@
     "adaptive",
     "reckless"
    ],
-   "stability": 0.88,
+   "stability": 0.605,
    "surprises": true
   },
   "helix-espionage": {
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": -3.183,
-     "low": -4.8385,
-     "mean": -4.025,
+     "high": -2.9205,
+     "low": -4.3712,
+     "mean": -3.663,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": 6.701,
-     "low": 4.897,
-     "mean": 5.706,
+     "high": 6.285,
+     "low": 5.2125,
+     "mean": 5.7755,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": -2.9085,
-     "low": -4.71,
-     "mean": -3.727,
+     "high": -2.714,
+     "low": -4.0537,
+     "mean": -3.4365,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": 1.7785,
-     "low": 0.0075,
-     "mean": 0.954,
+     "high": 1.8765,
+     "low": 0.2357,
+     "mean": 1.029,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": -1.983,
-     "low": -2.028,
-     "mean": -2.004,
+     "high": -1.989,
+     "low": -2.0205,
+     "mean": -2.0025,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": -1.986,
-     "low": -2.028,
-     "mean": -2.004,
+     "high": -1.989,
+     "low": -2.0175,
+     "mean": -2.0025,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": -1.983,
-     "low": -2.025,
-     "mean": -2.004,
+     "high": -1.9875,
+     "low": -2.0175,
+     "mean": -2.0025,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": -2.154,
-     "low": -2.202,
-     "mean": -2.178,
+     "high": -2.1615,
+     "low": -2.1975,
+     "mean": -2.1795,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": -3.0775,
-     "low": -3.265,
-     "mean": -3.151,
+     "high": -3.0527,
+     "low": -3.1662,
+     "mean": -3.105,
      "row": "adaptive"
     },
     {
      "col": "conservative",
-     "high": 6.339,
-     "low": 4.815,
-     "mean": 5.585,
+     "high": 6.214,
+     "low": 5.136,
+     "mean": 5.6605,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": -1.1015,
-     "low": -3.015,
-     "mean": -2.2615,
+     "high": -1.89,
+     "low": -3.098,
+     "mean": -2.4925,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": 2.5015,
-     "low": 0.5,
-     "mean": 1.5375,
+     "high": 1.8782,
+     "low": 0.4822,
+     "mean": 1.1247,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": -5.6435,
-     "low": -6.5555,
-     "mean": -6.21,
+     "high": -5.5985,
+     "low": -6.5142,
+     "mean": -6.0788,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": 2.611,
-     "low": 0.5115,
-     "mean": 1.583,
+     "high": 2.3148,
+     "low": 0.9413,
+     "mean": 1.6653,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": -4.2035,
-     "low": -5.8535,
-     "mean": -5.066,
+     "high": -4.43,
+     "low": -5.6698,
+     "mean": -5.0715,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": 1.1625,
-     "low": -1.107,
-     "mean": 0.1755,
+     "high": 0.876,
+     "low": -0.51,
+     "mean": 0.1883,
      "row": "reckless"
     }
    ],
@@ -1242,7 +1242,7 @@
     "mixed": 200
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -1257,114 +1257,114 @@
    "accuser_payoff_intervals": [
     {
      "col": "aggressive",
-     "high": 3.408,
-     "low": 1.0915,
-     "mean": 2.1915,
+     "high": 2.6907,
+     "low": 1.0268,
+     "mean": 1.8188,
      "row": "aggressive"
     },
     {
      "col": "conservative",
-     "high": 7.2995,
-     "low": 6.0475,
-     "mean": 6.6695,
+     "high": 6.9198,
+     "low": 5.8992,
+     "mean": 6.4223,
      "row": "aggressive"
     },
     {
      "col": "adaptive",
-     "high": 7.31,
-     "low": 6.062,
-     "mean": 6.6695,
+     "high": 6.9002,
+     "low": 5.802,
+     "mean": 6.4223,
      "row": "aggressive"
     },
     {
      "col": "reckless",
-     "high": 6.2285,
-     "low": 4.384,
-     "mean": 5.321,
+     "high": 5.667,
+     "low": 4.3833,
+     "mean": 5.0972,
      "row": "aggressive"
     },
     {
      "col": "aggressive",
-     "high": 0.1765,
-     "low": -1.0415,
-     "mean": -0.4325,
+     "high": 0.263,
+     "low": -0.787,
+     "mean": -0.237,
      "row": "conservative"
     },
     {
      "col": "conservative",
-     "high": 0.2675,
-     "low": -1.119,
-     "mean": -0.4325,
+     "high": 0.2832,
+     "low": -0.6848,
+     "mean": -0.237,
      "row": "conservative"
     },
     {
      "col": "adaptive",
-     "high": 0.2585,
-     "low": -1.0415,
-     "mean": -0.4325,
+     "high": 0.1972,
+     "low": -0.6325,
+     "mean": -0.237,
      "row": "conservative"
     },
     {
      "col": "reckless",
-     "high": 1.89,
-     "low": 0.181,
-     "mean": 0.999,
+     "high": 1.8377,
+     "low": 0.6332,
+     "mean": 1.0967,
      "row": "conservative"
     },
     {
      "col": "aggressive",
-     "high": -1.784,
-     "low": -1.968,
-     "mean": -1.8705,
+     "high": -1.7828,
+     "low": -1.8975,
+     "mean": -1.8418,
      "row": "adaptive"
     },
     {
      "col": "conservative",
-     "high": 0.3975,
-     "low": -1.0745,
-     "mean": -0.3665,
+     "high": 0.1263,
+     "low": -0.9158,
+     "mean": -0.3997,
      "row": "adaptive"
     },
     {
      "col": "adaptive",
-     "high": -0.7865,
-     "low": -1.885,
-     "mean": -1.4045,
+     "high": -0.865,
+     "low": -1.5682,
+     "mean": -1.2642,
      "row": "adaptive"
     },
     {
      "col": "reckless",
-     "high": -0.664,
-     "low": -1.6995,
-     "mean": -1.1875,
+     "high": -1.0822,
+     "low": -1.6638,
+     "mean": -1.4028,
      "row": "adaptive"
     },
     {
      "col": "aggressive",
-     "high": 2.3575,
-     "low": 0.2665,
-     "mean": 1.1985,
+     "high": 1.822,
+     "low": 0.3188,
+     "mean": 1.129,
      "row": "reckless"
     },
     {
      "col": "conservative",
-     "high": 4.0155,
-     "low": 1.8745,
-     "mean": 2.992,
+     "high": 3.7828,
+     "low": 2.319,
+     "mean": 3.0095,
      "row": "reckless"
     },
     {
      "col": "adaptive",
-     "high": 3.718,
-     "low": 1.852,
-     "mean": 2.7855,
+     "high": 3.6823,
+     "low": 2.3,
+     "mean": 2.9485,
      "row": "reckless"
     },
     {
      "col": "reckless",
-     "high": 3.6515,
-     "low": 1.842,
-     "mean": 2.804,
+     "high": 3.3937,
+     "low": 2.1555,
+     "mean": 2.7788,
      "row": "reckless"
     }
    ],
@@ -1378,11 +1378,11 @@
     "reckless"
    ],
    "label_counts": {
-    "dominance-solvable": 167,
-    "mixed": 33
+    "dominance-solvable": 177,
+    "mixed": 23
    },
    "n_resamples": 200,
-   "n_seeds": 100,
+   "n_seeds": 200,
    "rng_seed": 0,
    "row_strategies": [
     "aggressive",
@@ -1390,11 +1390,11 @@
     "adaptive",
     "reckless"
    ],
-   "stability": 0.835,
+   "stability": 0.885,
    "surprises": true
   }
  },
  "n_resamples": 200,
- "n_seeds": 100,
+ "n_seeds": 200,
  "surprises": true
 }

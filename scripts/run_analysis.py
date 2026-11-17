@@ -33,7 +33,7 @@ def main() -> None:
     ap.add_argument("what", choices=("bootstrap", "sensitivity", "matters", "classic", "efficiency"))
     ap.add_argument("--surprises", action="store_true")
     ap.add_argument("--workers", type=int, default=1)
-    ap.add_argument("--seeds", type=int, default=0, help="seeds per cell (default: 100 bootstrap, 16 sensitivity)")
+    ap.add_argument("--seeds", type=int, default=0, help="seeds per cell (default: 200 for bootstrap, classic and efficiency, as the proposal says; 16 sensitivity; 8 matters)")
     ap.add_argument("--resamples", type=int, default=200)
     a = ap.parse_args()
     sur = Surprises() if a.surprises else None
@@ -41,18 +41,18 @@ def main() -> None:
     RESULTS.mkdir(exist_ok=True)
     t0 = time.time()
     if a.what == "bootstrap":
-        seeds = tuple(range(a.seeds or 100))
+        seeds = tuple(range(a.seeds or 200))
         rows = bootstrap_library(list(CASES), seeds=seeds, n_resamples=a.resamples, workers=a.workers, surprises=sur)
         out = {"surprises": a.surprises, "n_seeds": len(seeds), "n_resamples": a.resamples, "cases": {r.case_id: json.loads(r.model_dump_json()) for r in rows}}
     elif a.what == "classic":
-        seeds = tuple(range(a.seeds or 100))
+        seeds = tuple(range(a.seeds or 200))
         cases = {}
         for cid in CASES:
             samples = collect_samples(get_case(cid), STYLES, seeds, workers=a.workers, surprises=sur)
             cases[cid] = json.loads(classify_case(cid, samples, STYLES, STYLES, n_resamples=a.resamples, surprises=a.surprises).model_dump_json())
         out = {"surprises": a.surprises, "n_seeds": len(seeds), "n_resamples": a.resamples, "cases": cases}
     elif a.what == "efficiency":
-        seeds = tuple(range(a.seeds or 100))
+        seeds = tuple(range(a.seeds or 200))
         cases = {}
         for cid in CASES:
             t = estimate_payoffs(get_case(cid), STYLES, seeds=seeds, workers=a.workers, surprises=sur)

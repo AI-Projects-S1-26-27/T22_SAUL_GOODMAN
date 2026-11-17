@@ -3,54 +3,54 @@
   "aurora-defi": {
    "A": [
     [
-     -6.978,
-     -6.922,
-     -6.978,
-     -3.236
+     -6.861,
+     -6.787,
+     -6.861,
+     -3.252
     ],
     [
-     -1.68,
-     -1.68,
-     -1.68,
-     -1.648
+     -1.658,
+     -1.658,
+     -1.658,
+     -1.63
     ],
     [
-     -2.02,
-     -4.4855,
-     -4.5015,
-     -2.6525
+     -1.982,
+     -4.26825,
+     -4.29425,
+     -2.60475
     ],
     [
-     -6.436,
-     -6.224,
-     -6.2535,
-     -4.5325
+     -6.42975,
+     -6.2465,
+     -6.27575,
+     -4.644
     ]
    ],
    "B": [
     [
-     5.9935,
-     7.4575,
-     7.2355,
-     5.0435
+     5.995,
+     7.4795,
+     7.2425,
+     4.96625
     ],
     [
      6.7,
-     7.79,
-     7.79,
-     6.3355
+     7.794,
+     7.794,
+     6.2965
     ],
     [
-     6.5,
-     7.473,
-     7.251,
-     5.3205
+     6.49625,
+     7.46875,
+     7.27825,
+     5.2715
     ],
     [
-     6.9345,
-     8.112,
-     8.001,
-     5.5135
+     6.9205,
+     8.09375,
+     7.99125,
+     5.34
     ]
    ],
    "accuser_win_rate": [
@@ -104,10 +104,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": 7.4575,
-     "mixed_value_exact": "2983/400",
+     "mixed_value": 7.46875,
+     "mixed_value_exact": "239/32",
      "pure_strategy": "conservative",
-     "pure_value": 7.4575
+     "pure_value": 7.46875
     },
     "equilibria": [
      {
@@ -117,7 +117,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "col_payoff": 7.79,
+      "col_payoff": 7.794,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -127,8 +127,8 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -1.68,
-      "security_gap_col": 0.3325,
+      "row_payoff": -1.658,
+      "security_gap_col": 0.32525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      },
@@ -139,7 +139,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 7.79,
+      "col_payoff": 7.794,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -149,8 +149,8 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -1.68,
-      "security_gap_col": 0.3325,
+      "row_payoff": -1.658,
+      "security_gap_col": 0.32525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      }
@@ -183,10 +183,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": -1.68,
-     "mixed_value_exact": "-42/25",
+     "mixed_value": -1.658,
+     "mixed_value_exact": "-829/500",
      "pure_strategy": "conservative",
-     "pure_value": -1.68
+     "pure_value": -1.658
     },
     "social_dilemma": false
    },
@@ -200,54 +200,54 @@
   "broken-bike": {
    "A": [
     [
-     8.662,
-     8.662,
-     8.662,
-     8.7795
+     8.6755,
+     8.6755,
+     8.6755,
+     8.83125
     ],
     [
-     6.6635,
-     9.312,
-     9.312,
-     6.245
+     6.372,
+     9.324,
+     9.324,
+     6.01175
     ],
     [
-     6.5135,
-     9.312,
-     9.312,
-     6.1655
+     6.222,
+     9.324,
+     9.324,
+     5.93075
     ],
     [
-     7.421,
-     7.421,
-     7.421,
-     6.4355
+     7.456,
+     7.456,
+     7.456,
+     6.4485
     ]
    ],
    "B": [
     [
-     -0.861,
-     -0.303,
-     -0.303,
-     -3.7265
+     -0.86475,
+     -0.30675,
+     -0.30675,
+     -3.7805
     ],
     [
-     -0.676,
-     -0.622,
-     -0.622,
-     -0.7015
+     -0.326,
+     -0.63,
+     -0.63,
+     -0.48025
     ],
     [
-     -0.676,
-     -0.622,
-     -0.622,
-     -0.7015
+     -0.326,
+     -0.63,
+     -0.63,
+     -0.48025
     ],
     [
-     -0.396,
-     0.1625,
-     0.1625,
-     -2.3995
+     -0.3985,
+     0.153,
+     0.153,
+     -2.5255
     ]
    ],
    "accuser_win_rate": [
@@ -258,16 +258,16 @@
      1.0
     ],
     [
-     0.75,
+     0.72,
      1.0,
      1.0,
-     0.71
+     0.685
     ],
     [
-     0.75,
+     0.72,
      1.0,
      1.0,
-     0.71
+     0.685
     ],
     [
      0.96,
@@ -290,7 +290,7 @@
     "theorem_holds": true
    },
    "efficiency": {
-    "all_equilibria_efficient": true,
+    "all_equilibria_efficient": false,
     "col_labels": [
      "aggressive",
      "conservative",
@@ -299,100 +299,83 @@
     ],
     "col_security": {
      "mixed_strategy": {
-      "conservative": "1"
+      "aggressive": "3/8",
+      "conservative": "5/8"
      },
-     "mixed_value": -0.622,
-     "mixed_value_exact": "-311/500",
+     "mixed_value": -0.516,
+     "mixed_value_exact": "-129/250",
      "pure_strategy": "conservative",
-     "pure_value": -0.622
+     "pure_value": -0.63
     },
     "equilibria": [
      {
       "col_mix": {
        "adaptive": "0",
-       "aggressive": "0",
-       "conservative": "1",
+       "aggressive": "1297/5904",
+       "conservative": "4607/5904",
        "reckless": "0"
       },
-      "col_payoff": -0.622,
-      "dominated_by": [],
-      "pareto_efficient": true,
-      "pure": true,
+      "col_payoff": -0.516,
+      "dominated_by": [
+       {
+        "col": "conservative",
+        "col_gain": 0.20925,
+        "row": "aggressive",
+        "row_gain": 0.0
+       },
+       {
+        "col": "adaptive",
+        "col_gain": 0.20925,
+        "row": "aggressive",
+        "row_gain": 0.0
+       }
+      ],
+      "pareto_efficient": false,
+      "pure": false,
       "row_mix": {
        "adaptive": "0",
-       "aggressive": "0",
-       "conservative": "1",
+       "aggressive": "152/431",
+       "conservative": "279/431",
        "reckless": "0"
       },
-      "row_payoff": 9.312,
+      "row_payoff": 8.6755,
       "security_gap_col": 0.0,
-      "security_gap_row": 0.65,
+      "security_gap_row": 0.0,
       "strictly_dominated": false
      },
      {
       "col_mix": {
-       "adaptive": "1",
-       "aggressive": "0",
+       "adaptive": "4607/5904",
+       "aggressive": "1297/5904",
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": -0.622,
-      "dominated_by": [],
-      "pareto_efficient": true,
-      "pure": true,
+      "col_payoff": -0.516,
+      "dominated_by": [
+       {
+        "col": "conservative",
+        "col_gain": 0.20925,
+        "row": "aggressive",
+        "row_gain": 0.0
+       },
+       {
+        "col": "adaptive",
+        "col_gain": 0.20925,
+        "row": "aggressive",
+        "row_gain": 0.0
+       }
+      ],
+      "pareto_efficient": false,
+      "pure": false,
       "row_mix": {
        "adaptive": "0",
-       "aggressive": "0",
-       "conservative": "1",
+       "aggressive": "152/431",
+       "conservative": "279/431",
        "reckless": "0"
       },
-      "row_payoff": 9.312,
+      "row_payoff": 8.6755,
       "security_gap_col": 0.0,
-      "security_gap_row": 0.65,
-      "strictly_dominated": false
-     },
-     {
-      "col_mix": {
-       "adaptive": "0",
-       "aggressive": "0",
-       "conservative": "1",
-       "reckless": "0"
-      },
-      "col_payoff": -0.622,
-      "dominated_by": [],
-      "pareto_efficient": true,
-      "pure": true,
-      "row_mix": {
-       "adaptive": "1",
-       "aggressive": "0",
-       "conservative": "0",
-       "reckless": "0"
-      },
-      "row_payoff": 9.312,
-      "security_gap_col": 0.0,
-      "security_gap_row": 0.65,
-      "strictly_dominated": false
-     },
-     {
-      "col_mix": {
-       "adaptive": "1",
-       "aggressive": "0",
-       "conservative": "0",
-       "reckless": "0"
-      },
-      "col_payoff": -0.622,
-      "dominated_by": [],
-      "pareto_efficient": true,
-      "pure": true,
-      "row_mix": {
-       "adaptive": "1",
-       "aggressive": "0",
-       "conservative": "0",
-       "reckless": "0"
-      },
-      "row_payoff": 9.312,
-      "security_gap_col": 0.0,
-      "security_gap_row": 0.65,
+      "security_gap_row": 0.0,
       "strictly_dominated": false
      }
     ],
@@ -440,10 +423,10 @@
      "mixed_strategy": {
       "aggressive": "1"
      },
-     "mixed_value": 8.662,
-     "mixed_value_exact": "4331/500",
+     "mixed_value": 8.6755,
+     "mixed_value_exact": "17351/2000",
      "pure_strategy": "aggressive",
-     "pure_value": 8.662
+     "pure_value": 8.6755
     },
     "social_dilemma": false
    },
@@ -457,54 +440,54 @@
   "cookie-jar": {
    "A": [
     [
-     -2.4,
-     -2.4,
-     -2.4,
-     -2.128
+     -2.396,
+     -2.396,
+     -2.396,
+     -2.2
     ],
     [
-     -1.318,
-     -1.318,
-     -1.318,
-     -1.274
+     -1.314,
+     -1.314,
+     -1.314,
+     -1.266
     ],
     [
-     -1.816,
-     -1.816,
-     -1.816,
-     -1.548
+     -1.796,
+     -1.796,
+     -1.796,
+     -1.582
     ],
     [
-     -3.192,
-     -3.192,
-     -3.192,
-     -3.048
+     -3.19875,
+     -3.19875,
+     -3.19875,
+     -3.04525
     ]
    ],
    "B": [
     [
-     7.135,
-     8.2625,
-     8.2595,
-     6.46
+     7.13875,
+     8.26875,
+     8.26425,
+     6.5305
     ],
     [
      7.3,
-     8.39,
-     8.39,
-     7.139
+     8.394,
+     8.394,
+     7.0815
     ],
     [
-     7.135,
-     8.2625,
-     8.2595,
-     6.46
+     7.13875,
+     8.26875,
+     8.26425,
+     6.5305
     ],
     [
-     7.2985,
-     8.3855,
-     8.3825,
-     6.742
+     7.278,
+     8.36975,
+     8.36525,
+     6.74025
     ]
    ],
    "accuser_win_rate": [
@@ -512,7 +495,7 @@
      0.0,
      0.0,
      0.0,
-     0.02
+     0.015
     ],
     [
      0.0,
@@ -524,7 +507,7 @@
      0.0,
      0.0,
      0.0,
-     0.02
+     0.015
     ],
     [
      0.0,
@@ -558,10 +541,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": 8.2625,
-     "mixed_value_exact": "661/80",
+     "mixed_value": 8.26875,
+     "mixed_value_exact": "1323/160",
      "pure_strategy": "conservative",
-     "pure_value": 8.2625
+     "pure_value": 8.26875
     },
     "equilibria": [
      {
@@ -571,7 +554,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "col_payoff": 8.39,
+      "col_payoff": 8.394,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -581,8 +564,8 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -1.318,
-      "security_gap_col": 0.1275,
+      "row_payoff": -1.314,
+      "security_gap_col": 0.12525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      },
@@ -593,7 +576,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 8.39,
+      "col_payoff": 8.394,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -603,8 +586,8 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -1.318,
-      "security_gap_col": 0.1275,
+      "row_payoff": -1.314,
+      "security_gap_col": 0.12525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      }
@@ -633,10 +616,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": -1.318,
-     "mixed_value_exact": "-659/500",
+     "mixed_value": -1.314,
+     "mixed_value_exact": "-657/500",
      "pure_strategy": "conservative",
-     "pure_value": -1.318
+     "pure_value": -1.314
     },
     "social_dilemma": false
    },
@@ -668,10 +651,10 @@
      0.0
     ],
     [
-     -0.606,
-     -0.606,
-     -0.606,
-     -0.606
+     -0.567,
+     -0.567,
+     -0.567,
+     -0.567
     ]
    ],
    "B": [
@@ -679,25 +662,25 @@
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
-     9.758,
+     9.76,
      9.85,
      9.85,
-     9.613
+     9.5965
     ]
    ],
    "accuser_win_rate": [
@@ -764,7 +747,7 @@
        "conservative": "0",
        "reckless": "1"
       },
-      "col_payoff": 9.922,
+      "col_payoff": 9.91525,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -775,7 +758,7 @@
        "reckless": "0"
       },
       "row_payoff": 0.0,
-      "security_gap_col": 0.072,
+      "security_gap_col": 0.06525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      },
@@ -786,7 +769,7 @@
        "conservative": "0",
        "reckless": "1"
       },
-      "col_payoff": 9.922,
+      "col_payoff": 9.91525,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -797,7 +780,7 @@
        "reckless": "0"
       },
       "row_payoff": 0.0,
-      "security_gap_col": 0.072,
+      "security_gap_col": 0.06525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      },
@@ -808,7 +791,7 @@
        "conservative": "0",
        "reckless": "1"
       },
-      "col_payoff": 9.922,
+      "col_payoff": 9.91525,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -819,7 +802,7 @@
        "reckless": "0"
       },
       "row_payoff": 0.0,
-      "security_gap_col": 0.072,
+      "security_gap_col": 0.06525,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      }
@@ -883,10 +866,10 @@
      0.0
     ],
     [
-     -0.169,
-     -0.169,
-     -0.169,
-     -0.169
+     -0.1365,
+     -0.1365,
+     -0.1365,
+     -0.1365
     ]
    ],
    "B": [
@@ -894,25 +877,25 @@
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ]
    ],
    "accuser_win_rate": [
@@ -966,10 +949,10 @@
      "mixed_strategy": {
       "reckless": "1"
      },
-     "mixed_value": 9.922,
-     "mixed_value_exact": "4961/500",
+     "mixed_value": 9.91525,
+     "mixed_value_exact": "39661/4000",
      "pure_strategy": "reckless",
-     "pure_value": 9.922
+     "pure_value": 9.91525
     },
     "equilibria": [
      {
@@ -979,7 +962,7 @@
        "conservative": "0",
        "reckless": "1"
       },
-      "col_payoff": 9.922,
+      "col_payoff": 9.91525,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1001,7 +984,7 @@
        "conservative": "0",
        "reckless": "1"
       },
-      "col_payoff": 9.922,
+      "col_payoff": 9.91525,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1023,7 +1006,7 @@
        "conservative": "0",
        "reckless": "1"
       },
-      "col_payoff": 9.922,
+      "col_payoff": 9.91525,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1083,51 +1066,51 @@
      -0.85,
      -0.85,
      -0.85,
-     -0.642
+     -0.746
     ],
     [
-     -0.526,
-     -0.526,
-     -0.526,
-     -0.322
+     -0.536,
+     -0.536,
+     -0.536,
+     -0.434
     ],
     [
-     -0.526,
-     -0.526,
-     -0.526,
-     -0.322
+     -0.536,
+     -0.536,
+     -0.536,
+     -0.434
     ],
     [
-     -1.206,
-     -1.206,
-     -1.206,
-     -1.006
+     -1.26825,
+     -1.26825,
+     -1.26825,
+     -1.16825
     ]
    ],
    "B": [
     [
      9.0,
-     9.454,
-     9.454,
-     8.416
+     9.456,
+     9.456,
+     8.5235
     ],
     [
      9.0,
-     9.454,
-     9.454,
-     8.416
+     9.456,
+     9.456,
+     8.5235
     ],
     [
      9.0,
-     9.454,
-     9.454,
-     8.416
+     9.456,
+     9.456,
+     8.5235
     ],
     [
      9.017,
-     9.467,
-     9.467,
-     8.458
+     9.469,
+     9.469,
+     8.55825
     ]
    ],
    "accuser_win_rate": [
@@ -1135,25 +1118,25 @@
      0.0,
      0.0,
      0.0,
-     0.02
+     0.01
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.02
+     0.01
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.02
+     0.01
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.02
+     0.01
     ]
    ],
    "col_strategies": [
@@ -1181,10 +1164,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": 9.454,
-     "mixed_value_exact": "4727/500",
+     "mixed_value": 9.456,
+     "mixed_value_exact": "1182/125",
      "pure_strategy": "conservative",
-     "pure_value": 9.454
+     "pure_value": 9.456
     },
     "equilibria": [
      {
@@ -1194,7 +1177,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "col_payoff": 9.454,
+      "col_payoff": 9.456,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1204,7 +1187,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -0.526,
+      "row_payoff": -0.536,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1216,7 +1199,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 9.454,
+      "col_payoff": 9.456,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1226,7 +1209,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -0.526,
+      "row_payoff": -0.536,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1238,7 +1221,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "col_payoff": 9.454,
+      "col_payoff": 9.456,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1248,7 +1231,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "row_payoff": -0.526,
+      "row_payoff": -0.536,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1260,7 +1243,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 9.454,
+      "col_payoff": 9.456,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1270,7 +1253,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "row_payoff": -0.526,
+      "row_payoff": -0.536,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1320,10 +1303,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": -0.526,
-     "mixed_value_exact": "-263/500",
+     "mixed_value": -0.536,
+     "mixed_value_exact": "-67/125",
      "pure_strategy": "conservative",
-     "pure_value": -0.526
+     "pure_value": -0.536
     },
     "social_dilemma": false
    },
@@ -1337,10 +1320,10 @@
   "edge-poisoned-tree": {
    "A": [
     [
-     -5.31,
-     -4.955,
-     -4.955,
-     7.909
+     -5.37,
+     -4.9295,
+     -4.9295,
+     7.985
     ],
     [
      0.0,
@@ -1349,50 +1332,50 @@
      0.0
     ],
     [
-     -0.88,
-     -0.498,
-     -0.498,
-     7.705
+     -0.80875,
+     -0.45225,
+     -0.45225,
+     7.859
     ],
     [
-     -5.7885,
-     -5.5685,
-     -5.5685,
-     6.4485
+     -5.845,
+     -5.735,
+     -5.735,
+     6.5675
     ]
    ],
    "B": [
     [
-     8.2365,
-     8.305,
-     8.305,
-     -1.164
+     8.32725,
+     8.33725,
+     8.33725,
+     -1.22525
     ],
     [
      9.85,
      9.85,
      9.85,
-     9.922
+     9.91525
     ],
     [
-     9.3965,
-     9.012,
-     9.012,
-     0.1425
+     9.48175,
+     9.135,
+     9.135,
+     -0.012
     ],
     [
-     8.2715,
-     8.4335,
-     8.4335,
-     -1.0175
+     8.33725,
+     8.566,
+     8.566,
+     -1.09125
     ]
    ],
    "accuser_win_rate": [
     [
-     0.06,
-     0.09,
-     0.09,
-     0.97
+     0.05,
+     0.085,
+     0.085,
+     0.975
     ],
     [
      0.0,
@@ -1401,15 +1384,15 @@
      0.0
     ],
     [
-     0.01,
-     0.06,
-     0.06,
-     0.88
+     0.005,
+     0.05,
+     0.05,
+     0.895
     ],
     [
-     0.06,
-     0.08,
-     0.08,
+     0.055,
+     0.065,
+     0.065,
      0.94
     ]
    ],
@@ -1420,9 +1403,9 @@
     "reckless"
    ],
    "constant_sum": {
-    "maximin": 0.06,
-    "minimax": 0.06,
-    "nash_value": 0.06,
+    "maximin": 0.055,
+    "minimax": 0.055,
+    "nash_value": 0.055,
     "saddle_point": true,
     "theorem_holds": true
    },
@@ -1438,36 +1421,36 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": 8.305,
-     "mixed_value_exact": "1661/200",
+     "mixed_value": 8.33725,
+     "mixed_value_exact": "33349/4000",
      "pure_strategy": "conservative",
-     "pure_value": 8.305
+     "pure_value": 8.33725
     },
     "equilibria": [
      {
       "col_mix": {
        "adaptive": "0",
-       "aggressive": "1541/1717",
+       "aggressive": "31436/34671",
        "conservative": "0",
-       "reckless": "176/1717"
+       "reckless": "3235/34671"
       },
-      "col_payoff": 9.846498820501823,
+      "col_payoff": 9.847486315252642,
       "dominated_by": [
        {
         "col": "reckless",
-        "col_gain": 0.075501179498177,
+        "col_gain": 0.067763684747358,
         "row": "conservative",
         "row_gain": 0.0
        },
        {
         "col": "aggressive",
-        "col_gain": 0.003501179498177,
+        "col_gain": 0.002513684747358,
         "row": "conservative",
         "row_gain": 0.0
        },
        {
         "col": "conservative",
-        "col_gain": 0.003501179498177,
+        "col_gain": 0.002513684747358,
         "row": "conservative",
         "row_gain": 0.0
        }
@@ -1475,13 +1458,13 @@
       "pareto_efficient": false,
       "pure": false,
       "row_mix": {
-       "adaptive": "36/4663",
+       "adaptive": "261/38236",
        "aggressive": "0",
-       "conservative": "4627/4663",
+       "conservative": "37975/38236",
        "reckless": "0"
       },
       "row_payoff": 0.0,
-      "security_gap_col": 1.541499,
+      "security_gap_col": 1.510236,
       "security_gap_row": 0.0,
       "strictly_dominated": false
      }
@@ -1527,54 +1510,54 @@
   "garden-dog": {
    "A": [
     [
-     -1.156,
-     -1.156,
-     -1.156,
-     -0.968
+     -1.162,
+     -1.162,
+     -1.162,
+     -1.036
     ],
     [
-     -0.844,
-     -0.844,
-     -0.844,
-     -0.512
+     -0.838,
+     -0.838,
+     -0.838,
+     -0.554
     ],
     [
-     -0.844,
-     -0.844,
-     -0.844,
-     -0.512
+     -0.838,
+     -0.838,
+     -0.838,
+     -0.554
     ],
     [
-     -2.448,
-     -2.448,
-     -2.448,
-     -2.592
+     -2.444,
+     -2.444,
+     -2.444,
+     -2.5915
     ]
    ],
    "B": [
     [
      7.85,
-     8.628,
-     8.628,
-     7.2745
+     8.62,
+     8.62,
+     7.28275
     ],
     [
      7.85,
-     8.628,
-     8.628,
-     7.2745
+     8.62,
+     8.62,
+     7.28275
     ],
     [
      7.85,
-     8.628,
-     8.628,
-     7.2745
+     8.62,
+     8.62,
+     7.28275
     ],
     [
-     8.7715,
-     9.5045,
-     9.4585,
-     6.433
+     8.74975,
+     9.51275,
+     9.466,
+     6.40725
     ]
    ],
    "accuser_win_rate": [
@@ -1582,19 +1565,19 @@
      0.0,
      0.0,
      0.0,
-     0.03
+     0.025
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.03
+     0.025
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.03
+     0.025
     ],
     [
      0.0,
@@ -1628,10 +1611,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": 8.628,
-     "mixed_value_exact": "2157/250",
+     "mixed_value": 8.62,
+     "mixed_value_exact": "431/50",
      "pure_strategy": "conservative",
-     "pure_value": 8.628
+     "pure_value": 8.62
     },
     "equilibria": [
      {
@@ -1641,7 +1624,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "col_payoff": 8.628,
+      "col_payoff": 8.62,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1651,7 +1634,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -0.844,
+      "row_payoff": -0.838,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1663,7 +1646,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 8.628,
+      "col_payoff": 8.62,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1673,7 +1656,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "row_payoff": -0.844,
+      "row_payoff": -0.838,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1685,7 +1668,7 @@
        "conservative": "1",
        "reckless": "0"
       },
-      "col_payoff": 8.628,
+      "col_payoff": 8.62,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1695,7 +1678,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "row_payoff": -0.844,
+      "row_payoff": -0.838,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1707,7 +1690,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 8.628,
+      "col_payoff": 8.62,
       "dominated_by": [],
       "pareto_efficient": true,
       "pure": true,
@@ -1717,7 +1700,7 @@
        "conservative": "0",
        "reckless": "0"
       },
-      "row_payoff": -0.844,
+      "row_payoff": -0.838,
       "security_gap_col": 0.0,
       "security_gap_row": 0.0,
       "strictly_dominated": false
@@ -1763,10 +1746,10 @@
      "mixed_strategy": {
       "conservative": "1"
      },
-     "mixed_value": -0.844,
-     "mixed_value_exact": "-211/250",
+     "mixed_value": -0.838,
+     "mixed_value_exact": "-419/500",
      "pure_strategy": "conservative",
-     "pure_value": -0.844
+     "pure_value": -0.838
     },
     "social_dilemma": false
    },
@@ -1780,62 +1763,62 @@
   "helix-espionage": {
    "A": [
     [
-     -3.4495,
-     7.724,
-     -3.052,
-     1.4815
+     -3.16875,
+     7.732,
+     -2.8845,
+     1.196
     ],
     [
      -1.95,
      -1.95,
      -1.95,
-     -2.184
+     -2.193
     ],
     [
-     -3.11,
-     7.574,
-     -1.675,
-     1.6205
+     -3.051,
+     7.582,
+     -1.6135,
+     1.85975
     ],
     [
-     -5.9755,
-     2.7325,
-     -4.864,
-     0.5065
+     -5.84525,
+     3.01825,
+     -4.71625,
+     0.8645
     ]
    ],
    "B": [
     [
-     3.8775,
+     3.68775,
      -0.6,
-     5.326,
-     -1.1405
+     5.1615,
+     -1.01075
     ],
     [
-     5.966,
+     5.984,
      8.8,
-     7.626,
-     4.289
+     7.65,
+     4.1925
     ],
     [
-     5.661,
+     5.615,
      -0.6,
-     5.305,
-     -0.583
+     5.24925,
+     -0.923
     ],
     [
-     5.5275,
-     2.394,
-     6.5105,
-     -1.619
+     5.25425,
+     2.06625,
+     6.2185,
+     -2.0275
     ]
    ],
    "accuser_win_rate": [
     [
-     0.2,
+     0.225,
      1.0,
-     0.23,
-     0.56
+     0.245,
+     0.535
     ],
     [
      0.0,
@@ -1844,16 +1827,16 @@
      0.0
     ],
     [
-     0.0,
+     0.005,
      1.0,
-     0.22,
-     0.48
+     0.225,
+     0.505
     ],
     [
-     0.04,
-     0.73,
-     0.13,
-     0.58
+     0.06,
+     0.76,
+     0.155,
+     0.61
     ]
    ],
    "col_strategies": [
@@ -1863,9 +1846,9 @@
     "reckless"
    ],
    "constant_sum": {
-    "maximin": 0.2,
-    "minimax": 0.2,
-    "nash_value": 0.2,
+    "maximin": 0.225,
+    "minimax": 0.225,
+    "nash_value": 0.225,
     "saddle_point": true,
     "theorem_holds": true
    },
@@ -1879,39 +1862,38 @@
     ],
     "col_security": {
      "mixed_strategy": {
-      "adaptive": "1189/1203",
-      "aggressive": "14/1203"
+      "adaptive": "1"
      },
-     "mixed_value": 5.309142975893599,
-     "mixed_value_exact": "6386899/1203000",
+     "mixed_value": 5.1615,
+     "mixed_value_exact": "10323/2000",
      "pure_strategy": "adaptive",
-     "pure_value": 5.305
+     "pure_value": 5.1615
     },
     "equilibria": [
      {
       "col_mix": {
-       "adaptive": "232/287",
-       "aggressive": "55/287",
+       "adaptive": "2202/2875",
+       "aggressive": "673/2875",
        "conservative": "0",
        "reckless": "0"
       },
-      "col_payoff": 5.714859126984127,
+      "col_payoff": 5.681426356589148,
       "dominated_by": [
        {
         "col": "conservative",
-        "col_gain": 3.085140873015873,
+        "col_gain": 3.118573643410852,
         "row": "conservative",
         "row_gain": 0.0
        },
        {
         "col": "adaptive",
-        "col_gain": 1.911140873015873,
+        "col_gain": 1.968573643410852,
         "row": "conservative",
         "row_gain": 0.0
        },
        {
         "col": "aggressive",
-        "col_gain": 0.251140873015873,
+        "col_gain": 0.302573643410852,
         "row": "conservative",
         "row_gain": 0.0
        }
@@ -1919,14 +1901,14 @@
       "pareto_efficient": false,
       "pure": false,
       "row_mix": {
-       "adaptive": "415/504",
+       "adaptive": "952/1161",
        "aggressive": "0",
-       "conservative": "89/504",
+       "conservative": "209/1161",
        "reckless": "0"
       },
       "row_payoff": -1.95,
-      "security_gap_col": 0.405716,
-      "security_gap_row": 0.054676,
+      "security_gap_col": 0.519926,
+      "security_gap_row": 0.051912,
       "strictly_dominated": false
      }
     ],
@@ -1956,13 +1938,13 @@
     ],
     "row_security": {
      "mixed_strategy": {
-      "adaptive": "468/9929",
-      "conservative": "9461/9929"
+      "adaptive": "972/20615",
+      "conservative": "19643/20615"
      },
-     "mixed_value": -2.004676201027294,
-     "mixed_value_exact": "-1990443/992900",
+     "mixed_value": -2.00191229687121,
+     "mixed_value_exact": "-20634711/10307500",
      "pure_strategy": "conservative",
-     "pure_value": -2.184
+     "pure_value": -2.193
     },
     "social_dilemma": false
    },
@@ -1976,80 +1958,80 @@
   "kestrel-av": {
    "A": [
     [
-     2.4705,
-     7.846,
-     7.846,
-     6.3755
+     1.88675,
+     7.836,
+     7.836,
+     6.143
     ],
     [
      -1.8,
      -1.8,
      -1.8,
-     0.663
+     0.35625
     ],
     [
-     -1.946,
-     -2.278,
-     -2.092,
-     -1.7735
+     -1.926,
+     -2.264,
+     -2.0605,
+     -1.80925
     ],
     [
-     2.587,
-     3.961,
-     3.453,
-     3.4475
+     3.08725,
+     4.53675,
+     4.14,
+     3.8285
     ]
    ],
    "B": [
     [
-     1.636,
+     2.034,
      -0.75,
      -1.206,
-     -2.8705
+     -2.70925
     ],
     [
-     7.124,
+     7.128,
      8.35,
-     7.894,
-     3.4095
+     7.914,
+     3.658
     ],
     [
-     7.568,
+     7.558,
      8.65,
-     8.214,
-     6.318
+     8.216,
+     6.286
     ],
     [
-     0.992,
-     2.2425,
-     1.987,
-     -2.419
+     0.553,
+     1.77175,
+     1.39125,
+     -2.97025
     ]
    ],
    "accuser_win_rate": [
     [
-     0.59,
+     0.545,
      1.0,
      1.0,
-     0.92
+     0.9
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.24
+     0.21
     ],
     [
      0.0,
      0.0,
      0.0,
-     0.02
+     0.015
     ],
     [
-     0.72,
-     0.76,
-     0.74,
-     0.78
+     0.765,
+     0.81,
+     0.8,
+     0.815
     ]
    ],
    "col_strategies": [
@@ -2059,9 +2041,9 @@
     "reckless"
    ],
    "constant_sum": {
-    "maximin": 0.72,
-    "minimax": 0.72,
-    "nash_value": 0.72,
+    "maximin": 0.765,
+    "minimax": 0.765,
+    "nash_value": 0.765,
     "saddle_point": true,
     "theorem_holds": true
    },
@@ -2075,52 +2057,56 @@
     ],
     "col_security": {
      "mixed_strategy": {
-      "aggressive": "855/1039",
-      "conservative": "184/1039"
+      "aggressive": "10087/16011",
+      "conservative": "5924/16011"
      },
-     "mixed_value": 1.2134552454282965,
-     "mixed_value_exact": "63039/51950",
+     "mixed_value": 1.003932171632003,
+     "mixed_value_exact": "2678993/2668500",
      "pure_strategy": "aggressive",
-     "pure_value": 0.992
+     "pure_value": 0.553
     },
     "equilibria": [
      {
       "col_mix": {
        "adaptive": "0",
-       "aggressive": "7770/8003",
-       "conservative": "233/8003",
+       "aggressive": "13197/17999",
+       "conservative": "4802/17999",
        "reckless": "0"
       },
-      "col_payoff": 1.2134552454282965,
+      "col_payoff": 1.003932171632003,
       "dominated_by": [
        {
         "col": "conservative",
-        "col_gain": 1.0290447545717034,
+        "col_gain": 0.767817828367997,
         "row": "reckless",
-        "row_gain": 1.3339972510308635
+        "row_gain": 1.0627841268959388
        },
        {
         "col": "adaptive",
-        "col_gain": 0.7735447545717035,
+        "col_gain": 0.387317828367997,
         "row": "reckless",
-        "row_gain": 0.8259972510308635
+        "row_gain": 0.6660341268959388
        }
       ],
       "pareto_efficient": false,
       "pure": false,
       "row_mix": {
        "adaptive": "0",
-       "aggressive": "2501/7273",
+       "aggressive": "1625/5337",
        "conservative": "0",
-       "reckless": "4772/7273"
+       "reckless": "3712/5337"
       },
-      "row_payoff": 2.6270027489691365,
+      "row_payoff": 3.4739658731040612,
       "security_gap_col": 0.0,
-      "security_gap_row": 0.040003,
+      "security_gap_row": 0.386716,
       "strictly_dominated": true
      }
     ],
     "pareto_cells": [
+     [
+      "aggressive",
+      "aggressive"
+     ],
      [
       "aggressive",
       "conservative"
@@ -2138,10 +2124,6 @@
       "conservative"
      ],
      [
-      "adaptive",
-      "reckless"
-     ],
-     [
       "reckless",
       "conservative"
      ]
@@ -2156,10 +2138,10 @@
      "mixed_strategy": {
       "reckless": "1"
      },
-     "mixed_value": 2.587,
-     "mixed_value_exact": "2587/1000",
+     "mixed_value": 3.08725,
+     "mixed_value_exact": "12349/4000",
      "pure_strategy": "reckless",
-     "pure_value": 2.587
+     "pure_value": 3.08725
     },
     "social_dilemma": true
    },
@@ -2171,6 +2153,6 @@
    ]
   }
  },
- "n_seeds": 100,
+ "n_seeds": 200,
  "surprises": false
 }
