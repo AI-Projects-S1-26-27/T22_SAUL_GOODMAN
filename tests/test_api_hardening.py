@@ -49,3 +49,12 @@ def test_a_third_heavy_request_gets_503_instead_of_starving_the_server() -> None
         for _ in held:
             server._HEAVY.release()
     assert client.post("/api/tree", json={"case_id": "cookie-jar"}).status_code == 200  # and it recovers
+
+
+def test_a_deployment_can_name_its_own_host_but_a_wildcard_is_ignored(monkeypatch) -> None:  # hosting config
+    monkeypatch.setenv("COURTROOM_ALLOWED_HOSTS", "demo.example.org, *")
+    c = TestClient(create_app())
+    assert c.get("/api/health", headers={"Host": "demo.example.org"}).status_code == 200
+    assert c.get("/api/health", headers={"Host": "evil.example"}).status_code == 400  # "*" does not open the door to every host
+    monkeypatch.delenv("COURTROOM_ALLOWED_HOSTS")
+    assert TestClient(create_app()).get("/api/health", headers={"Host": "demo.example.org"}).status_code == 400

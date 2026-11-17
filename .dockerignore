@@ -1,0 +1,13 @@
+.git
+.venv
+_backup
+tests
+report
+presentation
+docs
+scripts
+**/__pycache__
+*.egg-info
+.env*
+FINAL_PLAN.md
+SUBMISSION_PLAN.md

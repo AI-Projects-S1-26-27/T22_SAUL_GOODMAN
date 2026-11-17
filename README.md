@@ -6,6 +6,27 @@ Team **Saul Goodman** · Track: Demo · Domain: Agents & Game Theory
 
 **Live demo:** <https://ai-project-weld-omega.vercel.app>
 
+**Start here.** Saul Goodman Courtroom is a simulated trial played as a game between two budgeted lawyer agents and a fixed, exact, rule-based judge (no
+language model in the core), with a game-theory layer that finds equilibria and tests how stable they are. It is the CS F407 (Artificial Intelligence)
+project of Team 22, BITS Pilani Hyderabad Campus. Three commands run everything:
+
+```bash
+pip install -e ".[dev]"                 # Python 3.11 or newer; then: python -m playwright install chromium (browser tests only)
+python -m pytest -q && python scripts/preflight.py      # the whole suite, then a pass/fail list of everything the demo needs
+python -m courtroom serve               # live demo at http://127.0.0.1:8000
+```
+
+| Read or open | Where |
+|---|---|
+| Final report (PDF) | [`report/Saul_Goodman_T22_Report.pdf`](report/Saul_Goodman_T22_Report.pdf) (source and build: `report/`) |
+| Presentation (6 slides) | [`presentation/Saul_Goodman_T22.pdf`](presentation/Saul_Goodman_T22.pdf) and [`.pptx`](presentation/Saul_Goodman_T22.pptx) |
+| Demo script and rehearsal | [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md), [`docs/REHEARSAL.md`](docs/REHEARSAL.md) |
+| Hosted site (static: recorded trials and stored results) | <https://ai-project-weld-omega.vercel.app>; live-server hosting is prepared in [`docs/process/DEPLOY.md`](docs/process/DEPLOY.md) |
+| Where the code differs from the proposal | [`DEVIATIONS.md`](DEVIATIONS.md) |
+| How every number is produced | [`PROVENANCE.md`](PROVENANCE.md), [`REPORT.md`](REPORT.md) (the long technical document) |
+| How the work was done, planned and pushed | [`docs/process/`](docs/process/) |
+
+
 Pick a fictional case, choose how each lawyer plays, and watch the trial unfold step by step.
 A prosecution agent and a defense agent compete to build the strongest case from structured,
 synthetic evidence. They present exhibits, object, challenge witnesses and rest, each under a

@@ -7,6 +7,7 @@ Input sizes are bounded so a demo audience can't hang the server.
 from __future__ import annotations
 
 import json
+import os
 import threading
 from collections.abc import Awaitable, Callable, Iterator
 from pathlib import Path
@@ -243,7 +244,9 @@ def _run(req: TrialRequest, case: CaseFile | None = None) -> TrialResult:
 def create_app() -> FastAPI:
     app = FastAPI(title="Saul Goodman Courtroom", version=__version__)
     # the server is for this computer only: a request that names another host (DNS rebinding) is refused
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "[::1]", "testserver"])
+    # a public deployment names its own host(s) in COURTROOM_ALLOWED_HOSTS (comma separated, e.g. "my-demo.onrender.com"); the default stays local-only
+    extra = [h.strip() for h in os.environ.get("COURTROOM_ALLOWED_HOSTS", "").split(",") if h.strip() and h.strip() != "*"]
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "[::1]", "testserver", *extra])
 
     @app.middleware("http")
     async def limit_body(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
