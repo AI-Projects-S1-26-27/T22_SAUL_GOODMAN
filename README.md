@@ -1,220 +1,162 @@
-# Saul Goodman Courtroom
+<div align="center">
 
-**Two AI lawyers. One rulebook judge.**
+# ⚖️ Saul Goodman Courtroom
 
-Team **Saul Goodman** · Track: Demo · Domain: Agents & Game Theory
+### Two AI lawyers. One rulebook judge. Exact game theory.
 
-**Live demo:** <https://ai-project-weld-omega.vercel.app>
+*A simulated trial played as a strategic game, a deterministic judge that shows its working,
+and a 3D courtroom where you can watch every move.*
 
-**Start here.** Saul Goodman Courtroom is a simulated trial played as a game between two budgeted lawyer agents and a fixed, exact, rule-based judge (no
-language model in the core), with a game-theory layer that finds equilibria and tests how stable they are. It is the CS F407 (Artificial Intelligence)
-project of Team 22, BITS Pilani Hyderabad Campus. Three commands run everything:
+[![Live demo](https://img.shields.io/badge/Live_demo-ai--project--weld--omega.vercel.app-000000?style=for-the-badge&logo=vercel)](https://ai-project-weld-omega.vercel.app)
 
-```bash
-pip install -e ".[dev]"                 # Python 3.11 or newer; then: python -m playwright install chromium (browser tests only)
-python -m pytest -q && python scripts/preflight.py      # the whole suite, then a pass/fail list of everything the demo needs
-python -m courtroom serve               # live demo at http://127.0.0.1:8000
-```
+![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?logo=pydantic&logoColor=white)
+![three.js](https://img.shields.io/badge/three.js-3D_courtroom-000000?logo=threedotjs&logoColor=white)
+![No build step](https://img.shields.io/badge/frontend-vanilla_JS,_no_build-F7DF1E?logo=javascript&logoColor=black)
+![Deterministic](https://img.shields.io/badge/verdicts-bit--for--bit_reproducible-success)
 
-| Read or open | Where |
-|---|---|
-| Final report (PDF) | [`report/Saul_Goodman_T22_Report.pdf`](report/Saul_Goodman_T22_Report.pdf) (source and build: `report/`) |
-| Presentation (6 slides) | [`presentation/Saul_Goodman_T22.pdf`](presentation/Saul_Goodman_T22.pdf) and [`.pptx`](presentation/Saul_Goodman_T22.pptx) |
-| Demo script and rehearsal | [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md), [`docs/REHEARSAL.md`](docs/REHEARSAL.md) |
-| Hosted site (static: recorded trials and stored results) | <https://ai-project-weld-omega.vercel.app>; live-server hosting is prepared in [`docs/process/DEPLOY.md`](docs/process/DEPLOY.md) |
-| Where the code differs from the proposal | [`DEVIATIONS.md`](DEVIATIONS.md) |
-| How every number is produced | [`PROVENANCE.md`](PROVENANCE.md), [`REPORT.md`](REPORT.md) (the long technical document) |
-| How the work was done, planned and pushed | [`docs/process/`](docs/process/) |
+**CS F407 Artificial Intelligence · Team 22 · BITS Pilani, Hyderabad Campus**
+Track: Demo · Domain: Agents & Game Theory
 
+</div>
+
+---
+
+## Table of contents
+
+1. [What is this?](#-what-is-this)
+2. [Try it in 60 seconds](#-try-it-in-60-seconds)
+3. [Features at a glance](#-features-at-a-glance)
+4. [How a trial works](#-how-a-trial-works)
+5. [The four playing styles](#-the-four-playing-styles)
+6. [How the judge decides](#-how-the-judge-decides)
+7. [Game theory: which style wins?](#-game-theory-which-style-wins)
+8. [The web app](#-the-web-app)
+9. [The case library](#-the-case-library)
+10. [Command-line tools](#-command-line-tools)
+11. [HTTP API](#-http-api)
+12. [Architecture and team](#-architecture-and-team)
+13. [Robustness and verification](#-robustness-and-verification)
+14. [Deploying](#-deploying)
+15. [Project layout](#-project-layout)
+16. [Documentation index](#-documentation-index)
+
+---
+
+## 🧭 What is this?
 
 Pick a fictional case, choose how each lawyer plays, and watch the trial unfold step by step.
-A prosecution agent and a defense agent compete to build the strongest case from structured,
-synthetic evidence. They present exhibits, object, challenge witnesses and rest, each under a
-fixed budget. The judge is **not** an AI. It is a fully deterministic rulebook that uses exact
-fractions: it rules on every objection with a named rule, weighs only the accepted evidence,
-point by point, and records every step in a hash-chained audit trail. Same case, same choices,
-same verdict, every time.
 
-On top of the trials, a game-theory layer replays each case for every combination of styles,
-builds the payoff matrix and solves it for **exact rational Nash equilibria**. That answers the
-question the demo is built around: *should a lawyer go on the attack or play it safe?*
+- A **prosecution agent** and a **defense agent** compete to build the strongest case from structured, synthetic evidence. They
+  present exhibits, object, challenge witnesses and rest, each under a fixed **budget** and with only a noisy view of the other
+  side's hidden flaws.
+- The **judge is not a language model.** It is a fully deterministic rulebook that uses exact fractions: it rules on every
+  objection with a named rule, weighs only the accepted evidence, and records every step in a **hash-chained audit trail**.
+  Same case, same choices, same seed: same verdict, every time.
+- A **game-theory layer** replays each case for every pairing of styles, builds the payoff matrix and solves it for **exact
+  rational Nash equilibria**, then checks how stable they are.
 
----
+That answers the question the whole demo is built around:
 
-## Contents
+> **Should a lawyer go on the attack, or play it safe?**
 
-- [Quick start](#quick-start)
-- [Live controls, the AI layer and the best-response search](#live-controls-the-ai-layer-and-the-best-response-search)
-- [The web app](#the-web-app)
-- [How a trial works](#how-a-trial-works)
-- [The four playing styles](#the-four-playing-styles)
-- [How the judge decides](#how-the-judge-decides)
-- [Game theory: which style wins?](#game-theory-which-style-wins)
-- [The case library](#the-case-library)
-- [Command-line tools](#command-line-tools)
-- [Architecture](#architecture)
-- [Robustness guarantees](#robustness-guarantees)
-- [Deploying](#deploying)
-- [Project layout](#project-layout)
+<p align="center">
+  <img src="presentation/figures/fig_payoff.png" alt="Accuser win rate by style pairing for the Helix Espionage case" width="520">
+</p>
 
 ---
 
-## Quick start
+## 🚀 Try it in 60 seconds
 
-Requires **Python 3.11+**.
+**Just look:** open the hosted site, <https://ai-project-weld-omega.vercel.app>, pick a case, brief your lawyers and click
+**Enter the courtroom**. It plays recorded trials, with voices and music, in any modern browser.
+
+**Run everything locally** (Python 3.11 or newer):
 
 ```bash
-git clone <this-repo>
-cd AI-PROJECT_SAUL_GOODMAN
+git clone https://github.com/AI-Projects-S1-26-27/T22_SAUL_GOODMAN.git
+cd T22_SAUL_GOODMAN
 pip install -e ".[dev]"
-python -m courtroom serve
+python -m courtroom serve          # open http://127.0.0.1:8000
 ```
 
-Open <http://127.0.0.1:8000>. The local server runs the **live simulator**, so you can use any
-trial number, any pairing of styles (including a mixed strategy) and larger strategy games.
+The local server runs the **live simulator**: the page shows a green **LIVE** badge and every trial, table and search is
+computed in front of you.
 
-Run the test suite:
+**Check it:**
 
 ```bash
-python -m pytest
+python -m pytest -q                         # the full test suite
+python scripts/preflight.py                 # a pass/fail list of everything the demo needs
+python -m playwright install chromium       # only needed for the browser tests
 ```
 
 ---
 
-## Live controls, the AI layer and the best-response search
+## ✨ Features at a glance
 
-The deployed site replays trials recorded earlier. The **local server computes**: with `python -m courtroom serve` the page shows
-a green **LIVE** badge and everything below is worked out in front of you by the exact judge. Without it the page says **RECORDED**.
-
-- **Seed box, digest, "Run it again and compare".** Pick a seed, run the trial, then run it twice more: both digests and the hash
-  chain are checked.
-- **Does strategy matter here?** Measured for every case from fresh runs of every pairing of Bold, Careful and Smart, and shown on the
-  docket and in the lab: decided by the evidence, by the lawyers, or a coin-flip between seeds. In many of the hand-written cases the
-  evidence alone decides, and the page says so.
-- **Surprise me.** Searches generated cases (`gen-<seed>`) for one where the lawyers really change the verdict and plays it in the 3D
-  room. `python -m courtroom find` does the same from the command line.
-- **Courtroom surprises.** A witness may not appear, a digital record may lack its certificate, a witness may turn hostile. Off by
-  default and off for every recorded trial; a toggle in live mode (`--surprises` on the command line).
-- **Change the case.** Edit an exhibit's reliability, a witness's credibility, a flag, the standard of proof or the budget, add or
-  remove exhibits and witnesses, then run it and see the verdict and the log-odds move. Cases can also be written from scratch.
-- **Why this verdict, and what would flip it.** The judge's own numbers in plain words, and the smallest single change to one exhibit or
-  witness that would have flipped the verdict. "Try it" plays the whole trial again with that change.
-- **The AI lawyer, case drafting and spoken lines** (optional). With a key in `.env` (`OLLAMA_API_KEY` or `GEMINI_API_KEY`) or a local
-  Ollama running, an "AI lawyer" style appears, a case can be drafted from plain English (validated, then handed to the editor), and
-  unscripted cases get model-worded lines. The model never decides a verdict or enters a certified result. See `docs/LLM_ROLE.md`.
-- **Strategy lab chapters** "How sure are we?" (bootstrap stability and sensitivity to the rulebook's constants) and "Can a better
-  lawyer be found?" (a double-oracle search over lawyer profiles, with `python -m courtroom oracle`), each with surprises off and on.
-
-Documents: `REPORT.md` (the write-up), `PROVENANCE.md` (one command per claim), `DEMO_SCRIPT.md` (a five-minute run), `DEVIATIONS.md`
-(where the code and the proposal differ), `AGENTS.md` (how to change things safely). Numbers in those documents are generated from `results/` by `python scripts/render_docs.py`.
-
-```bash
-python -m courtroom matters                      # does strategy matter, case by case
-python -m courtroom find --count 40              # search generated cases for contested ones
-python -m courtroom oracle --case helix-espionage --budget 60 --workers 4
-python -m courtroom verify --case helix-espionage --seed 6 -p adaptive -d aggressive --surprises
-python scripts/stub_ollama.py                    # a stand-in model server, to try the AI features with no key
-```
+| | Feature | What you get |
+|---|---|---|
+| 🏛️ | **3D courtroom** | three.js room with judge, lawyers, bailiff and witnesses; camera cuts, witness walk to the stand, oath, exhibit cards with stamps |
+| 🎙️ | **Pre-recorded voices** | Every spoken line recorded with a fixed voice per character, so every device hears the same trial |
+| 🎵 | **Synthesised score** | Web Audio soundtrack that ducks under speech, with verdict themes that start the moment the verdict appears |
+| 🧑‍⚖️ | **Exact rulebook judge** | Rational arithmetic, named rules for every ruling, a directed-verdict review, a tamper-evident hash chain |
+| 🤖 | **Four strategic lawyers** | Bold, Careful, Smart (Bayesian, learns the opponent) and Wild, plus a test-only chaos agent |
+| ♟️ | **Exact Nash equilibria** | Support enumeration over rationals, best-response verification, IESDS, replicator dynamics |
+| 📊 | **Strategy lab** | A guided game-theory "casebook" page: payoff tables, best replies, equilibria, classic games, efficiency, guarantees, thinking ahead |
+| 🔬 | **Stability checks** | Bootstrap confidence, sensitivity to the judge's constants, and a double-oracle search for a better lawyer |
+| ✏️ | **What-if editor** | Change an exhibit's reliability or a witness's credibility, rerun, and watch the verdict and log-odds move |
+| ❓ | **Why this verdict?** | The judge's numbers in plain words, and the smallest single change that would have flipped the outcome |
+| 🎲 | **Surprise me** | Searches generated cases for one where the lawyers genuinely change the verdict |
+| 🌪️ | **Courtroom surprises** | Optional: absent witnesses, uncertified records, hostile witnesses (off by default and in every certified result) |
+| 🧭 | **Guided tour** | A one-screen Guide map and a spotlight walkthrough of each page |
 
 ---
 
-## The lecture concepts, computed from our own games
-
-Six course ideas are computed from this project's own measured games, never pasted in. Where an idea does not occur in our data, the lab and
-`REPORT.md` say so plainly (section 6.6 to 6.9).
-
-- **Classic games** (prisoner's dilemma, stag hunt, battle of the sexes, chicken, matching pennies): every two-by-two corner of every case's
-  measured table is named by the order of its payoffs, with a tolerance tied to the standard errors and a bootstrap stability. Generated cases
-  are searched for the games not found in the library.
-- **Pareto optimality:** the efficient cells of each table, and whether each equilibrium is efficient or dominated for both sides.
-- **Minimax:** exact mixed security values, the minimax theorem checked on the win-probability game, and the gap in the real general-sum game.
-- **Minimax and alpha-beta on the trial tree:** the trial as a sequential game on the engine's own rules, solved exactly on an open-file
-  relaxation (both sides see everything, zero-sum). A **lookahead** lawyer (depth-limited alpha-beta) is an exhibition style, selectable
-  with the local server and never part of the certified analysis. Lab chapters: "Which classic game is this?", "Is the equilibrium
-  efficient?", "What can each side guarantee?", "Thinking ahead".
-
-```bash
-python -m courtroom classic --case helix-espionage        # which classic game does each 2x2 corner resemble?
-python -m courtroom classic --find prisoners-dilemma,stag-hunt,battle-of-the-sexes --count 30
-python -m courtroom efficiency --case kestrel-av          # Pareto, security values, minimax theorem
-python -m courtroom tree --case cookie-jar                # minimax vs alpha-beta on the trial tree
-python -m courtroom lookahead --case kestrel-av           # does thinking ahead beat the four styles? (exhibition)
-```
-
-The proposal-versus-code differences are listed in `DEVIATIONS.md`.
-
----
-
-## The web app
-
-The home page is one scrolling page (the strategy lab is a second page, `lab.html`):
-
-| Section | What it shows |
-|---|---|
-| **Hero and How a trial works** | The idea in a few lines: two lawyers, one fixed rulebook judge. |
-| **Today's docket** | The cases, in three tabs: *Everyday*, *Serious* and *Tricky tests* (plus *Found by search* when the local server has found any). Picking a card selects the case. |
-| **Brief your lawyers** | One of four styles for each side, a seed box, a courtroom-surprises switch, and the other live controls when the local server is running; on the hosted site it says RECORDED. **Enter the courtroom** opens the 3D room. |
-| **The courtroom** | The trial plays step by step with voices and music; a case-notes drawer, a transcript, how sure the judge is of each point, and a verdict card with *Why this verdict?* and *What would flip it?* when live. |
-| **Which style wins?** | The four-by-four win-rate table for the picked case (stored certified results), with what each side pays, the stable picks, and a plain note when the evidence decides the case. |
-| **Strategy lab** | A second page that works the game out chapter by chapter (payoff tables, equilibria, best replies, classic games, efficiency, guarantees, thinking ahead). |
-
-A **Guide** link in the top bar opens a one-screen map of which part does what and runs a guided tour of the page (it also opens once, by itself, the first time a browser visits each page).
-
-The front end is plain HTML, CSS and JavaScript with **no build step**. It loads GSAP, three.js and Google Fonts from CDNs for polish; the
-trial player still works without them. When the API isn't reachable it falls back to the pre-exported bundle
-(`courtroom/viz/web/data/bundle.js`), so the recorded trials play offline or from `file://` (without the 3D scene if three.js cannot load).
-
-**Hosted demo vs. local server.** The Vercel deployment is the static UI running on that bundle.
-It includes the seed-0 trial for all sixteen pairings of the four styles on each case, plus the 2×2 Aggressive/Careful
-games, and the stored results the lab reads; it hides the controls that need the engine. Run `python -m courtroom serve` locally to unlock everything.
-
----
-
-## How a trial works
+## ⚙️ How a trial works
 
 The trial is a finite state machine:
 
 ```
 OPENING → PROSECUTION_CASE → DIRECTED_VERDICT_REVIEW ─(granted)→ DELIBERATION → CLOSED
-                                     │(denied)
+                                     │ (denied)
                                      ▼
                               DEFENSE_CASE → REBUTTAL → DELIBERATION → CLOSED
 ```
 
-On its turn, a lawyer can:
+On its turn a lawyer can:
 
 | Move | What happens |
 |---|---|
 | **Present evidence** | Offer a document, record or witness. The other side gets exactly one chance to object (or pass). |
-| **Object** | Claim the evidence is hearsay, unverified, illegally obtained, shared too late, guesswork or off-topic. A wrong objection is penalised. |
-| **Challenge a witness** | Use evidence to impeach a witness. If it works, that witness counts for half. |
-| **Ask to end early** | The defense can move for a directed verdict; it is granted only if some point's log-odds are below zero. (If a point has no accepted supporting evidence at all, the judge ends the trial on its own: rule DV-2.) |
+| **Object** | Hearsay, unverified, illegally obtained, disclosed too late, speculation or off-topic. A wrong objection is penalised. |
+| **Challenge a witness** | Use an *admitted* exhibit to impeach a witness. If it works, that witness counts for half. |
+| **Ask to end early** | The defense can move for a directed verdict; granted only if some point's log-odds are below zero. If a point has no supporting evidence at all, the judge ends the trial on its own (rule DV-2). |
 | **Rest** | Stop presenting. Passing twice in a row counts as resting, so nobody can stall forever. |
 
-Every move costs part of a fixed **budget**, each stage has a **turn cap**, and neither lawyer can
-see the other side's hidden flaws for sure. Each lawyer reads every possible defect through a
-noisy, seeded channel, so objecting is a decision made under uncertainty.
-
-Flawed evidence is only thrown out if the opponent **objects on the right ground**. Unchallenged
-flaws are waived, just as in real procedure, which is what makes objection strategy matter.
+Every move costs budget, each stage has a turn cap, and each lawyer reads the other side's possible defects through a noisy,
+seeded channel, so **objecting is a decision under uncertainty**. Flawed evidence is only thrown out if the opponent objects
+**on the right ground**; unchallenged flaws are waived, just as in real procedure. That is what makes strategy matter.
 
 ---
 
-## The four playing styles
+## 🎭 The four playing styles
 
-| Style | Behaviour |
-|---|---|
-| **Aggressive** (Bold) | Offers the evidence that helps it, including flawed items when the gain is worth the risk, and objects on thin suspicion. |
-| **Careful** (Conservative) | Offers only clean evidence that matters, and objects only when confident. |
-| **Adaptive** (Smart) | Maximises expected value and learns the opponent's objection rate (Beta posterior). |
-| **Reckless** (Wild) | Plays random legal moves, objects on a whim, and sometimes moves out of turn. This is the fourth style in every certified table. |
-| **Mixed** *(local only)* | Aggressive with probability *p*, otherwise Careful. Not one of the four styles in the certified tables. |
+| Style | In the UI | Behaviour |
+|---|---|---|
+| `aggressive` | **Bold** | Offers whatever helps, flawed items included when the gain is worth the risk, and objects on thin suspicion. |
+| `conservative` | **Careful** | Offers only clean evidence that matters, and objects only when confident. |
+| `adaptive` | **Smart** | Maximises expected value and learns the opponent's objection rate with a Beta posterior. |
+| `reckless` | **Wild** | Random legal moves, whimsical objections, and the occasional out-of-turn move. |
+| `mixed` | *local only* | Bold with probability *p*, otherwise Careful. |
+| `lookahead` | *local only, exhibition* | Depth-limited alpha-beta on the trial tree. Never part of the certified tables. |
 
-`chaos` (random, often illegal moves) is a test-only agent that exists to prove the rules cannot be broken; it is not offered as a style.
+`chaos` (random, often illegal moves) is a test-only agent that exists to prove the rules cannot be broken.
 
 ---
 
-## How the judge decides
+## 🧑‍⚖️ How the judge decides
 
 For each legal element (point) `e`, over **accepted** evidence only:
 
@@ -232,169 +174,256 @@ verdict = GUILTY / LIABLE  iff  every element's L_e clears the standard (conjunc
 | Clear and convincing | Serious civil claims | `11/10` | ~75 % |
 | Balance of probabilities | Civil cases | `> 0` | > 50 % |
 
-- **Exact arithmetic.** Decisions compare exact rationals (`fractions.Fraction`). Floats exist
-  only on display fields, so rounding can never flip a verdict.
-- **Every ruling cites a rule:** `OBJ-HEARSAY`, `OBJ-AUTH`, `OBJ-EXCLUSIONARY`, `OBJ-DISCLOSURE`,
-  `OBJ-SPECULATION`, `OBJ-RELEVANCE`, `DV-2`, `STALL-1`, `TURN-CAP`, `CONTEMPT-1`, …
-- **Tamper-evident record.** Every event is chained with `h_n = SHA256(h_{n−1} ‖ event_n)`, and the
-  final digest fingerprints the whole trial.
-- **Penalties.** An overruled objection costs ¼ point. A procedural violation costs 1 point plus a
-  budget fine. Knowingly offering illegally obtained or undisclosed evidence costs 2 points.
+- **Exact arithmetic.** Decisions compare `fractions.Fraction` values; floats exist only for display, so rounding can never flip
+  a verdict.
+- **Every ruling cites a rule:** `OBJ-HEARSAY`, `OBJ-AUTH`, `OBJ-EXCLUSIONARY`, `OBJ-DISCLOSURE`, `OBJ-SPECULATION`,
+  `OBJ-RELEVANCE`, `DV-2`, `STALL-1`, `TURN-CAP`, `CONTEMPT-1`, …
+- **Tamper-evident record.** Every event is chained with `h_n = SHA256(h_{n−1} ‖ event_n)`; the final digest fingerprints the
+  whole trial.
+- **Penalties.** An overruled objection costs ¼ point; a procedural violation costs 1 point plus a budget fine; knowingly offering
+  illegal or undisclosed evidence costs 2 points.
 
 ---
 
-## Game theory: which style wins?
+## ♟️ Game theory: which style wins?
 
-Payoffs are general-sum: `U = V·win − c·spent − μ·sanctions`. For each case, the game layer:
+Payoffs are general-sum: `U = V·win − c·spent − μ·sanctions`. For each case the game layer:
 
-1. Estimates the payoff matrix by Monte-Carlo over many seeded trials per cell.
-2. Solves for **all Nash equilibria** with an exact rational support-enumeration solver.
-3. Independently verifies each equilibrium with a best-response check.
-4. Runs iterated elimination of strictly dominated strategies (IESDS) and flags dominance.
-5. Simulates replicator dynamics, showing how play would drift if both sides kept learning.
+1. **Estimates the payoff matrix** by Monte Carlo over seeded trials per cell (200 seeds per cell for the certified results).
+2. **Solves for all Nash equilibria** with an exact rational support-enumeration solver.
+3. **Verifies** each equilibrium independently with a best-response check.
+4. Runs **iterated elimination of strictly dominated strategies** (IESDS) and flags dominance.
+5. Simulates **replicator dynamics** to show how play drifts if both sides keep learning.
+6. Tests **stability**: bootstrap resampling, sensitivity to the judge's constants, and a **double-oracle search** for a lawyer
+   profile that beats the four styles.
 
-The analyzer reports triviality honestly instead of hiding it. Calibration notes are in
-[`docs/DESIGN.md`](docs/DESIGN.md).
+**Does strategy even matter?** In many hand-written cases the evidence alone decides the verdict, and the app says so plainly
+instead of hiding it:
+
+<p align="center">
+  <img src="presentation/figures/fig_matters.png" alt="How much the lawyers move the verdict, case by case, compared with seed noise" width="640">
+</p>
+
+**Lecture concepts, computed from our own games** (never pasted in):
+
+- **Classic games:** every 2×2 corner of every measured table is named (prisoner's dilemma, stag hunt, battle of the sexes,
+  chicken, matching pennies) by its payoff order, with a tolerance tied to the standard errors.
+- **Pareto efficiency:** the efficient cells, and whether each equilibrium is efficient or dominated.
+- **Minimax:** exact mixed security values and the minimax theorem on the win-probability game.
+- **Minimax and alpha-beta on the trial tree:** the trial as a sequential game, solved exactly on an open-file relaxation, with node
+  counts for both searches.
+
+<p align="center">
+  <img src="presentation/figures/fig_bootstrap.png" alt="Bootstrap stability of the equilibrium" width="420">
+  <img src="presentation/figures/fig_tree.png" alt="Minimax versus alpha-beta node counts on the trial tree" width="420">
+</p>
 
 ---
 
-## The case library
+## 🖥️ The web app
 
-All cases, people and organisations are **synthetic**.
+Plain HTML, CSS and JavaScript with **no build step** (`courtroom/viz/web/`). GSAP, three.js and Google Fonts load from CDNs;
+the trial player still works without them, and falls back to the recorded bundle (`data/bundle.js`) when no server is reachable,
+even from `file://`.
 
-| Case | Type | What it demonstrates | Equilibrium (2×2, Aggressive/Careful) |
-|---|---|---|---|
-| `helix-espionage` (flagship) | Criminal | Matching-pennies structure: aggressive prosecution beats a passive defense, and an aggressive defense punishes it | **Mixed** NE: prosecution ≈ 40 % aggressive, defense ≈ 91 % aggressive. No dominant strategy, and replicator dynamics orbit the NE |
-| `kestrel-av` | Civil | Arms race: aggression is strictly dominant for the plaintiff | Pure NE (Aggressive, Aggressive), dominance-solvable |
-| `aurora-defi` | Criminal | Strong white-hat defense: aggression only burns budget | Pure NE (Careful, Careful), dominance-solvable |
-| `edge-empty-docket` | Criminal | Zero evidence | Directed acquittal (rule DV-2) under every pairing, including Chaotic |
-| `edge-mutual-exclusion` | Civil | Two equally credible, contradictory witnesses | Exactly symmetric discount → log-odds exactly `0` → not liable |
-| `edge-poisoned-tree` | Criminal | Every exhibit is defective | An objecting defense wins, while a passive defense can still lose |
-| `edge-defense-only` | Criminal | Only exculpatory evidence | Directed acquittal ordered by the judge on its own motion (sua sponte) |
+| Section | What it shows |
+|---|---|
+| **Hero & how a trial works** | The idea in a few lines: two lawyers, one fixed rulebook judge. |
+| **Today's docket** | Cases in tabs: *Everyday*, *Serious*, *Tricky tests* (and *Found by search* when live). |
+| **Brief your lawyers** | A style for each side, a seed, the surprises switch, and live controls when the server is running. |
+| **The courtroom** | The 3D trial with voices and music, case-notes drawer, transcript, the judge's certainty per point, and the verdict card with *Why this verdict?* and *What would flip it?* |
+| **Which style wins?** | The 4×4 win-rate table for the chosen case, what each side pays, the stable picks, and a plain note when the evidence decides. |
+| **Strategy lab** (`lab.html`) | The game worked out chapter by chapter, each with a plain lead, *How to read it*, the chart, *What it says for this case* and *Show the working*, plus an analyst chat. |
 
-New cases can also be generated procedurally (`courtroom/cases/generator.py`).
+**Hosted vs. local.** The Vercel site is the static app on recorded trials (seed 0 for all 16 pairings of the four styles on every
+case) and stored results, so the RECORDED badge shows and live-only controls are hidden. `python -m courtroom serve` unlocks
+everything.
+
+**Optional language-model features.** With `OLLAMA_API_KEY` or `GEMINI_API_KEY` in an ignored `.env` file (or a local Ollama), an
+"AI lawyer" style, case drafting from plain English and model-worded lines become available. The model never decides a verdict and
+never enters a certified result; the core never imports it (a test checks). See [`docs/LLM_ROLE.md`](docs/LLM_ROLE.md).
 
 ---
 
-## Command-line tools
+## 📚 The case library
+
+All cases, people and organisations are **fictional**.
+
+| Case | Type | What it demonstrates |
+|---|---|---|
+| `helix-espionage` (flagship) | Criminal | Matching-pennies structure: a mixed equilibrium, no dominant strategy, replicator dynamics orbit the equilibrium |
+| `kestrel-av` | Civil | Arms race: aggression is strictly dominant for the plaintiff |
+| `aurora-defi` | Criminal | Strong white-hat defense: aggression only burns budget |
+| `cookie-jar`, `broken-bike`, `garden-dog` | Everyday | Small, plain-language disputes for first-time viewers |
+| `edge-empty-docket` | Edge case | Zero evidence: directed acquittal (DV-2) under every pairing |
+| `edge-mutual-exclusion` | Edge case | Two equally credible, contradictory witnesses: log-odds exactly `0` |
+| `edge-poisoned-tree` | Edge case | Every exhibit is defective: only an objecting defense is safe |
+| `edge-defense-only` | Edge case | Only exculpatory evidence: the judge directs an acquittal on its own motion |
+
+New cases can be generated procedurally (`courtroom/cases/generator.py`, ids like `gen-<seed>`) or written in the in-page editor.
+
+---
+
+## 🛠️ Command-line tools
 
 ```bash
-python -m courtroom cases                           # list the case library
-python -m courtroom run --live                      # animated terminal replay of the flagship case
-python -m courtroom game --case helix-espionage     # payoff matrix + exact Nash equilibria
-python -m courtroom tournament                      # game analysis across the whole library
-python -m courtroom verify -p chaos -d adaptive     # prove bit-for-bit determinism
-python -m courtroom stress --cases 100              # 2,500-trial fuzz run, exits 1 on any failure
-python -m courtroom export                          # rebuild the static web bundle
-python -m courtroom serve                           # web UI + API on http://127.0.0.1:8000
+python -m courtroom cases                              # list the case library
+python -m courtroom run --live                         # animated terminal replay of the flagship case
+python -m courtroom game --case helix-espionage        # payoff matrix + exact Nash equilibria
+python -m courtroom tournament                         # game analysis across the whole library
+python -m courtroom verify -p chaos -d adaptive        # prove bit-for-bit determinism
+python -m courtroom stress --cases 100                 # 2,500-trial fuzz run; exits 1 on any failure
+python -m courtroom matters                            # does strategy matter, case by case
+python -m courtroom find --count 40                    # search generated cases for contested ones
+python -m courtroom oracle --case helix-espionage --budget 60 --workers 4   # best-response search
+python -m courtroom classic --case helix-espionage     # which classic game is each 2x2 corner?
+python -m courtroom efficiency --case kestrel-av       # Pareto, security values, minimax theorem
+python -m courtroom tree --case cookie-jar             # minimax vs alpha-beta on the trial tree
+python -m courtroom lookahead --case kestrel-av        # does thinking ahead beat the four styles?
+python -m courtroom export --workers 4                 # rebuild the static web bundle
+python -m courtroom serve                              # web UI + API on http://127.0.0.1:8000
 ```
 
-Run any command with `--help` for its options.
+Every command takes `--help`.
 
-### HTTP API (served by `python -m courtroom serve`)
+---
+
+## 🌐 HTTP API
+
+Served by `python -m courtroom serve`. Bodies are size- and depth-limited, foreign `Host` headers are refused, and heavy routes
+run at most two at a time (the rest get a 503).
 
 | Endpoint | Purpose |
 |---|---|
 | `GET /api/health` | Liveness check |
 | `GET /api/cases`, `GET /api/cases/{id}` | Case library and full case files |
 | `GET /api/strategies` | Available playing styles |
-| `POST /api/trial` | Run one trial `{case_id, prosecution, defense, seed}` |
-| `POST /api/game` | Payoff matrix + equilibria `{case_id, strategies, seeds}` |
-| `POST /api/classic`, `POST /api/classic/find` | Classic-game labels for a case's 2x2 corners; search generated cases for a dilemma, stag hunt or battle of the sexes (bounded) |
-| `POST /api/efficiency` | Pareto cells, equilibrium efficiency, security values, the minimax theorem (bounded) |
-| `POST /api/tree` | The trial tree on the open-file relaxation: minimax, alpha-beta, node counts (bounded to small cases) |
-| `POST /api/lookahead` | The lookahead lawyer against the four styles (exhibition, bounded) |
+| `POST /api/trial` | Run one trial `{case_id, prosecution, defense, seed}` (or an inline case) |
+| `POST /api/game` | Payoff matrix + equilibria |
+| `POST /api/verify`, `/api/matters`, `/api/find`, `/api/explain` | Determinism check, does-strategy-matter, case search, verdict explanation and the smallest change that would flip it |
+| `POST /api/bootstrap`, `/api/oracle`, `GET /api/results` | Bootstrap stability, best-response (double-oracle) search, stored certified results |
+| `POST /api/classic`, `/api/classic/find` | Classic-game labels; search generated cases for a given game |
+| `POST /api/efficiency` | Pareto cells, equilibrium efficiency, security values |
+| `POST /api/tree`, `/api/lookahead` | Trial-tree minimax/alpha-beta; the lookahead lawyer (bounded) |
+| `POST /api/analyst` | Strategy-lab chat (Ollama Cloud, then local Ollama; the page falls back to a built-in analyst) |
 
 ---
 
-## Architecture
+## 🏗️ Architecture and team
 
-The project was built by seven engineers, each owning one package:
+Seven packages, one owner each. Arrows point one way only: the judge knows nothing about agents, agents see the judge only through
+a read-only `Oracle`, and the visualisation layer cannot influence outcomes.
 
 ```
                         ┌──────────────────────────────┐
-                        │ E1 contracts/ (Pydantic v2)  │  shared, frozen data contracts
+                        │      contracts/ (Pydantic v2) │  shared, frozen data contracts
                         └──────────────┬───────────────┘
       ┌───────────────┬────────────────┼────────────────┬────────────────┐
       ▼               ▼                ▼                ▼                ▼
- E1 cases/       E3 judge/        E2 procedure/     E4 agents/       E5 gametheory/
- library,        admissibility,   FSM, validator,   oracle, Bayesian payoff MC, exact
- generator       exact scoring,   ledgers           perception,      Nash, IESDS,
-                 DV, verdict                        policies, chaos  replicator, stress
-      └───────────────┴──────────┬─────┴────────────────┘                │
-                                 ▼                                       │
-                       E6 engine/ + api/ + cli  ◄────────────────────────┘
+   cases/          judge/         procedure/         agents/        gametheory/
+   library,        admissibility, FSM, validator,    oracle, noisy   payoff MC, exact
+   generator       exact scoring  ledgers            perception,     Nash, IESDS,
+                   DV, verdict                       policies        replicator, search
+      └───────────────┴──────────┬─────┴────────────────┘                 │
+                                 ▼                                        │
+                       engine/ + api/ + cli  ◄────────────────────────────┘
                        orchestration, fault barrier, audit chain, HTTP
                                  │  TrialResult / PayoffTable (read-only)
                                  ▼
-                       E7 viz/  terminal dashboard (rich) + web app (vanilla JS)
+                       viz/  terminal dashboard + 3D web app + strategy lab
 ```
 
-| # | Owns | Package | Public contract | Tests |
-|---|---|---|---|---|
-| E1 | Contracts & case library | `contracts/`, `cases/` | `CaseFile`, `EvidenceItem`, `Action`, `TrialEvent`, `TrialResult`… | `test_contracts_and_cases.py` |
-| E2 | Procedure & objection arbiter | `procedure/` | `ProcedureState.expected()`, `validate() → Violation \| None` | `test_procedure.py` |
-| E3 | Deterministic judge | `judge/` | `Judge.rule_on_objection / directed_verdict_review / deliberate`, `score_record` | `test_judge.py` |
-| E4 | Strategic agents | `agents/` | `Agent.act(PartyView, Oracle) → Action`, `make_agent(name, rng)` | `test_agents.py` |
-| E5 | Game theory & tournament | `gametheory/` | `estimate_payoffs → PayoffTable`, `analyze → GameAnalysis`, `stress → StressReport` | `test_gametheory.py` |
-| E6 | Engine, API, CLI | `engine/`, `api/`, `cli.py` | `run_trial → TrialResult`, `/api/*` | `test_engine.py`, `test_api.py` |
-| E7 | Visualisation | `viz/` | Consumes `TrialResult` / `PayoffTable` only and never calls the engine | `test_api.py::test_ui_is_served` + manual |
-
-**Dependency rule:** arrows only point down. The judge knows nothing about agents, agents see the
-judge only through the read-only `Oracle`, and the visualisation layer can't influence outcomes.
+| Member | Package | Responsible for | Tests |
+|---|---|---|---|
+| **Aditya Singh** | `contracts/`, `cases/` | Frozen data models, case validator, flagship and everyday cases, edge fixtures, seeded generator | `test_contracts_and_cases.py` |
+| **Divvij Y. Chichra** | `procedure/` | Phase state machine, action validator, ledgers, turn caps | `test_procedure.py` |
+| **Lakshya Sachdeva** | `judge/` | Admissibility rules, exact scoring, directed verdict, rule trace | `test_judge.py`, `test_judge_boundaries.py` |
+| **Mofasser A. Midda** | `agents/` | Perception, Oracle, all lawyer strategies, the Wild style | `test_agents.py` |
+| **Rohan B. Pagire** | `gametheory/` | Payoff Monte Carlo, exact Nash solver, bootstrap, replicator dynamics, lab maths | `test_gametheory.py`, `test_nash_edges.py` |
+| **Pramit Khandelwal** | `engine/`, `api/`, `cli.py` | Trial loop, fault barrier, event log, FastAPI, replay and stress commands | `test_engine.py`, `test_api.py` |
+| **Rakshit Goel** | `viz/` | Terminal dashboard, web UI, 3D courtroom, exhibit cards, tours, strategy lab | browser tests in `tests/test_ui_*.py` |
 
 ---
 
-## Robustness guarantees
+## 🛡️ Robustness and verification
 
-- **Weak or no evidence:** prior-only scoring plus a mandatory directed-verdict review (DV-2,
-  applied sua sponte even if the defense never asks).
+- **Weak or no evidence:** prior-only scoring plus a mandatory directed-verdict review (DV-2, applied even if the defense never asks).
 - **Contradictions:** a symmetric discount, backed by a permutation-invariance test.
-- **Bad-faith actions:** 11 typed violation rules. A violation becomes a PASS plus a fine and a
-  sanction, and three violations mean contempt.
-- **Loops and deadlocks:** one-action response windows (an objection can't be objected to), a
-  stall rule, turn caps and a global watchdog.
-- **Agent crashes:** caught at the fault barrier (`V-AGENT-FAULT`), including in `opening_statement()`.
-- **Demo infrastructure:** bundle fallback, works from `file://`, and `no-cache` headers.
-- **Verified:** a 2,500-trial fuzz run, including the Chaotic agent, had 0 crashes and 0 invariant
-  violations, and 250/250 replays were bit-identical. The whole suite passes.
-
----
-
-## Deploying
-
-The live demo at <https://ai-project-weld-omega.vercel.app> is a static deployment of
-`courtroom/viz/web` (see [`vercel.json`](vercel.json): no build command, output directory
-`courtroom/viz/web`).
-
-After changing cases, agents or judge constants:
+- **Bad faith:** 11 typed violation rules. A violation becomes a PASS plus a fine and a sanction; three violations mean contempt.
+- **Loops and deadlocks:** one-action response windows, a stall rule, turn caps and a global watchdog.
+- **Agent crashes:** caught at the fault barrier (`V-AGENT-FAULT`).
+- **Determinism:** the digest of every recorded trial and every spoken line is pinned; a test replays them all.
+- **Fuzzing:** a 2,500-trial stress run including the chaos agent: 0 crashes, 0 invariant violations, bit-identical replays.
+- **Network-free tests:** real network calls are blocked in every test; CI runs the full check list on every push.
 
 ```bash
-python -m courtroom export      # regenerate courtroom/viz/web/data/bundle.js
+python -m pytest -q
+for f in courtroom/viz/web/*.js; do node --check "$f"; done
+node scripts/check_lab_math.cjs               # lab maths vs the engine's exact results
+python scripts/preflight.py
 ```
-
-Then commit and redeploy (push to the connected branch, or run `vercel --prod`).
 
 ---
 
-## Project layout
+## ☁️ Deploying
+
+The hosted demo is a static deployment of `courtroom/viz/web` ([`vercel.json`](vercel.json): no build command, output directory
+`courtroom/viz/web`). After changing cases, agents or judge constants:
+
+```bash
+python -m courtroom export --workers 4        # regenerate courtroom/viz/web/data/bundle.js
+```
+
+then re-record any changed voice lines (see [`AGENTS.md`](AGENTS.md) §4), bump the `?v=N` cache-busters in `index.html` and
+`lab.html`, and push. A container setup for hosting the **live** server (Render, Fly.io, Cloud Run) is ready in
+[`Dockerfile`](Dockerfile) and [`docs/process/DEPLOY.md`](docs/process/DEPLOY.md).
+
+---
+
+## 📁 Project layout
 
 ```
 courtroom/
-  contracts/   frozen Pydantic data contracts
-  cases/       synthetic case library + procedural generator
-  procedure/   trial state machine, validator, ledgers
-  judge/       admissibility, exact scoring, verdict
-  agents/      strategic agents, noisy perception, policies
-  gametheory/  payoff estimation, exact Nash, dynamics, stress
-  engine/      trial orchestration, audit chain, utilities
-  api/         FastAPI server (web UI + /api)
-  viz/         terminal dashboard + web/ (index.html, styles.css, app.js, data/bundle.js)
-  cli.py       command-line entry point
-docs/DESIGN.md design dialectic and calibration notes
-tests/         the test suite
+  contracts/    frozen Pydantic data contracts
+  cases/        synthetic case library + procedural generator
+  procedure/    trial state machine, validator, ledgers
+  judge/        admissibility, exact scoring, verdict
+  agents/       strategic agents, noisy perception, policies
+  gametheory/   payoffs, exact Nash, dynamics, bootstrap, search, classic games, trees
+  engine/       trial orchestration, audit chain
+  api/          FastAPI server (web UI + /api)
+  llm/          optional language-model exhibition layer (off by default)
+  viz/          terminal dashboard + web/ (3D courtroom, strategy lab, voices, bundle)
+  cli.py        command-line entry point
+results/        certified result files every number is generated from
+presentation/   slides (PDF, PPTX) and figures
+scripts/        export, voice recording, preflight, result and figure scripts
+tests/          the test suite (unit, property, golden digests, API, browser)
+docs/           design, code review, UI audit, rehearsal, process notes
 ```
 
 ---
 
+## 📖 Documentation index
+
+| Document | What's in it |
+|---|---|
+| [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) · [`docs/REHEARSAL.md`](docs/REHEARSAL.md) | A five-minute demo run and its rehearsal sheet |
+| [`presentation/Saul_Goodman_T22.pdf`](presentation/Saul_Goodman_T22.pdf) | The six-slide presentation ([`.pptx`](presentation/Saul_Goodman_T22.pptx)) |
+| [`PROVENANCE.md`](PROVENANCE.md) | One command per claim: how every number is produced |
+| [`DEVIATIONS.md`](DEVIATIONS.md) | Where the code differs from the proposal, and why |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | Design dialectic and calibration notes |
+| [`docs/CODE_REVIEW.md`](docs/CODE_REVIEW.md) · [`docs/UI_AUDIT.md`](docs/UI_AUDIT.md) | The structured code review with a status for every finding; the UI audit |
+| [`docs/LLM_ROLE.md`](docs/LLM_ROLE.md) | What the optional language-model layer may and may not do |
+| [`AGENTS.md`](AGENTS.md) | How to change the project safely (bundle, story, voices, sound, lab) |
+| [`docs/proposal/`](docs/proposal/) · [`docs/process/`](docs/process/) | The submitted proposal; how the work was planned, deployed and pushed |
+
+---
+
+<div align="center">
+
 *All cases, people and organisations are fictional. This is a stylised simulation, not legal advice.*
+
+**Team 22 · Saul Goodman** · CS F407 Artificial Intelligence · BITS Pilani, Hyderabad Campus
+
+</div>
