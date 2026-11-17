@@ -220,7 +220,7 @@ goes behind a flag that defaults to today's rules (see `Surprises`).
 | Lab chapters that need the server or the results | `courtroom/viz/web/lab-extra.js` | `python scripts/build_analysis_js.py` after any change in `results/`; bump `?v=N` in `lab.html` |
 | Anything a model does | `courtroom/llm/` | nothing in the core may import it (a test checks); add a stub test; read `docs/LLM_ROLE.md` |
 | A certified result | run `scripts/run_analysis.py` or `scripts/run_oracle_results.py`, which write `results/` | then `python scripts/build_analysis_js.py` and `python scripts/render_docs.py` |
-| Numbers in `REPORT.md`, `PROVENANCE.md`, `DEMO_SCRIPT.md` | never by hand: edit `scripts/render_docs.py` | `python scripts/render_docs.py --check` (a test runs it) |
+| Numbers in `REPORT.md`, `PROVENANCE.md` | never by hand: edit `scripts/render_docs.py` | `python scripts/render_docs.py --check` (a test runs it) |
 
 **Rules for the model layer.**
 

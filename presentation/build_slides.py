@@ -4,7 +4,7 @@
     python presentation/build_slides.py --pdf   # the deck, then presentation/Saul_Goodman_T22.pdf
 
 Every number on a slide is read from results/ and git by scripts/submission_facts.py. Exactly six slides, in the order the course
-brief and SUBMISSION_PLAN.md section 2 fix; speaker notes on each carry a target time. Needs python-pptx (and playwright's Chromium for --pdf, already a dev dependency).
+brief fixes; speaker notes on each carry a target time. Needs python-pptx (and playwright's Chromium for --pdf, already a dev dependency).
 """
 
 from __future__ import annotations

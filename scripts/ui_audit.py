@@ -6,7 +6,7 @@
 
 It flags, per case and section: text that says NaN / null / undefined / Infinity / [object, empty table cells, tables whose numbers are
 all zero or all equal, and chapters whose text does not change at all when the case changes (stale state). A flag is a question, not a
-verdict: someone has to decide from results/ whether it is a true value or a bug (that decision is recorded in docs/UI_AUDIT.md).
+verdict: someone has to decide from results/ whether it is a true value or a bug.
 Needs playwright and its Chromium.
 """
 

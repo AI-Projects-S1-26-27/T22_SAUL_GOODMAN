@@ -1,6 +1,6 @@
 """Fill the generated regions of the docs from the certified files in results/. No number in those docs is typed by hand.
 
-    python scripts/render_docs.py            # rewrite REPORT.md, PROVENANCE.md and DEMO_SCRIPT.md in place
+    python scripts/render_docs.py            # rewrite REPORT.md and PROVENANCE.md in place
     python scripts/render_docs.py --check    # exit 1 if any of them is out of date (a test runs this)
 
 A generated region sits between ``<!-- BEGIN GENERATED:name -->`` and ``<!-- END GENERATED:name -->``. Everything outside the
@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-DOCS = ("REPORT.md", "PROVENANCE.md", "DEMO_SCRIPT.md", "DEVIATIONS.md")
+DOCS = ("REPORT.md", "PROVENANCE.md", "DEVIATIONS.md")
 RESULTS = ROOT / "results"
 NAMES = {"aggressive": "Bold", "conservative": "Careful", "adaptive": "Smart", "reckless": "Wild"}
 
