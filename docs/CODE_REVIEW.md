@@ -109,7 +109,7 @@ a fresh clone.
 
 ## Counts
 
-Found 70. Fixed 33, deferred 36, rejected 1. By severity (fixed / deferred / rejected): P0 1 / 0 / 0; P1 16 / 4 / 0; P2 14 / 9 / 1; P3 2 / 23 / 0. "Fixed" for API1 means a cap on concurrent heavy jobs, not a per-request time limit. Commits: one per fix or per closely related group, each naming its ids.
+Found 70. Fixed 34, deferred 35, rejected 1 (E1 was fixed after this review, with the owner's approval, so P1 reads 17 / 3 / 0 now). By severity (fixed / deferred / rejected): P0 1 / 0 / 0; P1 17 / 3 / 0; P2 14 / 9 / 1; P3 2 / 23 / 0. "Fixed" for API1 means a cap on concurrent heavy jobs, not a per-request time limit. Commits: one per fix or per closely related group, each naming its ids.
 
 ## Not confirmed by any reviewer (not counted)
 

@@ -8,3 +8,10 @@ dist/
 .venv/
 .vercel
 .env*
+
+# LaTeX build leftovers (the committed PDF is report/Saul_Goodman_T22_Report.pdf)
+report/main.pdf
+report/*.log
+report/*.aux
+report/*.out
+report/*.toc
