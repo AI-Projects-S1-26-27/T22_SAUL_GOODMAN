@@ -826,6 +826,12 @@ function strategyTakeaway(g, flat) {
   return out;
 }
 
+/* How strongly the judge believed the Accuser's case in the recorded trial: the probability of the weakest element. */
+function caseStrength(cid, p, d) {
+  const els = B.trials[`${cid}|${p}|${d}|0`]?.verdict?.snapshot?.elements;
+  return els?.length ? Math.min(...els.map((e) => e.probability)) : null;
+}
+
 function renderStrategy(cid) {
   const A_ = window.COURTROOM_ANALYSIS, sur = !!S.surprises;
   const eff = sur ? A_?.efficiency_surprises : A_?.efficiency;
@@ -844,9 +850,11 @@ function renderStrategy(cid) {
   rows.forEach((r, i) => {
     kids.push(el("div", { class: "h row" }, `${styleOf(r).label} Accuser`));
     cols.forEach((c, j) => {
-      const w = rateAt(i, j), def = w !== null && w < 0.5, share = w === null ? 0 : def ? 1 - w : w;
-      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}${w === null ? " nodata" : ""}${def ? " def" : ""}` },
-        el("span", { class: "bg", style: `transform:scaleY(${share})` }), el("b", {}, w === null ? "no data" : sharePct(share)), el("small", {}, def ? "Defender wins" : "Accuser wins"),
+      const w = rateAt(i, j), s = caseStrength(cid, r, c);
+      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}${w === null ? " nodata" : ""}` },
+        el("span", { class: "bg", style: `transform:scaleY(${s ?? w ?? 0})` }), el("b", {}, s !== null ? sharePct(s) : w === null ? "no data" : sharePct(w)),
+        el("small", {}, s !== null ? "case strength" : "Accuser wins"),
+        w !== null && s !== null ? el("small", { class: "pay" }, `Accuser wins ${sharePct(w)} of trials`) : "",
         el("small", { class: "pay" }, `pays: Acc ${money(g.A?.[i]?.[j])} · Def ${money(g.B?.[i]?.[j])}`)));
     });
   });

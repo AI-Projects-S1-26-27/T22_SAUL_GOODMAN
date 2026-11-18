@@ -44,7 +44,7 @@
     { needs: "#live-seed", title: "Run it again and compare", body: "In the courtroom, the badge at the top has Run it again and compare. It plays the same trial a second time and shows that the two digests match, which is the proof that the engine is reproducible." },
     { needs: "#live-seed", title: "Why this verdict?", body: "After a live trial the verdict card has Why this verdict? It explains the judge's numbers in plain words: which exhibit moved which point and by how much." },
     { needs: "#live-seed", title: "What would flip it (the tipping point)", body: "The verdict card also lists the smallest single change to one exhibit or one witness that would flip the result. Press Try it to play the whole trial again with that change." },
-    { target: "#strategy .matrix", title: "Which style wins", body: "Each box shows which side usually wins when the two styles meet, and how often, with what each side pays in small print. A gold ring is a stable pick. If every box is the same, the evidence decides the case, and the page says so." },
+    { target: "#strategy .matrix", title: "Which style wins", body: "Each box shows how strongly the judge believed the Accuser's case when the two styles meet, with how often the Accuser wins below it, with what each side pays in small print. A gold ring is a stable pick. If every box is the same, the evidence decides the case, and the page says so." },
     { target: "#lab .btn", title: "The strategy lab", body: "The lab works out the game behind every case, chapter by chapter, in plain words. It has its own tour, and the Guide button there explains each chapter." },
   ];
 
