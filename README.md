@@ -17,7 +17,7 @@ and a 3D courtroom where you can watch every move.*
 ![Deterministic](https://img.shields.io/badge/verdicts-bit--for--bit_reproducible-success)
 
 **CS F407 Artificial Intelligence · Team 22 · BITS Pilani, Hyderabad Campus**
-Track: Demo · Domain: Agents & Game Theory
+Track: Research · Domain: Agents & Game Theory
 
 </div>
 
