@@ -27,6 +27,7 @@ function el(tag, attrs = {}, ...kids) {
   return n;
 }
 const pct = (p) => `${Math.round(100 * p)}%`;
+const sharePct = (p) => (p > 0 && p < 0.005 ? "<1%" : p < 1 && p > 0.995 ? ">99%" : pct(p));
 const capFirst = (s) => s[0].toUpperCase() + s.slice(1);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -843,9 +844,9 @@ function renderStrategy(cid) {
   rows.forEach((r, i) => {
     kids.push(el("div", { class: "h row" }, `${styleOf(r).label} Accuser`));
     cols.forEach((c, j) => {
-      const w = rateAt(i, j);
-      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}${w === null ? " nodata" : ""}` },
-        el("span", { class: "bg", style: `transform:scaleY(${w ?? 0})` }), el("b", {}, w === null ? "no data" : pct(w)), el("small", {}, "Accuser wins"),
+      const w = rateAt(i, j), def = w !== null && w < 0.5, share = w === null ? 0 : def ? 1 - w : w;
+      kids.push(el("div", { class: `cell${eq.has(`${r}|${c}`) ? " eq" : ""}${w === null ? " nodata" : ""}${def ? " def" : ""}` },
+        el("span", { class: "bg", style: `transform:scaleY(${share})` }), el("b", {}, w === null ? "no data" : sharePct(share)), el("small", {}, def ? "Defender wins" : "Accuser wins"),
         el("small", { class: "pay" }, `pays: Acc ${money(g.A?.[i]?.[j])} · Def ${money(g.B?.[i]?.[j])}`)));
     });
   });
